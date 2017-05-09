@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Http } from '@angular/http';
 import { Transfer} from '@ionic-native/transfer';
 import { File } from '@ionic-native/file';
-import { NativeGeocoder, NativeGeocoderForwardResult } from '@ionic-native/native-geocoder';
 import { NativeStorage } from '@ionic-native/native-storage';
 
 import { HttpService } from '../providers/http-service';

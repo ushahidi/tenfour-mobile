@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button color="primary" #next ion-button text-only [disabled]="url.value.length == 0" (click)="onNext($event)">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list class="signin">
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>How should we name your organization's URL?</h2>
+    </ion-item>
+    <ion-item class="input">
+      <ion-label fixed>URL</ion-label>
+      <ion-input #url type="text" value="" placeholder="rollcall.io"></ion-input>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info">
+      <p>Try to make your Rollcall web address something short and familiar to the people in your organization.</p>
+    </ion-item>
+    <ion-item text-wrap no-lines class="hint">
+      <p>Your organization's URL can only include lowercase letters, numbers, and dashes; and must start with a letter or number.</p>
+    </ion-item>
+  </ion-list>
+</ion-content>

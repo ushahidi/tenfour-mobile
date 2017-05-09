@@ -1,0 +1,21 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button color="primary" #next ion-button text-only [disabled]="url.value.length == 0" (click)="onNext($event)">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>Let's get you signed in.</h2>
+      <p>Enter your organization's RollCall web address.</p>
+    </ion-item>
+    <ion-item class="input">
+      <ion-label fixed>URL</ion-label>
+      <ion-input #url type="text" value="" placeholder="rollcall.io"></ion-input>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -18,11 +18,18 @@ import { Diagnostic } from '@ionic-native/diagnostic';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { SQLite } from '@ionic-native/sqlite';
 import { Keyboard } from '@ionic-native/keyboard';
-import { NativeGeocoder } from '@ionic-native/native-geocoder'
 import { NativeStorage } from '@ionic-native/native-storage';
 
-import { MyApp } from './app.component';
-import { HomePage } from '../pages/home/home';
+import { RollcallApp } from './app.component';
+
+import { SigninUrlPage } from '../pages/signin-url/signin-url';
+import { SigninEmailPage } from '../pages/signin-email/signin-email';
+import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+
+import { SignupUrlPage } from '../pages/signup-url/signup-url';
+import { SignupNamePage } from '../pages/signup-name/signup-name';
+import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
+import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { DateTimePipe } from '../pipes/date-time';
 import { TimeAgoPipe } from '../pipes/time-ago';
@@ -37,8 +44,14 @@ import { DatabaseService } from '../providers/database-service';
 
 @NgModule({
   declarations: [
-    MyApp,
-    HomePage,
+    RollcallApp,
+    SigninUrlPage,
+    SigninEmailPage,
+    SigninPasswordPage,
+    SignupUrlPage,
+    SignupNamePage,
+    SignupPlanPage,
+    SignupPasswordPage,
     DateTimePipe,
     TimeAgoPipe,
     TitleizePipe,
@@ -51,12 +64,19 @@ import { DatabaseService } from '../providers/database-service';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    IonicModule.forRoot(MyApp)
+    IonicModule.forRoot(RollcallApp)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    MyApp,
-    HomePage
+    RollcallApp,
+    SigninUrlPage,
+    SigninEmailPage,
+    SigninUrlPage,
+    SigninPasswordPage,
+    SignupUrlPage,
+    SignupNamePage,
+    SignupPlanPage,
+    SignupPasswordPage
   ],
   providers: [
     { provide: File, useClass: File },
