@@ -1,4 +1,6 @@
 {
-  "name": "rollcall-ionic",
-  "app_id": ""
+  "name": "rollcall",
+  "app_id": "",
+  "v2": true,
+  "typescript": true
 }
