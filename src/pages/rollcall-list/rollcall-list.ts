@@ -1,8 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SigninPasswordPage } from '../../pages/signin-password/signin-password';
 
 import { ApiService } from '../../providers/api-service';
 
@@ -10,15 +9,18 @@ import { Organization } from '../../models/organization';
 
 @IonicPage()
 @Component({
-  selector: 'page-signin-email',
-  templateUrl: 'signin-email.html',
+  selector: 'page-rollcall-list',
+  templateUrl: 'rollcall-list.html',
   providers: [ ApiService ],
-  entryComponents:[ SigninPasswordPage ]
+  entryComponents:[  ]
 })
-export class SigninEmailPage extends BasePage {
+export class RollcallListPage extends BasePage {
 
-  @ViewChild('email')
-  email:TextInput;
+  @ViewChild('notifications')
+  notifications:Button;
+
+  @ViewChild('create')
+  create:Button;
 
   organization:Organization = null;
 
@@ -33,23 +35,15 @@ export class SigninEmailPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService) {
+      protected api:ApiService,
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-  }
-
-  onNext(event) {
-    this.logger.info(this, "onNext");
-    if (this.email.value && this.email.value.length > 0) {
-      let email = this.email.value;
-      this.showPage(SigninPasswordPage,
-        { organization: this.organization,
-          email: email });
-    }
+    this.events.publish("organization:loaded", this.organization);
   }
 
 }

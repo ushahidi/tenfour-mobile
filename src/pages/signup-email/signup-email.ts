@@ -2,25 +2,20 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SigninPasswordPage } from '../../pages/signin-password/signin-password';
 
 import { ApiService } from '../../providers/api-service';
 
-import { Organization } from '../../models/organization';
-
 @IonicPage()
 @Component({
-  selector: 'page-signin-email',
-  templateUrl: 'signin-email.html',
+  selector: 'page-signup-email',
+  templateUrl: 'signup-email.html',
   providers: [ ApiService ],
-  entryComponents:[ SigninPasswordPage ]
+  entryComponents:[  ]
 })
-export class SigninEmailPage extends BasePage {
+export class SignupEmailPage extends BasePage {
 
   @ViewChild('email')
   email:TextInput;
-
-  organization:Organization = null;
 
   constructor(
       protected zone:NgZone,
@@ -37,19 +32,8 @@ export class SigninEmailPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-  }
-
   onNext(event) {
     this.logger.info(this, "onNext");
-    if (this.email.value && this.email.value.length > 0) {
-      let email = this.email.value;
-      this.showPage(SigninPasswordPage,
-        { organization: this.organization,
-          email: email });
-    }
   }
 
 }

@@ -27,9 +27,15 @@ import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
 import { SignupUrlPage } from '../pages/signup-url/signup-url';
+import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupNamePage } from '../pages/signup-name/signup-name';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
+
+import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
+import { GroupListPage } from '../pages/group-list/group-list';
+import { PeopleListPage } from '../pages/people-list/people-list';
+import { SettingsPage } from '../pages/settings/settings';
 
 import { DateTimePipe } from '../pipes/date-time';
 import { TimeAgoPipe } from '../pipes/time-ago';
@@ -49,9 +55,14 @@ import { DatabaseService } from '../providers/database-service';
     SigninEmailPage,
     SigninPasswordPage,
     SignupUrlPage,
+    SignupEmailPage,
     SignupNamePage,
     SignupPlanPage,
     SignupPasswordPage,
+    RollcallListPage,
+    GroupListPage,
+    PeopleListPage,
+    SettingsPage,
     DateTimePipe,
     TimeAgoPipe,
     TitleizePipe,
@@ -74,9 +85,14 @@ import { DatabaseService } from '../providers/database-service';
     SigninUrlPage,
     SigninPasswordPage,
     SignupUrlPage,
+    SignupEmailPage,
     SignupNamePage,
     SignupPlanPage,
-    SignupPasswordPage
+    SignupPasswordPage,
+    RollcallListPage,
+    GroupListPage,
+    PeopleListPage,
+    SettingsPage
   ],
   providers: [
     { provide: File, useClass: File },

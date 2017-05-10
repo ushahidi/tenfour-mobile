@@ -1,1 +1,16 @@
-<ion-nav [root]="rootPage"></ion-nav>
+<ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false">
+  <ion-header>
+    <ion-toolbar color="navbar">
+      <ion-title *ngIf="organization">{{organization.name}}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
+      <ion-item detail-push tappable (click)="showPeopleList($event)">People</ion-item>
+      <ion-item detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
+      <ion-item detail-push tappable (click)="showSettings($event)">Settings</ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+<ion-nav  #content swipeBackEnabled="false" [root]="rootPage"></ion-nav>
