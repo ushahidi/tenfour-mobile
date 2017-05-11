@@ -5,12 +5,17 @@ import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
 
+import { SignupCheckPage } from '../../pages/signup-check/signup-check';
+
+import { Email } from '../../models/email';
+import { Organization } from '../../models/organization';
+
 @IonicPage()
 @Component({
   selector: 'page-signup-email',
   templateUrl: 'signup-email.html',
   providers: [ ApiService ],
-  entryComponents:[  ]
+  entryComponents:[ SignupCheckPage ]
 })
 export class SignupEmailPage extends BasePage {
 
@@ -32,8 +37,32 @@ export class SignupEmailPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  onNext(event) {
-    this.logger.info(this, "onNext");
+  showNext(event) {
+    this.logger.info(this, "showNext");
+    if (this.email.value && this.email.value.length > 0) {
+      let loading = this.showLoading("Registering...");
+      this.api.registerEmail(this.email.value).then(
+        (email:Email) => {
+          loading.dismiss();
+          let organization = new Organization({});
+          organization.email = this.email.value;
+          this.showPage(SignupCheckPage,
+            { organization: organization });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert("Email Verification", error);
+        });
+    }
+  }
+
+  onKeyPress(event) {
+    if (event.keyCode == 13) {
+      this.hideKeyboard();
+      this.showNext(event);
+      return false;
+    }
+    return true;
   }
 
 }

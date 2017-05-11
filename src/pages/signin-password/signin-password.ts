@@ -45,23 +45,34 @@ export class SigninPasswordPage extends BasePage {
     this.email = this.getParameter<string>("email");
   }
 
-  onNext(event) {
-    this.logger.info(this, "onNext");
+  showNext(event) {
+    this.logger.info(this, "showNext");
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
       let password = this.password.value;
       this.api.userLogin(this.email, password).then(
-        (data:any) => {
+        (token:Token) => {
+          this.logger.info(this, "showNext", token);
           loading.dismiss();
+          this.showToast("Logged in");
           this.showRootPage(RollcallListPage,
             { organization: this.organization });
         },
         (error:any) => {
-          this.logger.error(this, "onNext", error);
+          this.logger.error(this, "showNext", error);
           loading.dismiss();
           this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
         });
     }
+  }
+
+  onKeyPress(event) {
+    if (event.keyCode == 13) {
+      this.hideKeyboard();
+      this.showNext(event);
+      return false;
+    }
+    return true;
   }
 
 }

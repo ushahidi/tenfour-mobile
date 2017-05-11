@@ -2,7 +2,7 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons end>
-      <button color="primary" #next ion-button text-only (click)="onNext($event)">Next</button>
+      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -11,6 +11,9 @@
     <ion-item class="heading">
       <img src="assets/images/dots.png"/>
       <h2>Ready to choose your plan?</h2>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info">
+      <p>Actually, on second thought let's just skip that for now...</p>
     </ion-item>
   </ion-list>
 </ion-content>

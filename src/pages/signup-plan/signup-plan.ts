@@ -5,16 +5,23 @@ import { IonicPage, TextInput,
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
+import { ApiService } from '../../providers/api-service';
+
+import { Organization } from '../../models/organization';
+
 @IonicPage()
 @Component({
   selector: 'page-signup-plan',
   templateUrl: 'signup-plan.html',
+  providers: [ ApiService ],
   entryComponents:[ SignupPasswordPage ]
 })
 export class SignupPlanPage extends BasePage {
 
   @ViewChild('url')
   url:TextInput;
+
+  organization:Organization;
 
   constructor(
       protected zone:NgZone,
@@ -30,9 +37,15 @@ export class SignupPlanPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  onNext(event) {
-    this.logger.info(this, "onNext");
-    this.showPage(SignupPasswordPage, {});
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    this.organization = this.getParameter<Organization>("organization");
+  }
+
+  showNext(event) {
+    this.logger.info(this, "showNext");
+    this.showPage(SignupPasswordPage,
+      { organization: this.organization });
   }
 
 }

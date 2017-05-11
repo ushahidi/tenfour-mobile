@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>Let's set up your new organization.</h2>
+      <p *ngIf="organization">Your invitation was sent to <strong>{{organization.email}}</strong>. Is this the correct email address?</p>
+    </ion-item>
+    <ion-item no-lines class="action">
+      <button ion-button block color="primary" (click)="confirmEmail($event)">Yes, that's the right address</button>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info">
+      <p>If that's not right, you can switch to a different email address. We'll send you a new invite to that address.</p>
+    </ion-item>
+  </ion-list>
+</ion-content>

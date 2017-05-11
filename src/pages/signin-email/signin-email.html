@@ -2,19 +2,20 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons end>
-      <button color="primary" ion-button text-only [disabled]="email.value.length == 0" (click)="onNext($event)">Next</button>
+      <button color="primary" ion-button text-only [disabled]="email.value.length == 0" (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading" *ngIf="organization">
-      <img [src]="organization.profile_picture"/>
+      <img [src]="organization.profile_picture" *ngIf="organization.profile_picture"/>
+      <img src="assets/images/dots.png" *ngIf="organization.profile_picture == null"/>
       <h2>What's your email address for {{organization.name}}?</h2>
     </ion-item>
     <ion-item class="input">
       <ion-label fixed>Email</ion-label>
-      <ion-input #email type="email" value="" placeholder="Your email address"></ion-input>
+      <ion-input #email type="email" autocorrect="off" autocapitalize="none" placeholder="Your email address" (keypress)="onKeyPress($event)"></ion-input>
     </ion-item>
   </ion-list>
 </ion-content>

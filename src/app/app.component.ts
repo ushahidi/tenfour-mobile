@@ -1,9 +1,15 @@
 import { Component, Injector, ViewChild } from '@angular/core';
-import { Platform, Events, Nav, MenuController } from 'ionic-angular';
+import { Platform, Events, Nav, MenuController, NavController } from 'ionic-angular';
+
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Deeplinks } from '@ionic-native/deeplinks';
 
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
+import { SigninEmailPage } from '../pages/signin-email/signin-email';
+
+import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
+
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PeopleListPage } from '../pages/people-list/people-list';
@@ -25,7 +31,10 @@ export class RollcallApp {
   organization:Organization = null;
 
   @ViewChild(Nav)
-  nav: Nav;
+  nav:Nav;
+
+  @ViewChild('rootNavController')
+  navController:NavController;
 
   constructor(
     protected platform:Platform,
@@ -35,11 +44,13 @@ export class RollcallApp {
     protected splashScreen:SplashScreen,
     protected api:ApiService,
     protected logger:LoggerService,
-    protected menuController:MenuController) {
+    protected menuController:MenuController,
+    protected deeplinks:Deeplinks) {
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
       this.loadStatusBar();
       this.loadMenuEvents();
+      this.loadDeepLinks();
       this.hideSplashScreen();
     });
   }
@@ -53,6 +64,19 @@ export class RollcallApp {
       this.logger.info(this, "Organization", organization);
       this.organization = organization;
     });
+  }
+
+  loadDeepLinks() {
+    this.deeplinks.routeWithNavController(this.navController, {
+      '/organization': SigninUrlPage,
+      '/login/email': SigninEmailPage,
+      '/organization/email/confirmation/': SignupConfirmPage }).subscribe(
+      (match:any) => {
+        this.logger.info(this, "Deeplinks Match", match);
+      },
+      (nomatch:any) => {
+        this.logger.info(this, "DeepLinks No Match", nomatch);
+      });
   }
 
   hideSplashScreen() {

@@ -15,6 +15,12 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+.md, .ios {
+  .back-button {
+    color: color($colors, primary) !important;
+  }
+}
+
 ion-list {
   ion-item {
     &.heading {
@@ -52,6 +58,21 @@ ion-list {
         font-size: 0.7em;
         text-align: center;
         margin-bottom: 20px;
+      }
+    }
+    &.action {
+      .item-button {
+        padding: 1.4em;
+      }
+    }
+    &.other {
+      text-align: center;
+      margin-top: 50px;
+      h4 {
+        font-size: 1.0em;
+      }
+      button {
+        font-size: 1.2em;
       }
     }
   }

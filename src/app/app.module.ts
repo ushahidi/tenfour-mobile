@@ -19,6 +19,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 import { SQLite } from '@ionic-native/sqlite';
 import { Keyboard } from '@ionic-native/keyboard';
 import { NativeStorage } from '@ionic-native/native-storage';
+import { AppAvailability } from '@ionic-native/app-availability';
+import { Deeplinks } from '@ionic-native/deeplinks';
 
 import { RollcallApp } from './app.component';
 
@@ -29,6 +31,9 @@ import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 import { SignupUrlPage } from '../pages/signup-url/signup-url';
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupNamePage } from '../pages/signup-name/signup-name';
+import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
+import { SignupCheckPage } from '../pages/signup-check/signup-check';
+import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
@@ -57,6 +62,9 @@ import { DatabaseService } from '../providers/database-service';
     SignupUrlPage,
     SignupEmailPage,
     SignupNamePage,
+    SignupOwnerPage,
+    SignupCheckPage,
+    SignupConfirmPage,
     SignupPlanPage,
     SignupPasswordPage,
     RollcallListPage,
@@ -87,6 +95,9 @@ import { DatabaseService } from '../providers/database-service';
     SignupUrlPage,
     SignupEmailPage,
     SignupNamePage,
+    SignupOwnerPage,
+    SignupCheckPage,
+    SignupConfirmPage,
     SignupPlanPage,
     SignupPasswordPage,
     RollcallListPage,
@@ -110,6 +121,8 @@ import { DatabaseService } from '../providers/database-service';
     { provide: InAppBrowser, useClass: InAppBrowser },
     { provide: SocialSharing, useClass: SocialSharing },
     { provide: NativeStorage, useClass: NativeStorage },
+    { provide: AppAvailability, useClass: AppAvailability },
+    { provide: Deeplinks, useClass: Deeplinks },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: DatabaseService, useClass: DatabaseService },

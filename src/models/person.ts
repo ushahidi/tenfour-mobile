@@ -3,16 +3,16 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
 
-@Table("organizations")
-export class Organization extends Model {
+@Table("people")
+export class Person extends Model {
 
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
   }
 
-  public newInstance<M extends Organization>(data:any=null):Organization {
-    return new Organization(data);
+  public newInstance<M extends Person>(data:any=null):Person {
+    return new Person(data);
   }
 
   @Column("id", INTEGER, PRIMARY_KEY)
@@ -21,19 +21,22 @@ export class Organization extends Model {
   @Column("name", TEXT)
   public name:string = null;
 
-  @Column("subdomain", TEXT)
-  public subdomain:string = null;
+  @Column("description", TEXT)
+  public description:string = null;
+
+  @Column("person_type", TEXT)
+  public person_type:string = null;
 
   @Column("profile_picture", TEXT)
   public profile_picture:string = null;
 
-  @Column("organization_name", TEXT)
-  public organization_name:string = null;
+  @Column("role", TEXT)
+  public role:string = null;
 
-  @Column("email", TEXT)
-  public email:string = null;
+  @Column("organization_id", INTEGER)
+  public organization_id:number = null;
 
-  @Column("password", TEXT)
-  public password:string = null;
+  @Column("uri", TEXT)
+  public uri:string = null;
 
 }

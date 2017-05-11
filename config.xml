@@ -114,5 +114,12 @@
   <plugin name="cordova-plugin-inappbrowser" spec="~1.7.1"/>
   <plugin name="ionic-plugin-keyboard" spec="~2.2.1"/>
   <plugin name="cordova-plugin-network-information" spec="~1.3.3"/>
+  <plugin name="cordova-plugin-appavailability" spec="~0.4.2"/>
+  <plugin name="ionic-plugin-deeplinks" spec="~1.0.15">
+    <variable name="URL_SCHEME" value="rollcall://"/>
+    <variable name="DEEPLINK_SCHEME" value="https"/>
+    <variable name="DEEPLINK_HOST" value="staging.rollcall.io"/>
+    <variable name="ANDROID_PATH_PREFIX" value="/"/>
+  </plugin>
   <icon src="resources/ios/icon/icon-small@3x.png"/>
 </widget>

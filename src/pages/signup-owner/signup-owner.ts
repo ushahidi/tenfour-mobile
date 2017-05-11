@@ -3,7 +3,7 @@ import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupPlanPage } from '../../pages/signup-plan/signup-plan';
+import { SignupNamePage } from '../../pages/signup-name/signup-name';
 
 import { ApiService } from '../../providers/api-service';
 
@@ -11,15 +11,15 @@ import { Organization } from '../../models/organization';
 
 @IonicPage()
 @Component({
-  selector: 'page-signup-url',
-  templateUrl: 'signup-url.html',
+  selector: 'page-signup-owner',
+  templateUrl: 'signup-owner.html',
   providers: [ ApiService ],
-  entryComponents:[ SignupPlanPage ]
+  entryComponents:[ SignupNamePage ]
 })
-export class SignupUrlPage extends BasePage {
+export class SignupOwnerPage extends BasePage {
 
-  @ViewChild('subdomain')
-  subdomain:TextInput;
+  @ViewChild('owner')
+  owner:TextInput;
 
   organization:Organization;
 
@@ -45,25 +45,9 @@ export class SignupUrlPage extends BasePage {
 
   showNext(event) {
     this.logger.info(this, "showNext");
-    let loading = this.showLoading("Checking...");
-    this.api.getOrganizations(this.subdomain.value).then(
-      (organizations:Organization[]) => {
-        this.logger.error(this, "showNext", organizations);
-        loading.dismiss();
-        if (organizations && organizations.length > 0) {
-          this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
-        }
-        else {
-          this.organization.subdomain = this.subdomain.value;
-          this.showPage(SignupPlanPage,
-            { organization: this.organization });
-        }
-      },
-      (error:any) => {
-        this.logger.info(this, "showNext", error);
-        loading.dismiss();
-        this.showAlert("Organization URL", error);
-      });
+    this.organization.name = this.owner.value;
+    this.showPage(SignupNamePage,
+      { organization: this.organization });
   }
 
   onKeyPress(event) {

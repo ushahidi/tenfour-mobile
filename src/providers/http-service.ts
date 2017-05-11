@@ -59,8 +59,10 @@ export class HttpService {
         .timeout(12000)
         .map(res => res.json())
         .catch((error:any) => {
+          this.logger.error(this, "GET", url, error);
           if (error instanceof Response) {
-            return Observable.throw(error.json().error || 'Request Error');
+            let json:any = error.json();
+            return Observable.throw(json.error || json.message || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -97,8 +99,10 @@ export class HttpService {
           }
         })
         .catch((error:any) => {
+          this.logger.error(this, "POST", url, error);
           if (error instanceof Response) {
-            return Observable.throw(error.json().error || 'Request Error');
+            let json:any = error.json();
+            return Observable.throw(json.error || json.message || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -136,8 +140,10 @@ export class HttpService {
           }
         })
         .catch((error:any) => {
+          this.logger.error(this, "PUT", url, error);
           if (error instanceof Response) {
-            return Observable.throw(error.json().error || 'Request Error');
+            let json:any = error.json();
+            return Observable.throw(json.error || json.message || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -175,8 +181,10 @@ export class HttpService {
           }
         })
         .catch((error:any) => {
+          this.logger.error(this, "PATCH", url, error);
           if (error instanceof Response) {
-            return Observable.throw(error.json().error || 'Request Error');
+            let json:any = error.json();
+            return Observable.throw(json.error || json.message || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -217,8 +225,10 @@ export class HttpService {
           }
         })
         .catch((error:any) => {
+          this.logger.error(this, "DELETE", url, error);
           if (error instanceof Response) {
-            return Observable.throw(error.json().error || 'Request Error');
+            let json:any = error.json();
+            return Observable.throw(json.error || json.message || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");

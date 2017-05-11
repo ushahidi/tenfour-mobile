@@ -7,6 +7,7 @@ import { SigninPasswordPage } from '../../pages/signin-password/signin-password'
 import { ApiService } from '../../providers/api-service';
 
 import { Organization } from '../../models/organization';
+import { Email } from '../../models/email';
 
 @IonicPage()
 @Component({
@@ -42,14 +43,23 @@ export class SigninEmailPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  onNext(event) {
-    this.logger.info(this, "onNext");
+  showNext(event) {
+    this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
       let email = this.email.value;
       this.showPage(SigninPasswordPage,
         { organization: this.organization,
           email: email });
     }
+  }
+
+  onKeyPress(event) {
+    if (event.keyCode == 13) {
+      this.hideKeyboard();
+      this.showNext(event);
+      return false;
+    }
+    return true;
   }
 
 }

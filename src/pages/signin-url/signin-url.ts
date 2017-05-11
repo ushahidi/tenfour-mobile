@@ -18,8 +18,8 @@ import { Organization } from '../../models/organization';
 })
 export class SigninUrlPage extends BasePage {
 
-  @ViewChild('url')
-  url:TextInput;
+  @ViewChild('subdomain')
+  subdomain:TextInput;
 
   constructor(
       protected zone:NgZone,
@@ -36,14 +36,14 @@ export class SigninUrlPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  onNext(event) {
-    this.logger.info(this, "onNext", this.url.value);
-    if (this.url.value && this.url.value.length > 0) {
-      let subdomain = this.url.value.toLowerCase();
+  showNext(event) {
+    this.logger.info(this, "showNext", this.subdomain.value);
+    if (this.subdomain.value && this.subdomain.value.length > 0) {
+      let subdomain = this.subdomain.value.toLowerCase();
       let loading = this.showLoading("Searching...");
-      this.api.searchOrganizations(subdomain).then(
+      this.api.getOrganizations(subdomain).then(
         (organizations:Organization[]) => {
-          this.logger.info(this, "onNext", organizations);
+          this.logger.info(this, "showNext", organizations);
           loading.dismiss();
           if (organizations && organizations.length > 0) {
             let organization:Organization = organizations[0];
@@ -55,11 +55,25 @@ export class SigninUrlPage extends BasePage {
           }
         },
         (error:any) => {
-          this.logger.error(this, "onNext", error);
+          this.logger.error(this, "showNext", error);
           loading.dismiss();
           this.showAlert("Problem Finding Organization", error);
         });
     }
+  }
+
+  createOrganization(event) {
+    this.logger.info(this, "createOrganization");
+    this.showPage(SignupEmailPage, {});
+  }
+
+  onKeyPress(event) {
+    if (event.keyCode == 13) {
+      this.hideKeyboard();
+      this.showNext(event);
+      return false;
+    }
+    return true;
   }
 
 }

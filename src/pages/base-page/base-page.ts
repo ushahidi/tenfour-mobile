@@ -2,6 +2,7 @@ import { Component, ViewChild, NgZone } from '@angular/core';
 import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { Network } from '@ionic-native/network';
+import { Keyboard } from '@ionic-native/keyboard';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { InAppBrowser, InAppBrowserObject } from '@ionic-native/in-app-browser';
@@ -23,6 +24,7 @@ export class BasePage {
   protected zone:NgZone;
   protected logger:LoggerService;
   protected network:Network;
+  protected keyboard:Keyboard;
   protected statusBar:StatusBar;
   protected inAppBrowser:InAppBrowser;
   protected socialSharing:SocialSharing;
@@ -44,6 +46,7 @@ export class BasePage {
     this.zone = _zone;
     this.logger = InjectorService.injector.get(LoggerService);
     this.network = InjectorService.injector.get(Network);
+    this.keyboard = InjectorService.injector.get(Keyboard);
     this.statusBar = InjectorService.injector.get(StatusBar);
     this.inAppBrowser = InjectorService.injector.get(InAppBrowser);
     this.socialSharing = InjectorService.injector.get(SocialSharing);
@@ -226,6 +229,14 @@ export class BasePage {
         this.logger.error(this, "resizeContent", "NULL");
       }
     }, delay);
+  }
+
+  showKeyboard() {
+    this.keyboard.show();
+  }
+
+  hideKeyboard() {
+    this.keyboard.close();
   }
 
 }
