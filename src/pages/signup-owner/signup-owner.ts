@@ -50,7 +50,7 @@ export class SignupOwnerPage extends BasePage {
       { organization: this.organization });
   }
 
-  onKeyPress(event) {
+  showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

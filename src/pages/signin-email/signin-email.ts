@@ -53,7 +53,7 @@ export class SigninEmailPage extends BasePage {
     }
   }
 
-  onKeyPress(event) {
+  showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

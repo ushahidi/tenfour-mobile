@@ -14,7 +14,7 @@
     </ion-item>
     <ion-item class="input">
       <ion-label fixed>URL</ion-label>
-      <ion-input #subdomain type="text" autocorrect="off" autocapitalize="none" placeholder="rollcall.io" (keypress)="onKeyPress($event)"></ion-input>
+      <ion-input #subdomain type="text" autocorrect="off" autocapitalize="none" placeholder="rollcall.io" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
     <ion-item text-wrap no-lines class="info">
       <p>Try to make your Rollcall web address something short and familiar to the people in your organization.</p>

@@ -5,6 +5,7 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
 
 import { ApiService } from '../../providers/api-service';
+import { DatabaseService } from '../../providers/database-service';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -13,7 +14,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
-  providers: [ ApiService ],
+  providers: [ ApiService, DatabaseService ],
   entryComponents:[  RollcallListPage ]
 })
 export class SigninPasswordPage extends BasePage {
@@ -35,7 +36,8 @@ export class SigninPasswordPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService) {
+      protected api:ApiService,
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -52,11 +54,17 @@ export class SigninPasswordPage extends BasePage {
       let password = this.password.value;
       this.api.userLogin(this.email, password).then(
         (token:Token) => {
-          this.logger.info(this, "showNext", token);
-          loading.dismiss();
-          this.showToast("Logged in");
-          this.showRootPage(RollcallListPage,
-            { organization: this.organization });
+          this.logger.info(this, "showNext", "User Token", token);
+          this.database.saveOrganization(this.organization).then((saved:any) => {
+            this.logger.info(this, "showNext", "Organization Saved", saved);
+            this.database.saveToken(token).then((saved:any) => {
+              this.logger.info(this, "showNext", "Token Saved", saved);
+              loading.dismiss();
+              this.showToast("Logged in");
+              this.showRootPage(RollcallListPage,
+                { organization: this.organization });
+            });
+          });
         },
         (error:any) => {
           this.logger.error(this, "showNext", error);
@@ -66,7 +74,7 @@ export class SigninPasswordPage extends BasePage {
     }
   }
 
-  onKeyPress(event) {
+  showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

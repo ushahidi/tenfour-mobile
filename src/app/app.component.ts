@@ -1,5 +1,5 @@
 import { Component, Injector, ViewChild } from '@angular/core';
-import { Platform, Events, Nav, MenuController, NavController } from 'ionic-angular';
+import { Platform, Events, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -17,17 +17,22 @@ import { SettingsPage } from '../pages/settings/settings';
 
 import { ApiService } from '../providers/api-service';
 import { LoggerService } from '../providers/logger-service';
+import { DatabaseService } from '../providers/database-service';
 import { InjectorService } from '../providers/injector-service';
 
+import { Model } from '../models/model';
 import { Organization } from '../models/organization';
-
+import { Email } from '../models/email';
+import { Person } from '../models/person';
+import { Contact } from '../models/contact';
+import { Token } from '../models/token';
 
 @Component({
   templateUrl: 'app.html'
 })
 export class RollcallApp {
 
-  rootPage:any = SigninUrlPage;
+  rootPage:any;
   organization:Organization = null;
 
   @ViewChild(Nav)
@@ -43,15 +48,25 @@ export class RollcallApp {
     protected events:Events,
     protected splashScreen:SplashScreen,
     protected api:ApiService,
+    protected database:DatabaseService,
     protected logger:LoggerService,
-    protected menuController:MenuController,
+    protected modalController:ModalController,
+    protected toastController:ToastController,
+    protected loadingController:LoadingController,
+    protected alertController: AlertController,
+    protected menuController: MenuController,
     protected deeplinks:Deeplinks) {
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
       this.loadStatusBar();
       this.loadMenuEvents();
       this.loadDeepLinks();
-      this.hideSplashScreen();
+      this.loadApplication([
+        new Organization(),
+        new Email(),
+        new Person(),
+        new Contact(),
+        new Token()]);
     });
   }
 
@@ -79,7 +94,82 @@ export class RollcallApp {
       });
   }
 
-  hideSplashScreen() {
+  loadApplication(models:Model[]) {
+    this.loadDatabase(models).then((loaded:any) => {
+        this.database.getOrganizations().then((organizations:Organization[]) => {
+          if (organizations && organizations.length > 0) {
+            this.organization = organizations[0];
+            this.showRollcallList();
+          }
+          else {
+            this.showSigninUrl();
+          }
+        });
+      },
+      (error) => {
+        this.splashScreen.hide();
+        this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
+          text: 'Reset Database',
+          handler: (clicked) => {
+            let loading = this.showLoading("Resetting...");
+            this.resetDatabase().then(
+              (reset:any) => {
+                this.loadDatabase(models).then(
+                  (created:any) => {
+                    loading.dismiss();
+                    this.showSigninUrl();
+                  },
+                  (error:any) => {
+                    loading.dismiss();
+                    this.showAlert("Problem Creating Database", "There was a problem creating the database.");
+                  }
+                );
+              },
+              (error:any) => {
+                loading.dismiss();
+                this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
+            });
+          }
+        }]);
+      });
+  }
+
+  loadDatabase(models:Model[]):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadDatabase");
+      this.database.createTables(models).then(
+        (created:any) => {
+          this.logger.info(this, "loadDatabase", "Created");
+          let tests = [];
+          for (let model of models) {
+            tests.push(this.database.testModel(model));
+          }
+          Promise.all(tests).then(
+            (passed) => {
+              this.logger.info(this, "loadDatabase", "Tested");
+              resolve();
+            },
+            (error) => {
+              this.logger.error(this, "loadDatabase", "Failed", error);
+              reject(error);
+            });
+        },
+        (error:any) => {
+          this.logger.error(this, "loadDatabase", "Failed", error);
+          reject(error);
+        });
+    });
+  }
+
+  resetDatabase():Promise<any> {
+    this.logger.info(this, "resetDatabase");
+    return this.database.deleteDatabase();
+  }
+
+  showSigninUrl() {
+    this.logger.info(this, "showSigninUrl");
+    this.nav.setRoot(SigninUrlPage, { });
+    this.menuController.close();
     this.splashScreen.hide();
   }
 
@@ -88,6 +178,7 @@ export class RollcallApp {
     this.nav.setRoot(RollcallListPage,
       { organization: this.organization });
     this.menuController.close();
+    this.splashScreen.hide();
   }
 
   showGroupList() {
@@ -109,6 +200,47 @@ export class RollcallApp {
     this.nav.setRoot(SettingsPage,
       { organization: this.organization });
     this.menuController.close();
+  }
+
+  userLogout() {
+    this.logger.info(this, "userLogout");
+    let loading = this.showLoading("Logging out...");
+    let removes = [
+      this.database.removeOrganizations(),
+      this.database.removeEmails(),
+      this.database.removePeople(),
+      this.database.removeTokens()];
+    Promise.all(removes).then((removed:any) => {
+      loading.dismiss();
+      this.showSigninUrl();
+    });
+  }
+
+  showLoading(message:string):Loading {
+    let loading = this.loadingController.create({
+      content: message
+    });
+    loading.present();
+    return loading;
+  }
+
+  showAlert(title:string, subTitle:string, buttons:any=['OK']):Alert {
+    let alert = this.alertController.create({
+      title: title,
+      subTitle: subTitle,
+      buttons: buttons
+    });
+    alert.present();
+    return alert;
+  }
+
+  showToast(message:string, duration:number=1500):Toast {
+    let toast = this.toastController.create({
+      message: message,
+      duration: duration
+    });
+    toast.present();
+    return toast;
   }
 
 }

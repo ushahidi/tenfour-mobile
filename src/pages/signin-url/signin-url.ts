@@ -67,7 +67,7 @@ export class SigninUrlPage extends BasePage {
     this.showPage(SignupEmailPage, {});
   }
 
-  onKeyPress(event) {
+  showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);
