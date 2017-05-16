@@ -18,6 +18,9 @@ export class Contact extends Model {
   @Column("id", INTEGER, PRIMARY_KEY)
   public id:number = null;
 
+  @Column("organization_id", INTEGER)
+  public organization_id:number = null;
+
   @Column("type", TEXT)
   public type:string = null;
 
@@ -29,5 +32,20 @@ export class Contact extends Model {
 
   @Column("uri", TEXT)
   public uri:string = null;
+
+  @Column("preferred", BOOLEAN)
+  public preferred:boolean = null;
+  
+  @Column("bounce_count", INTEGER)
+  public bounce_count:number = null;
+
+  @Column("blocked", INTEGER)
+  public blocked:number = null;
+
+  @Column("created_at", TEXT)
+  public created_at:Date = null;
+
+  @Column("updated_at", TEXT)
+  public updated_at:Date = null;
 
 }

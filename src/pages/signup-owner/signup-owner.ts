@@ -45,7 +45,7 @@ export class SignupOwnerPage extends BasePage {
 
   showNext(event) {
     this.logger.info(this, "showNext");
-    this.organization.name = this.owner.value;
+    this.organization.user_name = this.owner.value;
     this.showPage(SignupNamePage,
       { organization: this.organization });
   }

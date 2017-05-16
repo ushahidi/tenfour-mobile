@@ -1,22 +1,22 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput,
-         Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
+import { ChecklistPage } from '../../pages/checklist/checklist';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  RollcallListPage ]
+  entryComponents:[ ChecklistPage ]
 })
 export class SignupPasswordPage extends BasePage {
 
@@ -46,35 +46,37 @@ export class SignupPasswordPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
-    this.logger.info(this, "showNext");
-  }
-
   createOrganization(event) {
-    this.logger.info(this, "showNext");
+    this.logger.info(this, "createOrganization");
     let loading = this.showLoading("Creating...");
     this.api.clientLogin().then(
-      (token:Token) => {
-        this.logger.info(this, "createOrganization", "Client Token", token);
+      (clientToken:Token) => {
+        this.logger.info(this, "createOrganization", "Client Token", clientToken);
         this.organization.password = this.password.value;
-        this.api.createOrganization(token, this.organization).then(
+        this.api.createOrganization(clientToken, this.organization).then(
           (organization:Organization) => {
             this.logger.info(this, "createOrganization", "Organization", organization);
             this.api.userLogin(this.organization.email, this.organization.password).then(
-              (token:Token) => {
-                this.logger.info(this, "createOrganization", "User Token", token);
-                this.database.saveOrganization(this.organization).then((saved:any) => {
-                  this.logger.info(this, "showNext", "Organization Saved", saved);
-                  this.database.saveToken(token).then((saved:any) => {
-                    this.logger.info(this, "showNext", "Token Saved", saved);
+              (userToken:Token) => {
+                this.logger.info(this, "userLogin", "User Token", userToken);
+                this.api.getPerson(userToken, this.organization, "me").then((person:Person) => {
+                  this.logger.info(this, "userLogin", "Person", person);
+                  organization.user_id = person.id;
+                  let saves = [
+                    this.database.saveOrganization(organization),
+                    this.database.saveToken(organization, userToken),
+                    this.database.savePerson(organization, person)];
+                  Promise.all(saves).then(saved => {
                     loading.dismiss();
-                    this.showToast("Organization created");
-                    this.showRootPage(RollcallListPage,
-                      { organization: this.organization });
+                    this.showToast("Logged in");
+                    this.showRootPage(ChecklistPage,
+                      { organization: organization,
+                        person: person });
                   });
                 });
               },
               (error:any) => {
+                this.logger.error(this, "userLogin", error);
                 loading.dismiss();
                 this.showAlert("User Token Error", error);
               });
@@ -91,10 +93,10 @@ export class SignupPasswordPage extends BasePage {
         });
   }
 
-  showNextOnReturn(event) {
+  createOrganizationOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
-      this.showNext(event);
+      this.createOrganization(event);
       return false;
     }
     return true;

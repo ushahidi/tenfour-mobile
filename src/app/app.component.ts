@@ -10,6 +10,7 @@ import { SigninEmailPage } from '../pages/signin-email/signin-email';
 
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 
+import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PeopleListPage } from '../pages/people-list/people-list';
@@ -95,18 +96,37 @@ export class RollcallApp {
   }
 
   loadApplication(models:Model[]) {
-    this.loadDatabase(models).then((loaded:any) => {
+    this.logger.info(this, "loadApplication");
+    this.loadDatabase(models).then(
+      (loaded:any) => {
+        this.logger.info(this, "loadApplication", "Database", loaded);
         this.database.getOrganizations().then((organizations:Organization[]) => {
           if (organizations && organizations.length > 0) {
             this.organization = organizations[0];
-            this.showRollcallList();
+            this.logger.info(this, "loadApplication", "Organization", this.organization);
+            this.database.getPerson(this.organization.user_id).then(
+              (person:Person) => {
+                this.logger.info(this, "loadApplication", "Person", person);
+                if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRollcallList();
+                }
+                else {
+                  this.showChecklist(person);
+                }
+              },
+              (error:any) => {
+                this.logger.error(this, "loadApplication", "Person", error);
+                this.showChecklist(null);
+              });
           }
           else {
+            this.logger.info(this, "loadApplication", "No Organizations");
             this.showSigninUrl();
           }
         });
       },
-      (error) => {
+      (error:any) => {
+        this.logger.error(this, "loadApplication", "loadDatabase", error);
         this.splashScreen.hide();
         this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
           text: 'Reset Database',
@@ -169,6 +189,15 @@ export class RollcallApp {
   showSigninUrl() {
     this.logger.info(this, "showSigninUrl");
     this.nav.setRoot(SigninUrlPage, { });
+    this.menuController.close();
+    this.splashScreen.hide();
+  }
+
+  showChecklist(person:Person) {
+    this.logger.info(this, "showChecklist");
+    this.nav.setRoot(ChecklistPage,
+      { organization: this.organization,
+        person: person });
     this.menuController.close();
     this.splashScreen.hide();
   }

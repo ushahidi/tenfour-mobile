@@ -45,9 +45,8 @@ export class SignupNamePage extends BasePage {
 
   showNext(event) {
     this.logger.info(this, "showNext");
-    let name = this.name.value;
     let loading = this.showLoading("Loading...");
-    this.api.getOrganizations(null, name).then(
+    this.api.getOrganizations(null, this.name.value).then(
       (organizations:Organization[]) => {
         this.logger.error(this, "showNext", organizations);
         loading.dismiss();
@@ -55,7 +54,7 @@ export class SignupNamePage extends BasePage {
           this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
         }
         else {
-          this.organization.organization_name = name;
+          this.organization.name = this.name.value;
           this.showPage(SignupUrlPage,
             { organization: this.organization });
         }

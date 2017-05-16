@@ -465,7 +465,7 @@ export class SqlService {
     });
   }
 
-  saveModel<M extends Model>(model:M) {
+  saveModel<M extends Model>(model:M):Promise<any> {
     return new Promise((resolve, reject) => {
       let table:string = model.getTable();
       let columns:any[] = model.getColumns();

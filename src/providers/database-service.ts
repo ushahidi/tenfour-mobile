@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
-import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+import { SQLite } from '@ionic-native/sqlite';
 
-import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN } from '../models/model';
-
-import { LoggerService } from '../providers/logger-service';
 import { SqlService } from '../providers/sql-service';
+import { LoggerService } from '../providers/logger-service';
 
 import { Token } from '../models/token';
 import { Email } from '../models/email';
@@ -16,7 +14,7 @@ import { Organization } from '../models/organization';
 export class DatabaseService extends SqlService {
 
   constructor(
-    protected sqlite: SQLite,
+    protected sqlite:SQLite,
     protected platform:Platform,
     protected logger:LoggerService) {
     super(sqlite, platform, logger);
@@ -24,7 +22,7 @@ export class DatabaseService extends SqlService {
 
   // ########## ORGANIZATION ##########
 
-  saveOrganization(organization:Organization) {
+  saveOrganization(organization:Organization):Promise<any> {
     return this.saveModel(organization);
   }
 
@@ -37,73 +35,26 @@ export class DatabaseService extends SqlService {
     return this.getModel<Organization>(new Organization(), where);
   }
 
-  removeOrganization(organization:Organization) {
+  removeOrganization(organization:Organization):Promise<any> {
     let where = { id: organization.id };
     return this.removeModel<Organization>(new Organization(), where);
   }
 
-  removeOrganizations() {
+  removeOrganizations():Promise<any> {
     let where = { };
     return this.removeModel<Organization>(new Organization(), where);
   }
 
-  // ########## EMAIL ##########
-
-  saveEmail(email:Email) {
-    return this.saveModel(email);
-  }
-
-  getEmails(where:{}=null, order:{}=null):Promise<Email[]> {
-    return this.getModels<Email>(new Email(), where, order);
-  }
-
-  getEmail(id:number):Promise<Email> {
-    let where = { id: id };
-    return this.getModel<Email>(new Email(), where);
-  }
-
-  removeEmail(email:Email) {
-    let where = { id: email.id };
-    return this.removeModel<Email>(new Email(), where);
-  }
-
-  removeEmails() {
-    let where = { };
-    return this.removeModel<Email>(new Email(), where);
-  }
-
-  // ########## PERSON ##########
-
-  savePerson(person:Person) {
-    return this.saveModel(person);
-  }
-
-  getPersons(where:{}=null, order:{}=null):Promise<Person[]> {
-    return this.getModels<Person>(new Person(), where, order);
-  }
-
-  getPerson(id:number):Promise<Person> {
-    let where = { id: id };
-    return this.getModel<Person>(new Person(), where);
-  }
-
-  removePerson(person:Person) {
-    let where = { id: person.id };
-    return this.removeModel<Person>(new Person(), where);
-  }
-
-  removePeople() {
-    let where = { };
-    return this.removeModel<Person>(new Person(), where);
-  }
-
   // ########## TOKEN ##########
 
-  saveToken(token:Token) {
+  saveToken(organization:Organization, token:Token):Promise<any> {
+    token.organization_id = organization.id;
     return this.saveModel(token);
   }
 
-  getTokens(where:{}=null, order:{}=null):Promise<Token[]> {
+  getTokens(organization:Organization):Promise<Token[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
     return this.getModels<Token>(new Token(), where, order);
   }
 
@@ -112,14 +63,82 @@ export class DatabaseService extends SqlService {
     return this.getModel<Token>(new Token(), where);
   }
 
-  removeToken(token:Token) {
+  removeToken(token:Token):Promise<any> {
     let where = { id: token.id };
     return this.removeModel<Token>(new Token(), where);
   }
 
-  removeTokens() {
+  removeTokens(organization:Organization=null) {
     let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
     return this.removeModel<Token>(new Token(), where);
+  }
+
+  // ########## PERSON ##########
+
+  savePerson(organization:Organization, person:Person):Promise<any> {
+    person.organization_id = organization.id;
+    return this.saveModel(person);
+  }
+
+  getPeople(organization:Organization):Promise<Person[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
+    return this.getModels<Person>(new Person(), where, order);
+  }
+
+  getPerson(id:number):Promise<Person> {
+    let where = { };
+    if (id) {
+      where["id"] = id;
+    }
+    return this.getModel<Person>(new Person(), where);
+  }
+
+  removePerson(person:Person):Promise<any> {
+    let where = { id: person.id };
+    return this.removeModel<Person>(new Person(), where);
+  }
+
+  removePeople(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Person>(new Person(), where);
+  }
+
+  // ########## EMAIL ##########
+
+  saveEmail(organization:Organization, email:Email):Promise<any> {
+    email.organization_id = organization.id;
+    return this.saveModel(email);
+  }
+
+  getEmails(organization:Organization):Promise<Email[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
+    return this.getModels<Email>(new Email(), where, order);
+  }
+
+  getEmail(id:number):Promise<Email> {
+    let where = { id: id };
+    return this.getModel<Email>(new Email(), where);
+  }
+
+  removeEmail(email:Email):Promise<any> {
+    let where = { id: email.id };
+    return this.removeModel<Email>(new Email(), where);
+  }
+
+  removeEmails(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Email>(new Email(), where);
   }
 
 }

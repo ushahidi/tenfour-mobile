@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content no-bounce>
+  <ion-slides pager bounce>
+    <ion-slide *ngIf="organization">
+      <h2>{{organization.name}} is in good hands.</h2>
+      <p>You've taken the first step toward ensuring your organization's safety.</p>
+    </ion-slide>
+    <ion-slide *ngIf="organization && person">
+      <div *ngIf="person.config_added_people == false || person.config_profile_reviewed == false || person.config_self_test_sent == false">
+        <h2>Let's make sure {{organization.name}} is ready.</h2>
+        <p>There's a few things we can do to ensure everything's in order:</p>
+      </div>
+      <div *ngIf="person.config_added_people == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">
+        <h2>You're all set!</h2>
+      </div>
+      <div padding-left padding-right class="completed" *ngIf="person.config_added_people == true">
+        <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+        <p>You added people to your organizaton</p>
+      </div>
+      <ion-card tappable *ngIf="person.config_added_people == false" (click)="taskAddPeople($event)">
+        <ion-card-content>
+          <div class="icon-border">
+            <ion-icon ios="ios-person-add" md="md-person-add"></ion-icon>
+          </div>
+          <h2>Add people to your organization</h2>
+          <p>Make sure everyone you need to reach is included.</p>
+        </ion-card-content>
+      </ion-card>
+      <div padding-left padding-right class="completed" *ngIf="person.config_profile_reviewed == true">
+        <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+        <p>You reviewed your contact information</p>
+      </div>
+      <ion-card tappable *ngIf="person.config_profile_reviewed == false" (click)="taskReviewContact($event)">
+        <ion-card-content>
+          <div class="icon-border">
+            <ion-icon ios="ios-person" md="md-person"></ion-icon>
+          </div>
+          <h2>Review your contact information</h2>
+          <p>Make sure your information is complete and accurate, and that you have at least one number number or emailed added for when it matters most.</p>
+        </ion-card-content>
+      </ion-card>
+      <div padding-left padding-right class="completed" *ngIf="person.config_self_test_sent == true">
+        <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+        <p>You sent a test RollCall to yourself</p>
+      </div>
+      <ion-card tappable *ngIf="person.config_self_test_sent == false" (click)="taskSendRollCall($event)">
+        <ion-card-content>
+          <div class="icon-border">
+            <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
+          </div>
+          <h2>Send a test RollCall to yourself</h2>
+          <p>Confirm that you'll get messages when it really matters by sending yourself a test message.</p>
+        </ion-card-content>
+      </ion-card>
+      <div padding-left padding-right padding-bottom>
+        <button ion-button block color="primary" (click)="getStarted($event)"
+                *ngIf="person.config_added_people == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
+      </div>
+    </ion-slide>
+  </ion-slides>
+</ion-content>

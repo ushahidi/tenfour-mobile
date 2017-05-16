@@ -156,11 +156,11 @@ export class ApiService extends HttpService {
     return new Promise((resolve, reject) => {
       let url = this.api + "/api/v1/organizations";
       let params = {
-        name: organization.name,
+        name: organization.user_name,
         email: organization.email,
         password: organization.password,
         subdomain: organization.subdomain,
-        organization_name: organization.organization_name };
+        organization_name: organization.name };
       this.httpPost(url, token.access_token, params).then(
         (data:any) => {
           let organization:Organization = new Organization(data);
@@ -172,13 +172,38 @@ export class ApiService extends HttpService {
     });
   }
 
-  getOrganizationPerson(token:Token, organization:Organization):Promise<Person> {
+  getPeople(token:Token, organization:Organization):Promise<Person[]> {
     return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
+      let url = this.api + `/api/v1/organizations/${organization.id}/people/`;
       this.httpGet(url, token.access_token).then(
         (data:any) => {
-          let person = new Person(data);
-          resolve(person);
+          let people = [];
+          if (data && data.people) {
+            for (let item of data.people) {
+              let person = new Person(item);
+              people.push(person);
+            }
+          }
+          resolve(people);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  getPerson(token:Token, organization:Organization, id:any="me"):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${organization.id}/people/${id}`;
+      this.httpGet(url, token.access_token).then(
+        (data:any) => {
+          if (data && data.person) {
+            let person = new Person(data.person);
+            resolve(person);
+          }
+          else {
+            reject("Not Found");
+          }
         },
         (error:any) => {
           reject(error);

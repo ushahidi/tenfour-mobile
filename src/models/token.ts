@@ -18,6 +18,9 @@ export class Token extends Model {
   @Column("id", INTEGER, PRIMARY_KEY)
   public id:number = null;
 
+  @Column("organization_id", INTEGER)
+  public organization_id:number = null;
+
   @Column("access_token", TEXT)
   public access_token:string = null;
 

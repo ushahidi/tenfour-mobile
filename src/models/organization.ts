@@ -9,6 +9,9 @@ export class Organization extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+    if (data && data.user) {
+      this.user_id = data.user.id;
+    }
   }
 
   public newInstance<M extends Organization>(data:any=null):Organization {
@@ -27,13 +30,19 @@ export class Organization extends Model {
   @Column("profile_picture", TEXT)
   public profile_picture:string = null;
 
-  @Column("organization_name", TEXT)
-  public organization_name:string = null;
-
   @Column("email", TEXT)
   public email:string = null;
 
   @Column("password", TEXT)
   public password:string = null;
+
+  @Column("user_id", INTEGER)
+  public user_id:number = null;
+
+  @Column("user_name", TEXT)
+  public user_name:string = null;
+
+  @Column("uri", TEXT)
+  public uri:string = null;
 
 }

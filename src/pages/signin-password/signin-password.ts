@@ -3,19 +3,21 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
+import { ChecklistPage } from '../../pages/checklist/checklist';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  RollcallListPage ]
+  entryComponents:[ RollcallListPage, ChecklistPage ]
 })
 export class SigninPasswordPage extends BasePage {
 
@@ -55,14 +57,25 @@ export class SigninPasswordPage extends BasePage {
       this.api.userLogin(this.email, password).then(
         (token:Token) => {
           this.logger.info(this, "showNext", "User Token", token);
-          this.database.saveOrganization(this.organization).then((saved:any) => {
-            this.logger.info(this, "showNext", "Organization Saved", saved);
-            this.database.saveToken(token).then((saved:any) => {
-              this.logger.info(this, "showNext", "Token Saved", saved);
+          this.api.getPerson(token, this.organization, "me").then((person:Person) => {
+            this.logger.info(this, "showNext", "Person", person);
+            this.organization.user_id = person.id;
+            let saves = [
+              this.database.saveOrganization(this.organization),
+              this.database.saveToken(this.organization, token),
+              this.database.savePerson(this.organization, person)];
+            Promise.all(saves).then(saved => {
               loading.dismiss();
               this.showToast("Logged in");
-              this.showRootPage(RollcallListPage,
-                { organization: this.organization });
+              if (person.config_profile_reviewed && person.config_self_test_sent) {
+                this.showRootPage(RollcallListPage,
+                  { organization: this.organization });
+              }
+              else {
+                this.showRootPage(ChecklistPage,
+                  { organization: this.organization,
+                    person: person });
+              }
             });
           });
         },

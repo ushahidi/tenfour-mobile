@@ -37,6 +37,7 @@ import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
+import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PeopleListPage } from '../pages/people-list/people-list';
@@ -67,6 +68,7 @@ import { DatabaseService } from '../providers/database-service';
     SignupConfirmPage,
     SignupPlanPage,
     SignupPasswordPage,
+    ChecklistPage,
     RollcallListPage,
     GroupListPage,
     PeopleListPage,
@@ -100,6 +102,7 @@ import { DatabaseService } from '../providers/database-service';
     SignupConfirmPage,
     SignupPlanPage,
     SignupPasswordPage,
+    ChecklistPage,
     RollcallListPage,
     GroupListPage,
     PeopleListPage,
