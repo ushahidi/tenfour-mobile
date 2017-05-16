@@ -2,25 +2,26 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
+import { PersonAddPage } from '../../pages/person-add/person-add';
+import { PersonDetailsPage } from '../../pages/person-details/person-details';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
-  selector: 'page-checklist',
-  templateUrl: 'checklist.html',
+  selector: 'page-person-list',
+  templateUrl: 'person-list.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallListPage ]
+  entryComponents:[ PersonAddPage, PersonDetailsPage ]
 })
-export class ChecklistPage extends BasePage {
+export class PersonListPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
 
   constructor(
       protected zone:NgZone,
@@ -42,31 +43,30 @@ export class ChecklistPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.person.config_added_people = false;
-    this.person.config_profile_reviewed = false;
-    this.person.config_self_test_sent = false;
+    this.events.publish("organization:loaded", this.organization);
+    this.database.getPeople(this.organization).then((people:Person[]) => {
+      this.organization.people = people;
+    });
+    // this.database.getTokens(this.organization).then((tokens:Token[]) => {
+    //   let token = tokens[0];
+    //   this.api.getPeople(token, this.organization).then(
+    //     (people:Person[]) => {
+    //       this.organization.people = people;
+    //     });
+    // });
   }
 
-  taskAddPeople(event) {
-    this.logger.info(this, "taskAddPeople");
-    this.person.config_added_people = true;
-  }
-
-  taskReviewContact(event) {
-    this.logger.info(this, "taskReviewContact");
-    this.person.config_profile_reviewed = true;
-  }
-
-  taskSendRollCall(event) {
-    this.logger.info(this, "taskSendRollCall");
-    this.person.config_self_test_sent = true;
-  }
-
-  showRollcallList(event) {
-    this.logger.info(this, "showRollcallList");
-    this.showRootPage(RollcallListPage,
+  addPeople(event:any) {
+    this.logger.info(this, "addPeople");
+    this.showModal(PersonAddPage,
       { organization: this.organization });
+  }
+
+  showPerson(event:any, person:Person) {
+    this.logger.info(this, "showPerson");
+    this.showPage(PersonDetailsPage,
+      { organization: this.organization,
+        person: person })
   }
 
 }

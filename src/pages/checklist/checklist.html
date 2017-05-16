@@ -57,7 +57,7 @@
         </ion-card-content>
       </ion-card>
       <div padding-left padding-right padding-bottom>
-        <button ion-button block color="primary" (click)="getStarted($event)"
+        <button ion-button block color="primary" (click)="showRollcallList($event)"
                 *ngIf="person.config_added_people == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
       </div>
     </ion-slide>

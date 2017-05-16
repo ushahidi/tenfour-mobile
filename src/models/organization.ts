@@ -2,6 +2,7 @@ import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
+import { Person } from '../models/person';
 
 @Table("organizations")
 export class Organization extends Model {
@@ -44,5 +45,7 @@ export class Organization extends Model {
 
   @Column("uri", TEXT)
   public uri:string = null;
+
+  people:Person[] = [];
 
 }

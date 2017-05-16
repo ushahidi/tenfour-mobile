@@ -2,7 +2,6 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -12,15 +11,14 @@ import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
-  selector: 'page-checklist',
-  templateUrl: 'checklist.html',
+  selector: 'page-person-add',
+  templateUrl: 'person-add.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallListPage ]
+  entryComponents:[  ]
 })
-export class ChecklistPage extends BasePage {
+export class PersonAddPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
 
   constructor(
       protected zone:NgZone,
@@ -42,31 +40,22 @@ export class ChecklistPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.person.config_added_people = false;
-    this.person.config_profile_reviewed = false;
-    this.person.config_self_test_sent = false;
   }
 
-  taskAddPeople(event) {
-    this.logger.info(this, "taskAddPeople");
-    this.person.config_added_people = true;
+  onCancel(event) {
+    this.hideModal();
   }
 
-  taskReviewContact(event) {
-    this.logger.info(this, "taskReviewContact");
-    this.person.config_profile_reviewed = true;
+  addPerson(event) {
+    this.logger.info(this, "addPerson");
   }
 
-  taskSendRollCall(event) {
-    this.logger.info(this, "taskSendRollCall");
-    this.person.config_self_test_sent = true;
+  invitePerson(event) {
+    this.logger.info(this, "invitePerson");
   }
 
-  showRollcallList(event) {
-    this.logger.info(this, "showRollcallList");
-    this.showRootPage(RollcallListPage,
-      { organization: this.organization });
+  importPerson(event) {
+    this.logger.info(this, "importPerson");
   }
 
 }

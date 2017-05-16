@@ -13,7 +13,7 @@ import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
-import { PeopleListPage } from '../pages/people-list/people-list';
+import { PersonListPage } from '../pages/person-list/person-list';
 import { SettingsPage } from '../pages/settings/settings';
 
 import { ApiService } from '../providers/api-service';
@@ -217,9 +217,9 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  showPeopleList() {
-    this.logger.info(this, "showPeopleList");
-    this.nav.setRoot(PeopleListPage,
+  showPersonList() {
+    this.logger.info(this, "showPersonList");
+    this.nav.setRoot(PersonListPage,
       { organization: this.organization });
     this.menuController.close();
   }

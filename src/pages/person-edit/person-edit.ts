@@ -4,19 +4,22 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
+import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
-  selector: 'page-people-list',
-  templateUrl: 'people-list.html',
-  providers: [ ApiService ],
+  selector: 'page-person-edit',
+  templateUrl: 'person-edit.html',
+  providers: [ ApiService, DatabaseService ],
   entryComponents:[  ]
 })
-export class PeopleListPage extends BasePage {
+export class PersonEditPage extends BasePage {
 
   organization:Organization = null;
+  person:Person = null;
 
   constructor(
       protected zone:NgZone,
@@ -30,6 +33,7 @@ export class PeopleListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
+      protected database:DatabaseService,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -37,7 +41,7 @@ export class PeopleListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.events.publish("organization:loaded", this.organization);
+    this.person = this.getParameter<Person>("person");
   }
 
 }

@@ -37,10 +37,14 @@ import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
+import { PersonListPage } from '../pages/person-list/person-list';
+import { PersonAddPage } from '../pages/person-add/person-add';
+import { PersonEditPage } from '../pages/person-edit/person-edit';
+import { PersonDetailsPage } from '../pages/person-details/person-details';
+
 import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
-import { PeopleListPage } from '../pages/people-list/people-list';
 import { SettingsPage } from '../pages/settings/settings';
 
 import { DateTimePipe } from '../pipes/date-time';
@@ -71,7 +75,10 @@ import { DatabaseService } from '../providers/database-service';
     ChecklistPage,
     RollcallListPage,
     GroupListPage,
-    PeopleListPage,
+    PersonListPage,
+    PersonAddPage,
+    PersonEditPage,
+    PersonDetailsPage,
     SettingsPage,
     DateTimePipe,
     TimeAgoPipe,
@@ -105,7 +112,10 @@ import { DatabaseService } from '../providers/database-service';
     ChecklistPage,
     RollcallListPage,
     GroupListPage,
-    PeopleListPage,
+    PersonListPage,
+    PersonAddPage,
+    PersonEditPage,
+    PersonDetailsPage,
     SettingsPage
   ],
   providers: [
