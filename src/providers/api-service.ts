@@ -83,13 +83,13 @@ export class ApiService extends HttpService {
             }
             else {
               this.logger.info(this, "getToken", "Expired", token);
-              this.refreshLogin(token.refresh_token).then(
-                (newToken:Token) => {
-                  resolve(newToken);
+              this.userLogin(token.username, token.password).then(
+                (token:Token) => {
+                  resolve(token);
                 },
                 (error:any) => {
                   reject(error);
-                });
+              });
             }
           }
           else {
@@ -154,6 +154,8 @@ export class ApiService extends HttpService {
       this.httpPost(url, null, params).then(
         (data:any) => {
           let token:Token = <Token>data;
+          token.username = username;
+          token.password = password;
           token.issued_at = new Date();
           if (data.expires_in) {
             token.expires_at = new Date();

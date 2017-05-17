@@ -62,21 +62,34 @@ export class PersonListPage extends BasePage {
       });
     }
     else {
-      this.api.getToken().then((token:Token) => {
-        this.api.getPeople(token, this.organization).then(
-          (people:Person[]) => {
-            this.organization.people = people;
-            if (event) {
-              event.complete();
-            }
-          },
-          (error:any) => {
-            if (event) {
-              event.complete();
-            }
-            this.showToast(error);
-          });
-      });
+      this.api.getToken().then(
+        (token:Token) => {
+          this.api.getPeople(token, this.organization).then(
+            (people:Person[]) => {
+              this.organization.people = people;
+              let saves = [];
+              for (let person of people) {
+                saves.push(this.database.savePerson(this.organization, person));
+              }
+              Promise.all(saves).then(saved => {
+                if (event) {
+                  event.complete();
+                }
+              });
+            },
+            (error:any) => {
+              if (event) {
+                event.complete();
+              }
+              this.showToast(error);
+            });
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          this.showToast(error);
+        });
     }
   }
 

@@ -62,21 +62,35 @@ export class PersonDetailsPage extends BasePage {
       });
     }
     else {
-      this.api.getToken().then((token:Token) => {
-        this.api.getPerson(token, this.organization, this.person.id).then(
-          (person:Person) => {
-            this.person = person;
-            if (event) {
-              event.complete();
-            }
-          },
-          (error:any) => {
-            if (event) {
-              event.complete();
-            }
-            this.showToast(error);
-          });
-      });
+      this.api.getToken().then(
+        (token:Token) => {
+          this.api.getPerson(token, this.organization, this.person.id).then(
+            (person:Person) => {
+              this.person = person;
+              let saves = [];
+              for (let contact of person.contacts) {
+                saves.push(this.database.saveContact(person, contact));
+              }
+              saves.push(this.database.savePerson(this.organization, person))
+              Promise.all(saves).then(saved => {
+                if (event) {
+                  event.complete();
+                }
+              });
+            },
+            (error:any) => {
+              if (event) {
+                event.complete();
+              }
+              this.showToast(error);
+            });
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          this.showToast(error);
+        });
     }
   }
 
