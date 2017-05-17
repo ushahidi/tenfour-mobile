@@ -26,7 +26,7 @@ import { Organization } from '../models/organization';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
-import { Token } from '../models/token';
+import { RollCall } from '../models/rollcall';
 
 @Component({
   templateUrl: 'app.html'
@@ -67,7 +67,7 @@ export class RollcallApp {
         new Email(),
         new Person(),
         new Contact(),
-        new Token()]);
+        new RollCall()]);
     });
   }
 
@@ -238,7 +238,7 @@ export class RollcallApp {
       this.database.removeOrganizations(),
       this.database.removeEmails(),
       this.database.removePeople(),
-      this.database.removeTokens()];
+      this.database.removeContacts()];
     Promise.all(removes).then((removed:any) => {
       loading.dismiss();
       this.showSigninUrl();

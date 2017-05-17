@@ -49,25 +49,32 @@ export class PersonDetailsPage extends BasePage {
 
   loadPerson(event:any, cache:boolean=true) {
     if (cache) {
-      this.database.getPerson(this.person.id).then((person:Person) => {
-        this.person = person;
-        this.database.getContacts(person).then((contacts:Contact[]) => {
+      this.database.getContacts(this.person).then((contacts:Contact[]) => {
+        if (contacts && contacts.length > 0) {
           this.person.contacts = contacts;
           if (event) {
             event.complete();
           }
-        });
+        }
+        else {
+          this.loadPerson(event, false);
+        }
       });
     }
     else {
-      this.database.getTokens(this.organization).then((tokens:Token[]) => {
-        let token = tokens[0];
+      this.api.getToken().then((token:Token) => {
         this.api.getPerson(token, this.organization, this.person.id).then(
           (person:Person) => {
             this.person = person;
             if (event) {
               event.complete();
             }
+          },
+          (error:any) => {
+            if (event) {
+              event.complete();
+            }
+            this.showToast(error);
           });
       });
     }

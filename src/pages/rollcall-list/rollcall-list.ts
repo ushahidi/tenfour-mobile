@@ -4,8 +4,11 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
+import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { RollCall } from '../../models/rollcall';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -36,6 +39,7 @@ export class RollcallListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
+      protected database:DatabaseService,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -44,6 +48,47 @@ export class RollcallListPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.events.publish("organization:loaded", this.organization);
+    this.loadRollCalls(null, true);
+  }
+
+  loadRollCalls(event:any, cache:boolean=true) {
+    if (cache) {
+      this.database.getRollCalls(this.organization).then((rollcalls:RollCall[]) => {
+        if (rollcalls && rollcalls.length > 0) {
+          this.organization.rollcalls = rollcalls;
+          if (event) {
+            event.complete();
+          }
+        }
+        else {
+          this.loadRollCalls(event, false);
+        }
+      });
+    }
+    else {
+      this.api.getToken().then(
+        (token:Token) => {
+          this.api.getRollCalls(token, this.organization).then(
+            (rollcalls:RollCall[]) => {
+              this.organization.rollcalls = rollcalls;
+              if (event) {
+                event.complete();
+              }
+            },
+            (error:any) => {
+              if (event) {
+                event.complete();
+              }
+              this.showToast(error);
+            });
+        }, 
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          this.showToast(error);
+        });
+    }
   }
 
 }

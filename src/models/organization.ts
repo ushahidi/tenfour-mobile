@@ -3,6 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Person } from '../models/person';
+import { RollCall } from '../models/rollcall';
 
 @Table("organizations")
 export class Organization extends Model {
@@ -46,6 +47,8 @@ export class Organization extends Model {
   @Column("uri", TEXT)
   public uri:string = null;
 
-  people:Person[] = [];
+  public people:Person[] = [];
+
+  public rollcalls:RollCall[] = [];
 
 }

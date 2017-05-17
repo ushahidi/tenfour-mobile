@@ -47,24 +47,34 @@ export class PersonListPage extends BasePage {
     this.loadPeople(null, true);
   }
 
-  loadPeople(event:any, cache:true) {
+  loadPeople(event:any, cache:boolean=true) {
     if (cache) {
       this.database.getPeople(this.organization).then((people:Person[]) => {
-        this.organization.people = people;
-        if (event) {
-          event.complete();
+        if (people && people.length > 0) {
+          this.organization.people = people;
+          if (event) {
+            event.complete();
+          }
+        }
+        else {
+          this.loadPeople(event, false);
         }
       });
     }
     else {
-      this.database.getTokens(this.organization).then((tokens:Token[]) => {
-        let token = tokens[0];
+      this.api.getToken().then((token:Token) => {
         this.api.getPeople(token, this.organization).then(
           (people:Person[]) => {
             this.organization.people = people;
             if (event) {
               event.complete();
             }
+          },
+          (error:any) => {
+            if (event) {
+              event.complete();
+            }
+            this.showToast(error);
           });
       });
     }

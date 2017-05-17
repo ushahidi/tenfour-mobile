@@ -16,6 +16,7 @@ import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
+import { RollCall } from '../models/rollcall';
 
 @Injectable()
 export class ApiService extends HttpService {
@@ -24,6 +25,7 @@ export class ApiService extends HttpService {
   clientId:string = "webapp";
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
   scope:string = "user";
+  token:string = "OAuth Token";
 
   constructor(
     protected platform:Platform,
@@ -51,6 +53,68 @@ export class ApiService extends HttpService {
     });
   }
 
+  saveToken(token:Token) {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "saveToken", token);
+      let json = JSON.stringify(token);
+      this.storage.setItem(this.token, json).then(
+        (data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+
+  }
+
+  getToken():Promise<Token> {
+    return new Promise((resolve, reject) => {
+      this.storage.getItem(this.token).then(
+        (data:any) => {
+          this.logger.info(this, "getToken", data);
+          if (data) {
+            let json = JSON.parse(data);
+            let token:Token = <Token>json;
+            let now = new Date();
+            if (now > token.expires_at) {
+              this.logger.info(this, "getToken", "Valid", token);
+              resolve(token);
+            }
+            else {
+              this.logger.info(this, "getToken", "Expired", token);
+              this.refreshLogin(token.refresh_token).then(
+                (newToken:Token) => {
+                  resolve(newToken);
+                },
+                (error:any) => {
+                  reject(error);
+                });
+            }
+          }
+          else {
+            reject("No Token");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "getToken", error);
+          reject(error);
+        });
+    });
+  }
+
+  removeToken():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.remove(this.token).then(
+        (removed:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
   clientLogin():Promise<Token> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/oauth/access_token";
@@ -61,8 +125,15 @@ export class ApiService extends HttpService {
         client_secret: this.clientSecret };
       this.httpPost(url, null, params).then(
         (data:any) => {
-          let token = new Token(data);
-          resolve(token);
+          let token:Token = <Token>data;
+          token.issued_at = new Date();
+          if (data.expires_in) {
+            token.expires_at = new Date();
+            token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
+          }
+          this.saveToken(token).then(saved => {
+            resolve(token);
+          });
         },
         (error:any) => {
           reject(error);
@@ -82,8 +153,42 @@ export class ApiService extends HttpService {
         client_secret: this.clientSecret };
       this.httpPost(url, null, params).then(
         (data:any) => {
-          let token = new Token(data);
-          resolve(token);
+          let token:Token = <Token>data;
+          token.issued_at = new Date();
+          if (data.expires_in) {
+            token.expires_at = new Date();
+            token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
+          }
+          this.saveToken(token).then(saved => {
+            resolve(token);
+          });
+        },
+        (error:any) => {
+          reject(error);
+        })
+    });
+  }
+
+  refreshLogin(refreshToken:string):Promise<Token> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + "/oauth/access_token";
+      let params = {
+        grant_type: "refresh_token",
+        scope: this.scope,
+        refresh_token: refreshToken,
+        client_id: this.clientId,
+        client_secret: this.clientSecret };
+      this.httpPost(url, null, params).then(
+        (data:any) => {
+          let token:Token = <Token>data;
+          token.issued_at = new Date();
+          if (data.expires_in) {
+            token.expires_at = new Date();
+            token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
+          }
+          this.saveToken(token).then(saved => {
+            resolve(token);
+          });
         },
         (error:any) => {
           reject(error);
@@ -211,5 +316,81 @@ export class ApiService extends HttpService {
         });
     });
   }
+  getRollCalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<RollCall[]> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
+      this.httpGet(url, token.access_token).then(
+        (data:any) => {
+          let rollcalls = [];
+          if (data && data.rollcalls) {
+            for (let attributes of data.rollcalls) {
+              let rollcall = new RollCall(attributes);
+              rollcalls.push(rollcall);
+            }
+          }
+          resolve(rollcalls);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  // apiGet(url:string, params:any=null):Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     this.getLogin(deployment).then((token:Token) => {
+  //       this.httpGet(url, token.access_token, params).then(
+  //         (data:any) => {
+  //           resolve(data);
+  //         },
+  //         (error:any) => {
+  //           reject(error);
+  //         });
+  //     });
+  //   });
+  // }
+  //
+  // apiPost(url:string, params:any=null):Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     this.getToken().then((token:Token) => {
+  //       this.httpPost(url, token.access_token, params).then(
+  //         (data:any) => {
+  //           resolve(data);
+  //         },
+  //         (error:any) => {
+  //           reject(error);
+  //         });
+  //     });
+  //   });
+  // }
+  //
+  // apiPut(url:string, params:any=null):Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     this.getToken().then((token:Token) => {
+  //       this.httpPut(url, token.access_token, params).then(
+  //         (data:any) => {
+  //           resolve(data);
+  //         },
+  //         (error:any) => {
+  //           reject(error);
+  //         });
+  //     });
+  //   });
+  // }
+  //
+  // apiDelete(deployment:Deployment, endpoint:string):Promise<any> {
+  //   return new Promise((resolve, reject) => {
+  //     this.getLogin(deployment).then((login:Login) => {
+  //       let url = deployment.api + endpoint;
+  //       this.httpDelete(url, login.access_token).then(
+  //         (data:any) => {
+  //           resolve(data);
+  //         },
+  //         (error:any) => {
+  //           reject(error);
+  //         });
+  //     });
+  //   });
+  // }
 
 }

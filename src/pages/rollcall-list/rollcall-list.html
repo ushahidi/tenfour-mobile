@@ -17,5 +17,20 @@
   </ion-navbar>
 </ion-header>
 <ion-content padding>
-
+  <ion-refresher (ionRefresh)="loadRollCalls($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list *ngIf="organization && organization.rollcalls">
+    <ion-item no-lines *ngIf="organization.rollcalls.length == 0">
+      <h2>There currently are no RollCalls...</h2>
+    </ion-item>
+    <ion-card *ngFor="let rollcall of organization.rollcalls">
+      <ion-card-content text-center>
+        <img [src]="rollcall.user_picture" *ngIf="rollcall.user_picture"/>
+        <ion-icon *ngIf="rollcall.user_picture == null"></ion-icon>
+        <h2>{{rollcall.message}}</h2>
+        <p>{{rollcall.created_at}}. <strong>From {{rollcall.user_name}}.</strong></p>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
 </ion-content>

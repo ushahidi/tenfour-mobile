@@ -5,10 +5,10 @@ import { SQLite } from '@ionic-native/sqlite';
 import { SqlService } from '../providers/sql-service';
 import { LoggerService } from '../providers/logger-service';
 
-import { Token } from '../models/token';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
+import { RollCall } from '../models/rollcall';
 import { Organization } from '../models/organization';
 
 @Injectable()
@@ -46,37 +46,6 @@ export class DatabaseService extends SqlService {
     return this.removeModel<Organization>(new Organization(), where);
   }
 
-  // ########## TOKEN ##########
-
-  saveToken(organization:Organization, token:Token):Promise<any> {
-    token.organization_id = organization.id;
-    return this.saveModel(token);
-  }
-
-  getTokens(organization:Organization):Promise<Token[]> {
-    let where = { organization_id: organization.id };
-    let order = { };
-    return this.getModels<Token>(new Token(), where, order);
-  }
-
-  getToken(id:number):Promise<Token> {
-    let where = { id: id };
-    return this.getModel<Token>(new Token(), where);
-  }
-
-  removeToken(token:Token):Promise<any> {
-    let where = { id: token.id };
-    return this.removeModel<Token>(new Token(), where);
-  }
-
-  removeTokens(organization:Organization=null) {
-    let where = { };
-    if (organization) {
-      where['organization_id'] = organization.id;
-    }
-    return this.removeModel<Token>(new Token(), where);
-  }
-
   // ########## PERSON ##########
 
   savePerson(organization:Organization, person:Person):Promise<any> {
@@ -109,6 +78,37 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Person>(new Person(), where);
+  }
+
+  // ########## ROLLCALL ##########
+
+  saveRollCall(organization:Organization, rollcall:RollCall):Promise<any> {
+    rollcall.organization_id = organization.id;
+    return this.saveModel(rollcall);
+  }
+
+  getRollCalls(organization:Organization):Promise<RollCall[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
+    return this.getModels<RollCall>(new RollCall(), where, order);
+  }
+
+  getRollCall(id:number):Promise<RollCall> {
+    let where = { id: id };
+    return this.getModel<RollCall>(new RollCall(), where);
+  }
+
+  removeRollCall(rollcall:RollCall):Promise<any> {
+    let where = { id: rollcall.id };
+    return this.removeModel<RollCall>(new RollCall(), where);
+  }
+
+  removeRollCalls(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<RollCall>(new RollCall(), where);
   }
 
   // ########## EMAIL ##########

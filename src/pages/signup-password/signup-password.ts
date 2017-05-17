@@ -64,7 +64,6 @@ export class SignupPasswordPage extends BasePage {
                   organization.user_id = person.id;
                   let saves = [
                     this.database.saveOrganization(organization),
-                    this.database.saveToken(organization, userToken),
                     this.database.savePerson(organization, person)];
                   Promise.all(saves).then(saved => {
                     loading.dismiss();
