@@ -47,6 +47,15 @@ export class Organization extends Model {
   @Column("uri", TEXT)
   public uri:string = null;
 
+  @Column("created_at", TEXT)
+  public created_at:Date = null;
+
+  @Column("updated_at", TEXT)
+  public updated_at:Date = null;
+  
+  @Column("saved_at", TEXT)
+  public saved_at:Date = null;
+
   public people:Person[] = [];
 
   public rollcalls:RollCall[] = [];

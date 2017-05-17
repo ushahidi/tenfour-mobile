@@ -1,8 +1,25 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title>Edit Person</ion-title>
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title *ngIf="editing == true">Edit Person</ion-title>
+    <ion-title *ngIf="editing == false">Add Person</ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" *ngIf="editing == true" (click)="updatePerson($event)">Save</button>
+      <button ion-button color="primary" *ngIf="editing == false" (click)="createPerson($event)">Save</button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
-  
+  <ion-list *ngIf="person">
+    <ion-item color="white">
+      <ion-label floating>Name</ion-label>
+      <ion-input type="text" [(ngModel)]="person.name"></ion-input>
+    </ion-item>
+    <ion-item color="white">
+      <ion-label floating>Description</ion-label>
+      <ion-input type="text" [(ngModel)]="person.description"></ion-input>
+    </ion-item>
+  </ion-list>
 </ion-content>

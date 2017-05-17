@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { PersonEditPage } from '../../pages/person-edit/person-edit';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -14,7 +15,7 @@ import { Person } from '../../models/person';
   selector: 'page-person-add',
   templateUrl: 'person-add.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  ]
+  entryComponents:[ PersonEditPage ]
 })
 export class PersonAddPage extends BasePage {
 
@@ -48,6 +49,8 @@ export class PersonAddPage extends BasePage {
 
   addPerson(event) {
     this.logger.info(this, "addPerson");
+    this.showModal(PersonEditPage,
+      { organization: this.organization });
   }
 
   invitePerson(event) {

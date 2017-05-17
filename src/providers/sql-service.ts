@@ -472,7 +472,7 @@ export class SqlService {
       let values:any[] = model.getValues();
       if (model.isPersisted()) {
         this.logger.info(this, "saveModel", "Updating", model);
-        values['saved'] = new Date();
+        values['saved_at'] = new Date();
         this.executeUpdate(table, columns, values).then(
           (results) => {
             resolve(results);
@@ -483,7 +483,7 @@ export class SqlService {
       }
       else {
         this.logger.info(this, "saveModel", "Inserting", model);
-        values['saved'] = new Date();
+        values['saved_at'] = new Date();
         this.executeInsert(table, columns, values).then(
           (results) => {
             resolve(results);

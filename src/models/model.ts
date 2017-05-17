@@ -12,7 +12,7 @@ export let PRIMARY_KEY:boolean = true;
 @Injectable()
 export class Model {
 
-  public saved: Date = null;
+  public saved_at: Date = null;
 
   constructor(data:any=null) {
     this.copyInto(data);
@@ -65,7 +65,7 @@ export class Model {
   }
 
   public isPersisted() : boolean {
-    return this.saved != null;
+    return this.saved_at != null;
   }
 
 }

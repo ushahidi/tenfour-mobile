@@ -1,22 +1,22 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons start>
-      <button ion-button (click)="onCancel($event)">Cancel</button>
+      <button ion-button color="primary" (click)="onCancel($event)">Cancel</button>
     </ion-buttons>
     <ion-title>Add People</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
-    <ion-item (click)="addPerson($event)">
+    <ion-item color="white" detail-push tappable (click)="addPerson($event)">
       <ion-icon ios="ios-add" md="md-add" item-left></ion-icon>
       <h2>Add person</h2>
     </ion-item>
-    <ion-item (click)="invitePerson($event)">
+    <ion-item color="white" detail-push tappable (click)="invitePerson($event)">
       <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
       <h2>Invite person</h2>
     </ion-item>
-    <ion-item (click)="importPerson($event)">
+    <ion-item color="white" detail-push tappable (click)="importPerson($event)">
       <ion-icon ios="ios-download-outline" md="md-download" item-left></ion-icon>
       <h2>Import person</h2>
     </ion-item>

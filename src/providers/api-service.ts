@@ -14,7 +14,6 @@ import { DatabaseService } from '../providers/database-service';
 import { Token } from '../models/token';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
-import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 import { RollCall } from '../models/rollcall';
 
@@ -318,6 +317,51 @@ export class ApiService extends HttpService {
         });
     });
   }
+
+  createPerson(token:Token, person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
+      let params = {
+        name: person.name,
+        description: person.description,
+        person_type: "user",
+        role: "member" };
+      this.httpPost(url, token.access_token, params).then(
+        (data:any) => {
+          if (data && data.person) {
+            resolve(new Person(data.person));
+          }
+          else {
+            reject("Person Not Created");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  updatePerson(token:Token, person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
+      let params = {
+        name: person.name,
+        description: person.description };
+      this.httpPut(url, token.access_token, params).then(
+        (data:any) => {
+          if (data && data.person) {
+            resolve(new Person(data.person));
+          }
+          else {
+            reject("Person Not Updated");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
   getRollCalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<RollCall[]> {
     return new Promise((resolve, reject) => {
       let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
