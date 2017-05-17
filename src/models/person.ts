@@ -32,6 +32,9 @@ export class Person extends Model {
   @Column("name", TEXT)
   public name:string = null;
 
+  @Column("initials", TEXT)
+  public initials:string = null;
+
   @Column("description", TEXT)
   public description:string = null;
 
@@ -46,6 +49,9 @@ export class Person extends Model {
 
   @Column("uri", TEXT)
   public uri:string = null;
+
+  @Column("gravatar", TEXT)
+  public gravatar:string = null;
 
   @Column("invite_sent", INTEGER)
   public invite_sent:number = null;
@@ -64,6 +70,9 @@ export class Person extends Model {
 
   @Column("has_logged_in", BOOLEAN)
   public has_logged_in:boolean = null;
+
+  @Column("blocked", BOOLEAN)
+  public blocked:boolean = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;

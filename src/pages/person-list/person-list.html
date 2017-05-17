@@ -22,7 +22,9 @@
       <ion-avatar item-left *ngIf="person.profile_picture">
         <img [src]="person.profile_picture">
       </ion-avatar>
-      <ion-icon name="person" item-left *ngIf="person.profile_picture == null"></ion-icon>
+      <div item-left class="initials" *ngIf="person.profile_picture == null">
+        <span>{{person.initials}}</span>
+      </div>
       <h2>{{person.name}}</h2>
     </ion-item>
   </ion-list>
