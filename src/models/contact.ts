@@ -21,6 +21,9 @@ export class Contact extends Model {
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
 
+  @Column("person_id", INTEGER)
+  public person_id:number = null;
+
   @Column("type", TEXT)
   public type:string = null;
 
@@ -35,7 +38,7 @@ export class Contact extends Model {
 
   @Column("preferred", BOOLEAN)
   public preferred:boolean = null;
-  
+
   @Column("bounce_count", INTEGER)
   public bounce_count:number = null;
 

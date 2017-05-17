@@ -8,6 +8,7 @@ import { LoggerService } from '../providers/logger-service';
 import { Token } from '../models/token';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
+import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 
 @Injectable()
@@ -139,6 +140,38 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Email>(new Email(), where);
+  }
+
+  // ########## CONTACT ##########
+
+  saveContact(person:Person, contact:Contact):Promise<any> {
+    contact.organization_id = person.organization_id;
+    contact.person_id = person.id;
+    return this.saveModel(contact);
+  }
+
+  getContacts(person:Person):Promise<Contact[]> {
+    let where = { person_id: person.id };
+    let order = { };
+    return this.getModels<Contact>(new Contact(), where, order);
+  }
+
+  getContact(id:number):Promise<Contact> {
+    let where = { id: id };
+    return this.getModel<Contact>(new Contact(), where);
+  }
+
+  removeContact(contact:Contact):Promise<any> {
+    let where = { id: contact.id };
+    return this.removeModel<Contact>(new Contact(), where);
+  }
+
+  removeContacts(person:Person=null) {
+    let where = { };
+    if (person) {
+      where['person_id'] = person.id;
+    }
+    return this.removeModel<Contact>(new Contact(), where);
   }
 
 }

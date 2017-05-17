@@ -1,21 +1,24 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons start>
-      <button ion-button icon-only menuToggle>
+      <button ion-button icon-only menuToggle color="primary">
         <ion-icon name="menu"></ion-icon>
       </button>
     </ion-buttons>
     <ion-title>People</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only (click)="addPeople($event)">
+      <button ion-button icon-only color="primary" (click)="addPeople($event)">
         <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
+  <ion-refresher (ionRefresh)="loadPeople($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list *ngIf="organization && organization.people">
-    <ion-item detail-push tappable (click)="showPerson($event, person)" *ngFor="let person of organization.people">
+    <ion-item color="white" detail-push tappable (click)="showPerson($event, person)" *ngFor="let person of organization.people">
       <ion-avatar item-left *ngIf="person.profile_picture">
         <img [src]="person.profile_picture">
       </ion-avatar>

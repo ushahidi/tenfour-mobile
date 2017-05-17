@@ -14,6 +14,7 @@ import { DatabaseService } from '../providers/database-service';
 import { Token } from '../models/token';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
+import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 
 @Injectable()
@@ -179,8 +180,8 @@ export class ApiService extends HttpService {
         (data:any) => {
           let people = [];
           if (data && data.people) {
-            for (let item of data.people) {
-              let person = new Person(item);
+            for (let attributes of data.people) {
+              let person = new Person(attributes);
               people.push(person);
             }
           }
@@ -202,7 +203,7 @@ export class ApiService extends HttpService {
             resolve(person);
           }
           else {
-            reject("Not Found");
+            reject("Person Not Found");
           }
         },
         (error:any) => {

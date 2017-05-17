@@ -1,8 +1,39 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title>Person Details</ion-title>
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" (click)="editPerson($event)">
+        Edit
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
-
+  <ion-refresher (ionRefresh)="loadPerson($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list *ngIf="person">
+    <ion-item color="white" class="profile" text-center>
+      <img [src]="person.profile_picture" *ngIf="person.profile_picture"/>
+      <h1>{{person.name}}</h1>
+      <p>{{person.description}}</p>
+    </ion-item>
+    <ion-item color="white" class="contact" *ngFor="let contact of person.contacts">
+      <ion-icon ios="ios-mail-outline" md="md-mail" item-left *ngIf="contact.type == 'email'"></ion-icon>
+      <ion-icon ios="ios-call-outline" md="md-call" item-left *ngIf="contact.type == 'phone'"></ion-icon>
+      <ion-label>{{contact.type | titleize}}</ion-label>
+      <div item-content class="content">{{contact.contact}}</div>
+    </ion-item>
+    <ion-item color="white" class="role">
+      <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      <ion-label>Role</ion-label>
+      <div item-content class="content">{{person.role | titleize}}</div>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="person">
+    <ion-list-header>Emergency Contact Person</ion-list-header>
+    <ion-item color="white" detail-push class="emergency">
+      None
+    </ion-item>
+  </ion-list>
 </ion-content>

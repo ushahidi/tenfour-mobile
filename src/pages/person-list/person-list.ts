@@ -1,5 +1,5 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonAddPage } from '../../pages/person-add/person-add';
@@ -44,16 +44,30 @@ export class PersonListPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.events.publish("organization:loaded", this.organization);
-    this.database.getPeople(this.organization).then((people:Person[]) => {
-      this.organization.people = people;
-    });
-    // this.database.getTokens(this.organization).then((tokens:Token[]) => {
-    //   let token = tokens[0];
-    //   this.api.getPeople(token, this.organization).then(
-    //     (people:Person[]) => {
-    //       this.organization.people = people;
-    //     });
-    // });
+    this.loadPeople(null, true);
+  }
+
+  loadPeople(event:any, cache:true) {
+    if (cache) {
+      this.database.getPeople(this.organization).then((people:Person[]) => {
+        this.organization.people = people;
+        if (event) {
+          event.complete();
+        }
+      });
+    }
+    else {
+      this.database.getTokens(this.organization).then((tokens:Token[]) => {
+        let token = tokens[0];
+        this.api.getPeople(token, this.organization).then(
+          (people:Person[]) => {
+            this.organization.people = people;
+            if (event) {
+              event.complete();
+            }
+          });
+      });
+    }
   }
 
   addPeople(event:any) {

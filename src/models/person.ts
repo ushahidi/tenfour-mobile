@@ -2,6 +2,7 @@ import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
+import { Contact } from '../models/contact';
 
 @Table("people")
 export class Person extends Model {
@@ -9,6 +10,13 @@ export class Person extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+    if (data && data.contacts && data.contacts.length > 0) {
+      this.contacts = [];
+      for (let attributes of data.contacts) {
+        let contact = new Contact(attributes);
+        this.contacts.push(contact);
+      }
+    }
   }
 
   public newInstance<M extends Person>(data:any=null):Person {
@@ -62,5 +70,7 @@ export class Person extends Model {
 
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
+
+  public contacts:Contact[] = [];
 
 }

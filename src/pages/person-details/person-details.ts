@@ -1,5 +1,5 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -8,6 +8,8 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
+import { Contact } from '../../models/contact';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -42,6 +44,36 @@ export class PersonDetailsPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
+    this.loadPerson(null, true);
   }
 
+  loadPerson(event:any, cache:boolean=true) {
+    if (cache) {
+      this.database.getPerson(this.person.id).then((person:Person) => {
+        this.person = person;
+        this.database.getContacts(person).then((contacts:Contact[]) => {
+          this.person.contacts = contacts;
+          if (event) {
+            event.complete();
+          }
+        });
+      });
+    }
+    else {
+      this.database.getTokens(this.organization).then((tokens:Token[]) => {
+        let token = tokens[0];
+        this.api.getPerson(token, this.organization, this.person.id).then(
+          (person:Person) => {
+            this.person = person;
+            if (event) {
+              event.complete();
+            }
+          });
+      });
+    }
+  }
+
+  editPerson(event) {
+    this.logger.info(this, "editPerson");
+  }
 }
