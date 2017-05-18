@@ -1,27 +1,9 @@
 page-person-details {
   .profile {
-    text-align: center;
-    img {
-      max-width: 60px;
+    h1 {
     }
     p {
       color: #888;
-    }
-    h1 {
-    }
-    .initials {
-      margin-left:auto;
-      margin-right:auto;
-      margin-bottom: 6px;
-      width: 60px;
-      height: 60px;
-      color: white;
-      font-size: 28px;
-      padding-top: 12px;
-      background-color: black;
-      text-align: center;
-      border-radius: 50%;
-      -webkit-border-radius: 50%;
     }
   }
   .contact {

@@ -12,10 +12,7 @@
   </ion-refresher>
   <ion-list *ngIf="person">
     <ion-item color="white" class="profile" text-center>
-      <img [src]="person.profile_picture" *ngIf="person.profile_picture"/>
-      <div class="initials" *ngIf="person.profile_picture == null">
-        <span>{{person.initials}}</span>
-      </div>
+      <person-avatar item-center [initials]="person.initials" [image]="person.profile_picture" [large]="true"></person-avatar>
       <h1>{{person.name}}</h1>
       <p>{{person.description}}</p>
     </ion-item>

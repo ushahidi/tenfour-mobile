@@ -1,0 +1,6 @@
+<ion-avatar [class.large]="large" *ngIf="image && image.length > 0">
+  <img [src]="image">
+</ion-avatar>
+<div [class.large]="large" class="initials" *ngIf="image == null">
+  <span>{{initials}}</span>
+</div>

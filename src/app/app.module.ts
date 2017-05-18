@@ -54,6 +54,8 @@ import { CapitalizePipe } from '../pipes/capitalize';
 import { TruncatePipe } from '../pipes/truncate';
 import { HtmlParserPipe } from '../pipes/html-parser';
 
+import { PersonAvatarComponent } from '../components/person-avatar/person-avatar';
+
 import { LoggerService } from '../providers/logger-service';
 import { ApiService } from '../providers/api-service';
 import { DatabaseService } from '../providers/database-service';
@@ -85,7 +87,8 @@ import { DatabaseService } from '../providers/database-service';
     TitleizePipe,
     CapitalizePipe,
     TruncatePipe,
-    HtmlParserPipe
+    HtmlParserPipe,
+    PersonAvatarComponent
   ],
   imports: [
     HttpModule,

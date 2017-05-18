@@ -153,4 +153,12 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
   
+  changePhoto(event) {
+    this.logger.info(this, "changePhoto");
+  }
+  
+  addPhoto(event) {
+    this.logger.info(this, "addPhoto");
+  }
+  
 }
