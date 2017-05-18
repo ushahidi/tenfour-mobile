@@ -84,5 +84,17 @@ export class Person extends Model {
   public saved_at:Date = null;
 
   public contacts:Contact[] = [];
+  
+  getEmails() {
+    return this.contacts.filter(function(contact) {
+      return contact.type == 'email';
+    });
+  }
+  
+  getPhones() {
+    return this.contacts.filter(function(contact) {
+      return contact.type == 'phone';
+    });
+  }
 
 }

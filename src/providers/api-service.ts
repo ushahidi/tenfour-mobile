@@ -14,6 +14,7 @@ import { DatabaseService } from '../providers/database-service';
 import { Token } from '../models/token';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
+import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 import { RollCall } from '../models/rollcall';
 
@@ -362,6 +363,52 @@ export class ApiService extends HttpService {
     });
   }
 
+  createContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
+      let params = {
+        type: contact.type,
+        contact: contact.contact, 
+        preferred: contact.preferred || 0,
+        organization_id: person.organization_id };
+      this.httpPost(url, token.access_token, params).then(
+        (data:any) => {
+          if (data && data.contact) {
+            resolve(new Contact(data.contact));
+          }
+          else {
+            reject("Contact Not Created");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  updateContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
+      let params = {
+        type: contact.type,
+        preferred: contact.preferred || 0,
+        contact: contact.contact, 
+        organization_id: person.organization_id };
+      this.httpPut(url, token.access_token, params).then(
+        (data:any) => {
+          if (data && data.contact) {
+            resolve(new Contact(data.contact));
+          }
+          else {
+            reject("Contact Not Updated");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+  
   getRollCalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<RollCall[]> {
     return new Promise((resolve, reject) => {
       let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
@@ -381,62 +428,5 @@ export class ApiService extends HttpService {
         });
     });
   }
-
-  // apiGet(url:string, params:any=null):Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     this.getLogin(deployment).then((token:Token) => {
-  //       this.httpGet(url, token.access_token, params).then(
-  //         (data:any) => {
-  //           resolve(data);
-  //         },
-  //         (error:any) => {
-  //           reject(error);
-  //         });
-  //     });
-  //   });
-  // }
-  //
-  // apiPost(url:string, params:any=null):Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     this.getToken().then((token:Token) => {
-  //       this.httpPost(url, token.access_token, params).then(
-  //         (data:any) => {
-  //           resolve(data);
-  //         },
-  //         (error:any) => {
-  //           reject(error);
-  //         });
-  //     });
-  //   });
-  // }
-  //
-  // apiPut(url:string, params:any=null):Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     this.getToken().then((token:Token) => {
-  //       this.httpPut(url, token.access_token, params).then(
-  //         (data:any) => {
-  //           resolve(data);
-  //         },
-  //         (error:any) => {
-  //           reject(error);
-  //         });
-  //     });
-  //   });
-  // }
-  //
-  // apiDelete(deployment:Deployment, endpoint:string):Promise<any> {
-  //   return new Promise((resolve, reject) => {
-  //     this.getLogin(deployment).then((login:Login) => {
-  //       let url = deployment.api + endpoint;
-  //       this.httpDelete(url, login.access_token).then(
-  //         (data:any) => {
-  //           resolve(data);
-  //         },
-  //         (error:any) => {
-  //           reject(error);
-  //         });
-  //     });
-  //   });
-  // }
 
 }
