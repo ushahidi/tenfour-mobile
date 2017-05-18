@@ -15,8 +15,8 @@
   <ion-list *ngIf="person">
     <ion-item color="white" class="profile" text-center>
       <person-avatar [initials]="person.initials" [image]="person.profile_picture" [large]="true"></person-avatar>
-      <button ion-button clear color="primary" *ngIf="person.profile_picture" (click)="changePhoto($event)">Change photo</button>
-      <button ion-button clear color="primary" *ngIf="person.profile_picture == null" (click)="addPhoto($event)">Add photo</button>
+      <button ion-button clear color="primary" *ngIf="person.profile_picture" (click)="showCameraOptions($event)">Change photo</button>
+      <button ion-button clear color="primary" *ngIf="person.profile_picture == null" (click)="showCameraOptions($event)">Add photo</button>
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Name</ion-label>

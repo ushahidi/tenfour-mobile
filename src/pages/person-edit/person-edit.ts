@@ -1,6 +1,9 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { Camera, CameraOptions } from '@ionic-native/camera';
+
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
@@ -23,6 +26,7 @@ export class PersonEditPage extends BasePage {
   organization:Organization = null;
   person:Person = null;
   editing:boolean = true;
+  cameraPresent: boolean = true;
 
   constructor(
       protected zone:NgZone,
@@ -37,8 +41,18 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
-      protected events:Events) {
+      protected events:Events, 
+      protected camera:Camera, 
+      protected diagnostic:Diagnostic) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+  }
+
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.diagnostic.isCameraPresent().then((cameraPresent:boolean) => {
+      this.logger.info(this, "isCameraPresent", cameraPresent);
+      this.cameraPresent = cameraPresent;
+    })
   }
 
   ionViewWillEnter() {
@@ -153,12 +167,66 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
   
-  changePhoto(event) {
-    this.logger.info(this, "changePhoto");
+  showCameraOptions() {
+    let buttons = [];
+    if (this.cameraPresent) {
+      buttons.push({
+        text: 'Take Photo',
+        handler: () => {
+          this.showCamera();
+        }
+      });
+    }
+    buttons.push({
+      text: 'Photo Library',
+      handler: () => {
+        this.showCameraRoll();
+      }
+    });
+    buttons.push({
+      text: 'Cancel',
+      role: 'cancel'
+    });
+    let actionSheet = this.actionController.create({
+      buttons: buttons
+    });
+    actionSheet.present();
+  }
+
+  showCamera() {
+    this.logger.info(this, "showCamera");
+    let options:CameraOptions = {
+      mediaType: this.camera.MediaType.PICTURE,
+      encodingType: this.camera.EncodingType.JPEG,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      sourceType: this.camera.PictureSourceType.CAMERA
+    }
+    this.camera.getPicture(options).then((imageData:any) => {
+      this.logger.info(this, "showCamera", "Captured");
+      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;   
+    }, 
+    (error:any) => {
+      this.logger.error(this, "showCamera", error);
+      this.showAlert("Problem Taking Photo", error);
+    });
   }
   
-  addPhoto(event) {
-    this.logger.info(this, "addPhoto");
+  showCameraRoll() {
+    this.logger.info(this, "showCameraRoll");
+    let options:CameraOptions = {
+      mediaType: this.camera.MediaType.PICTURE,
+      encodingType: this.camera.EncodingType.JPEG,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
+    }
+    this.camera.getPicture(options).then((imageData:any) => {
+      this.logger.info(this, "showCameraRoll", "Selected");
+      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;      
+    }, 
+    (error:any) => {
+      this.logger.error(this, "showCameraRoll", error);
+      this.showAlert("Problem Selecting Photo", error);
+    });
   }
   
 }

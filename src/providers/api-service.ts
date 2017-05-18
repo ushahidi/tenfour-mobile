@@ -327,6 +327,9 @@ export class ApiService extends HttpService {
         description: person.description,
         person_type: "user",
         role: "member" };
+      if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+        params['_input_image'] = person.profile_picture;
+      }
       this.httpPost(url, token.access_token, params).then(
         (data:any) => {
           if (data && data.person) {
@@ -348,6 +351,9 @@ export class ApiService extends HttpService {
       let params = {
         name: person.name,
         description: person.description };
+      if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+        params['_input_image'] = person.profile_picture;
+      }
       this.httpPut(url, token.access_token, params).then(
         (data:any) => {
           if (data && data.person) {
