@@ -22,7 +22,7 @@
     "@ionic-native/app-availability": "^3.7.0",
     "@ionic-native/app-version": "^3.6.1",
     "@ionic-native/camera": "^3.6.1",
-    "@ionic-native/contacts": "^3.6.1",
+    "@ionic-native/contacts": "^3.9.2",
     "@ionic-native/core": "3.6.1",
     "@ionic-native/deeplinks": "^3.7.0",
     "@ionic-native/device": "^3.6.1",

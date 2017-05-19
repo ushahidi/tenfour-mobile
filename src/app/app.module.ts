@@ -21,6 +21,7 @@ import { Keyboard } from '@ionic-native/keyboard';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { AppAvailability } from '@ionic-native/app-availability';
 import { Deeplinks } from '@ionic-native/deeplinks';
+import { Contacts } from '@ionic-native/contacts';
 
 import { RollcallApp } from './app.component';
 
@@ -41,6 +42,8 @@ import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonAddPage } from '../pages/person-add/person-add';
 import { PersonEditPage } from '../pages/person-edit/person-edit';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
+import { PersonInvitePage } from '../pages/person-invite/person-invite';
+import { PersonImportPage } from '../pages/person-import/person-import';
 
 import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
@@ -81,6 +84,8 @@ import { DatabaseService } from '../providers/database-service';
     PersonAddPage,
     PersonEditPage,
     PersonDetailsPage,
+    PersonInvitePage,
+    PersonImportPage,
     SettingsPage,
     DateTimePipe,
     TimeAgoPipe,
@@ -119,6 +124,8 @@ import { DatabaseService } from '../providers/database-service';
     PersonAddPage,
     PersonEditPage,
     PersonDetailsPage,
+    PersonInvitePage,
+    PersonImportPage,
     SettingsPage
   ],
   providers: [
@@ -139,6 +146,7 @@ import { DatabaseService } from '../providers/database-service';
     { provide: NativeStorage, useClass: NativeStorage },
     { provide: AppAvailability, useClass: AppAvailability },
     { provide: Deeplinks, useClass: Deeplinks },
+    { provide: Contacts, useClass: Contacts },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: DatabaseService, useClass: DatabaseService },

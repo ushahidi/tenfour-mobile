@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelImport($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Import Person</ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" (click)="importContacts($event)">Import</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="imports">
+    <ion-item color="white" *ngFor="let contact of imports">
+      <ion-label>{{contact.name.formatted}}</ion-label>
+      <ion-checkbox [(ngModel)]="contact.checked"></ion-checkbox>
+    </ion-item>
+  </ion-list>  
+</ion-content>

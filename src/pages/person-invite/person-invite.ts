@@ -1,27 +1,27 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { PersonEditPage } from '../../pages/person-edit/person-edit';
-import { PersonInvitePage } from '../../pages/person-invite/person-invite';
-import { PersonImportPage } from '../../pages/person-import/person-import';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
+import { Contact } from '../../models/contact';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
-  selector: 'page-person-add',
-  templateUrl: 'person-add.html',
+  selector: 'page-person-invite',
+  templateUrl: 'person-invite.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ PersonEditPage, PersonInvitePage ]
+  entryComponents:[  ]
 })
-export class PersonAddPage extends BasePage {
+export class PersonInvitePage extends BasePage {
 
   organization:Organization = null;
+  person:Person = null;
 
   constructor(
       protected zone:NgZone,
@@ -44,27 +44,9 @@ export class PersonAddPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
   }
-
-  onCancel(event) {
+  
+  cancelInvite(event) {
     this.hideModal();
   }
-
-  addPerson(event) {
-    this.logger.info(this, "addPerson");
-    this.showModal(PersonEditPage,
-      { organization: this.organization });
-  }
-
-  invitePerson(event) {
-    this.logger.info(this, "invitePerson");
-    this.showModal(PersonInvitePage,
-      { organization: this.organization });
-  }
-
-  importPerson(event) {
-    this.logger.info(this, "importPerson");
-    this.showModal(PersonImportPage,
-      { organization: this.organization });
-  }
-
+  
 }

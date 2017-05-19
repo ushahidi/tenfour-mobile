@@ -94,9 +94,6 @@
     <variable name="CAMERA_USAGE_DESCRIPTION" value=" "/>
     <variable name="PHOTOLIBRARY_USAGE_DESCRIPTION" value=" "/>
   </plugin>
-  <plugin name="cordova-plugin-contacts" spec="~2.3.1">
-    <variable name="CONTACTS_USAGE_DESCRIPTION" value=" "/>
-  </plugin>
   <plugin name="cordova-plugin-device" spec="~1.1.4"/>
   <plugin name="cordova-plugin-file" spec="~4.3.3"/>
   <plugin name="cordova-plugin-geolocation" spec="~2.4.3">
@@ -120,6 +117,9 @@
     <variable name="DEEPLINK_SCHEME" value="https"/>
     <variable name="DEEPLINK_HOST" value="staging.rollcall.io"/>
     <variable name="ANDROID_PATH_PREFIX" value="/"/>
+  </plugin>
+  <plugin name="cordova-plugin-contacts" spec="~2.3.1">
+    <variable name="CONTACTS_USAGE_DESCRIPTION" value=" "/>
   </plugin>
   <icon src="resources/ios/icon/icon-small@3x.png"/>
 </widget>

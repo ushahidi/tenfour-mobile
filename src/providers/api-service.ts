@@ -324,7 +324,7 @@ export class ApiService extends HttpService {
       let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
       let params = {
         name: person.name,
-        description: person.description,
+        description: person.description || "",
         person_type: "user",
         role: "member" };
       if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
@@ -350,7 +350,7 @@ export class ApiService extends HttpService {
       let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
       let params = {
         name: person.name,
-        description: person.description };
+        description: person.description || ""};
       if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
         params['_input_image'] = person.profile_picture;
       }
