@@ -3,17 +3,30 @@
     <ion-buttons start>
       <button ion-button color="primary" (click)="cancelImport($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Import Person</ion-title>
+    <ion-title>Import people</ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" (click)="importContacts($event)">Import</button>
+      <button ion-button color="primary" (click)="importContacts($event)">Done</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
+  <ion-list>
+    <ion-item text-wrap color="white">
+      <ion-label>Invite selected people to join Rollcall</ion-label>
+      <ion-toggle [(ngModel)]="invite"></ion-toggle>
+    </ion-item>
+    <ion-item text-wrap color="white">
+      <ion-label>Invite people via</ion-label>
+      <ion-select [(ngModel)]="invitation">
+        <ion-option value="email">Email</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
   <ion-list *ngIf="imports">
+    <ion-list-header>Contacts</ion-list-header>
     <ion-item color="white" *ngFor="let contact of imports">
       <ion-label>{{contact.name.formatted}}</ion-label>
       <ion-checkbox [(ngModel)]="contact.checked"></ion-checkbox>
     </ion-item>
-  </ion-list>  
+  </ion-list>
 </ion-content>

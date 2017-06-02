@@ -5,7 +5,7 @@ import { Http } from '@angular/http';
 import { Transfer} from '@ionic-native/transfer';
 import { File } from '@ionic-native/file';
 import { NativeStorage } from '@ionic-native/native-storage';
-import { IsDebug } from '@ionic-native/is-debug';
+import { Device } from '@ionic-native/device';
 
 import { HttpService } from '../providers/http-service';
 import { LoggerService } from '../providers/logger-service';
@@ -28,28 +28,22 @@ export class ApiService extends HttpService {
   token:string = "OAuth Token";
 
   constructor(
+    protected device:Device,
     protected platform:Platform,
     protected http:Http,
     protected file:File,
     protected transfer:Transfer,
     protected logger:LoggerService,
     protected storage:NativeStorage,
-    protected database:DatabaseService,
-    protected isDebug:IsDebug) {
+    protected database:DatabaseService) {
     super(http, file, transfer, logger);
     this.platform.ready().then(() => {
-      this.isDebug.getIsDebug().then(
-        (debug:boolean) => {
-          if (debug) {
-            this.api = "/api.staging.rollcall.io";
-          }
-          else {
-            this.api = "https://api.staging.rollcall.io";
-          }
-        },
-        (error:any) => {
-          this.api = "https://api.staging.rollcall.io";
-        });
+      if (this.device.isVirtual) {
+        this.api = "/api.staging.rollcall.io";
+      }
+      else {
+        this.api = "https://api.staging.rollcall.io";
+      }
     });
   }
 
@@ -374,7 +368,7 @@ export class ApiService extends HttpService {
       let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
       let params = {
         type: contact.type,
-        contact: contact.contact, 
+        contact: contact.contact,
         preferred: contact.preferred || 0,
         organization_id: person.organization_id };
       this.httpPost(url, token.access_token, params).then(
@@ -397,7 +391,7 @@ export class ApiService extends HttpService {
       let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
       let params = {
         type: contact.type,
-        contact: contact.contact, 
+        contact: contact.contact,
         preferred: contact.preferred || 0,
         organization_id: person.organization_id };
       this.httpPut(url, token.access_token, params).then(
@@ -414,7 +408,7 @@ export class ApiService extends HttpService {
         });
     });
   }
-  
+
   getRollCalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<RollCall[]> {
     return new Promise((resolve, reject) => {
       let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;

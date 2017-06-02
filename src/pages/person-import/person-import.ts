@@ -24,7 +24,9 @@ export class PersonImportPage extends BasePage {
 
   organization:Organization = null;
   imports:any[] = [];
-  
+  invite:boolean = true;
+  invitation:string = "email";
+
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -48,16 +50,18 @@ export class PersonImportPage extends BasePage {
     this.imports = [];
     this.contacts.find(['*'], {filter: ""}).then((contacts) => {
       this.logger.info(this, "Contacts", contacts);
+      this.imports.push(this.defaultContact());
       for (let contact of contacts) {
+        this.logger.info(this, "Contact", contact);
         this.imports.push(contact);
       }
     });
   }
-  
+
   cancelImport(event) {
     this.hideModal();
   }
-  
+
   importContacts(event) {
     this.logger.info(this, "importContacts");
     let loading = this.showLoading("Importing...");
@@ -83,7 +87,7 @@ export class PersonImportPage extends BasePage {
             if (contact.contact.indexOf("+1") == -1) {
               contact.contact = "+1" + contact.contact;
             }
-            person.contacts.push(contact);  
+            person.contacts.push(contact);
           }
         }
         for (let email of contact.emails) {
@@ -92,7 +96,7 @@ export class PersonImportPage extends BasePage {
             contact.organization_id = this.organization.id;
             contact.type = "email";
             contact.contact = email.value;
-            person.contacts.push(contact);  
+            person.contacts.push(contact);
           }
         }
         imports.push(person);
@@ -107,10 +111,10 @@ export class PersonImportPage extends BasePage {
         loading.dismiss();
         this.hideModal();
         this.showToast(`${imports.length} contacts imported`);
-      });  
+      });
     });
   }
-  
+
   createPerson(token:Token, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.api.createPerson(token, person).then((newPerson:Person) => {
@@ -122,31 +126,62 @@ export class PersonImportPage extends BasePage {
           Promise.all(creates).then(created => {
             resolve(newPerson);
           });
-        }, 
+        },
         (error: any) => {
           reject(error);
         });
-      }, 
+      },
       (error: any) => {
         reject(error);
       });
     });
   }
-  
+
   createContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.api.createContact(token, person, contact).then((newContact:Contact) => {
         this.database.saveContact(person, newContact).then((saved:any) => {
           resolve(newContact);
-        }, 
+        },
         (error: any) => {
           reject(error);
         });
       },
       (error:any) => {
         reject(error);
-      });  
+      });
     });
   }
-  
+
+  defaultContact():any {
+    return {
+      "id":2,
+      "rawId":null,
+      "displayName":null,
+      "note":null,
+      "photos":null,
+      "categories":null,
+      "urls":null,
+      "ims":null,
+      "nickname":null,
+      "birthday":"1978-01-20T12:00:00.000Z",
+      "name":{
+        "givenName":"Dale",
+        "honorificSuffix":null,
+        "formatted":"Dale Zak",
+        "middleName":null,
+        "familyName":"Zak",
+        "honorificPrefix":null},
+      "phoneNumbers":[
+        {"value":"(306) 341-3644","pref":false,"id":0,"type":"mobile"}],
+      "emails":[
+        {"value":"dalezak@gmail.com","pref":false,"id":0,"type":"home"},
+        {"value":"dale@ushahidi.com","pref":false,"id":1,"type":"work"}],
+      "addresses":[
+        {"pref":"false","locality":"Saskatoon","region":"CA","id":0,"postalCode":"S7N0E1","country":"Canada","type":"home","streetAddress":"413 10th Street East"}],
+      "organizations":[
+        {"pref":"false","title":"Producer","name":"Creative Consulting","department":null,"type":null}]
+      }
+  }
+
 }

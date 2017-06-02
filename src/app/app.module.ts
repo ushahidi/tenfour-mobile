@@ -22,6 +22,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { AppAvailability } from '@ionic-native/app-availability';
 import { Deeplinks } from '@ionic-native/deeplinks';
 import { Contacts } from '@ionic-native/contacts';
+import { Device } from '@ionic-native/device';
 
 import { RollcallApp } from './app.component';
 
@@ -130,6 +131,7 @@ import { DatabaseService } from '../providers/database-service';
   ],
   providers: [
     { provide: File, useClass: File },
+    { provide: Device, useClass: Device },
     { provide: SQLite, useClass: SQLite },
     { provide: Camera, useClass: Camera },
     { provide: IsDebug, useClass: IsDebug },
