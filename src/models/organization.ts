@@ -3,7 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Person } from '../models/person';
-import { RollCall } from '../models/rollcall';
+import { Rollcall } from '../models/rollcall';
 
 @Table("organizations")
 export class Organization extends Model {
@@ -52,12 +52,12 @@ export class Organization extends Model {
 
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
-  
+
   @Column("saved_at", TEXT)
   public saved_at:Date = null;
 
   public people:Person[] = [];
 
-  public rollcalls:RollCall[] = [];
+  public rollcalls:Rollcall[] = [];
 
 }

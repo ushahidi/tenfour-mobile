@@ -2,12 +2,13 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { RollcallRepliesPage } from '../../pages/rollcall-replies/rollcall-replies';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
-import { RollCall } from '../../models/rollcall';
+import { Rollcall } from '../../models/rollcall';
 import { Token } from '../../models/token';
 
 @IonicPage()
@@ -15,7 +16,7 @@ import { Token } from '../../models/token';
   selector: 'page-rollcall-list',
   templateUrl: 'rollcall-list.html',
   providers: [ ApiService ],
-  entryComponents:[  ]
+  entryComponents:[ RollcallRepliesPage ]
 })
 export class RollcallListPage extends BasePage {
 
@@ -26,6 +27,8 @@ export class RollcallListPage extends BasePage {
   create:Button;
 
   organization:Organization = null;
+
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -52,13 +55,15 @@ export class RollcallListPage extends BasePage {
   }
 
   loadRollCalls(event:any, cache:boolean=true) {
+    this.loading = true;
     if (cache) {
-      this.database.getRollCalls(this.organization).then((rollcalls:RollCall[]) => {
+      this.database.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
         if (rollcalls && rollcalls.length > 0) {
           this.organization.rollcalls = rollcalls;
           if (event) {
             event.complete();
           }
+          this.loading = false;
         }
         else {
           this.loadRollCalls(event, false);
@@ -68,27 +73,36 @@ export class RollcallListPage extends BasePage {
     else {
       this.api.getToken().then(
         (token:Token) => {
-          this.api.getRollCalls(token, this.organization).then(
-            (rollcalls:RollCall[]) => {
+          this.api.getRollcalls(token, this.organization).then(
+            (rollcalls:Rollcall[]) => {
               this.organization.rollcalls = rollcalls;
               if (event) {
                 event.complete();
               }
+              this.loading = false;
             },
             (error:any) => {
               if (event) {
                 event.complete();
               }
+              this.loading = false;
               this.showToast(error);
             });
-        }, 
+        },
         (error:any) => {
           if (event) {
             event.complete();
           }
+          this.loading = false;
           this.showToast(error);
         });
     }
+  }
+
+  showReplies(event:any, rollcall:Rollcall) {
+    this.showPage(RollcallRepliesPage, {
+      organization: this.organization,
+      rollcall: rollcall })
   }
 
 }

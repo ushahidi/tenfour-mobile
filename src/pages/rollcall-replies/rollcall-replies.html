@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons>
+      <button ion-button icon-only menuToggle color="primary">
+        <ion-icon name="menu"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>RollCall</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="rollcall">
+    <ion-item text-wrap color="white">
+      <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <h1 text-center>{{rollcall.message}}</h1>
+      <p text-center>{{rollcall.created_at}}. <strong>From {{rollcall.user_name}}.</strong></p>
+    </ion-item>
+    <ion-item *ngFor="let reply of rollcall.replies">
+      <h2>{{reply.answer}}</h2>
+      <h2>{{reply.message}}</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

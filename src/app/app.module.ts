@@ -46,8 +46,10 @@ import { PersonDetailsPage } from '../pages/person-details/person-details';
 import { PersonInvitePage } from '../pages/person-invite/person-invite';
 import { PersonImportPage } from '../pages/person-import/person-import';
 
-import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
+import { RollcallRepliesPage } from '../pages/rollcall-replies/rollcall-replies';
+
+import { ChecklistPage } from '../pages/checklist/checklist';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { SettingsPage } from '../pages/settings/settings';
 
@@ -80,6 +82,7 @@ import { DatabaseService } from '../providers/database-service';
     SignupPasswordPage,
     ChecklistPage,
     RollcallListPage,
+    RollcallRepliesPage,
     GroupListPage,
     PersonListPage,
     PersonAddPage,
@@ -120,6 +123,7 @@ import { DatabaseService } from '../providers/database-service';
     SignupPasswordPage,
     ChecklistPage,
     RollcallListPage,
+    RollcallRepliesPage,
     GroupListPage,
     PersonListPage,
     PersonAddPage,

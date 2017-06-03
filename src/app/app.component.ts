@@ -26,7 +26,9 @@ import { Organization } from '../models/organization';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
-import { RollCall } from '../models/rollcall';
+import { Rollcall } from '../models/rollcall';
+import { Answer } from '../models/answer';
+import { Reply } from '../models/reply';
 
 @Component({
   templateUrl: 'app.html'
@@ -59,6 +61,7 @@ export class RollcallApp {
     protected deeplinks:Deeplinks) {
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
+      this.logger.info(this, "Platform", "Ready");
       this.loadStatusBar();
       this.loadMenuEvents();
       this.loadDeepLinks();
@@ -67,15 +70,20 @@ export class RollcallApp {
         new Email(),
         new Person(),
         new Contact(),
-        new RollCall()]);
+        new Rollcall(),
+        new Answer(),
+        new Reply()
+      ]);
     });
   }
 
   loadStatusBar() {
+    this.logger.info(this, "loadStatusBar");
     this.statusBar.styleDefault();
   }
 
   loadMenuEvents() {
+    this.logger.info(this, "loadMenuEvents");
     this.events.subscribe("organization:loaded", (organization:Organization) => {
       this.logger.info(this, "Organization", organization);
       this.organization = organization;
@@ -83,6 +91,7 @@ export class RollcallApp {
   }
 
   loadDeepLinks() {
+    this.logger.info(this, "loadDeepLinks");
     this.deeplinks.routeWithNavController(this.navController, {
       '/organization': SigninUrlPage,
       '/login/email': SigninEmailPage,

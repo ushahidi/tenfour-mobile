@@ -16,7 +16,9 @@ import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
-import { RollCall } from '../models/rollcall';
+import { Rollcall } from '../models/rollcall';
+import { Answer } from '../models/answer';
+import { Reply } from '../models/reply';
 
 @Injectable()
 export class ApiService extends HttpService {
@@ -409,15 +411,33 @@ export class ApiService extends HttpService {
     });
   }
 
-  getRollCalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<RollCall[]> {
+  getRollcalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<Rollcall[]> {
     return new Promise((resolve, reject) => {
       let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
       this.httpGet(url, token.access_token).then(
         (data:any) => {
           let rollcalls = [];
           if (data && data.rollcalls) {
-            for (let attributes of data.rollcalls) {
-              let rollcall = new RollCall(attributes);
+            for (let _rollcall of data.rollcalls) {
+              let rollcall = new Rollcall(_rollcall);
+              if (_rollcall.user) {
+                rollcall.user = new Person(_rollcall.user);
+              }
+              rollcall.answers = [];
+              for (let _answer of _rollcall.answers) {
+                let answer = new Answer(_answer);
+                rollcall.answers.push(answer);
+              }
+              rollcall.replies = [];
+              for (let _reply of _rollcall.replies) {
+                let reply = new Reply(_reply);
+                rollcall.replies.push(reply);
+              }
+              rollcall.recipients = [];
+              for (let _recipient of _rollcall.recipients) {
+                let person = new Person(_recipient);
+                rollcall.recipients.push(person);
+              }
               rollcalls.push(rollcall);
             }
           }
