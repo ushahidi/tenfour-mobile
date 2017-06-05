@@ -36,6 +36,9 @@ export class Answer extends Model {
   @Column("color", TEXT)
   public color:string = null;
 
+  @Column("replies", INTEGER)
+  public replies:number = null;
+
   @Column("saved_at", TEXT)
   public saved_at:Date = null;
 

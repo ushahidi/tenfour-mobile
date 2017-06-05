@@ -3,12 +3,14 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallRepliesPage } from '../../pages/rollcall-replies/rollcall-replies';
+import { RollcallReplyPage } from '../../pages/rollcall-reply/rollcall-reply';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
+import { Recipient } from '../../models/recipients';
 import { Token } from '../../models/token';
 
 @IonicPage()
@@ -16,7 +18,7 @@ import { Token } from '../../models/token';
   selector: 'page-rollcall-list',
   templateUrl: 'rollcall-list.html',
   providers: [ ApiService ],
-  entryComponents:[ RollcallRepliesPage ]
+  entryComponents:[ RollcallRepliesPage, RollcallReplyPage ]
 })
 export class RollcallListPage extends BasePage {
 
@@ -71,31 +73,38 @@ export class RollcallListPage extends BasePage {
       });
     }
     else {
-      this.api.getToken().then(
-        (token:Token) => {
-          this.api.getRollcalls(token, this.organization).then(
-            (rollcalls:Rollcall[]) => {
+      this.api.getToken().then((token:Token) => {
+        this.api.getRollcalls(token, this.organization).then(
+          (rollcalls:Rollcall[]) => {
+            let saves = [];
+            for (let rollcall of rollcalls) {
+              saves.push(this.database.saveRollcall(this.organization, rollcall));
+              for (let answer of rollcall.answers) {
+                saves.push(this.database.saveAnswer(rollcall, answer));
+              }
+              for (let recipient of rollcall.recipients) {
+                saves.push(this.database.saveRecipient(rollcall, recipient));
+              }
+              for (let reply of rollcall.replies) {
+                saves.push(this.database.saveReply(rollcall, reply));
+              }
+            }
+            Promise.all(saves).then(saved => {
               this.organization.rollcalls = rollcalls;
               if (event) {
                 event.complete();
               }
               this.loading = false;
-            },
-            (error:any) => {
-              if (event) {
-                event.complete();
-              }
-              this.loading = false;
-              this.showToast(error);
             });
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          this.loading = false;
-          this.showToast(error);
-        });
+          },
+          (error:any) => {
+            if (event) {
+              event.complete();
+            }
+            this.loading = false;
+            this.showToast(error);
+          });
+      });
     }
   }
 
@@ -103,6 +112,18 @@ export class RollcallListPage extends BasePage {
     this.showPage(RollcallRepliesPage, {
       organization: this.organization,
       rollcall: rollcall })
+  }
+
+  sendReply(event:any, rollcall:Rollcall) {
+    this.logger.info(this, "sendReply");
+    let modal = this.showModal(RollcallReplyPage, {
+      organization: this.organization,
+      rollcall: rollcall });
+    modal.onDidDismiss(data => {
+      if (data) {
+        this.loadRollCalls(null, true);
+      }
+   });
   }
 
 }

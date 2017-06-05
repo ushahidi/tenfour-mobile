@@ -24,12 +24,14 @@
     <ion-item no-lines *ngIf="loading == false && organization.rollcalls.length == 0">
       <h2>There currently are no RollCalls...</h2>
     </ion-item>
-    <ion-card color="white" tappable (click)="showReplies($event, rollcall)" *ngFor="let rollcall of organization.rollcalls">
-      <ion-card-content text-center>
+    <ion-card color="white" *ngFor="let rollcall of organization.rollcalls">
+      <ion-card-content text-center tappable (click)="showReplies($event, rollcall)">
         <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
         <h1>{{rollcall.message}}</h1>
-        <p>{{rollcall.created_at}}. <strong>From {{rollcall.user_name}}.</strong></p>
+        <p>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
+        <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
       </ion-card-content>
+      <button ion-button clear color="primary" tappable (click)="sendReply($event, rollcall)">Respond</button>
     </ion-card>
   </ion-list>
 </ion-content>

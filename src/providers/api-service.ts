@@ -19,6 +19,7 @@ import { Organization } from '../models/organization';
 import { Rollcall } from '../models/rollcall';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
+import { Recipient } from '../models/recipient';
 
 @Injectable()
 export class ApiService extends HttpService {
@@ -420,28 +421,60 @@ export class ApiService extends HttpService {
           if (data && data.rollcalls) {
             for (let _rollcall of data.rollcalls) {
               let rollcall = new Rollcall(_rollcall);
-              if (_rollcall.user) {
-                rollcall.user = new Person(_rollcall.user);
-              }
-              rollcall.answers = [];
-              for (let _answer of _rollcall.answers) {
-                let answer = new Answer(_answer);
-                rollcall.answers.push(answer);
-              }
-              rollcall.replies = [];
-              for (let _reply of _rollcall.replies) {
-                let reply = new Reply(_reply);
-                rollcall.replies.push(reply);
-              }
-              rollcall.recipients = [];
-              for (let _recipient of _rollcall.recipients) {
-                let person = new Person(_recipient);
-                rollcall.recipients.push(person);
-              }
               rollcalls.push(rollcall);
             }
           }
           resolve(rollcalls);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  getRollcall(token:Token, id:number):Promise<Rollcall> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/rollcalls/${id}`;
+      this.httpGet(url, token.access_token).then(
+        (data:any) => {
+          if (data && data.rollcall) {
+            let rollcall = new Rollcall(data.rollcall);
+            resolve(rollcall);
+          }
+          else {
+            reject("Rollcall Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  postReply(token:Token, rollcall:Rollcall, reply:Reply):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies`;
+      let params = { };
+      if (reply) {
+        if (reply.answer) {
+          params["answer"] = reply.answer;
+        }
+        if (reply.message) {
+          params["message"] = reply.message;
+        }
+        if (reply.location_text) {
+          params["location_text"] = reply.location_text;
+        }
+      }
+      this.httpPost(url, token.access_token, params).then(
+        (data:any) => {
+          if (data && data.reply) {
+            let reply = new Reply(data.reply);
+            resolve(reply);
+          }
+          else {
+            reject("Reply Not Sent");
+          }
         },
         (error:any) => {
           reject(error);

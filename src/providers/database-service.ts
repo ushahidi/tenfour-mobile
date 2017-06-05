@@ -12,6 +12,7 @@ import { Rollcall } from '../models/rollcall';
 import { Organization } from '../models/organization';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
+import { Recipient } from '../models/recipient';
 
 @Injectable()
 export class DatabaseService extends SqlService {
@@ -55,8 +56,14 @@ export class DatabaseService extends SqlService {
     return this.saveModel(person);
   }
 
-  getPeople(organization:Organization):Promise<Person[]> {
-    let where = { organization_id: organization.id };
+  getPeople(organization:Organization, ids:number[]=null):Promise<Person[]> {
+    let where = { };
+    if (organization) {
+      where["organization_id"] = organization.id;
+    }
+    if (ids) {
+      where["id"] = ids;
+    }
     let order = { };
     return this.getModels<Person>(new Person(), where, order);
   }
@@ -80,78 +87,6 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Person>(new Person(), where);
-  }
-
-  // ########## ROLLCALL ##########
-
-  saveRollcall(organization:Organization, rollcall:Rollcall):Promise<any> {
-    rollcall.organization_id = organization.id;
-    return this.saveModel(rollcall);
-  }
-
-  getRollcalls(organization:Organization):Promise<Rollcall[]> {
-    let where = { organization_id: organization.id };
-    let order = { };
-    return this.getModels<Rollcall>(new Rollcall(), where, order);
-  }
-
-  getRollcall(id:number):Promise<Rollcall> {
-    return new Promise((resolve, reject) => {
-      let where = { id: id };
-      this.getModel<Rollcall>(new Rollcall(), where).then((rollcall:Rollcall) => {
-        Promise.all([
-          this.getAnswers(rollcall),
-          this.getReplies(rollcall)]).then((results:any[]) => {
-            rollcall.answers = <Answer[]>results[0];
-            rollcall.replies = <Reply[]>results[1];
-            resolve(rollcall);
-        });
-      });
-    });
-  }
-
-  removeRollcall(rollcall:Rollcall):Promise<any> {
-    let where = { id: rollcall.id };
-    return this.removeModel<Rollcall>(new Rollcall(), where);
-  }
-
-  removeRollcalls(organization:Organization=null) {
-    let where = { };
-    if (organization) {
-      where['organization_id'] = organization.id;
-    }
-    return this.removeModel<Rollcall>(new Rollcall(), where);
-  }
-
-  // ########## EMAIL ##########
-
-  saveEmail(organization:Organization, email:Email):Promise<any> {
-    email.organization_id = organization.id;
-    return this.saveModel(email);
-  }
-
-  getEmails(organization:Organization):Promise<Email[]> {
-    let where = { organization_id: organization.id };
-    let order = { };
-    return this.getModels<Email>(new Email(), where, order);
-  }
-
-  getEmail(id:number):Promise<Email> {
-    let where = { id: id };
-    return this.getModel<Email>(new Email(), where);
-  }
-
-  removeEmail(email:Email):Promise<any> {
-    let where = { id: email.id };
-    return this.removeModel<Email>(new Email(), where);
-  }
-
-  removeEmails(organization:Organization=null) {
-    let where = { };
-    if (organization) {
-      where['organization_id'] = organization.id;
-    }
-    return this.removeModel<Email>(new Email(), where);
   }
 
   // ########## CONTACT ##########
@@ -186,6 +121,69 @@ export class DatabaseService extends SqlService {
     return this.removeModel<Contact>(new Contact(), where);
   }
 
+  // ########## ROLLCALL ##########
+
+  saveRollcall(organization:Organization, rollcall:Rollcall):Promise<any> {
+    rollcall.organization_id = organization.id;
+    return this.saveModel(rollcall);
+  }
+
+  getRollcalls(organization:Organization):Promise<Rollcall[]> {
+    return new Promise((resolve, reject) => {
+      let where = { organization_id: organization.id };
+      let order = { created_at: "DESC" };
+      this.getModels<Rollcall>(new Rollcall(), where, order).then((rollcalls:Rollcall[]) => {
+        let rollcall_ids = rollcalls.map((rollcall:Rollcall) => rollcall.id);
+        this.logger.info(this, "getRollcalls", rollcall_ids);
+        Promise.all([
+          this.getAnswers(null, rollcall_ids),
+          this.getReplies(null, rollcall_ids),
+          this.getRecipients(null, rollcall_ids)]).then((results:any[]) => {
+            let answers = <Answer[]>results[0];
+            let replies = <Reply[]>results[1];
+            let recipients = <Recipient[]>results[2];
+            for (let rollcall of rollcalls) {
+              rollcall.answers = answers.filter(answer => answer.rollcall_id == rollcall.id);
+              rollcall.replies = replies.filter(reply => reply.rollcall_id == rollcall.id);
+              rollcall.recipients = recipients.filter(recipient => recipient.rollcall_id == rollcall.id);
+            }
+            resolve(rollcalls);
+        });
+        resolve(rollcalls);
+      });
+    });
+  }
+
+  getRollcall(id:number):Promise<Rollcall> {
+    return new Promise((resolve, reject) => {
+      let where = { id: id };
+      this.getModel<Rollcall>(new Rollcall(), where).then((rollcall:Rollcall) => {
+        Promise.all([
+          this.getAnswers(rollcall),
+          this.getReplies(rollcall),
+          this.getRecipients(rollcall)]).then((results:any[]) => {
+            rollcall.answers = <Answer[]>results[0];
+            rollcall.replies = <Reply[]>results[1];
+            rollcall.recipients = <Recipient[]>results[2];
+            resolve(rollcall);
+        });
+      });
+    });
+  }
+
+  removeRollcall(rollcall:Rollcall):Promise<any> {
+    let where = { id: rollcall.id };
+    return this.removeModel<Rollcall>(new Rollcall(), where);
+  }
+
+  removeRollcalls(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Rollcall>(new Rollcall(), where);
+  }
+
   // ########## ANSWER ##########
 
   saveAnswer(rollcall:Rollcall, answer:Answer):Promise<any> {
@@ -194,8 +192,14 @@ export class DatabaseService extends SqlService {
     return this.saveModel(answer);
   }
 
-  getAnswers(rollcall:Rollcall):Promise<Answer[]> {
-    let where = { rollcall_id: rollcall.id };
+  getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Answer[]> {
+    let where = { };
+    if (rollcall) {
+      where['rollcall_id'] = rollcall.id;
+    }
+    if (rollcall_ids) {
+      where['rollcall_id'] = rollcall_ids;
+    }
     let order = { };
     return this.getModels<Answer>(new Answer(), where, order);
   }
@@ -226,10 +230,31 @@ export class DatabaseService extends SqlService {
     return this.saveModel(reply);
   }
 
-  getReplies(rollcall:Rollcall):Promise<Reply[]> {
-    let where = { rollcall_id: rollcall.id };
-    let order = { };
-    return this.getModels<Reply>(new Reply(), where, order);
+  getReplies(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Reply[]> {
+    return new Promise((resolve, reject) => {
+      let where = { };
+      if (rollcall) {
+        where['rollcall_id'] = rollcall.id;
+      }
+      if (rollcall_ids) {
+        where['rollcall_id'] = rollcall_ids;
+      }
+      let order = {  created_at: "DESC" };
+      this.getModels<Reply>(new Reply(), where, order).then((replies:Reply[]) => {
+        resolve(replies);
+        // let user_ids = replies.map((reply) => reply.user_id);
+        // this.getPeople(null, user_ids).then((users:User[]) => {
+        //   for (let reply of replies) {
+        //     let user = users.find(user => user.id == reply.user_id);
+        //     reply.user_id = user.id;
+            // reply.user_name = user.name;
+            // reply.user_description = user.description;
+            // reply.user_initials = user.initials;
+            // reply.user_picture = user.profile_picture;
+        //   }
+        // });
+      });
+    });
   }
 
   getReply(id:number):Promise<Reply> {
@@ -248,6 +273,75 @@ export class DatabaseService extends SqlService {
       where['rollcall_id'] = rollcall.id;
     }
     return this.removeModel<Reply>(new Reply(), where);
+  }
+
+  // ########## RECIPIENT ##########
+
+  saveRecipient(rollcall:Rollcall, recipient:Recipient):Promise<any> {
+    recipient.organization_id = rollcall.organization_id;
+    recipient.rollcall_id = rollcall.id;
+    return this.saveModel(recipient);
+  }
+
+  getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Recipient[]> {
+    let where = { };
+    if (rollcall) {
+      where['rollcall_id'] = rollcall.id;
+    }
+    if (rollcall_ids) {
+      where['rollcall_id'] = rollcall_ids;
+    }
+    let order = { };
+    return this.getModels<Recipient>(new Recipient(), where, order);
+  }
+
+  getRecipient(id:number):Promise<Recipient> {
+    let where = { id: id };
+    return this.getModel<Recipient>(new Recipient(), where);
+  }
+
+  removeRecipient(recipient:Recipient):Promise<any> {
+    let where = { id: recipient.id };
+    return this.removeModel<Recipient>(new Recipient(), where);
+  }
+
+  removeRecipients(rollcall:Rollcall=null) {
+    let where = { };
+    if (rollcall) {
+      where['rollcall_id'] = rollcall.id;
+    }
+    return this.removeModel<Recipient>(new Recipient(), where);
+  }
+
+  // ########## EMAIL ##########
+
+  saveEmail(organization:Organization, email:Email):Promise<any> {
+    email.organization_id = organization.id;
+    return this.saveModel(email);
+  }
+
+  getEmails(organization:Organization):Promise<Email[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
+    return this.getModels<Email>(new Email(), where, order);
+  }
+
+  getEmail(id:number):Promise<Email> {
+    let where = { id: id };
+    return this.getModel<Email>(new Email(), where);
+  }
+
+  removeEmail(email:Email):Promise<any> {
+    let where = { id: email.id };
+    return this.removeModel<Email>(new Email(), where);
+  }
+
+  removeEmails(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Email>(new Email(), where);
   }
 
 }

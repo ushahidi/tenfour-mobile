@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelReply($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" (click)="sendReply($event)">Send</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="rollcall">
+    <ion-item text-wrap color="white">
+      <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <h1 text-center>{{rollcall.message}}</h1>
+      <p text-center>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
+    </ion-item>
+  </ion-list>
+  <div *ngIf="rollcall && reply">
+    <div padding-left padding-right padding-bottom *ngFor="let answer of rollcall.answers">
+      <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == reply.answer" (click)="selectAnswer($event, answer)">{{answer.answer}}</button>
+      <button ion-button block outline color="grey" *ngIf="answer.answer != reply.answer" (click)="selectAnswer($event, answer)">{{answer.answer}}</button>
+    </div>
+  </div>
+  <ion-list *ngIf="rollcall && reply">
+    <ion-item color="dark">
+      <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+      <ion-input type="text" placeholder="Add message" [(ngModel)]="reply.message"></ion-input>
+    </ion-item>
+    <ion-item color="dark">
+      <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+      <ion-input type="text" placeholder="Add location" [(ngModel)]="reply.location_text"></ion-input>
+    </ion-item>
+  </ion-list>
+</ion-content>

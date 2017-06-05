@@ -9,13 +9,14 @@ export class PersonAvatarComponent {
 
   image: string;
   initials: string;
+  color: string = "#000000";
   large:boolean = false;
 
   constructor() {
   }
-  
+
   ngOnInit() {
-      
+
   }
 
 }

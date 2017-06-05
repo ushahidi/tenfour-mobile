@@ -3,6 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Person } from '../models/person';
+import { Recipient } from '../models/recipient';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 
@@ -12,12 +13,51 @@ export class Rollcall extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
-    if (data && data.user) {
-      this.user_id = data.user.id;
-      this.user_name = data.user.name;
-      this.user_description = data.user.description;
-      this.user_initials = data.user.initials;
-      this.user_picture = data.user.profile_picture;
+    if (data) {
+      if (data.user) {
+        this.user_id = data.user.id;
+        this.user_name = data.user.name;
+        this.user_description = data.user.description;
+        this.user_initials = data.user.initials;
+        this.user_picture = data.user.profile_picture;
+      }
+      if (data.answers) {
+        this.answers = [];
+        for (let i = 0; i < data.answers.length; i++) {
+          let answer = new Answer(data.answers[i]);
+          answer.id = Number(`${data.id}${i+1}`);
+          if (data.replies) {
+            answer.replies = data.replies.filter(reply => reply.answer == answer.answer).length;
+          }
+          else {
+            answer.replies = 0;
+          }
+          this.answers.push(answer);
+        }
+      }
+      if (data.recipients) {
+        this.recipients = [];
+        for (let _recipient of data.recipients) {
+          let person = new Recipient(_recipient);
+          this.recipients.push(person);
+        }
+      }
+      if (data.replies) {
+        this.replies = [];
+        for (let _reply of data.replies) {
+          let reply = new Reply(_reply);
+          if (data.recipients) {
+            let recipient = data.recipients.find(recipient => recipient.id == _reply.user_id);
+            if (recipient) {
+              reply.user_name = recipient.name;
+              reply.user_initials = recipient.initials;
+              reply.user_description = recipient.description;
+              reply.user_picture = recipient.profile_picture;
+            }
+          }
+          this.replies.push(reply);
+        }
+      }
     }
   }
 
@@ -83,8 +123,25 @@ export class Rollcall extends Model {
 
   public answers:Answer[] = [];
 
-  public recipients:Person[] = [];
+  public recipients:Recipient[] = [];
 
   public replies:Reply[] = [];
+
+  answerReplies(answer:Answer):Reply[] {
+    if (this.replies && this.replies.length > 0) {
+      return this.replies.filter(reply => reply.answer == answer.answer);
+    }
+    return [];
+  }
+
+  recipientsPending():Recipient[] {
+    let _recipients = [];
+    for (let recipient of this.recipients) {
+      if (this.replies.filter(reply => reply.user_id == recipient.id).length == 0) {
+        _recipients.push(recipient);
+      }
+    }
+    return _recipients;
+  }
 
 }

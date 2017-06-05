@@ -48,6 +48,7 @@ import { PersonImportPage } from '../pages/person-import/person-import';
 
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { RollcallRepliesPage } from '../pages/rollcall-replies/rollcall-replies';
+import { RollcallReplyPage } from '../pages/rollcall-reply/rollcall-reply';
 
 import { ChecklistPage } from '../pages/checklist/checklist';
 import { GroupListPage } from '../pages/group-list/group-list';
@@ -83,6 +84,7 @@ import { DatabaseService } from '../providers/database-service';
     ChecklistPage,
     RollcallListPage,
     RollcallRepliesPage,
+    RollcallReplyPage,
     GroupListPage,
     PersonListPage,
     PersonAddPage,
@@ -124,6 +126,7 @@ import { DatabaseService } from '../providers/database-service';
     ChecklistPage,
     RollcallListPage,
     RollcallRepliesPage,
+    RollcallReplyPage,
     GroupListPage,
     PersonListPage,
     PersonAddPage,

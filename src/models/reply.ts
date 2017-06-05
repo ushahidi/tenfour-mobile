@@ -30,6 +30,18 @@ export class Reply extends Model {
   @Column("user_id", INTEGER)
   public user_id:number = null;
 
+  @Column("user_name", TEXT)
+  public user_name:string = null;
+
+  @Column("user_description", TEXT)
+  public user_description:string = null;
+
+  @Column("user_picture", TEXT)
+  public user_picture:string = null;
+
+  @Column("user_initials", TEXT)
+  public user_initials:string = null;
+
   @Column("message_id", INTEGER)
   public message_id:number = null;
 

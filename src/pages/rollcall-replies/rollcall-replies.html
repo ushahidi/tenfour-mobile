@@ -5,19 +5,46 @@
         <ion-icon name="menu"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title>RollCall</ion-title>
+    <ion-title></ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
+  <ion-refresher (ionRefresh)="loadReplies($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list *ngIf="rollcall">
-    <ion-item text-wrap color="white">
+    <ion-item text-wrap text-center color="white">
       <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
-      <h1 text-center>{{rollcall.message}}</h1>
-      <p text-center>{{rollcall.created_at}}. <strong>From {{rollcall.user_name}}.</strong></p>
+      <h1>{{rollcall.message}}</h1>
+      <p>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
+      <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
     </ion-item>
-    <ion-item *ngFor="let reply of rollcall.replies">
-      <h2>{{reply.answer}}</h2>
-      <h2>{{reply.message}}</h2>
+    <ion-item text-wrap color="white" tappable (click)="sendReply($event)">
+      <div ion-text color="primary">Respond</div>
     </ion-item>
   </ion-list>
+  <div *ngIf="rollcall">
+    <ion-list *ngFor="let answer of rollcall.answers">
+      <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
+      <ion-item color="white" *ngFor="let reply of rollcall.answerReplies(answer)">
+        <person-avatar item-left [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
+        <h2>
+          <span>{{reply.user_name}}</span>
+          <small item-right>{{reply.created_at | dateTime}}</small>
+        </h2>
+        <p text-wrap>{{reply.message}}</p>
+      </ion-item>
+    </ion-list>
+    <ion-list *ngIf="rollcall.replies.length < rollcall.recipients.length">
+      <ion-list-header>No Response</ion-list-header>
+      <ion-item color="white" *ngFor="let recipient of rollcall.recipientsPending()">
+        <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
+        <h2>
+          <span>{{recipient.name}}</span>
+          <small item-right>{{recipient.created_at | dateTime}}</small>
+        </h2>
+        <p text-wrap>{{recipient.response_status}}</p>
+      </ion-item>
+    </ion-list>
+  </div>
 </ion-content>

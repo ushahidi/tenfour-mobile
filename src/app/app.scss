@@ -23,6 +23,15 @@
 
 ion-list {
   ion-item {
+    h1 {
+      color: #000000;
+    }
+    h2 {
+      
+    }
+    p {
+      color: #ccc;
+    }
     &.heading {
       text-align: center;
       margin-bottom: 20px;
@@ -37,6 +46,7 @@ ion-list {
         padding-bottom: 15px;
       }
       p {
+        color: #888;
         font-size: 0.9em;
         padding-bottom: 10px;
       }

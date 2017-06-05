@@ -29,6 +29,7 @@ import { Contact } from '../models/contact';
 import { Rollcall } from '../models/rollcall';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
+import { Recipient } from '../models/recipient';
 
 @Component({
   templateUrl: 'app.html'
@@ -72,7 +73,8 @@ export class RollcallApp {
         new Contact(),
         new Rollcall(),
         new Answer(),
-        new Reply()
+        new Reply(),
+        new Recipient()
       ]);
     });
   }
