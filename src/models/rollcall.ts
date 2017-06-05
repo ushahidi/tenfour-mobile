@@ -57,6 +57,9 @@ export class Rollcall extends Model {
           }
           this.replies.push(reply);
         }
+        if (data.recipients) {
+          this.waiting_count = data.recipients.length - data.replies.length;
+        }
       }
     }
   }
@@ -101,6 +104,9 @@ export class Rollcall extends Model {
   @Column("reply_count", INTEGER)
   public reply_count:number = null;
 
+  @Column("waiting_count", INTEGER)
+  public waiting_count:number = null;
+
   @Column("sent_count", INTEGER)
   public sent_count:number = null;
 
@@ -137,7 +143,10 @@ export class Rollcall extends Model {
   recipientsPending():Recipient[] {
     let _recipients = [];
     for (let recipient of this.recipients) {
-      if (this.replies.filter(reply => reply.user_id == recipient.id).length == 0) {
+      if (this.replies == null || this.replies.length == 0) {
+        _recipients.push(recipient);
+      }
+      else if (this.replies.filter(reply => reply.user_id == recipient.id).length == 0) {
         _recipients.push(recipient);
       }
     }

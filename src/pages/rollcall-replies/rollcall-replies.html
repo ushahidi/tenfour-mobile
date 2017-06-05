@@ -18,8 +18,9 @@
       <h1>{{rollcall.message}}</h1>
       <p>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
       <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
+      <ion-badge color="waiting" *ngIf="rollcall.waiting_count > 0">{{rollcall.waiting_count}}</ion-badge>
     </ion-item>
-    <ion-item text-wrap color="white" tappable (click)="sendReply($event)">
+    <ion-item text-wrap color="white" tappable (click)="sendReply($event)" *ngIf="rollcall.status =='pending'">
       <div ion-text color="primary">Respond</div>
     </ion-item>
   </ion-list>
