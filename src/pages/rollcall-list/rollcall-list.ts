@@ -4,6 +4,7 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallRepliesPage } from '../../pages/rollcall-replies/rollcall-replies';
 import { RollcallReplyPage } from '../../pages/rollcall-reply/rollcall-reply';
+import { NotificationListPage } from '../../pages/notification-list/notification-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -18,7 +19,7 @@ import { Token } from '../../models/token';
   selector: 'page-rollcall-list',
   templateUrl: 'rollcall-list.html',
   providers: [ ApiService ],
-  entryComponents:[ RollcallRepliesPage, RollcallReplyPage ]
+  entryComponents:[ RollcallRepliesPage, RollcallReplyPage, NotificationListPage ]
 })
 export class RollcallListPage extends BasePage {
 
@@ -124,6 +125,15 @@ export class RollcallListPage extends BasePage {
         this.loadRollCalls(null, true);
       }
    });
+  }
+
+  createRollcall(event:any) {
+    this.showToast("Creating Rollcalls Is Not Implemented");
+  }
+
+  showNotifications(event:any) {
+    this.showPage(NotificationListPage, {
+      organization: this.organization });
   }
 
 }

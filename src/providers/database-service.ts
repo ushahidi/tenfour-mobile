@@ -13,6 +13,7 @@ import { Organization } from '../models/organization';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
+import { Notification } from '../models/notification';
 
 @Injectable()
 export class DatabaseService extends SqlService {
@@ -342,6 +343,37 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Email>(new Email(), where);
+  }
+
+  // ########## NOTIFICATION ##########
+
+  saveNotification(organization:Organization, notification:Notification):Promise<any> {
+    notification.organization_id = organization.id;
+    return this.saveModel(notification);
+  }
+
+  getNotifications(organization:Organization):Promise<Notification[]> {
+    let where = { organization_id: organization.id };
+    let order = { };
+    return this.getModels<Notification>(new Notification(), where, order);
+  }
+
+  getNotification(id:number):Promise<Notification> {
+    let where = { id: id };
+    return this.getModel<Notification>(new Notification(), where);
+  }
+
+  removeNotification(notification:Notification):Promise<any> {
+    let where = { id: notification.id };
+    return this.removeModel<Notification>(new Notification(), where);
+  }
+
+  removeNotifications(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Notification>(new Notification(), where);
   }
 
 }

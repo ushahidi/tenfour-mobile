@@ -30,6 +30,7 @@ import { Rollcall } from '../models/rollcall';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
+import { Notification } from '../models/notification';
 
 @Component({
   templateUrl: 'app.html'
@@ -74,7 +75,8 @@ export class RollcallApp {
         new Rollcall(),
         new Answer(),
         new Reply(),
-        new Recipient()
+        new Recipient(),
+        new Notification()
       ]);
     });
   }

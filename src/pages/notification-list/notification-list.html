@@ -1,0 +1,37 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title>Notifications</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-refresher (ionRefresh)="loadNotifications($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list *ngIf="notifications">
+    <ion-item no-lines *ngIf="loading == false && notifications.length == 0">
+      <h2>There currently are no Notifications...</h2>
+    </ion-item>
+    <ion-card *ngFor="let notification of notifications">
+      <ion-item color="white" text-wrap *ngIf="notification.type == 'ReplyReceived'">
+        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+        <h3><strong>{{notification.reply_from}}</strong> responded to a RollCall.</h3>
+        <p><small>{{notification.created_at | dateTime}}</small></p>
+      </ion-item>
+      <ion-item color="white" text-wrap *ngIf="notification.type == 'RollCallReceived'">
+        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+        <h3>You received a Rollcall: <strong>{{notification.rollcall_message}}</strong></h3>
+        <p><small>{{notification.created_at | dateTime}}</small></p>
+      </ion-item>
+      <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonJoinedOrganization'">
+        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+        <h3><strong>{{notification.person_name}}</strong> joined the organization.</h3>
+        <p><small>{{notification.created_at | dateTime}}</small></p>
+      </ion-item>
+      <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonLeftOrganization'">
+        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+        <h3><strong>{{notification.person_name}}</strong> left the organization.</h3>
+        <p><small>{{notification.created_at | dateTime}}</small></p>
+      </ion-item>
+    </ion-card>
+  </ion-list>
+</ion-content>

@@ -20,6 +20,7 @@ import { Rollcall } from '../models/rollcall';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
+import { Notification } from '../models/notification';
 
 @Injectable()
 export class ApiService extends HttpService {
@@ -474,6 +475,29 @@ export class ApiService extends HttpService {
           }
           else {
             reject("Reply Not Sent");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
+  getNotifications(token:Token, organization:Organization):Promise<Notification[]> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
+      this.httpGet(url, token.access_token).then(
+        (data:any) => {
+          if (data && data.person && data.person.notifications) {
+            let notifications = [];
+            for (let _notification of data.person.notifications) {
+              let notification = new Notification(_notification);
+              notifications.push(notification);
+            }
+            resolve(notifications);
+          }
+          else {
+            reject("Notifications Not Found");
           }
         },
         (error:any) => {

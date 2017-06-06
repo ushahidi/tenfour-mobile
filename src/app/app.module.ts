@@ -51,7 +51,11 @@ import { RollcallRepliesPage } from '../pages/rollcall-replies/rollcall-replies'
 import { RollcallReplyPage } from '../pages/rollcall-reply/rollcall-reply';
 
 import { ChecklistPage } from '../pages/checklist/checklist';
+
 import { GroupListPage } from '../pages/group-list/group-list';
+
+import { NotificationListPage } from '../pages/notification-list/notification-list';
+
 import { SettingsPage } from '../pages/settings/settings';
 
 import { DateTimePipe } from '../pipes/date-time';
@@ -92,6 +96,7 @@ import { DatabaseService } from '../providers/database-service';
     PersonDetailsPage,
     PersonInvitePage,
     PersonImportPage,
+    NotificationListPage,
     SettingsPage,
     DateTimePipe,
     TimeAgoPipe,
@@ -128,6 +133,7 @@ import { DatabaseService } from '../providers/database-service';
     RollcallRepliesPage,
     RollcallReplyPage,
     GroupListPage,
+    NotificationListPage,
     PersonListPage,
     PersonAddPage,
     PersonEditPage,
