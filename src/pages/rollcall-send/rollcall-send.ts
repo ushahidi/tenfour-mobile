@@ -1,6 +1,8 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { StatusBar } from '@ionic-native/status-bar';
+
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallPeoplePage } from '../../pages/rollcall-people/rollcall-people';
 
@@ -35,7 +37,8 @@ export class RollcallSendPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService) {
+      protected database:DatabaseService,
+      protected statusBar:StatusBar) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -43,6 +46,12 @@ export class RollcallSendPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.rollcall = this.getParameter<Rollcall>("rollcall");
+    this.statusBar.overlaysWebView(false);
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    this.statusBar.overlaysWebView(true);
   }
 
   addPerson() {
