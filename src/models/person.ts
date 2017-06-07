@@ -3,6 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Contact } from '../models/contact';
+import { Notification } from '../models/notification';
 
 @Table("people")
 export class Person extends Model {
@@ -10,11 +11,20 @@ export class Person extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
-    if (data && data.contacts && data.contacts.length > 0) {
-      this.contacts = [];
-      for (let attributes of data.contacts) {
-        let contact = new Contact(attributes);
-        this.contacts.push(contact);
+    if (data) {
+      if (data.contacts && data.contacts.length > 0) {
+        this.contacts = [];
+        for (let _contact of data.contacts) {
+          let contact = new Contact(_contact);
+          this.contacts.push(contact);
+        }
+      }
+      if (data.notifications && data.notifications.length > 0) {
+        this.notifications = [];
+        for (let _notification of data.notifications) {
+          let notification = new Notification(_notification);
+          this.notifications.push(notification);
+        }
       }
     }
   }
@@ -28,6 +38,9 @@ export class Person extends Model {
 
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
+
+  @Column("self", INTEGER)
+  public self:boolean = null;
 
   @Column("name", TEXT)
   public name:string = null;
@@ -43,7 +56,7 @@ export class Person extends Model {
 
   @Column("profile_picture", TEXT)
   public profile_picture:string = null;
-  
+
   @Column("role", TEXT)
   public role:string = null;
 
@@ -84,13 +97,15 @@ export class Person extends Model {
   public saved_at:Date = null;
 
   public contacts:Contact[] = [];
-  
+
+  public notifications:Notification[] = [];
+
   getEmails() {
     return this.contacts.filter(function(contact) {
       return contact.type == 'email';
     });
   }
-  
+
   getPhones() {
     return this.contacts.filter(function(contact) {
       return contact.type == 'phone';

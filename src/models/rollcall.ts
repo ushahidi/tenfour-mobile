@@ -110,6 +110,9 @@ export class Rollcall extends Model {
   @Column("sent_count", INTEGER)
   public sent_count:number = null;
 
+  @Column("replied", BOOLEAN)
+  public replied:boolean = null;
+
   @Column("sent", BOOLEAN)
   public sent:boolean = null;
 

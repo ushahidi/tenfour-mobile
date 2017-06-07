@@ -12,7 +12,6 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -41,8 +40,8 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
-      protected events:Events, 
-      protected camera:Camera, 
+      protected events:Events,
+      protected camera:Camera,
       protected diagnostic:Diagnostic) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -78,74 +77,70 @@ export class PersonEditPage extends BasePage {
 
   createPerson(event) {
     let loading = this.showLoading("Creating...");
-    this.api.getToken().then((token:Token) => {
-      this.api.createPerson(token, this.person).then((person:Person) => {
-        let updates = [];
-        for (let contact of this.person.contacts) {
-          updates.push(this.updateContact(token, person, contact));
-        }
-        Promise.all(updates).then((updated:any) => {
-          this.database.savePerson(this.organization, person).then((saved:any) => {
-            loading.dismiss();
-            this.hideModal(person);
-          });  
-        }, 
-        (error:any) => {
+    this.api.createPerson(this.person).then((person:Person) => {
+      let updates = [];
+      for (let contact of this.person.contacts) {
+        updates.push(this.updateContact(person, contact));
+      }
+      Promise.all(updates).then((updated:any) => {
+        this.database.savePerson(this.organization, person).then((saved:any) => {
           loading.dismiss();
-          this.showAlert("Problem Creating Contacts", error);
+          this.hideModal(person);
         });
-      }, 
+      },
       (error:any) => {
         loading.dismiss();
-        this.showAlert("Problem Creating Person", error);
+        this.showAlert("Problem Creating Contacts", error);
       });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Creating Person", error);
     });
   }
 
   updatePerson(event) {
     let loading = this.showLoading("Updating...");
-    this.api.getToken().then((token:Token) => {
-      this.api.updatePerson(token, this.person).then(
-        (person:Person) => {
-          let updates = [];
-          for (let contact of this.person.contacts) {
-            updates.push(this.updateContact(token, person, contact));
-          }
-          Promise.all(updates).then((updated:any) => {
-            this.database.savePerson(this.organization, person).then((saved:any) => {
-              loading.dismiss();
-              this.hideModal(person);
-            });  
-          }, 
-          (error:any) => {
+    this.api.updatePerson(this.person).then(
+      (person:Person) => {
+        let updates = [];
+        for (let contact of this.person.contacts) {
+          updates.push(this.updateContact(person, contact));
+        }
+        Promise.all(updates).then((updated:any) => {
+          this.database.savePerson(this.organization, person).then((saved:any) => {
             loading.dismiss();
-            this.showAlert("Problem Updating Contacts", error);
+            this.hideModal(person);
           });
-        }, 
+        },
         (error:any) => {
           loading.dismiss();
-          this.showAlert("Problem Updating Person", error);
+          this.showAlert("Problem Updating Contacts", error);
         });
-    });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Updating Person", error);
+      });
   }
-  
-  updateContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
+
+  updateContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.contact == null || contact.contact.length == 0) {
         resolve(contact);
       }
       else if (contact.id) {
-        this.api.updateContact(token, person, contact).then((updated:Contact) => {
+        this.api.updateContact(person, contact).then((updated:Contact) => {
           this.database.saveContact(person, contact).then((saved:any) => {
             resolve(updated);
           });
-        }, 
+        },
         (error:any) => {
           reject(error);
         });
       }
       else {
-        this.api.createContact(token, person, contact).then((created:Contact) => {
+        this.api.createContact(person, contact).then((created:Contact) => {
           this.database.saveContact(person, contact).then((saved:any) => {
             resolve(created);
           });
@@ -156,7 +151,7 @@ export class PersonEditPage extends BasePage {
       }
     });
   }
-  
+
   addPhone(event) {
     let contact = new Contact({type: 'phone'});
     this.person.contacts.push(contact)
@@ -166,7 +161,7 @@ export class PersonEditPage extends BasePage {
     let contact = new Contact({type: 'email'});
     this.person.contacts.push(contact)
   }
-  
+
   showCameraOptions() {
     let buttons = [];
     if (this.cameraPresent) {
@@ -203,14 +198,14 @@ export class PersonEditPage extends BasePage {
     }
     this.camera.getPicture(options).then((imageData:any) => {
       this.logger.info(this, "showCamera", "Captured");
-      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;   
-    }, 
+      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
+    },
     (error:any) => {
       this.logger.error(this, "showCamera", error);
       this.showAlert("Problem Taking Photo", error);
     });
   }
-  
+
   showCameraRoll() {
     this.logger.info(this, "showCameraRoll");
     let options:CameraOptions = {
@@ -221,12 +216,12 @@ export class PersonEditPage extends BasePage {
     }
     this.camera.getPicture(options).then((imageData:any) => {
       this.logger.info(this, "showCameraRoll", "Selected");
-      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;      
-    }, 
+      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
+    },
     (error:any) => {
       this.logger.error(this, "showCameraRoll", error);
       this.showAlert("Problem Selecting Photo", error);
     });
   }
-  
+
 }

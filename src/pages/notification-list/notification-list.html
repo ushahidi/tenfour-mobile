@@ -4,14 +4,14 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadNotifications($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates($event, false)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-list *ngIf="notifications">
-    <ion-item no-lines *ngIf="loading == false && notifications.length == 0">
+  <ion-list *ngIf="person && person.notifications">
+    <ion-item no-lines *ngIf="loading == false && person.notifications.length == 0">
       <h2>There currently are no Notifications...</h2>
     </ion-item>
-    <ion-card *ngFor="let notification of notifications">
+    <ion-card *ngFor="let notification of person.notifications">
       <ion-item color="white" text-wrap *ngIf="notification.type == 'ReplyReceived'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h3><strong>{{notification.reply_from}}</strong> responded to a RollCall.</h3>

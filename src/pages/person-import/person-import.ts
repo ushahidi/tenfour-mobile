@@ -11,7 +11,6 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -102,26 +101,24 @@ export class PersonImportPage extends BasePage {
         imports.push(person);
       }
     }
-    this.api.getToken().then((token:Token) => {
-      let creates = [];
-      for (let person of imports) {
-        creates.push(this.createPerson(token, person));
-      }
-      Promise.all(creates).then(created => {
-        loading.dismiss();
-        this.hideModal();
-        this.showToast(`${imports.length} contacts imported`);
-      });
+    let creates = [];
+    for (let person of imports) {
+      creates.push(this.createPerson(person));
+    }
+    Promise.all(creates).then(created => {
+      loading.dismiss();
+      this.hideModal();
+      this.showToast(`${imports.length} contacts imported`);
     });
   }
 
-  createPerson(token:Token, person:Person):Promise<Person> {
+  createPerson(person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
-      this.api.createPerson(token, person).then((newPerson:Person) => {
+      this.api.createPerson(person).then((newPerson:Person) => {
         this.database.savePerson(this.organization, newPerson).then((saved:any) => {
           let creates = [];
           for (let contact of person.contacts) {
-            creates.push(this.createContact(token, newPerson, contact));
+            creates.push(this.createContact(newPerson, contact));
           }
           Promise.all(creates).then(created => {
             resolve(newPerson);
@@ -137,9 +134,9 @@ export class PersonImportPage extends BasePage {
     });
   }
 
-  createContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
+  createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
-      this.api.createContact(token, person, contact).then((newContact:Contact) => {
+      this.api.createContact(person, contact).then((newContact:Contact) => {
         this.database.saveContact(person, newContact).then((saved:any) => {
           resolve(newContact);
         },

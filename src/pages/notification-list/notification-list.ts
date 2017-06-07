@@ -6,8 +6,8 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
-import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 import { Notification } from '../../models/notification';
 
 @IonicPage()
@@ -20,7 +20,7 @@ import { Notification } from '../../models/notification';
 export class NotificationListPage extends BasePage {
 
   organization:Organization = null;
-  notifications:Notification[] = null;
+  person:Person = null;
   loading:boolean = false;
 
   constructor(
@@ -42,56 +42,49 @@ export class NotificationListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.loadNotifications(null, true);
+    this.person = this.getParameter<Person>("person");
+    this.loadUpdates(null, true);
   }
 
-  loadNotifications(event:any, cache:boolean=true) {
+  loadUpdates(event:any, cache:boolean=true) {
     this.loading = true;
+    Promise.all([this.loadNotifications(cache)]).then(
+      (loaded:any) =>{
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  loadNotifications(cache:boolean=true):Promise<any> {
     if (cache) {
-      this.database.getNotifications(this.organization).then((notifications:Notification[]) => {
+      return this.database.getNotifications(this.organization).then((notifications:Notification[]) => {
         if (notifications && notifications.length > 0) {
-          this.notifications = notifications;
-          if (event) {
-            event.complete();
-          }
-          this.loading = false;
+          this.person.notifications = notifications;
         }
         else {
-          this.loadNotifications(event, false);
+          this.loadNotifications(false);
         }
       });
     }
     else {
-      this.api.getToken().then(
-        (token:Token) => {
-          this.api.getNotifications(token, this.organization).then(
-            (notifications:Notification[]) => {
-              let saves = [];
-              for (let notification of notifications) {
-                saves.push(this.database.saveNotification(this.organization, notification));
-              }
-              Promise.all(saves).then(saved => {
-                this.notifications = notifications;
-                if (event) {
-                  event.complete();
-                }
-                this.loading = false;
-              });
-            },
-            (error:any) => {
-              this.loading = false;
-              if (event) {
-                event.complete();
-              }
-              this.showToast(error);
-            });
-        },
-        (error:any) => {
-          this.loading = false;
-          if (event) {
-            event.complete();
+      return this.api.getNotifications(this.organization).then(
+        (notifications:Notification[]) => {
+          let saves = [];
+          for (let notification of notifications) {
+            saves.push(this.database.saveNotification(this.organization, notification));
           }
-          this.showToast(error);
+          Promise.all(saves).then(saved => {
+            this.person.notifications = notifications;
+          });
         });
     }
   }

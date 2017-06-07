@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" (click)="sendRollcall($event)">Send</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="rollcall">
+    <ion-item text-wrap text-center color="white">
+      <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <h1>{{rollcall.message}}</h1>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="rollcall">
+    <ion-list-header>Send To</ion-list-header>
+    <ion-item color="white" tappable (click)="addPerson()">
+      <h2 ion-text color="primary">Add people</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

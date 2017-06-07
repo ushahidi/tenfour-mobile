@@ -278,231 +278,252 @@ export class ApiService extends HttpService {
     });
   }
 
-  getPeople(token:Token, organization:Organization):Promise<Person[]> {
+  getPeople(organization:Organization):Promise<Person[]> {
     return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${organization.id}/people/`;
-      this.httpGet(url, token.access_token).then(
-        (data:any) => {
-          let people = [];
-          if (data && data.people) {
-            for (let attributes of data.people) {
-              let person = new Person(attributes);
-              people.push(person);
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/people/`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            let people = [];
+            if (data && data.people) {
+              for (let _person of data.people) {
+                let person = new Person(_person);
+                people.push(person);
+              }
             }
-          }
-          resolve(people);
-        },
-        (error:any) => {
-          reject(error);
-        });
+            resolve(people);
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
     });
   }
 
-  getPerson(token:Token, organization:Organization, id:any="me"):Promise<Person> {
+  getPerson(organization:Organization, id:any="me"):Promise<Person> {
     return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${organization.id}/people/${id}`;
-      this.httpGet(url, token.access_token).then(
-        (data:any) => {
-          if (data && data.person) {
-            let person = new Person(data.person);
-            resolve(person);
-          }
-          else {
-            reject("Person Not Found");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  createPerson(token:Token, person:Person):Promise<Person> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
-      let params = {
-        name: person.name,
-        description: person.description || "",
-        person_type: "user",
-        role: "member" };
-      if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
-        params['_input_image'] = person.profile_picture;
-      }
-      this.httpPost(url, token.access_token, params).then(
-        (data:any) => {
-          if (data && data.person) {
-            resolve(new Person(data.person));
-          }
-          else {
-            reject("Person Not Created");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  updatePerson(token:Token, person:Person):Promise<Person> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
-      let params = {
-        name: person.name,
-        description: person.description || ""};
-      if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
-        params['_input_image'] = person.profile_picture;
-      }
-      this.httpPut(url, token.access_token, params).then(
-        (data:any) => {
-          if (data && data.person) {
-            resolve(new Person(data.person));
-          }
-          else {
-            reject("Person Not Updated");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  createContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
-      let params = {
-        type: contact.type,
-        contact: contact.contact,
-        preferred: contact.preferred || 0,
-        organization_id: person.organization_id };
-      this.httpPost(url, token.access_token, params).then(
-        (data:any) => {
-          if (data && data.contact) {
-            resolve(new Contact(data.contact));
-          }
-          else {
-            reject("Contact Not Created");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  updateContact(token:Token, person:Person, contact:Contact):Promise<Contact> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
-      let params = {
-        type: contact.type,
-        contact: contact.contact,
-        preferred: contact.preferred || 0,
-        organization_id: person.organization_id };
-      this.httpPut(url, token.access_token, params).then(
-        (data:any) => {
-          if (data && data.contact) {
-            resolve(new Contact(data.contact));
-          }
-          else {
-            reject("Contact Not Updated");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  getRollcalls(token:Token, organization:Organization, limit:number=10, offset:number=0):Promise<Rollcall[]> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
-      this.httpGet(url, token.access_token).then(
-        (data:any) => {
-          let rollcalls = [];
-          if (data && data.rollcalls) {
-            for (let _rollcall of data.rollcalls) {
-              let rollcall = new Rollcall(_rollcall);
-              rollcalls.push(rollcall);
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/people/${id}`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.person) {
+              let person = new Person(data.person);
+              person.self = (id === "me");
+              resolve(person);
             }
-          }
-          resolve(rollcalls);
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  getRollcall(token:Token, id:number):Promise<Rollcall> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/rollcalls/${id}`;
-      this.httpGet(url, token.access_token).then(
-        (data:any) => {
-          if (data && data.rollcall) {
-            let rollcall = new Rollcall(data.rollcall);
-            resolve(rollcall);
-          }
-          else {
-            reject("Rollcall Not Found");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  postReply(token:Token, rollcall:Rollcall, reply:Reply):Promise<Reply> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies`;
-      let params = { };
-      if (reply) {
-        if (reply.answer) {
-          params["answer"] = reply.answer;
-        }
-        if (reply.message) {
-          params["message"] = reply.message;
-        }
-        if (reply.location_text) {
-          params["location_text"] = reply.location_text;
-        }
-      }
-      this.httpPost(url, token.access_token, params).then(
-        (data:any) => {
-          if (data && data.reply) {
-            let reply = new Reply(data.reply);
-            resolve(reply);
-          }
-          else {
-            reject("Reply Not Sent");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  getNotifications(token:Token, organization:Organization):Promise<Notification[]> {
-    return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
-      this.httpGet(url, token.access_token).then(
-        (data:any) => {
-          if (data && data.person && data.person.notifications) {
-            let notifications = [];
-            for (let _notification of data.person.notifications) {
-              let notification = new Notification(_notification);
-              notifications.push(notification);
+            else {
+              reject("Person Not Found");
             }
-            resolve(notifications);
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  createPerson(person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
+        let params = {
+          name: person.name,
+          description: person.description || "",
+          person_type: "user",
+          role: "member" };
+        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+          params['_input_image'] = person.profile_picture;
+        }
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.person) {
+              resolve(new Person(data.person));
+            }
+            else {
+              reject("Person Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  updatePerson(person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
+        let params = {
+          name: person.name,
+          description: person.description || ""};
+        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+          params['_input_image'] = person.profile_picture;
+        }
+        this.httpPut(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.person) {
+              resolve(new Person(data.person));
+            }
+            else {
+              reject("Person Not Updated");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  createContact(person:Person, contact:Contact):Promise<Contact> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
+        let params = {
+          type: contact.type,
+          contact: contact.contact,
+          preferred: contact.preferred || 0,
+          organization_id: person.organization_id };
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.contact) {
+              resolve(new Contact(data.contact));
+            }
+            else {
+              reject("Contact Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  updateContact(person:Person, contact:Contact):Promise<Contact> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
+        let params = {
+          type: contact.type,
+          contact: contact.contact,
+          preferred: contact.preferred || 0,
+          organization_id: person.organization_id };
+        this.httpPut(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.contact) {
+              resolve(new Contact(data.contact));
+            }
+            else {
+              reject("Contact Not Updated");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  getRollcalls(organization:Organization, limit:number=10, offset:number=0):Promise<Rollcall[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            let rollcalls = [];
+            if (data && data.rollcalls) {
+              for (let _rollcall of data.rollcalls) {
+                let rollcall = new Rollcall(_rollcall);
+                rollcalls.push(rollcall);
+              }
+            }
+            resolve(rollcalls);
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  getRollcall(id:number):Promise<Rollcall> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls/${id}`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.rollcall) {
+              let rollcall = new Rollcall(data.rollcall);
+              resolve(rollcall);
+            }
+            else {
+              reject("Rollcall Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  postReply(rollcall:Rollcall, reply:Reply):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies`;
+        let params = { };
+        if (reply) {
+          if (reply.answer) {
+            params["answer"] = reply.answer;
           }
-          else {
-            reject("Notifications Not Found");
+          if (reply.message) {
+            params["message"] = reply.message;
           }
-        },
-        (error:any) => {
-          reject(error);
-        });
+          if (reply.location_text) {
+            params["location_text"] = reply.location_text;
+          }
+        }
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.reply) {
+              let reply = new Reply(data.reply);
+              resolve(reply);
+            }
+            else {
+              reject("Reply Not Sent");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  getNotifications(organization:Organization):Promise<Notification[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.person && data.person.notifications) {
+              let notifications = [];
+              for (let _notification of data.person.notifications) {
+                let notification = new Notification(_notification);
+                notifications.push(notification);
+              }
+              resolve(notifications);
+            }
+            else {
+              reject("Notifications Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
     });
   }
 

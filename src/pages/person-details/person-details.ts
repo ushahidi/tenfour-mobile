@@ -10,7 +10,6 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -23,6 +22,7 @@ export class PersonDetailsPage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -45,52 +45,50 @@ export class PersonDetailsPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    this.loadPerson(null, true);
+    this.loadUpdates(null, true);
   }
 
-  loadPerson(event:any, cache:boolean=true) {
+  loadUpdates(event:any, cache:boolean=true) {
+    this.loading = true;
+    Promise.all([this.loadPerson(cache)]).then(
+      (loaded:any) =>{
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  loadPerson(cache:boolean=true) {
     if (cache) {
-      this.database.getContacts(this.person).then((contacts:Contact[]) => {
+      return this.database.getContacts(this.person).then((contacts:Contact[]) => {
         if (contacts && contacts.length > 0) {
           this.person.contacts = contacts;
-          if (event) {
-            event.complete();
-          }
         }
         else {
-          this.loadPerson(event, false);
+          this.loadPerson(false);
         }
       });
     }
     else {
-      this.api.getToken().then(
-        (token:Token) => {
-          this.api.getPerson(token, this.organization, this.person.id).then(
-            (person:Person) => {
-              this.person = person;
-              let saves = [];
-              for (let contact of person.contacts) {
-                saves.push(this.database.saveContact(person, contact));
-              }
-              saves.push(this.database.savePerson(this.organization, person))
-              Promise.all(saves).then(saved => {
-                if (event) {
-                  event.complete();
-                }
-              });
-            },
-            (error:any) => {
-              if (event) {
-                event.complete();
-              }
-              this.showToast(error);
-            });
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
+      return this.api.getPerson(this.organization, this.person.id).then(
+        (person:Person) => {
+          this.person = person;
+          let saves = [];
+          for (let contact of person.contacts) {
+            saves.push(this.database.saveContact(person, contact));
           }
-          this.showToast(error);
+          saves.push(this.database.savePerson(this.organization, person))
+          Promise.all(saves).then(saved => {
+
+          });
         });
     }
   }

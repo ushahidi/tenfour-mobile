@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { RollcallRepliesPage } from './rollcall-replies';
+import { ReplyListPage } from './reply-list';
 
 @NgModule({
   declarations: [
-    RollcallRepliesPage,
+    ReplyListPage,
   ],
   imports: [
-    IonicPageModule.forChild(RollcallRepliesPage),
+    IonicPageModule.forChild(ReplyListPage),
   ],
   exports: [
-    RollcallRepliesPage
+    ReplyListPage
   ]
 })
 export class RollcallRepliesModule {}

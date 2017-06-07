@@ -22,7 +22,7 @@ export class SignupPasswordPage extends BasePage {
 
   @ViewChild('password')
   password:TextInput;
-  
+
   @ViewChild('confirm')
   confirm:TextInput;
 
@@ -56,7 +56,7 @@ export class SignupPasswordPage extends BasePage {
     }
     else if (this.password.value != this.confirm.value) {
       this.showToast("Password and conform do not match");
-    } 
+    }
     else {
       let loading = this.showLoading("Creating...");
       this.api.clientLogin().then(
@@ -69,7 +69,7 @@ export class SignupPasswordPage extends BasePage {
               this.api.userLogin(this.organization.email, this.organization.password).then(
                 (userToken:Token) => {
                   this.logger.info(this, "userLogin", "User Token", userToken);
-                  this.api.getPerson(userToken, this.organization, "me").then((person:Person) => {
+                  this.api.getPerson(this.organization, "me").then((person:Person) => {
                     this.logger.info(this, "userLogin", "Person", person);
                     organization.user_id = person.id;
                     let saves = [

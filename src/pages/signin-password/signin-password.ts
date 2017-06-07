@@ -57,7 +57,7 @@ export class SigninPasswordPage extends BasePage {
       this.api.userLogin(this.email, password).then(
         (token:Token) => {
           this.logger.info(this, "showNext", "User Token", token);
-          this.api.getPerson(token, this.organization, "me").then((person:Person) => {
+          this.api.getPerson(this.organization, "me").then((person:Person) => {
             this.logger.info(this, "showNext", "Person", person);
             this.organization.user_id = person.id;
             let saves = [

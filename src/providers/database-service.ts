@@ -69,10 +69,13 @@ export class DatabaseService extends SqlService {
     return this.getModels<Person>(new Person(), where, order);
   }
 
-  getPerson(id:number):Promise<Person> {
+  getPerson(id:number, self:boolean=false):Promise<Person> {
     let where = { };
     if (id) {
       where["id"] = id;
+    }
+    if (self) {
+      where["self"] = true;
     }
     return this.getModel<Person>(new Person(), where);
   }

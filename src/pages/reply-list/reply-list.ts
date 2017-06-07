@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { ReplySendPage } from '../../pages/reply-send/reply-send';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -9,19 +10,16 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Reply } from '../../models/reply';
-import { Answer } from '../../models/answer';
 import { Recipient } from '../../models/recipient';
-import { Person } from '../../models/person';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
-  selector: 'page-rollcall-reply',
-  templateUrl: 'rollcall-reply.html',
+  selector: 'page-reply-list',
+  templateUrl: 'reply-list.html',
   providers: [ ApiService ],
-  entryComponents:[  ]
+  entryComponents:[ ReplySendPage ]
 })
-export class RollcallReplyPage extends BasePage {
+export class ReplyListPage extends BasePage {
 
   @ViewChild('notifications')
   notifications:Button;
@@ -32,8 +30,6 @@ export class RollcallReplyPage extends BasePage {
   organization:Organization = null;
 
   rollcall:Rollcall = null;
-
-  reply:Reply = null;
 
   loading:boolean = false;
 
@@ -58,50 +54,63 @@ export class RollcallReplyPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.rollcall = this.getParameter<Rollcall>("rollcall");
-    this.reply = this.getParameter<Reply>("reply");
-    if (this.reply == null) {
-      this.reply = new Reply();
-      this.reply.organization_id = this.organization.id;
-      this.reply.rollcall_id = this.rollcall.id;
+    this.loadUpdates(null, true);
+  }
+
+  loadUpdates(event:any, cache:boolean=true) {
+    this.loading = true;
+    Promise.all([this.loadReplies(cache)]).then(
+      (loaded:any) =>{
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  loadReplies(cache:boolean=true):Promise<any> {
+    if (cache) {
+      return this.database.getReplies(this.rollcall).then((replies:Reply[]) => {
+        this.rollcall.replies = replies;
+      });
     }
-  }
+    else {
+      return this.api.getRollcall(this.rollcall.id).then((rollcall:Rollcall) => {
+        let saves = [];
+        saves.push(this.database.saveRollcall(this.organization, rollcall));
+        for (let answer of rollcall.answers) {
+          saves.push(this.database.saveAnswer(rollcall, answer));
+        }
+        for (let recipient of rollcall.recipients) {
+          saves.push(this.database.saveRecipient(rollcall, recipient));
+        }
+        for (let reply of rollcall.replies) {
+          saves.push(this.database.saveReply(rollcall, reply));
+        }
+        Promise.all(saves).then(saved => {
 
-  selectAnswer(event:any, answer:Answer) {
-    if (answer) {
-      this.reply.answer = answer.answer;
-    }
-  }
-
-  cancelReply(event:any) {
-    this.logger.info(this, "cancelReply");
-    this.hideModal();
-  }
-
-  sendReply(event:any) {
-    this.logger.info(this, "sendReply");
-    let loading = this.showLoading("Sending...");
-    this.api.getToken().then((token:Token) => {
-      this.api.postReply(token, this.rollcall, this.reply).then(
-        (replied:Reply) => {
-          this.logger.info(this, "sendReply", "Reply", replied);
-          this.database.getPerson(replied.user_id).then((person:Person) => {
-            this.logger.info(this, "sendReply", "Person", person);
-            replied.user_name = person.name;
-            replied.user_description = person.description;
-            replied.user_initials = person.initials;
-            replied.user_picture = person.profile_picture;
-            this.database.saveReply(this.rollcall, replied).then(saved => {
-              loading.dismiss();
-              this.showToast("Rollcall Reply Sent");
-              this.hideModal({reply: replied});
-            });
-          });
-        },
-        (error:any) => {
-          loading.dismiss();
-          this.showAlert("Problem Sending Reply", error);
         });
-    });
+      });
+    }
+  }
+
+  sendReply(event) {
+    this.logger.info(this, "sendReply");
+    let modal = this.showModal(ReplySendPage, {
+      organization: this.organization,
+      rollcall: this.rollcall });
+    modal.onDidDismiss(data => {
+      if (data) {
+        this.loadReplies(true);
+      }
+   });
   }
 
 }

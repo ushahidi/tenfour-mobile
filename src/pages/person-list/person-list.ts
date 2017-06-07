@@ -10,7 +10,6 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -22,6 +21,7 @@ import { Token } from '../../models/token';
 export class PersonListPage extends BasePage {
 
   organization:Organization = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -49,7 +49,7 @@ export class PersonListPage extends BasePage {
 
   loadPeople(event:any, cache:boolean=true) {
     if (cache) {
-      this.database.getPeople(this.organization).then((people:Person[]) => {
+      return this.database.getPeople(this.organization).then((people:Person[]) => {
         if (people && people.length > 0) {
           this.organization.people = people;
           if (event) {
@@ -62,27 +62,18 @@ export class PersonListPage extends BasePage {
       });
     }
     else {
-      this.api.getToken().then(
-        (token:Token) => {
-          this.api.getPeople(token, this.organization).then(
-            (people:Person[]) => {
-              this.organization.people = people;
-              let saves = [];
-              for (let person of people) {
-                saves.push(this.database.savePerson(this.organization, person));
-              }
-              Promise.all(saves).then(saved => {
-                if (event) {
-                  event.complete();
-                }
-              });
-            },
-            (error:any) => {
-              if (event) {
-                event.complete();
-              }
-              this.showToast(error);
-            });
+      return this.api.getPeople(this.organization).then(
+        (people:Person[]) => {
+          this.organization.people = people;
+          let saves = [];
+          for (let person of people) {
+            saves.push(this.database.savePerson(this.organization, person));
+          }
+          Promise.all(saves).then(saved => {
+            if (event) {
+              event.complete();
+            }
+          });
         },
         (error:any) => {
           if (event) {
