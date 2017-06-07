@@ -39,8 +39,8 @@ export class Person extends Model {
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
 
-  @Column("self", INTEGER)
-  public self:boolean = null;
+  @Column("me", BOOLEAN)
+  public me:boolean = null;
 
   @Column("name", TEXT)
   public name:string = null;

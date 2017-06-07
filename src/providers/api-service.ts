@@ -308,7 +308,7 @@ export class ApiService extends HttpService {
           (data:any) => {
             if (data && data.person) {
               let person = new Person(data.person);
-              person.self = (id === "me");
+              person.me = (id === "me");
               resolve(person);
             }
             else {

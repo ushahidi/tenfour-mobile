@@ -85,10 +85,16 @@ export class RollcallEditPage extends BasePage {
   }
 
   addCustom() {
+    let colors = [
+      "#E8C440", "#58AC5D", "#B835C4", "#577BAB",
+      "#A28AD9", "#19AEE9", "#0273A3", "#4B9183",
+      "#D3BAEB", "#304170", "#99238C", "#1DB7ED",
+      "#793EE8", "#8FDEDC", "#507BBE", "#0F7E70"];
+    let color = colors[this.rollcall.answers.length];
     this.rollcall.answers.push(new Answer({
       icon: "",
       type: "custom",
-      color: "#B835C4",
+      color: color,
       answer: "Maybe"
     }));
   }
