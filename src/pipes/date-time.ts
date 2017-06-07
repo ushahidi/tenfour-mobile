@@ -19,7 +19,7 @@ export class DateTimePipe {
         nextDay: 'h:mm A [Tomorrow]',
         lastWeek: 'h:mm A MMMM Do',
         nextWeek: 'h:mm A MMMM Do',
-        sameElse: 'h:mm A MMMM Do, YYYY'
+        sameElse: 'h:mm A MMMM D, YYYY'
       });
     }
     return "";

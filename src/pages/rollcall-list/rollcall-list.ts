@@ -13,7 +13,6 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Rollcall } from '../../models/rollcall';
-import { Recipient } from '../../models/recipients';
 
 @IonicPage()
 @Component({

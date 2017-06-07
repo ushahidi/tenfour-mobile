@@ -8,7 +8,6 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
-import { Contact } from '../../models/contact';
 
 @IonicPage()
 @Component({

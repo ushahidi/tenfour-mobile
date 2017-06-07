@@ -1,5 +1,5 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
@@ -10,7 +10,6 @@ import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
-import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
@@ -35,8 +34,7 @@ export class PersonAddPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService,
-      protected events:Events) {
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

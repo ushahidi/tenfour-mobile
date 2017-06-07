@@ -1,16 +1,16 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { ChecklistPage } from './checklist';
+import { BasePage } from './base-page';
 
 @NgModule({
   declarations: [
-    ChecklistPage,
+    BasePage,
   ],
   imports: [
-    IonicPageModule.forChild(ChecklistPage),
+    IonicPageModule.forChild(BasePage),
   ],
   exports: [
-    ChecklistPage
+    BasePage
   ]
 })
-export class ChecklistModule {}
+export class BasePageModule {}

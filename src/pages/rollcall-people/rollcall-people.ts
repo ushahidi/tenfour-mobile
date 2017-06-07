@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -9,7 +9,6 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Person } from '../../models/person';
-import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({

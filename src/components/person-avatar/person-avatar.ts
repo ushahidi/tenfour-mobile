@@ -1,15 +1,21 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'person-avatar',
-  templateUrl: 'person-avatar.html',
-  inputs: ['initials', 'image', 'large']
+  templateUrl: 'person-avatar.html'
 })
 export class PersonAvatarComponent {
 
-  image: string;
-  initials: string;
+  @Input()
+  image: string = null;
+
+  @Input()
+  initials: string = null;
+
+  @Input()
   color: string = "#000000";
+
+  @Input()
   large:boolean = false;
 
   constructor() {

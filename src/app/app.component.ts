@@ -10,7 +10,7 @@ import { SigninEmailPage } from '../pages/signin-email/signin-email';
 
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 
-import { ChecklistPage } from '../pages/checklist/checklist';
+import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
@@ -120,17 +120,16 @@ export class RollcallApp {
             this.database.getPerson(this.organization.user_id).then(
               (person:Person) => {
                 this.logger.info(this, "loadApplication", "Person", person);
-                this.showRollcallList();
-                // if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                //   this.showRollcallList();
-                // }
-                // else {
-                //   this.showChecklist(person);
-                // }
+                if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRollcallList();
+                }
+                else {
+                  this.showOnboardList(person);
+                }
               },
               (error:any) => {
                 this.logger.error(this, "loadApplication", "Person", error);
-                this.showChecklist(null);
+                this.showOnboardList(null);
               });
           }
           else {
@@ -207,9 +206,9 @@ export class RollcallApp {
     this.splashScreen.hide();
   }
 
-  showChecklist(person:Person) {
-    this.logger.info(this, "showChecklist");
-    this.nav.setRoot(ChecklistPage,
+  showOnboardList(person:Person) {
+    this.logger.info(this, "showOnboardList");
+    this.nav.setRoot(OnboardListPage,
       { organization: this.organization,
         person: person });
     this.menuController.close();

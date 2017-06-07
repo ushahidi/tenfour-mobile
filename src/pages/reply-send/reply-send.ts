@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -10,7 +10,6 @@ import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
-import { Recipient } from '../../models/recipient';
 import { Person } from '../../models/person';
 
 @IonicPage()
@@ -48,8 +47,7 @@ export class ReplySendPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService,
-      protected events:Events) {
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

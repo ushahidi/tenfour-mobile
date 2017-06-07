@@ -11,7 +11,6 @@ import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
-import { Recipient } from '../../models/recipient';
 
 @IonicPage()
 @Component({

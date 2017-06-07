@@ -6,7 +6,6 @@ import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { ApiService } from '../../providers/api-service';
 
-import { Email } from '../../models/email';
 import { Organization } from '../../models/organization';
 
 @IonicPage()

@@ -1,5 +1,5 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
@@ -12,12 +12,12 @@ import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
-  selector: 'page-checklist',
-  templateUrl: 'checklist.html',
+  selector: 'page-onboard-list',
+  templateUrl: 'onboard-list.html',
   providers: [ ApiService, DatabaseService ],
   entryComponents:[ RollcallListPage ]
 })
-export class ChecklistPage extends BasePage {
+export class OnboardListPage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
@@ -34,8 +34,7 @@ export class ChecklistPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService,
-      protected events:Events) {
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

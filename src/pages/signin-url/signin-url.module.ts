@@ -13,4 +13,4 @@ import { SigninUrlPage } from './signin-url';
     SigninUrlPage
   ]
 })
-export class SignupUrlModule {}
+export class SigninUrlModule {}

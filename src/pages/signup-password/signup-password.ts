@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { ChecklistPage } from '../../pages/checklist/checklist';
+import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -16,7 +16,7 @@ import { Person } from '../../models/person';
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ ChecklistPage ]
+  entryComponents:[ OnboardListPage ]
 })
 export class SignupPasswordPage extends BasePage {
 
@@ -78,7 +78,7 @@ export class SignupPasswordPage extends BasePage {
                     Promise.all(saves).then(saved => {
                       loading.dismiss();
                       this.showToast("Logged in");
-                      this.showRootPage(ChecklistPage,
+                      this.showRootPage(OnboardListPage,
                         { organization: organization,
                           person: person });
                     });

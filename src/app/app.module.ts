@@ -26,50 +26,50 @@ import { Device } from '@ionic-native/device';
 
 import { RollcallApp } from './app.component';
 
-import { SigninUrlPage } from '../pages/signin-url/signin-url';
-import { SigninEmailPage } from '../pages/signin-email/signin-email';
-import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
+import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
+import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
-import { SignupUrlPage } from '../pages/signup-url/signup-url';
-import { SignupEmailPage } from '../pages/signup-email/signup-email';
-import { SignupNamePage } from '../pages/signup-name/signup-name';
-import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
-import { SignupCheckPage } from '../pages/signup-check/signup-check';
-import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
-import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
-import { SignupPasswordPage } from '../pages/signup-password/signup-password';
+import { SignupUrlModule} from '../pages/signup-url/signup-url.module';
+import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
+import { SignupNameModule } from '../pages/signup-name/signup-name.module';
+import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
+import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
+import { SignupConfirmModule } from '../pages/signup-confirm/signup-confirm.module';
+import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
+import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
 
-import { PersonListPage } from '../pages/person-list/person-list';
-import { PersonAddPage } from '../pages/person-add/person-add';
-import { PersonEditPage } from '../pages/person-edit/person-edit';
-import { PersonDetailsPage } from '../pages/person-details/person-details';
-import { PersonInvitePage } from '../pages/person-invite/person-invite';
-import { PersonImportPage } from '../pages/person-import/person-import';
+import { PersonListModule } from '../pages/person-list/person-list.module';
+import { PersonAddModule } from '../pages/person-add/person-add.module';
+import { PersonEditModule } from '../pages/person-edit/person-edit.module';
+import { PersonDetailsModule } from '../pages/person-details/person-details.module';
+import { PersonInviteModule } from '../pages/person-invite/person-invite.module';
+import { PersonImportModule } from '../pages/person-import/person-import.module';
 
-import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
-import { RollcallEditPage } from '../pages/rollcall-edit/rollcall-edit';
-import { RollcallPeoplePage } from '../pages/rollcall-people/rollcall-people';
-import { RollcallSendPage } from '../pages/rollcall-send/rollcall-send';
+import { RollcallListModule } from '../pages/rollcall-list/rollcall-list.module';
+import { RollcallEditModule } from '../pages/rollcall-edit/rollcall-edit.module';
+import { RollcallPeopleModule } from '../pages/rollcall-people/rollcall-people.module';
+import { RollcallSendModule } from '../pages/rollcall-send/rollcall-send.module';
 
-import { ReplyListPage } from '../pages/reply-list/reply-list';
-import { ReplySendPage } from '../pages/reply-send/reply-send';
+import { ReplyListModule } from '../pages/reply-list/reply-list.module';
+import { ReplySendModule } from '../pages/reply-send/reply-send.module';
 
-import { ChecklistPage } from '../pages/checklist/checklist';
+import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
-import { GroupListPage } from '../pages/group-list/group-list';
+import { GroupListModule } from '../pages/group-list/group-list.module';
 
-import { NotificationListPage } from '../pages/notification-list/notification-list';
+import { NotificationListModule } from '../pages/notification-list/notification-list.module';
 
-import { SettingsListPage } from '../pages/settings-list/settings-list';
+import { SettingsListModule } from '../pages/settings-list/settings-list.module';
 
-import { DateTimePipe } from '../pipes/date-time';
-import { TimeAgoPipe } from '../pipes/time-ago';
-import { TitleizePipe } from '../pipes/titleize';
-import { CapitalizePipe } from '../pipes/capitalize';
-import { TruncatePipe } from '../pipes/truncate';
-import { HtmlParserPipe } from '../pipes/html-parser';
+import { DateTimeModule } from '../pipes/date-time.module';
+import { TimeAgoModule } from '../pipes/time-ago.module';
+import { TitleizeModule } from '../pipes/titleize.module';
+import { CapitalizeModule } from '../pipes/capitalize.module';
+import { TruncateModule } from '../pipes/truncate.module';
+import { HtmlParserModule } from '../pipes/html-parser.module';
 
-import { PersonAvatarComponent } from '../components/person-avatar/person-avatar';
+import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
 
 import { LoggerService } from '../providers/logger-service';
 import { ApiService } from '../providers/api-service';
@@ -77,80 +77,55 @@ import { DatabaseService } from '../providers/database-service';
 
 @NgModule({
   declarations: [
-    RollcallApp,
-    SigninUrlPage,
-    SigninEmailPage,
-    SigninPasswordPage,
-    SignupUrlPage,
-    SignupEmailPage,
-    SignupNamePage,
-    SignupOwnerPage,
-    SignupCheckPage,
-    SignupConfirmPage,
-    SignupPlanPage,
-    SignupPasswordPage,
-    ChecklistPage,
-    RollcallListPage,
-    RollcallEditPage,
-    RollcallPeoplePage,
-    RollcallSendPage,
-    ReplyListPage,
-    ReplySendPage,
-    GroupListPage,
-    PersonListPage,
-    PersonAddPage,
-    PersonEditPage,
-    PersonDetailsPage,
-    PersonInvitePage,
-    PersonImportPage,
-    NotificationListPage,
-    SettingsListPage,
-    DateTimePipe,
-    TimeAgoPipe,
-    TitleizePipe,
-    CapitalizePipe,
-    TruncatePipe,
-    HtmlParserPipe,
-    PersonAvatarComponent
+    RollcallApp
   ],
   imports: [
     HttpModule,
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    PersonAvatarModule,
+    GroupListModule,
+    SigninUrlModule,
+    SigninEmailModule,
+    SigninUrlModule,
+    SigninPasswordModule,
+    SignupUrlModule,
+    SignupEmailModule,
+    SignupNameModule,
+    SignupOwnerModule,
+    SignupCheckModule,
+    SignupConfirmModule,
+    SignupPlanModule,
+    SignupPasswordModule,
+    OnboardListModule,
+    RollcallListModule,
+    RollcallEditModule,
+    RollcallPeopleModule,
+    RollcallSendModule,
+    ReplyListModule,
+    ReplySendModule,
+    GroupListModule,
+    NotificationListModule,
+    PersonListModule,
+    PersonAddModule,
+    PersonEditModule,
+    PersonDetailsModule,
+    PersonInviteModule,
+    PersonImportModule,
+    SettingsListModule,
+    DateTimeModule,
+    DateTimeModule,
+    TimeAgoModule,
+    TitleizeModule,
+    CapitalizeModule,
+    TruncateModule,
+    HtmlParserModule,
     IonicModule.forRoot(RollcallApp)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    RollcallApp,
-    SigninUrlPage,
-    SigninEmailPage,
-    SigninUrlPage,
-    SigninPasswordPage,
-    SignupUrlPage,
-    SignupEmailPage,
-    SignupNamePage,
-    SignupOwnerPage,
-    SignupCheckPage,
-    SignupConfirmPage,
-    SignupPlanPage,
-    SignupPasswordPage,
-    ChecklistPage,
-    RollcallListPage,
-    RollcallEditPage,
-    RollcallPeoplePage,
-    RollcallSendPage,
-    ReplyListPage,
-    ReplySendPage,
-    GroupListPage,
-    NotificationListPage,
-    PersonListPage,
-    PersonAddPage,
-    PersonEditPage,
-    PersonDetailsPage,
-    PersonInvitePage,
-    PersonImportPage,
-    SettingsListPage
+    RollcallApp
   ],
   providers: [
     { provide: File, useClass: File },

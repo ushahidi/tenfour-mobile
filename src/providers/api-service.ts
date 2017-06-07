@@ -17,9 +17,7 @@ import { Person } from '../models/person';
 import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 import { Rollcall } from '../models/rollcall';
-import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
-import { Recipient } from '../models/recipient';
 import { Notification } from '../models/notification';
 
 @Injectable()

@@ -3,7 +3,7 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
-import { ChecklistPage } from '../../pages/checklist/checklist';
+import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -17,7 +17,7 @@ import { Person } from '../../models/person';
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallListPage, ChecklistPage ]
+  entryComponents:[ RollcallListPage, OnboardListPage ]
 })
 export class SigninPasswordPage extends BasePage {
 
@@ -71,7 +71,7 @@ export class SigninPasswordPage extends BasePage {
                   { organization: this.organization });
               }
               else {
-                this.showRootPage(ChecklistPage,
+                this.showRootPage(OnboardListPage,
                   { organization: this.organization,
                     person: person });
               }

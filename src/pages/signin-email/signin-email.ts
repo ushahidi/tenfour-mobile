@@ -7,7 +7,6 @@ import { SigninPasswordPage } from '../../pages/signin-password/signin-password'
 import { ApiService } from '../../providers/api-service';
 
 import { Organization } from '../../models/organization';
-import { Email } from '../../models/email';
 
 @IonicPage()
 @Component({
