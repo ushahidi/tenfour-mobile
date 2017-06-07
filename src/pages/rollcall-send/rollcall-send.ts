@@ -2,6 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { RollcallPeoplePage } from '../../pages/rollcall-people/rollcall-people';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -15,7 +16,7 @@ import { Token } from '../../models/token';
   selector: 'page-rollcall-send',
   templateUrl: 'rollcall-send.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  ]
+  entryComponents:[ RollcallPeoplePage ]
 })
 export class RollcallSendPage extends BasePage {
 
@@ -45,7 +46,9 @@ export class RollcallSendPage extends BasePage {
   }
 
   addPerson() {
-    
+    let modal = this.showModal(RollcallPeoplePage, {
+      organization: this.organization,
+      rollcall: this.rollcall });
   }
 
   sendRollcall(event:any) {

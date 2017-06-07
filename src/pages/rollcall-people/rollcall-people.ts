@@ -2,26 +2,26 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { PersonAddPage } from '../../pages/person-add/person-add';
-import { PersonDetailsPage } from '../../pages/person-details/person-details';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { Rollcall } from '../../models/rollcall';
 import { Person } from '../../models/person';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
-  selector: 'page-person-list',
-  templateUrl: 'person-list.html',
+  selector: 'page-rollcall-people',
+  templateUrl: 'rollcall-people.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ PersonAddPage, PersonDetailsPage ]
+  entryComponents:[  ]
 })
-export class PersonListPage extends BasePage {
+export class RollcallPeoplePage extends BasePage {
 
   organization:Organization = null;
-  loading:boolean = false;
+  rollcall:Rollcall = null;
 
   constructor(
       protected zone:NgZone,
@@ -35,15 +35,14 @@ export class PersonListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService,
-      protected events:Events) {
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.events.publish("organization:loaded", this.organization);
+    this.rollcall = this.getParameter<Rollcall>("rollcall");
     this.loadPeople(null, true);
   }
 
@@ -84,17 +83,12 @@ export class PersonListPage extends BasePage {
     }
   }
 
-  addPeople(event:any) {
-    this.logger.info(this, "addPeople");
-    this.showModal(PersonAddPage,
-      { organization: this.organization });
+  cancelAdd(event) {
+    this.hideModal();
   }
 
-  showPerson(event:any, person:Person) {
-    this.logger.info(this, "showPerson");
-    this.showPage(PersonDetailsPage,
-      { organization: this.organization,
-        person: person })
+  doneAdd(event) {
+    this.hideModal();
   }
 
 }
