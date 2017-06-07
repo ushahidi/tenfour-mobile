@@ -9,12 +9,12 @@ import { Organization } from '../../models/organization';
 
 @IonicPage()
 @Component({
-  selector: 'page-settings',
-  templateUrl: 'settings.html',
+  selector: 'page-settings-list',
+  templateUrl: 'settings-list.html',
   providers: [ ApiService ],
   entryComponents:[  ]
 })
-export class SettingsPage extends BasePage {
+export class SettingsListPage extends BasePage {
 
   organization:Organization = null;
 

@@ -96,6 +96,8 @@ export class Person extends Model {
   @Column("saved_at", TEXT)
   public saved_at:Date = null;
 
+  public selected:boolean = null;
+
   public contacts:Contact[] = [];
 
   public notifications:Notification[] = [];

@@ -65,7 +65,7 @@ export class DatabaseService extends SqlService {
     if (ids) {
       where["id"] = ids;
     }
-    let order = { };
+    let order = { name: "ASC" };
     return this.getModels<Person>(new Person(), where, order);
   }
 

@@ -14,7 +14,7 @@ import { ChecklistPage } from '../pages/checklist/checklist';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
-import { SettingsPage } from '../pages/settings/settings';
+import { SettingsListPage } from '../pages/settings-list/settings-list';
 
 import { ApiService } from '../providers/api-service';
 import { LoggerService } from '../providers/logger-service';
@@ -238,9 +238,9 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  showSettings() {
-    this.logger.info(this, "showSettings");
-    this.nav.setRoot(SettingsPage,
+  showSettingsList() {
+    this.logger.info(this, "showSettingsList");
+    this.nav.setRoot(SettingsListPage,
       { organization: this.organization });
     this.menuController.close();
   }

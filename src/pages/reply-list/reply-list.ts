@@ -9,6 +9,7 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
+import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
 import { Recipient } from '../../models/recipient';
 
@@ -30,6 +31,8 @@ export class ReplyListPage extends BasePage {
   organization:Organization = null;
 
   rollcall:Rollcall = null;
+
+  person:Person = null;
 
   loading:boolean = false;
 
@@ -54,6 +57,7 @@ export class ReplyListPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.rollcall = this.getParameter<Rollcall>("rollcall");
+    this.person = this.getParameter<Person>("person");
     this.loadUpdates(null, true);
   }
 
@@ -84,7 +88,6 @@ export class ReplyListPage extends BasePage {
     else {
       return this.api.getRollcall(this.rollcall.id).then((rollcall:Rollcall) => {
         let saves = [];
-        saves.push(this.database.saveRollcall(this.organization, rollcall));
         for (let answer of rollcall.answers) {
           saves.push(this.database.saveAnswer(rollcall, answer));
         }
@@ -93,7 +96,11 @@ export class ReplyListPage extends BasePage {
         }
         for (let reply of rollcall.replies) {
           saves.push(this.database.saveReply(rollcall, reply));
+          if (this.person && this.person.id == reply.user_id) {
+            rollcall.replied = true;
+          }
         }
+        saves.push(this.database.saveRollcall(this.organization, rollcall));
         Promise.all(saves).then(saved => {
 
         });

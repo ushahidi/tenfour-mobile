@@ -308,7 +308,9 @@ export class ApiService extends HttpService {
           (data:any) => {
             if (data && data.person) {
               let person = new Person(data.person);
-              person.me = (id === "me");
+              if (id && id === "me") {
+                person.me = true;
+              }
               resolve(person);
             }
             else {
@@ -460,6 +462,35 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Rollcall Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  postRollcall(organization:Organization, rollcall:Rollcall):Promise<Rollcall> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls`;
+        let params = {
+          creditsRequired: 0,
+          organization_id: organization.id,
+          message: rollcall.message,
+          answers: rollcall.answers,
+          recipients: rollcall.recipients,
+          send_via: [rollcall.send_via]
+        };
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.rollcall) {
+              let rollcall = new Rollcall(data.rollcall);
+              resolve(rollcall);
+            }
+            else {
+              reject("Rollcall Not Created");
             }
           },
           (error:any) => {

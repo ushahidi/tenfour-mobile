@@ -10,11 +10,17 @@ export class DateTimePipe {
   transform(value, args) {
     if (value) {
       if (args) {
-        var date = moment(value).format('YYYY-MM-DD hh:mm:ss');
         let format = args;
-        return moment(date).format(format);
+        return moment(value).format(format);
       }
-      return moment(value).fromNow();
+      return moment(value).calendar(null, {
+        lastDay: 'h:mm A [Yesterday]',
+        sameDay: 'h:mm A [Today]',
+        nextDay: 'h:mm A [Tomorrow]',
+        lastWeek: 'h:mm A MMMM Do',
+        nextWeek: 'h:mm A MMMM Do',
+        sameElse: 'h:mm A MMMM Do, YYYY'
+      });
     }
     return "";
   }

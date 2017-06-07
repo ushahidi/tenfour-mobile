@@ -88,7 +88,16 @@ export class RollcallPeoplePage extends BasePage {
   }
 
   doneAdd(event) {
-    this.hideModal();
+    let groups = [];
+    let people = [];
+    for (let person of this.organization.people) {
+      if (person.selected) {
+        people.push(person);
+      }
+    }
+    this.hideModal({
+      groups:groups,
+      people: people });
   }
 
 }

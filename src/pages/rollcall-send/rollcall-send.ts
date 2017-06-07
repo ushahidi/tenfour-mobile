@@ -9,7 +9,7 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
-import { Token } from '../../models/token';
+import { Recipient } from '../../models/recipient';
 
 @IonicPage()
 @Component({
@@ -49,32 +49,43 @@ export class RollcallSendPage extends BasePage {
     let modal = this.showModal(RollcallPeoplePage, {
       organization: this.organization,
       rollcall: this.rollcall });
+    modal.onDidDismiss(data => {
+       if (data && data.people) {
+         let recipients = [];
+         for (let person of data.people) {
+           let recipient = new Recipient(person);
+           recipients.push(recipient);
+         }
+         this.rollcall.recipients = recipients;
+       }
+     });
+  }
+
+  removeRecipient(recipient:Recipient) {
+    for (let i = 0; i < this.rollcall.recipients.length; i++) {
+      if (this.rollcall.recipients[i] === recipient) {
+        this.rollcall.recipients.splice(i, 1);
+        break;
+      }
+    }
   }
 
   sendRollcall(event:any) {
-    // let loading = this.showLoading("Creating...");
-    // this.api.getToken().then((token:Token) => {
-    //   this.api.createPerson(token, this.person).then((person:Person) => {
-    //     let updates = [];
-    //     for (let contact of this.person.contacts) {
-    //       updates.push(this.updateContact(token, person, contact));
-    //     }
-    //     Promise.all(updates).then((updated:any) => {
-    //       this.database.savePerson(this.organization, person).then((saved:any) => {
-    //         loading.dismiss();
-    //         this.hideModal(person);
-    //       });
-    //     },
-    //     (error:any) => {
-    //       loading.dismiss();
-    //       this.showAlert("Problem Creating Contacts", error);
-    //     });
-    //   },
-    //   (error:any) => {
-    //     loading.dismiss();
-    //     this.showAlert("Problem Creating Person", error);
-    //   });
-    // });
+    let loading = this.showLoading("Sending...");
+    this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
+      this.database.saveRollcall(this.organization, rollcall).then(saved => {
+        loading.dismiss();
+        this.showToast("RollCall sent");
+        let firstViewController = this.navController.first();
+        this.navController.popToRoot({ animate: false }).then(() => {
+          firstViewController.dismiss({ rollcall: Rollcall });
+        });
+      });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Creating Rollcall", error);
+    });
   }
 
 }

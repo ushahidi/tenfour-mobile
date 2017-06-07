@@ -1,8 +1,8 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-title></ion-title>
-    <ion-buttons end>
-      <button ion-button color="primary" (click)="sendRollcall($event)">Send</button>
+    <ion-buttons end *ngIf="rollcall">
+      <button ion-button color="primary" [disabled]="rollcall.recipients == null || rollcall.recipients.length == 0"  (click)="sendRollcall($event)">Send</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -14,9 +14,24 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="rollcall">
+    <ion-item color="white">
+      <ion-label>Send via</ion-label>
+      <ion-select [(ngModel)]="rollcall.send_via" multiple="true">
+        <ion-option value="apponly">App Only</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="rollcall">
     <ion-list-header>Send To</ion-list-header>
     <ion-item color="white" tappable (click)="addPerson()">
       <h2 ion-text color="primary">Add people</h2>
+    </ion-item>
+    <ion-item color="white" *ngFor="let recipient of rollcall.recipients">
+      <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
+      <h2>{{recipient.name}}</h2>
+      <button ion-button icon-only item-right clear color="black" (click)="removeRecipient(recipient)">
+        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+      </button>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -41,20 +41,30 @@ export class RollcallEditPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    this.rollcall = this.getParameter<Rollcall>("rollcall");
-    if (this.rollcall == null) {
-      this.rollcall = new Rollcall({
-        organization_id: this.organization.id,
-        user_id: this.person.id,
-        user_initials: this.person.initials,
-        user_picture: this.person.profile_picture
-      });
-      this.addDefaults();
+    if (this.person) {
+      this.initRollcall();
     }
+    else {
+      this.database.getPerson(null, true).then((person:Person) => {
+        this.person = person;
+        this.initRollcall();
+      });
+    }
+  }
+
+  initRollcall() {
+    this.rollcall = new Rollcall({
+      organization_id: this.organization.id,
+      user_id: this.person.id,
+      user_initials: this.person.initials,
+      user_picture: this.person.profile_picture,
+      send_via: 'apponly'
+    });
+    this.addDefaults();
   }
 
   cancelEdit(event) {
@@ -102,7 +112,7 @@ export class RollcallEditPage extends BasePage {
   removeAnswer(answer:Answer) {
     for (let i = 0; i < this.rollcall.answers.length; i++) {
       if (this.rollcall.answers[i] === answer) {
-        this.rollcall.answers.splice(i,1);
+        this.rollcall.answers.splice(i, 1);
         break;
       }
     }

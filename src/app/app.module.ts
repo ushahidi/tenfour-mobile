@@ -60,7 +60,7 @@ import { GroupListPage } from '../pages/group-list/group-list';
 
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 
-import { SettingsPage } from '../pages/settings/settings';
+import { SettingsListPage } from '../pages/settings-list/settings-list';
 
 import { DateTimePipe } from '../pipes/date-time';
 import { TimeAgoPipe } from '../pipes/time-ago';
@@ -104,7 +104,7 @@ import { DatabaseService } from '../providers/database-service';
     PersonInvitePage,
     PersonImportPage,
     NotificationListPage,
-    SettingsPage,
+    SettingsListPage,
     DateTimePipe,
     TimeAgoPipe,
     TitleizePipe,
@@ -150,7 +150,7 @@ import { DatabaseService } from '../providers/database-service';
     PersonDetailsPage,
     PersonInvitePage,
     PersonImportPage,
-    SettingsPage
+    SettingsListPage
   ],
   providers: [
     { provide: File, useClass: File },
