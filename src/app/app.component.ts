@@ -120,12 +120,13 @@ export class RollcallApp {
             this.database.getPerson(this.organization.user_id).then(
               (person:Person) => {
                 this.logger.info(this, "loadApplication", "Person", person);
-                if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRollcallList();
-                }
-                else {
-                  this.showOnboardList(person);
-                }
+                this.showRollcallList();
+                // if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                //   this.showRollcallList();
+                // }
+                // else {
+                //   this.showOnboardList(person);
+                // }
               },
               (error:any) => {
                 this.logger.error(this, "loadApplication", "Person", error);

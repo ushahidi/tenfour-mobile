@@ -63,6 +63,7 @@ export class RollcallListPage extends BasePage {
       this.loadPerson(cache),
       this.loadRollCalls(cache)]).then(
       (loaded:any) =>{
+        this.logger.info(this, "loadUpdates", "Done");
         if (event) {
           event.complete();
         }
@@ -78,62 +79,77 @@ export class RollcallListPage extends BasePage {
   }
 
   loadPerson(cache:boolean=true):Promise<any> {
-    if (cache) {
-      return this.database.getPerson(null, true).then(
-        (person:Person) => {
-          if (person) {
-            this.person = person;
-          }
-          else {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.database.getPerson(null, true).then(
+          (person:Person) => {
+            this.logger.info(this, "loadPerson", "Database");
+            if (person) {
+              this.person = person;
+              resolve(person);
+            }
+            else {
+              this.loadPerson(false);
+            }
+          },
+          (error:any) => {
             this.loadPerson(false);
-          }
+          });
+      }
+      else {
+        this.api.getPerson(this.organization, "me").then((person:Person) => {
+          this.person = person;
+          resolve(person);
         },
         (error:any) => {
-          this.loadPerson(false);
+          reject(error);
         });
-    }
-    else {
-      return this.api.getPerson(this.organization, "me").then((person:Person) => {
-        this.person = person;
-      });
-    }
+      }
+    });
   }
 
   loadRollCalls(cache:boolean=true):Promise<any> {
-    if (cache) {
-      return this.database.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
-        if (rollcalls && rollcalls.length > 0) {
-          this.organization.rollcalls = rollcalls;
-        }
-        else {
-          this.loadRollCalls(false);
-        }
-      });
-    }
-    else {
-      return this.api.getRollcalls(this.organization).then(
-        (rollcalls:Rollcall[]) => {
-          let saves = [];
-          for (let rollcall of rollcalls) {
-            for (let answer of rollcall.answers) {
-              saves.push(this.database.saveAnswer(rollcall, answer));
-            }
-            for (let recipient of rollcall.recipients) {
-              saves.push(this.database.saveRecipient(rollcall, recipient));
-            }
-            for (let reply of rollcall.replies) {
-              saves.push(this.database.saveReply(rollcall, reply));
-              if (this.person && this.person.id == reply.user_id) {
-                rollcall.replied = true;
-              }
-            }
-            saves.push(this.database.saveRollcall(this.organization, rollcall));
-          }
-          Promise.all(saves).then(saved => {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        return this.database.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
+          if (rollcalls && rollcalls.length > 0) {
             this.organization.rollcalls = rollcalls;
-          });
+            resolve(rollcalls);
+          }
+          else {
+            this.loadRollCalls(false);
+          }
         });
-    }
+      }
+      else {
+        return this.api.getRollcalls(this.organization).then(
+          (rollcalls:Rollcall[]) => {
+            let saves = [];
+            for (let rollcall of rollcalls) {
+              for (let answer of rollcall.answers) {
+                saves.push(this.database.saveAnswer(rollcall, answer));
+              }
+              for (let recipient of rollcall.recipients) {
+                saves.push(this.database.saveRecipient(rollcall, recipient));
+              }
+              for (let reply of rollcall.replies) {
+                saves.push(this.database.saveReply(rollcall, reply));
+                if (this.person && this.person.id == reply.user_id) {
+                  rollcall.replied = true;
+                }
+              }
+              saves.push(this.database.saveRollcall(this.organization, rollcall));
+            }
+            Promise.all(saves).then(saved => {
+              this.organization.rollcalls = rollcalls;
+              resolve(rollcalls);
+            });
+          },
+          (error:any) => {
+            reject(error);
+          });
+      }
+    });
   }
 
   showReplies(event:any, rollcall:Rollcall) {

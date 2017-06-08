@@ -65,28 +65,36 @@ export class NotificationListPage extends BasePage {
   }
 
   loadNotifications(cache:boolean=true):Promise<any> {
-    if (cache) {
-      return this.database.getNotifications(this.organization).then((notifications:Notification[]) => {
-        if (notifications && notifications.length > 0) {
-          this.person.notifications = notifications;
-        }
-        else {
-          this.loadNotifications(false);
-        }
-      });
-    }
-    else {
-      return this.api.getNotifications(this.organization).then(
-        (notifications:Notification[]) => {
-          let saves = [];
-          for (let notification of notifications) {
-            saves.push(this.database.saveNotification(this.organization, notification));
-          }
-          Promise.all(saves).then(saved => {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        return this.database.getNotifications(this.organization).then((notifications:Notification[]) => {
+          if (notifications && notifications.length > 0) {
             this.person.notifications = notifications;
-          });
+            resolve(notifications);
+          }
+          else {
+            this.loadNotifications(false);
+          }
         });
-    }
+      }
+      else {
+        return this.api.getNotifications(this.organization).then(
+          (notifications:Notification[]) => {
+            let saves = [];
+            for (let notification of notifications) {
+              saves.push(this.database.saveNotification(this.organization, notification));
+            }
+            Promise.all(saves).then(saved => {
+              this.person.notifications = notifications;
+              resolve(notifications);
+            });
+          },
+          (error:any) => {
+            reject(error);
+          });
+      }
+    });
+
   }
 
 }
