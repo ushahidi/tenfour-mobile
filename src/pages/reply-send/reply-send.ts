@@ -99,4 +99,29 @@ export class ReplySendPage extends BasePage {
       });
   }
 
+  saveReply(event:any) {
+    this.logger.info(this, "saveReply");
+    let loading = this.showLoading("Sending...");
+    this.api.putReply(this.rollcall, this.reply).then(
+      (replied:Reply) => {
+        this.logger.info(this, "saveReply", "Reply", replied);
+        this.database.getPerson(replied.user_id).then((person:Person) => {
+          this.logger.info(this, "saveReply", "Person", person);
+          replied.user_name = person.name;
+          replied.user_description = person.description;
+          replied.user_initials = person.initials;
+          replied.user_picture = person.profile_picture;
+          this.database.saveReply(this.rollcall, replied).then(saved => {
+            loading.dismiss();
+            this.showToast("Rollcall Reply Saved");
+            this.hideModal({reply: replied});
+          });
+        });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Saving Reply", error);
+      });
+  }
+
 }

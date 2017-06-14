@@ -79,44 +79,72 @@ export class ReplyListPage extends BasePage {
   }
 
   loadReplies(cache:boolean=true):Promise<any> {
-    if (cache) {
-      return this.database.getReplies(this.rollcall).then((replies:Reply[]) => {
-        this.rollcall.replies = replies;
-      });
-    }
-    else {
-      return this.api.getRollcall(this.rollcall.id).then((rollcall:Rollcall) => {
-        let saves = [];
-        for (let answer of rollcall.answers) {
-          saves.push(this.database.saveAnswer(rollcall, answer));
-        }
-        for (let recipient of rollcall.recipients) {
-          saves.push(this.database.saveRecipient(rollcall, recipient));
-        }
-        for (let reply of rollcall.replies) {
-          saves.push(this.database.saveReply(rollcall, reply));
-          if (this.person && this.person.id == reply.user_id) {
-            rollcall.replied = true;
-          }
-        }
-        saves.push(this.database.saveRollcall(this.organization, rollcall));
-        Promise.all(saves).then(saved => {
-
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        return this.database.getReplies(this.rollcall).then((replies:Reply[]) => {
+          this.rollcall.replies = replies;
+          resolve(replies);
         });
-      });
-    }
+      }
+      else {
+        return this.api.getRollcall(this.rollcall.id).then((rollcall:Rollcall) => {
+          let saves = [];
+          for (let answer of rollcall.answers) {
+            saves.push(this.database.saveAnswer(rollcall, answer));
+          }
+          for (let recipient of rollcall.recipients) {
+            saves.push(this.database.saveRecipient(rollcall, recipient));
+          }
+          for (let reply of rollcall.replies) {
+            saves.push(this.database.saveReply(rollcall, reply));
+            if (this.person && this.person.id == reply.user_id) {
+              rollcall.replied = true;
+            }
+          }
+          saves.push(this.database.saveRollcall(this.organization, rollcall));
+          Promise.all(saves).then(saved => {
+            this.rollcall = rollcall;
+            resolve(rollcall.replies);
+          });
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+    });
   }
 
-  sendReply(event) {
+  sendReply(event:any) {
     this.logger.info(this, "sendReply");
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
       rollcall: this.rollcall });
     modal.onDidDismiss(data => {
       if (data) {
-        this.loadReplies(true);
+        let loading = this.showLoading("Refreshing...");
+        this.loadReplies(false).then((replies) => {
+          loading.dismiss();
+        });
       }
    });
+  }
+
+  editReply(event:any, reply:Reply) {
+    this.logger.info(this, "editReply");
+    if (reply.user_id == this.person.id) {
+      let modal = this.showModal(ReplySendPage, {
+        organization: this.organization,
+        rollcall: this.rollcall,
+        reply: reply });
+      modal.onDidDismiss(data => {
+        if (data) {
+          let loading = this.showLoading("Refreshing...");
+          this.loadReplies(false).then((replies) => {
+            loading.dismiss();
+          });
+        }
+     });
+    }
   }
 
 }

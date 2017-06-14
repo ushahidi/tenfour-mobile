@@ -27,12 +27,16 @@
   <div *ngIf="rollcall">
     <ion-list *ngFor="let answer of rollcall.answers">
       <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
-      <ion-item color="white" *ngFor="let reply of rollcall.answerReplies(answer)">
+      <ion-item color="white" tappable (click)="editReply($event, reply)" *ngFor="let reply of rollcall.answerReplies(answer)">
         <person-avatar item-left [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
-        <h2>
-          <span>{{reply.user_name}}</span>
-          <small item-right>{{reply.created_at | dateTime}}</small>
-        </h2>
+        <ion-row no-padding>
+          <ion-col text-left no-padding>
+            <h2>{{reply.user_name}}</h2>
+          </ion-col>
+          <ion-col text-right no-padding class="truncate">
+            <small>{{reply.created_at | dateTime}}</small>
+          </ion-col>
+        </ion-row>
         <p text-wrap>{{reply.message}}</p>
       </ion-item>
     </ion-list>
@@ -40,10 +44,14 @@
       <ion-list-header>No Response</ion-list-header>
       <ion-item color="white" *ngFor="let recipient of rollcall.recipientsPending()">
         <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
-        <h2>
-          <span>{{recipient.name}}</span>
-          <small item-right>{{recipient.created_at | dateTime}}</small>
-        </h2>
+        <ion-row no-padding>
+          <ion-col text-left no-padding>
+            <h2>{{recipient.name}}</h2>
+          </ion-col>
+          <ion-col text-right no-padding class="truncate">
+            <small>{{recipient.created_at | dateTime}}</small>
+          </ion-col>
+        </ion-row>
         <p text-wrap>{{recipient.response_status}}</p>
       </ion-item>
     </ion-list>

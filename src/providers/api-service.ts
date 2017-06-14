@@ -18,6 +18,7 @@ import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 import { Rollcall } from '../models/rollcall';
 import { Reply } from '../models/reply';
+import { Answer } from '../models/answer';
 import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
@@ -532,6 +533,45 @@ export class ApiService extends HttpService {
     });
   }
 
+  putReply(rollcall:Rollcall, reply:Reply):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies/${reply.id}`;
+        let params = { };
+        if (reply) {
+          if (reply.answer) {
+            params["answer"] = reply.answer;
+          }
+          if (reply.message) {
+            params["message"] = reply.message;
+          }
+          else {
+            params["message"] = "";
+          }
+          if (reply.location_text) {
+            params["location_text"] = reply.location_text;
+          }
+          else {
+            params["location_text"] = "";
+          }
+        }
+        this.httpPut(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.reply) {
+              let reply = new Reply(data.reply);
+              resolve(reply);
+            }
+            else {
+              reject("Reply Not Sent");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
   getNotifications(organization:Organization):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken().then((token:Token) => {
@@ -548,6 +588,32 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Notifications Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  getAnswers(id:number):Promise<Answer[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/rollcalls/${id}`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.rollcall && data.rollcall.answers) {
+              let answers = [];
+              for (let _answer of data.rollcall.answers) {
+                let answer = new Answer(_answer);
+                answer.replies = data.rollcall.replies.filter(reply => reply.answer == answer.answer).length;
+                answers.push(answer);
+              }
+              resolve(answers);
+            }
+            else {
+              reject("Answers Not Found");
             }
           },
           (error:any) => {

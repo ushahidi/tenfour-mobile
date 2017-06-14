@@ -5,7 +5,8 @@
     </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" (click)="sendReply($event)">Send</button>
+      <button ion-button color="primary" *ngIf="reply && reply.id == null" (click)="sendReply($event)">Send</button>
+      <button ion-button color="primary" *ngIf="reply && reply.id != null" (click)="saveReply($event)">Save</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
