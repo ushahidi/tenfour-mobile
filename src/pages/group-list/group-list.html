@@ -8,10 +8,18 @@
     <ion-title>Groups</ion-title>
   </ion-navbar>
 </ion-header>
-<ion-content padding>
-  <ion-list>
-    <ion-item no-lines text-wrap text-center>
-      <h2>Sadly, Groups are not implemented yet...</h2>
+<ion-content>
+  <ion-refresher (ionRefresh)="loadUpdates($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-list *ngIf="organization && organization.groups">
+    <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
+      <h2>There currently are no Groups...</h2>
     </ion-item>
+    <ion-list *ngIf="organization && organization.groups">
+      <ion-item color="white" *ngFor="let person of organization.groups">
+        <h2>{{group.name}}</h2>
+      </ion-item>
+    </ion-list>
   </ion-list>
 </ion-content>

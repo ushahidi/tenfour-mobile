@@ -4,6 +4,7 @@ import { Column } from '../decorators/column';
 import { Model, TEXT, INTEGER, PRIMARY_KEY } from '../models/model';
 import { Person } from '../models/person';
 import { Rollcall } from '../models/rollcall';
+import { Group } from '../models/group';
 
 @Table("organizations")
 export class Organization extends Model {
@@ -59,5 +60,7 @@ export class Organization extends Model {
   public people:Person[] = [];
 
   public rollcalls:Rollcall[] = [];
+
+  public groups:Group[] = [];
 
 }

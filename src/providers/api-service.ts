@@ -18,6 +18,7 @@ import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
 import { Rollcall } from '../models/rollcall';
 import { Reply } from '../models/reply';
+import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
 @Injectable()
@@ -547,6 +548,31 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Notifications Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
+  getGroups(organization:Organization):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/groups`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.groups) {
+              let groups = [];
+              for (let _group of data.groups) {
+                let group = new Group(_group);
+                groups.push(group);
+              }
+              resolve(groups);
+            }
+            else {
+              reject("Groups Not Found");
             }
           },
           (error:any) => {

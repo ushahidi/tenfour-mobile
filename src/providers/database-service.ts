@@ -13,6 +13,7 @@ import { Organization } from '../models/organization';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
+import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
 @Injectable()
@@ -377,6 +378,37 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Notification>(new Notification(), where);
+  }
+
+  // ########## GROUP ##########
+
+  saveGroup(organization:Organization, group:Group):Promise<any> {
+    group.organization_id = organization.id;
+    return this.saveModel(group);
+  }
+
+  getGroups(organization:Organization):Promise<Group[]> {
+    let where = { organization_id: organization.id };
+    let order = { name: "ASC" };
+    return this.getModels<Group>(new Group(), where, order);
+  }
+
+  getGroup(id:number):Promise<Group> {
+    let where = { id: id };
+    return this.getModel<Group>(new Group(), where);
+  }
+
+  removeGroup(group:Group):Promise<any> {
+    let where = { id: group.id };
+    return this.removeModel<Group>(new Group(), where);
+  }
+
+  removeGroups(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Group>(new Group(), where);
   }
 
 }

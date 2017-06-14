@@ -30,6 +30,7 @@ import { Rollcall } from '../models/rollcall';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
+import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
 @Component({
@@ -76,6 +77,7 @@ export class RollcallApp {
         new Answer(),
         new Reply(),
         new Recipient(),
+        new Group(),
         new Notification()
       ]);
     });

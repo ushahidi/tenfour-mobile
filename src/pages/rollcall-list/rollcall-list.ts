@@ -18,7 +18,7 @@ import { Rollcall } from '../../models/rollcall';
 @Component({
   selector: 'page-rollcall-list',
   templateUrl: 'rollcall-list.html',
-  providers: [ ApiService ],
+  providers: [ ApiService, DatabaseService ],
   entryComponents:[ RollcallEditPage, ReplyListPage, ReplySendPage, NotificationListPage ]
 })
 export class RollcallListPage extends BasePage {
