@@ -384,7 +384,7 @@ export class ApiService extends HttpService {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
         let params = {
           type: contact.type,
-          contact: contact.contact,
+          contact: contact.contact || "",
           preferred: contact.preferred || 0,
           organization_id: person.organization_id };
         this.httpPost(url, token.access_token, params).then(

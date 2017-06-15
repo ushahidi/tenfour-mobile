@@ -34,6 +34,7 @@
     "@ionic-native/keyboard": "^3.6.1",
     "@ionic-native/native-storage": "^3.6.1",
     "@ionic-native/network": "^3.6.1",
+    "@ionic-native/sim": "^3.6.1",
     "@ionic-native/social-sharing": "^3.6.1",
     "@ionic-native/splash-screen": "^3.6.1",
     "@ionic-native/sqlite": "^3.6.1",

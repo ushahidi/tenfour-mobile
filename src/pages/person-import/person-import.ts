@@ -1,7 +1,9 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { Sim } from '@ionic-native/sim';
 import { Contacts } from '@ionic-native/contacts';
+import { IsDebug } from '@ionic-native/is-debug';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -25,6 +27,8 @@ export class PersonImportPage extends BasePage {
   imports:any[] = [];
   invite:boolean = true;
   invitation:string = "email";
+  countryCode:string = "+1";
+  debug:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -39,29 +43,87 @@ export class PersonImportPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
-      protected contacts:Contacts) {
+      protected contacts:Contacts,
+      protected isDebug:IsDebug,
+      protected sim:Sim) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.imports = [];
-    this.contacts.find(['*'], {filter: ""}).then((contacts) => {
-      this.logger.info(this, "Contacts", contacts);
-      this.imports.push(this.defaultContact());
-      for (let contact of contacts) {
-        this.logger.info(this, "Contact", contact);
-        this.imports.push(contact);
+    this.isDebug.getIsDebug()
+      .then((isDebug:boolean) => {
+        this.debug = isDebug;
+      })
+      .catch((error: any) => {
+        this.debug = false;
+      });
+    this.sim.getSimInfo().then(
+      (info:any) => {
+        this.logger.info(this, 'SIM', info);
+        this.countryCode = "+1";
+        // if (info && info.countryCode) {
+        //   this.countryCode = info.countryCode;
+        // }
+        // else {
+        //   this.countryCode = "+1";
+        // }
+      },
+      (error:any) => {
+        this.logger.error(this, 'SIM', error);
+        this.countryCode = "+1";
       }
+    );
+    let loading = this.showLoading("Loading...");
+    this.loadContacts(null).then((loaded:any) => {
+      loading.dismiss();
     });
   }
 
-  cancelImport(event) {
+  cancelImport(event:any) {
     this.hideModal();
   }
 
-  importContacts(event) {
+  loadContacts(event:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "importContacts");
+      this.imports = [];
+      if (this.debug) {
+        this.imports.push(this.defaultContact());
+      }
+      return this.contacts.find(['*']).then((contacts) => {
+        let sorted = contacts.sort(function(a, b) {
+          var nameA = a.name.givenName;
+          var nameB = b.name.givenName;
+          var familyA = a.name.familyName;
+          var familyB = b.name.familyName;
+          if (familyA === familyB) {
+            return (nameA < nameB) ? -1 : (nameA > nameB) ? 1 : 0;
+          }
+          else {
+            return (familyA < familyB) ? -1 : (familyA > familyB) ? 1 : 0;
+          }
+        });
+        for (let contact of sorted) {
+          this.logger.info(this, "Contact", contact);
+          this.imports.push(contact);
+        }
+        if (event) {
+          event.complete();
+        }
+        resolve(true);
+      });
+    });
+  }
+
+  selectAll(event:any) {
+    for (let contact of this.imports) {
+      contact.checked = true;
+    }
+  }
+
+  importContacts(event:any) {
     this.logger.info(this, "importContacts");
     let loading = this.showLoading("Importing...");
     let imports = [];
@@ -79,14 +141,19 @@ export class PersonImportPage extends BasePage {
         }
         for (let phone of contact.phoneNumbers) {
           if (phone.value) {
-            let contact = new Contact();
-            contact.organization_id = this.organization.id;
-            contact.type = "phone";
-            contact.contact = phone.value.replace(/\D/g,'');
-            if (contact.contact.indexOf("+1") == -1) {
-              contact.contact = "+1" + contact.contact;
+            let phoneNumber = phone.value.replace(/\D/g,'');
+            if (phoneNumber) {
+              let contact = new Contact();
+              contact.organization_id = this.organization.id;
+              contact.type = "phone";
+              if (phoneNumber.indexOf("+") == -1) {
+                contact.contact = this.countryCode + phoneNumber;
+              }
+              else {
+                contact.contact = phoneNumber;
+              }
+              person.contacts.push(contact);
             }
-            person.contacts.push(contact);
           }
         }
         for (let email of contact.emails) {
@@ -109,6 +176,10 @@ export class PersonImportPage extends BasePage {
       loading.dismiss();
       this.hideModal();
       this.showToast(`${imports.length} contacts imported`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Importing Contacts", error);
     });
   }
 
@@ -122,13 +193,16 @@ export class PersonImportPage extends BasePage {
           }
           Promise.all(creates).then(created => {
             resolve(newPerson);
+          },
+          (error:any) => {
+            reject(error);
           });
         },
-        (error: any) => {
+        (error:any) => {
           reject(error);
         });
       },
-      (error: any) => {
+      (error:any) => {
         reject(error);
       });
     });
@@ -140,7 +214,7 @@ export class PersonImportPage extends BasePage {
         this.database.saveContact(person, newContact).then((saved:any) => {
           resolve(newContact);
         },
-        (error: any) => {
+        (error:any) => {
           reject(error);
         });
       },

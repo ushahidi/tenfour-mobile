@@ -10,6 +10,9 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
+  <ion-refresher (ionRefresh)="loadContacts($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-list>
     <ion-item text-wrap color="white">
       <ion-label>Invite selected people to join Rollcall</ion-label>
@@ -24,6 +27,9 @@
   </ion-list>
   <ion-list *ngIf="imports">
     <ion-list-header>Contacts</ion-list-header>
+    <ion-item color="white" tappable (click)="selectAll($event)">
+      <div ion-text color="primary">Select all</div>
+    </ion-item>
     <ion-item color="white" *ngFor="let contact of imports">
       <ion-label>{{contact.name.formatted}}</ion-label>
       <ion-checkbox [(ngModel)]="contact.checked"></ion-checkbox>

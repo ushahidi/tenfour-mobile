@@ -115,7 +115,7 @@ export class HttpService {
             resolve(json);
           },
           (error) => {
-            this.logger.error(this, "POST", url, error);
+            this.logger.error(this, "POST", url, params, error);
             reject(this.errorMessage(error));
           }
         );

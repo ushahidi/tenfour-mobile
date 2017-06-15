@@ -1,7 +1,7 @@
 import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
-import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
+import { Model, TEXT, INTEGER, PRIMARY_KEY } from '../models/model';
 
 @Table("groups")
 export class Group extends Model {

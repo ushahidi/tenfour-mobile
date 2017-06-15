@@ -23,6 +23,7 @@ import { AppAvailability } from '@ionic-native/app-availability';
 import { Deeplinks } from '@ionic-native/deeplinks';
 import { Contacts } from '@ionic-native/contacts';
 import { Device } from '@ionic-native/device';
+import { Sim } from '@ionic-native/sim';
 
 import { RollcallApp } from './app.component';
 
@@ -147,6 +148,7 @@ import { DatabaseService } from '../providers/database-service';
     { provide: AppAvailability, useClass: AppAvailability },
     { provide: Deeplinks, useClass: Deeplinks },
     { provide: Contacts, useClass: Contacts },
+    { provide: Sim, useClass: Sim },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: DatabaseService, useClass: DatabaseService },

@@ -7,6 +7,7 @@
   <access origin="*"/>
   <allow-navigation href="http://ionic.local/*"/>
   <allow-navigation href="http://localhost:3000"/>
+  <allow-navigation href="http://192.168.0.12:8100"/>
   <allow-intent href="http://*/*"/>
   <allow-intent href="https://*/*"/>
   <allow-intent href="tel:*"/>
@@ -123,4 +124,5 @@
     <variable name="CONTACTS_USAGE_DESCRIPTION" value="RollCall would like to access your contacts."/>
   </plugin>
   <plugin name="cordova-plugin-ios-no-export-compliance" spec="https://github.com/mikaoelitiana/cordova-plugin-ios-no-export-compliance.git"/>
+  <plugin name="cordova-plugin-sim" spec="~1.3.3"/>
 </widget>
