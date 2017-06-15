@@ -124,26 +124,26 @@ export class PersonImportPage extends BasePage {
 
   loadContacts(event:any=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "importContacts");
+      this.logger.info(this, "loadContacts");
       this.imports = [];
       if (this.debug) {
         this.imports.push(this.defaultContact());
       }
       this.contacts.find(['*']).then((contacts:any[]) => {
         let sorted = contacts.sort(function(a, b) {
-          var nameA = a.name.givenName;
-          var nameB = b.name.givenName;
+          var givenA = a.name.givenName;
+          var givenB = b.name.givenName;
           var familyA = a.name.familyName;
           var familyB = b.name.familyName;
           if (familyA === familyB) {
-            return (nameA < nameB) ? -1 : (nameA > nameB) ? 1 : 0;
+            return (givenA < givenB) ? -1 : (givenA > givenB) ? 1 : 0;
           }
           else {
             return (familyA < familyB) ? -1 : (familyA > familyB) ? 1 : 0;
           }
         });
         for (let contact of sorted) {
-          this.logger.info(this, "Contact", contact);
+          this.logger.info(this, "loadContacts", "Contact", contact);
           this.imports.push(contact);
         }
         if (event) {
