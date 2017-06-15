@@ -75,6 +75,7 @@ import { PersonAvatarModule } from '../components/person-avatar/person-avatar.mo
 import { LoggerService } from '../providers/logger-service';
 import { ApiService } from '../providers/api-service';
 import { DatabaseService } from '../providers/database-service';
+import { CountryService } from '../providers/country-service';
 
 @NgModule({
   declarations: [
@@ -151,6 +152,7 @@ import { DatabaseService } from '../providers/database-service';
     { provide: Sim, useClass: Sim },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
+    { provide: CountryService, useClass: CountryService },
     { provide: DatabaseService, useClass: DatabaseService },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]

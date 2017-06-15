@@ -8,17 +8,19 @@ import { IsDebug } from '@ionic-native/is-debug';
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
+import { CountryService } from '../../providers/country-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
+import { Country } from '../../models/country';
 
 @IonicPage()
 @Component({
   selector: 'page-person-import',
   templateUrl: 'person-import.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiService, DatabaseService, CountryService ],
   entryComponents:[  ]
 })
 export class PersonImportPage extends BasePage {
@@ -43,6 +45,7 @@ export class PersonImportPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
+      protected countries:CountryService,
       protected contacts:Contacts,
       protected isDebug:IsDebug,
       protected sim:Sim) {
@@ -52,47 +55,81 @@ export class PersonImportPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.isDebug.getIsDebug()
-      .then((isDebug:boolean) => {
-        this.debug = isDebug;
-      })
-      .catch((error: any) => {
-        this.debug = false;
-      });
-    this.sim.getSimInfo().then(
-      (info:any) => {
-        this.logger.info(this, 'SIM', info);
-        this.countryCode = "+1";
-        // if (info && info.countryCode) {
-        //   this.countryCode = info.countryCode;
-        // }
-        // else {
-        //   this.countryCode = "+1";
-        // }
-      },
-      (error:any) => {
-        this.logger.error(this, 'SIM', error);
-        this.countryCode = "+1";
-      }
-    );
     let loading = this.showLoading("Loading...");
-    this.loadContacts(null).then((loaded:any) => {
-      loading.dismiss();
-    });
+    this.loadDebug().then(debug => {
+      this.loadCountry().then(countries => {
+        this.loadContacts().then(contacts => {
+          loading.dismiss();
+        });
+      })
+    })
+    // Promise.all([
+    //   this.loadDebug(),
+    //   this.loadCountry(),
+    //   this.loadContacts()]).then((loaded:any) => {
+    //     loading.dismiss();
+    // });
   }
 
   cancelImport(event:any) {
     this.hideModal();
   }
 
-  loadContacts(event:any):Promise<any> {
+  loadDebug():Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.platform.ready().then(() => {
+        this.isDebug.getIsDebug()
+          .then((isDebug:boolean) => {
+            this.debug = isDebug;
+            resolve();
+          })
+          .catch((error: any) => {
+            this.debug = false;
+            resolve();
+          });
+      });
+    });
+  }
+
+  loadCountry():Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.sim.getSimInfo().then(
+        (info:any) => {
+          this.logger.info(this, 'loadCountry', 'SIM', info);
+          this.countries.getCode(info.countryCode).then(
+            (country:Country) => {
+              this.logger.info(this, 'loadCountry', 'Country', country);
+              if (country) {
+                this.countryCode == country.dial_code;
+              }
+              else {
+                this.countryCode = "+1";
+              }
+              resolve();
+            },
+            (error:any) => {
+              this.logger.error(this, 'loadCountry', 'Country', error);
+              this.countryCode = "+1";
+              resolve();
+            });
+        },
+        (error:any) => {
+          this.logger.error(this, 'loadCountry', 'SIM', error);
+          this.countryCode = "+1";
+          resolve();
+        }
+      );
+    });
+  }
+
+  loadContacts(event:any=null):Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "importContacts");
       this.imports = [];
       if (this.debug) {
         this.imports.push(this.defaultContact());
       }
-      return this.contacts.find(['*']).then((contacts) => {
+      this.contacts.find(['*']).then((contacts:any[]) => {
         let sorted = contacts.sort(function(a, b) {
           var nameA = a.name.givenName;
           var nameB = b.name.givenName;
@@ -112,7 +149,10 @@ export class PersonImportPage extends BasePage {
         if (event) {
           event.complete();
         }
-        resolve(true);
+        resolve();
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -172,7 +212,7 @@ export class PersonImportPage extends BasePage {
     for (let person of imports) {
       creates.push(this.createPerson(person));
     }
-    Promise.all(creates).then(created => {
+    return Promise.all(creates).then(created => {
       loading.dismiss();
       this.hideModal();
       this.showToast(`${imports.length} contacts imported`);
