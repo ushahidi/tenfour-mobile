@@ -95,8 +95,14 @@ export class PersonDetailsPage extends BasePage {
 
   editPerson(event) {
     this.logger.info(this, "editPerson");
-    this.showModal(PersonEditPage,
+    let modal = this.showModal(PersonEditPage,
       { organization: this.organization,
         person: this.person });
+    modal.onDidDismiss((data:any) => {
+      this.logger.info(this, "editPerson", "Modal", data);
+      if (data && data.deleted) {
+        this.closePage();
+      }
+    });
   }
 }

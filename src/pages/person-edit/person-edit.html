@@ -45,4 +45,7 @@
       <ion-input type="email" autocorrect="off" autocapitalize="none" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
+  <div padding-left padding-right padding-bottom *ngIf="person">
+    <button ion-button block color="danger" *ngIf="person.me == null || person.me == false" (click)="deletePerson($event)">Remove from organization</button>
+  </div>
 </ion-content>

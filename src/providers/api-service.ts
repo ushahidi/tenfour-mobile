@@ -378,6 +378,21 @@ export class ApiService extends HttpService {
     });
   }
 
+  deletePerson(person:Person):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
+        this.httpDelete(url, token.access_token).then(
+          (data:any) => {
+            resolve(data);
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
   createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken().then((token:Token) => {

@@ -48,10 +48,7 @@ export class PersonEditPage extends BasePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.diagnostic.isCameraPresent().then((cameraPresent:boolean) => {
-      this.logger.info(this, "isCameraPresent", cameraPresent);
-      this.cameraPresent = cameraPresent;
-    })
+    this.loadCamera();
   }
 
   ionViewWillEnter() {
@@ -71,6 +68,18 @@ export class PersonEditPage extends BasePage {
     }
   }
 
+  loadCamera() {
+    return this.diagnostic.isCameraPresent().then(
+      (cameraPresent:boolean) => {
+        this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
+        this.cameraPresent = cameraPresent;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCamera", "isCameraPresent", error);
+        this.cameraPresent = false;
+      });
+  }
+
   cancelEdit(event) {
     this.hideModal();
   }
@@ -85,7 +94,7 @@ export class PersonEditPage extends BasePage {
       Promise.all(updates).then((updated:any) => {
         this.database.savePerson(this.organization, person).then((saved:any) => {
           loading.dismiss();
-          this.hideModal(person);
+          this.hideModal({ person: person });
         });
       },
       (error:any) => {
@@ -110,7 +119,7 @@ export class PersonEditPage extends BasePage {
         Promise.all(updates).then((updated:any) => {
           this.database.savePerson(this.organization, person).then((saved:any) => {
             loading.dismiss();
-            this.hideModal(person);
+            this.hideModal({ person: person });
           });
         },
         (error:any) => {
@@ -221,6 +230,26 @@ export class PersonEditPage extends BasePage {
     (error:any) => {
       this.logger.error(this, "showCameraRoll", error);
       this.showAlert("Problem Selecting Photo", error);
+    });
+  }
+
+  deletePerson(event:any) {
+    let loading = this.showLoading("Removing...");
+    this.api.deletePerson(this.person).then((deleted:any) => {
+      let removes = [];
+      removes.push(this.database.removePerson(this.person));
+      for (let contact of this.person.contacts) {
+        removes.push(this.database.removeContact(contact));
+      }
+      Promise.all(removes).then(removed => {
+        loading.dismiss();
+        this.showToast("Person removed from organization");
+        this.hideModal({deleted: true});
+      });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Removing Person", error);
     });
   }
 
