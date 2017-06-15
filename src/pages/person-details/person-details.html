@@ -11,10 +11,16 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="person">
-    <ion-item color="white" class="profile" text-center>
+    <ion-item color="white" class="profile" text-center text-wrap>
       <person-avatar item-center [initials]="person.initials" [image]="person.profile_picture" [large]="true"></person-avatar>
       <h1>{{person.name}}</h1>
       <p>{{person.description}}</p>
+      <div *ngIf="organization">
+        <button ion-button clear color="primary" *ngIf="person.person_type == 'user'" (click)="invitePerson($event)">
+          <span *ngIf="person.invite_sent == true">Send another invitation</span>
+          <span *ngIf="person.invite_sent == false">Invite this person to join {{organization.name || 'organization'}}</span>
+        </button>
+      </div>
     </ion-item>
     <ion-item color="white" class="contact" *ngFor="let contact of person.contacts">
       <ion-icon ios="ios-mail-outline" md="md-mail" item-left *ngIf="contact.type == 'email'"></ion-icon>

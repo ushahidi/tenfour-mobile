@@ -66,8 +66,8 @@ export class Person extends Model {
   @Column("gravatar", TEXT)
   public gravatar:string = null;
 
-  @Column("invite_sent", INTEGER)
-  public invite_sent:number = null;
+  @Column("invite_sent", BOOLEAN)
+  public invite_sent:boolean = null;
 
   @Column("config_profile_reviewed", BOOLEAN)
   public config_profile_reviewed:boolean = null;

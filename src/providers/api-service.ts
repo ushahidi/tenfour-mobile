@@ -393,6 +393,30 @@ export class ApiService extends HttpService {
     });
   }
 
+  invitePerson(person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.getToken().then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/invite`;
+        let params = {
+          orgId: person.organization_id,
+          personId: person.id };
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.person) {
+              let person = new Person(data.person);
+              resolve(person);
+            }
+            else {
+              reject("Person Not Invited");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
   createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken().then((token:Token) => {

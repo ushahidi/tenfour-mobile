@@ -66,43 +66,74 @@ export class PersonDetailsPage extends BasePage {
       });
   }
 
-  loadPerson(cache:boolean=true) {
-    if (cache) {
-      return this.database.getContacts(this.person).then((contacts:Contact[]) => {
-        if (contacts && contacts.length > 0) {
-          this.person.contacts = contacts;
-        }
-        else {
-          this.loadPerson(false);
-        }
-      });
-    }
-    else {
-      return this.api.getPerson(this.organization, this.person.id).then(
-        (person:Person) => {
-          this.person = person;
-          let saves = [];
-          for (let contact of person.contacts) {
-            saves.push(this.database.saveContact(person, contact));
+  loadPerson(cache:boolean=true):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        return this.database.getContacts(this.person).then((contacts:Contact[]) => {
+          if (contacts && contacts.length > 0) {
+            this.person.contacts = contacts;
+            resolve(this.person);
           }
-          saves.push(this.database.savePerson(this.organization, person))
-          Promise.all(saves).then(saved => {
-
-          });
+          else {
+            this.loadPerson(false).then((person:Person) => {
+              resolve(person);
+            })
+          }
         });
-    }
+      }
+      else {
+        return this.api.getPerson(this.organization, this.person.id).then(
+          (person:Person) => {
+            this.person = person;
+            let saves = [];
+            for (let contact of person.contacts) {
+              saves.push(this.database.saveContact(person, contact));
+            }
+            saves.push(this.database.savePerson(this.organization, person))
+            Promise.all(saves).then(saved => {
+              resolve(person);
+            });
+          });
+      }
+    });
   }
 
-  editPerson(event) {
+  editPerson(event:any) {
     this.logger.info(this, "editPerson");
     let modal = this.showModal(PersonEditPage,
       { organization: this.organization,
         person: this.person });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);
-      if (data && data.deleted) {
-        this.closePage();
+      if (data) {
+        if (data.deleted) {
+          this.closePage();
+        }
+        else {
+          let loading = this.showLoading("Loading...");
+          this.loadPerson(true).then(person => {
+            this.person = person;
+            loading.dismiss();
+          });
+        }
       }
     });
+  }
+
+  invitePerson(event:any) {
+    this.logger.info(this, "invitePerson");
+    let loading = this.showLoading("Inviting...");
+    this.api.invitePerson(this.person).then(
+      (invited:Person) => {
+        this.database.savePerson(this.organization, invited).then(saved => {
+          this.person = invited;
+          loading.dismiss();
+          this.showToast("Person invited to organization");
+        });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Inviting Person", error);
+      });
   }
 }

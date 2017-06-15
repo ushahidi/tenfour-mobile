@@ -1,6 +1,6 @@
-<ion-avatar [class.large]="large" *ngIf="image && image.length > 0">
-  <img [src]="image">
+<ion-avatar class="person-avatar" [class.large]="large" [style.background-color]="color" *ngIf="image && image.length > 0">
+  <img [class.border]="color" [style.border-color]="color" [src]="image">
 </ion-avatar>
-<div [class.large]="large" class="initials" *ngIf="image == null">
-  <span>{{initials}}</span>
+<div class="person-avatar" [class.large]="large" *ngIf="image == null">
+  <div [class.border]="color" [style.border-color]="color">{{initials}}</div>
 </div>

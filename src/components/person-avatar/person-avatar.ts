@@ -7,13 +7,13 @@ import { Component, Input } from '@angular/core';
 export class PersonAvatarComponent {
 
   @Input()
-  image: string = null;
+  image:string = null;
 
   @Input()
-  initials: string = null;
+  initials:string = null;
 
   @Input()
-  color: string = "#000000";
+  color:string = null;
 
   @Input()
   large:boolean = false;
