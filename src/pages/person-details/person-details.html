@@ -16,7 +16,7 @@
       <h1>{{person.name}}</h1>
       <p>{{person.description}}</p>
       <div *ngIf="organization">
-        <button ion-button clear color="primary" *ngIf="person.person_type == 'user'" (click)="invitePerson($event)">
+        <button ion-button clear color="primary" *ngIf="person.needsInvite()" (click)="invitePerson($event)">
           <span *ngIf="person.invite_sent == true">Send another invitation</span>
           <span *ngIf="person.invite_sent == false">Invite this person to join {{organization.name || 'organization'}}</span>
         </button>

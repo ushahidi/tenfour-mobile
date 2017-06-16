@@ -114,4 +114,11 @@ export class Person extends Model {
     });
   }
 
+  needsInvite():boolean {
+    if (this.role == 'member' && this.has_logged_in == false) {
+      return this.getEmails().length > 0;
+    }
+    return false;
+  }
+
 }

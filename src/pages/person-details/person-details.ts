@@ -136,4 +136,5 @@ export class PersonDetailsPage extends BasePage {
         this.showAlert("Problem Inviting Person", error);
       });
   }
+
 }
