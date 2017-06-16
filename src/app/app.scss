@@ -20,7 +20,17 @@
     color: color($colors, primary) !important;
   }
 }
-
+ion-menu {
+  ion-select {
+    .select-ios {
+      padding-left: 0;
+    }
+    .select-text {
+      font-size: 1.2em;
+      font-weight: 500;
+    }
+  }
+}
 ion-list {
   ion-item {
     h1 {

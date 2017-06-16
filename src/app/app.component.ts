@@ -40,8 +40,13 @@ export class RollcallApp {
 
   zone:NgZone = null;
   rootPage:any;
+  organizations:Organization[] = [];
   organization:Organization = null;
   person:Person = null;
+
+  selectOptions:any = {
+    title: 'Organizations'
+  };
 
   @ViewChild(Nav)
   nav:Nav;
@@ -121,6 +126,7 @@ export class RollcallApp {
         this.logger.info(this, "loadApplication", "Database", loaded);
         this.database.getOrganizations().then((organizations:Organization[]) => {
           if (organizations && organizations.length > 0) {
+            this.organizations = organizations;
             this.organization = organizations[0];
             this.logger.info(this, "loadApplication", "Organization", this.organization);
             this.database.getPerson(this.organization.user_id).then(
@@ -140,6 +146,7 @@ export class RollcallApp {
               });
           }
           else {
+            this.organizations = [];
             this.logger.info(this, "loadApplication", "No Organizations");
             this.showSigninUrl();
           }
@@ -147,6 +154,7 @@ export class RollcallApp {
       },
       (error:any) => {
         this.logger.error(this, "loadApplication", "loadDatabase", error);
+        this.organizations = [];
         this.splashScreen.hide();
         this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
           text: 'Reset Database',
