@@ -309,6 +309,7 @@ export class ApiService extends HttpService {
             if (data && data.person) {
               let person = new Person(data.person);
               if (id && id === "me") {
+                this.logger.info(this, "getPerson", "Me", true);
                 person.me = true;
               }
               resolve(person);

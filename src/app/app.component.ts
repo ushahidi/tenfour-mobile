@@ -1,4 +1,4 @@
-import { Component, Injector, ViewChild } from '@angular/core';
+import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Events, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -38,8 +38,10 @@ import { Notification } from '../models/notification';
 })
 export class RollcallApp {
 
+  zone:NgZone = null;
   rootPage:any;
   organization:Organization = null;
+  person:Person = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -48,6 +50,7 @@ export class RollcallApp {
   navController:NavController;
 
   constructor(
+    protected _zone: NgZone,
     protected platform:Platform,
     protected injector:Injector,
     protected statusBar:StatusBar,
@@ -62,6 +65,7 @@ export class RollcallApp {
     protected alertController: AlertController,
     protected menuController: MenuController,
     protected deeplinks:Deeplinks) {
+    this.zone = _zone;
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
       this.logger.info(this, "Platform", "Ready");
@@ -200,6 +204,34 @@ export class RollcallApp {
   resetDatabase():Promise<any> {
     this.logger.info(this, "resetDatabase");
     return this.database.deleteDatabase();
+  }
+
+  loadMenu() {
+    this.logger.info(this, "loadMenu");
+    Promise.all([this.loadPerson()]).then(
+      (loaded) => {
+        this.logger.info(this, "loadMenu", "Loaded");
+      },
+      (error) => {
+        this.logger.error(this, "loadMenu", error);
+      });
+  }
+
+  loadPerson():Promise<any> {
+    this.logger.info(this, "loadPerson");
+    return this.database.getPerson(null, true).then(
+      (person:Person) => {
+        this.zone.run(() => {
+          this.logger.info(this, "loadPerson", person);
+          this.person = person;
+        });
+      },
+      (error:any) => {
+        this.zone.run(() => {
+          this.logger.error(this, "loadPerson", error);
+          this.person = null;
+        });
+      });
   }
 
   showSigninUrl() {

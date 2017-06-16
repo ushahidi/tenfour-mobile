@@ -98,8 +98,10 @@ export class RollcallListPage extends BasePage {
       }
       else {
         this.api.getPerson(this.organization, "me").then((person:Person) => {
-          this.person = person;
-          resolve(person);
+          this.database.savePerson(this.organization, person).then(saved => {
+            this.person = person;
+            resolve(person);
+          });
         },
         (error:any) => {
           reject(error);
