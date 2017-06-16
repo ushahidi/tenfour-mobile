@@ -43,12 +43,20 @@ export class NotificationListPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    this.loadUpdates(null, true);
+    if (this.person.notifications == null || this.person.notifications.length == 0) {
+      let loading = this.showLoading("Loading...");
+      this.loadUpdates(null, true).then(updated => {
+        loading.dismiss();
+      });
+    }
+    else {
+      this.loadUpdates(null, true);
+    }
   }
 
   loadUpdates(event:any, cache:boolean=true) {
     this.loading = true;
-    Promise.all([this.loadNotifications(cache)]).then(
+    return Promise.all([this.loadNotifications(cache)]).then(
       (loaded:any) =>{
         if (event) {
           event.complete();
