@@ -296,6 +296,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -321,6 +324,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -349,6 +355,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -375,6 +384,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -390,6 +402,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -414,6 +429,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -439,6 +457,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -464,6 +485,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -486,6 +510,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -507,6 +534,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -536,6 +566,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -569,6 +602,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -608,6 +644,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -633,6 +672,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -659,6 +701,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -684,6 +729,9 @@ export class ApiService extends HttpService {
           (error:any) => {
             reject(error);
           });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

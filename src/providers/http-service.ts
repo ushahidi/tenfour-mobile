@@ -344,22 +344,35 @@ export class HttpService {
     });
   }
 
-  errorMessage(err): string {
+  errorMessage(error:any):string {
     try {
-      let json = err.json();
-      if (json['errors']) {
-        let errors = json['errors'];
-        let messages = [];
-        for (let error of errors) {
-          messages.push(error['message']);
+      if (typeof error === 'string') {
+        return error;
+      }
+      else {
+        let json = error.json();
+        if (json['error']) {
+          return json['error'];
         }
-        return messages.join(", ");
+        else if (json['message']) {
+          return json['message'];
+        }
+        else if (json['errors']) {
+          let errors = json['errors'];
+          let messages = [];
+          for (let _error of errors) {
+            if (_error['message']) {
+              messages.push(_error['message']);
+            }
+          }
+          return messages.join(", ");
+        }
       }
     }
-    catch (error) {
-      this.logger.error(this, "errorMessage", error);
+    catch (err) {
+      this.logger.error(this, "errorMessage", err);
     }
-    return JSON.stringify(err);
+    return JSON.stringify(error);
   }
 
 }

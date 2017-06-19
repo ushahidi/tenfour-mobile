@@ -56,19 +56,17 @@ export class PersonImportPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     let loading = this.showLoading("Loading...");
-    this.loadDebug().then(debug => {
-      this.loadCountry().then(countries => {
-        this.loadContacts().then(contacts => {
-          loading.dismiss();
-        });
+    Promise.resolve()
+      .then(() => { return this.loadDebug(); })
+      .then(() => { return this.loadCountry(); })
+      .then(() => { return this.loadContacts(); })
+      .then(() => {
+        loading.dismiss();
       })
-    })
-    // Promise.all([
-    //   this.loadDebug(),
-    //   this.loadCountry(),
-    //   this.loadContacts()]).then((loaded:any) => {
-    //     loading.dismiss();
-    // });
+      .catch((error) => {
+        loading.dismiss();
+        this.showToast(error);
+      });
   }
 
   cancelImport(event:any) {
@@ -231,8 +229,18 @@ export class PersonImportPage extends BasePage {
           for (let contact of person.contacts) {
             creates.push(this.createContact(newPerson, contact));
           }
-          Promise.all(creates).then(created => {
-            resolve(newPerson);
+          Promise.all(creates).then((created:any) => {
+            if (this.invite == true && person.hasEmail()) {
+              this.api.invitePerson(person).then((invited:Person) => {
+                resolve(newPerson);
+              },
+              (error:any) => {
+                reject(error);
+              });
+            }
+            else {
+              resolve(newPerson);
+            }
           },
           (error:any) => {
             reject(error);

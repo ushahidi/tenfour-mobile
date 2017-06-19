@@ -102,21 +102,31 @@ export class Person extends Model {
 
   public notifications:Notification[] = [];
 
-  getEmails() {
+  getEmails():Contact[] {
     return this.contacts.filter(function(contact) {
       return contact.type == 'email';
     });
   }
 
-  getPhones() {
+  getPhones():Contact[] {
     return this.contacts.filter(function(contact) {
       return contact.type == 'phone';
     });
   }
 
+  hasEmail():boolean {
+    let emails = this.getEmails();
+    return emails && emails.length > 0;
+  }
+
+  hasPhone():boolean {
+    let phones = this.getPhones();
+    return phones && phones.length > 0;
+  }
+
   needsInvite():boolean {
     if (this.role == 'member' && this.has_logged_in == false) {
-      return this.getEmails().length > 0;
+      return this.hasEmail();
     }
     return false;
   }
