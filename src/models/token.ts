@@ -4,7 +4,9 @@ export interface Token {
   username:string;
 
   password:string;
-  
+
+  organization:string;
+
   token_type:string;
 
   access_token:string;

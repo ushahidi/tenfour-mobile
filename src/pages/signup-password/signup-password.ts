@@ -7,7 +7,6 @@ import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
-import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
@@ -59,47 +58,30 @@ export class SignupPasswordPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Creating...");
-      this.api.clientLogin().then(
-        (clientToken:Token) => {
-          this.logger.info(this, "createOrganization", "Client Token", clientToken);
-          this.organization.password = this.password.value;
-          this.api.createOrganization(clientToken, this.organization).then(
-            (organization:Organization) => {
-              this.logger.info(this, "createOrganization", "Organization", organization);
-              this.api.userLogin(this.organization.email, this.organization.password).then(
-                (userToken:Token) => {
-                  this.logger.info(this, "userLogin", "User Token", userToken);
-                  this.api.getPerson(this.organization, "me").then((person:Person) => {
-                    this.logger.info(this, "userLogin", "Person", person);
-                    organization.user_id = person.id;
-                    let saves = [
-                      this.database.saveOrganization(organization),
-                      this.database.savePerson(organization, person)];
-                    Promise.all(saves).then(saved => {
-                      loading.dismiss();
-                      this.showToast("Logged in");
-                      this.showRootPage(OnboardListPage,
-                        { organization: organization,
-                          person: person });
-                    });
-                  });
-                },
-                (error:any) => {
-                  this.logger.error(this, "userLogin", error);
-                  loading.dismiss();
-                  this.showAlert("User Token Error", error);
-                });
-            },
-            (error:any) => {
-              this.logger.error(this, "createOrganization", error);
+      this.organization.password = this.password.value;
+      this.api.createOrganization(this.organization).then(
+        (organization:Organization) => {
+          this.logger.info(this, "createOrganization", "Organization", organization);
+          this.api.getPerson(this.organization, "me").then((person:Person) => {
+            this.logger.info(this, "userLogin", "Person", person);
+            organization.user_id = person.id;
+            let saves = [
+              this.database.saveOrganization(organization),
+              this.database.savePerson(organization, person)];
+            Promise.all(saves).then(saved => {
               loading.dismiss();
-              this.showAlert("Problem Creating Organization", error);
+              this.showToast(`Logged in to ${organization.name}`);
+              this.showRootPage(OnboardListPage,
+                { organization: organization,
+                  person: person });
             });
-          },
-          (error:any) => {
-            loading.dismiss();
-            this.showAlert("Client Token Error", error);
           });
+        },
+        (error:any) => {
+          this.logger.error(this, "createOrganization", error);
+          loading.dismiss();
+          this.showAlert("Problem Creating Organization", error);
+        });
     }
   }
 

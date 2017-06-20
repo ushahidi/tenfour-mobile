@@ -86,10 +86,10 @@ export class PersonEditPage extends BasePage {
 
   createPerson(event) {
     let loading = this.showLoading("Creating...");
-    this.api.createPerson(this.person).then((person:Person) => {
+    this.api.createPerson(this.organization, this.person).then((person:Person) => {
       let updates = [];
       for (let contact of this.person.contacts) {
-        updates.push(this.updateContact(person, contact));
+        updates.push(this.updateContact(this.organization, person, contact));
       }
       Promise.all(updates).then((updated:any) => {
         this.database.savePerson(this.organization, person).then((saved:any) => {
@@ -110,11 +110,11 @@ export class PersonEditPage extends BasePage {
 
   updatePerson(event) {
     let loading = this.showLoading("Updating...");
-    this.api.updatePerson(this.person).then(
+    this.api.updatePerson(this.organization, this.person).then(
       (person:Person) => {
         let updates = [];
         for (let contact of this.person.contacts) {
-          updates.push(this.updateContact(person, contact));
+          updates.push(this.updateContact(this.organization, person, contact));
         }
         Promise.all(updates).then((updated:any) => {
           this.database.savePerson(this.organization, person).then((saved:any) => {
@@ -133,13 +133,13 @@ export class PersonEditPage extends BasePage {
       });
   }
 
-  updateContact(person:Person, contact:Contact):Promise<Contact> {
+  updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.contact == null || contact.contact.length == 0) {
         resolve(contact);
       }
       else if (contact.id) {
-        this.api.updateContact(person, contact).then((updated:Contact) => {
+        this.api.updateContact(organization, person, contact).then((updated:Contact) => {
           this.database.saveContact(person, contact).then((saved:any) => {
             resolve(updated);
           });
@@ -149,7 +149,7 @@ export class PersonEditPage extends BasePage {
         });
       }
       else {
-        this.api.createContact(person, contact).then((created:Contact) => {
+        this.api.createContact(organization, person, contact).then((created:Contact) => {
           this.database.saveContact(person, contact).then((saved:any) => {
             resolve(created);
           });
@@ -235,7 +235,7 @@ export class PersonEditPage extends BasePage {
 
   deletePerson(event:any) {
     let loading = this.showLoading("Removing...");
-    this.api.deletePerson(this.person).then((deleted:any) => {
+    this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
       let removes = [];
       removes.push(this.database.removePerson(this.person));
       for (let contact of this.person.contacts) {

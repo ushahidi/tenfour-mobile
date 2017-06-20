@@ -54,7 +54,7 @@ export class SigninPasswordPage extends BasePage {
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
       let password = this.password.value;
-      this.api.userLogin(this.email, password).then(
+      this.api.userLogin(this.organization, this.email, password).then(
         (token:Token) => {
           this.logger.info(this, "showNext", "User Token", token);
           this.api.getPerson(this.organization, "me").then((person:Person) => {
@@ -65,7 +65,7 @@ export class SigninPasswordPage extends BasePage {
               this.database.savePerson(this.organization, person)];
             Promise.all(saves).then(saved => {
               loading.dismiss();
-              this.showToast("Logged in");
+              this.showToast(`Logged in to ${this.organization.name}`);
               if (person.config_profile_reviewed && person.config_self_test_sent) {
                 this.showRootPage(RollcallListPage,
                   { organization: this.organization });

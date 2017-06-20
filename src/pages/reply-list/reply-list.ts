@@ -87,7 +87,7 @@ export class ReplyListPage extends BasePage {
         });
       }
       else {
-        return this.api.getRollcall(this.rollcall.id).then((rollcall:Rollcall) => {
+        return this.api.getRollcall(this.organization, this.rollcall.id).then((rollcall:Rollcall) => {
           let saves = [];
           for (let answer of rollcall.answers) {
             saves.push(this.database.saveAnswer(rollcall, answer));

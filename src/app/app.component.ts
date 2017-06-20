@@ -1,5 +1,5 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
-import { Platform, Events, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
+import { Platform, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -59,7 +59,6 @@ export class RollcallApp {
     protected platform:Platform,
     protected injector:Injector,
     protected statusBar:StatusBar,
-    protected events:Events,
     protected splashScreen:SplashScreen,
     protected api:ApiService,
     protected database:DatabaseService,
@@ -75,7 +74,6 @@ export class RollcallApp {
     this.platform.ready().then(() => {
       this.logger.info(this, "Platform", "Ready");
       this.loadStatusBar();
-      this.loadMenuEvents();
       this.loadDeepLinks();
       this.loadApplication([
         new Organization(),
@@ -95,14 +93,6 @@ export class RollcallApp {
   loadStatusBar() {
     this.logger.info(this, "loadStatusBar");
     this.statusBar.styleDefault();
-  }
-
-  loadMenuEvents() {
-    this.logger.info(this, "loadMenuEvents");
-    this.events.subscribe("organization:loaded", (organization:Organization) => {
-      this.logger.info(this, "Organization", organization);
-      this.organization = organization;
-    });
   }
 
   loadDeepLinks() {
@@ -216,30 +206,61 @@ export class RollcallApp {
 
   loadMenu() {
     this.logger.info(this, "loadMenu");
-    Promise.all([this.loadPerson()]).then(
-      (loaded) => {
+    Promise.all([
+      this.loadOrganizations(),
+      this.loadPerson()]).then(
+      (loaded:any) => {
         this.logger.info(this, "loadMenu", "Loaded");
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "loadMenu", error);
       });
   }
 
+  loadOrganizations():Promise<any> {
+    if (this.organizations && this.organizations.length > 0) {
+      this.logger.info(this, "loadOrganizations", this.organizations);
+      return Promise.resolve();
+    }
+    else {
+      return this.database.getOrganizations().then(
+        (organizations:Organization[]) => {
+          this.zone.run(() => {
+            this.logger.info(this, "loadOrganizations", organizations);
+            this.organizations = organizations;
+            this.organization = organizations[0];
+          });
+        },
+        (error:any) => {
+          this.zone.run(() => {
+            this.logger.error(this, "loadOrganizations", error);
+            this.organizations = null;
+            this.organization = null;
+          });
+        });
+    }
+  }
+
   loadPerson():Promise<any> {
-    this.logger.info(this, "loadPerson");
-    return this.database.getPerson(null, true).then(
-      (person:Person) => {
-        this.zone.run(() => {
-          this.logger.info(this, "loadPerson", person);
-          this.person = person;
+    if (this.person) {
+      this.logger.info(this, "loadPerson", this.person);
+      return Promise.resolve();
+    }
+    else {
+      return this.database.getPerson(null, true).then(
+        (person:Person) => {
+          this.zone.run(() => {
+            this.logger.info(this, "loadPerson", person);
+            this.person = person;
+          });
+        },
+        (error:any) => {
+          this.zone.run(() => {
+            this.logger.error(this, "loadPerson", error);
+            this.person = null;
+          });
         });
-      },
-      (error:any) => {
-        this.zone.run(() => {
-          this.logger.error(this, "loadPerson", error);
-          this.person = null;
-        });
-      });
+    }
   }
 
   showSigninUrl() {

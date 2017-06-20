@@ -123,7 +123,7 @@ export class PersonDetailsPage extends BasePage {
   invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
     let loading = this.showLoading("Inviting...");
-    this.api.invitePerson(this.person).then(
+    this.api.invitePerson(this.organization, this.person).then(
       (invited:Person) => {
         this.database.savePerson(this.organization, invited).then(saved => {
           this.person = invited;

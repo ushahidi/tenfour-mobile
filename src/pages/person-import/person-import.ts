@@ -223,7 +223,7 @@ export class PersonImportPage extends BasePage {
 
   createPerson(person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
-      this.api.createPerson(person).then((newPerson:Person) => {
+      this.api.createPerson(this.organization, person).then((newPerson:Person) => {
         this.database.savePerson(this.organization, newPerson).then((saved:any) => {
           let creates = [];
           for (let contact of person.contacts) {
@@ -231,7 +231,7 @@ export class PersonImportPage extends BasePage {
           }
           Promise.all(creates).then((created:any) => {
             if (this.invite == true && person.hasEmail()) {
-              this.api.invitePerson(person).then((invited:Person) => {
+              this.api.invitePerson(this.organization, person).then((invited:Person) => {
                 resolve(newPerson);
               },
               (error:any) => {
@@ -258,7 +258,7 @@ export class PersonImportPage extends BasePage {
 
   createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
-      this.api.createContact(person, contact).then((newContact:Contact) => {
+      this.api.createContact(this.organization, person, contact).then((newContact:Contact) => {
         this.database.saveContact(person, newContact).then((saved:any) => {
           resolve(newContact);
         },

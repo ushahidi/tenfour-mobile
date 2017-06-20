@@ -77,7 +77,7 @@ export class ReplySendPage extends BasePage {
   sendReply(event:any) {
     this.logger.info(this, "sendReply");
     let loading = this.showLoading("Sending...");
-    this.api.postReply(this.rollcall, this.reply).then(
+    this.api.postReply(this.organization, this.rollcall, this.reply).then(
       (replied:Reply) => {
         this.logger.info(this, "sendReply", "Reply", replied);
         this.database.getPerson(replied.user_id).then((person:Person) => {
@@ -102,7 +102,7 @@ export class ReplySendPage extends BasePage {
   saveReply(event:any) {
     this.logger.info(this, "saveReply");
     let loading = this.showLoading("Sending...");
-    this.api.putReply(this.rollcall, this.reply).then(
+    this.api.putReply(this.organization, this.rollcall, this.reply).then(
       (replied:Reply) => {
         this.logger.info(this, "saveReply", "Reply", replied);
         this.database.getPerson(replied.user_id).then((person:Person) => {
