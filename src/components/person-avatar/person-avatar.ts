@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'person-avatar',
@@ -18,7 +18,16 @@ export class PersonAvatarComponent {
   @Input()
   large:boolean = false;
 
-  constructor() {
+  @Input()
+  scrollTarget:any = null;
+
+  offset:number = 100;
+
+  errorImage:string = 'assets/images/user.jpg';
+
+  defaultImage:string = 'assets/images/user.jpg';
+
+  constructor(private elementRef:ElementRef) {
   }
 
   ngOnInit() {

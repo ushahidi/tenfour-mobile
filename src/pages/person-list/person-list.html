@@ -13,13 +13,13 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
   <ion-refresher (ionRefresh)="loadPeople($event, false)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="organization && organization.people">
     <ion-item color="white" detail-push tappable (click)="showPerson($event, person)" *ngFor="let person of organization.people">
-      <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+      <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
       <h2>{{person.name}}</h2>
     </ion-item>
   </ion-list>

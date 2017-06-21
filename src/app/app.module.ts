@@ -4,6 +4,8 @@ import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { LazyLoadImageModule } from 'ng-lazyload-image';
+
 import { AppVersion } from '@ionic-native/app-version';
 import { IsDebug } from '@ionic-native/is-debug';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -123,6 +125,7 @@ import { CountryService } from '../providers/country-service';
     CapitalizeModule,
     TruncateModule,
     HtmlParserModule,
+    LazyLoadImageModule,
     IonicModule.forRoot(RollcallApp)
   ],
   bootstrap: [IonicApp],

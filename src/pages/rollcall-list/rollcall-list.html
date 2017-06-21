@@ -16,7 +16,7 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
   <ion-refresher (ionRefresh)="loadUpdates($event, false)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -26,7 +26,7 @@
     </ion-item>
     <ion-card color="white" *ngFor="let rollcall of organization.rollcalls">
       <ion-card-content text-center tappable (click)="showReplies($event, rollcall)">
-        <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+        <person-avatar [scrollTarget]="scrollTarget" [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
         <h1>{{rollcall.message}}</h1>
         <p>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
         <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
