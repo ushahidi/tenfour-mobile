@@ -9,6 +9,7 @@ import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
+import { Token } from '../../models/token';
 
 @IonicPage()
 @Component({
@@ -62,19 +63,27 @@ export class SignupPasswordPage extends BasePage {
       this.api.createOrganization(this.organization).then(
         (organization:Organization) => {
           this.logger.info(this, "createOrganization", "Organization", organization);
-          this.api.getPerson(this.organization, "me").then((person:Person) => {
-            this.logger.info(this, "userLogin", "Person", person);
-            organization.user_id = person.id;
-            let saves = [
-              this.database.saveOrganization(organization),
-              this.database.savePerson(organization, person)];
-            Promise.all(saves).then(saved => {
-              loading.dismiss();
-              this.showToast(`Logged in to ${organization.name}`);
-              this.showRootPage(OnboardListPage,
-                { organization: organization,
-                  person: person });
+          this.api.userLogin(organization, organization.email, this.password.value).then((token:Token) => {
+            this.logger.info(this, "createOrganization", "Token", token);
+            this.api.getPerson(organization, "me").then((person:Person) => {
+              this.logger.info(this, "userLogin", "Person", person);
+              organization.user_id = person.id;
+              let saves = [
+                this.database.saveOrganization(organization),
+                this.database.savePerson(organization, person)];
+              Promise.all(saves).then(saved => {
+                loading.dismiss();
+                this.showToast(`Logged in to ${organization.name}`);
+                this.showRootPage(OnboardListPage,
+                  { organization: organization,
+                    person: person });
+              });
             });
+          },
+          (error:any) => {
+            this.logger.error(this, "createOrganization", error);
+            loading.dismiss();
+            this.showAlert("Problem Logging In", error);
           });
         },
         (error:any) => {

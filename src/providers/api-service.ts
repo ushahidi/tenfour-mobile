@@ -118,7 +118,6 @@ export class ApiService extends HttpService {
       let params = {
         grant_type: "client_credentials",
         scope: this.scope,
-        organization: organization.name,
         client_id: this.clientId,
         client_secret: this.clientSecret };
       this.httpPost(url, null, params).then(
@@ -264,16 +263,24 @@ export class ApiService extends HttpService {
     return new Promise((resolve, reject) => {
       let url = this.api + "/api/v1/organizations";
       let params = {
-        name: organization.user_name,
+        name: organization.name,
         email: organization.email,
+        owner: organization.user_name,
         password: organization.password,
-        subdomain: organization.subdomain,
-        organization_name: organization.name };
+        subdomain: organization.subdomain };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, token.access_token, params).then(
           (data:any) => {
-            let organization:Organization = new Organization(data);
-            resolve(organization);
+            if (data && data.organization) {
+              let _organization:Organization = new Organization(data.organization);
+              _organization.user_name = organization.user_name;
+              _organization.email = organization.email;
+              _organization.password = organization.password;
+              resolve(_organization);
+            }
+            else {
+              reject("Organization Not Created");
+            }
           },
           (error:any) => {
             reject(error);
