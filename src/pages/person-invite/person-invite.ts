@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -20,6 +20,8 @@ export class PersonInvitePage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
+  people:Person[] = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -33,18 +35,90 @@ export class PersonInvitePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiService,
-      protected database:DatabaseService,
-      protected events:Events) {
+      protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.loadPeople(null, true);
   }
 
-  cancelInvite(event) {
+  cancelInvite(event:any) {
     this.hideModal();
+  }
+
+  invitePeople(event:any) {
+    let invites = [];
+    for (let person of this.people) {
+      if (person.selected == true) {
+        invites.push(this.invitePerson(person));
+      }
+    }
+    if (invites.length > 0) {
+      let loading = this.showLoading("Inviting...");
+      Promise.all(invites).then(invited => {
+        loading.dismiss();
+        this.showToast("Invites sent");
+        let firstViewController = this.navController.first();
+        this.navController.popToRoot({ animate: false }).then(() => {
+          firstViewController.dismiss({ });
+        });
+      });
+    }
+    else {
+      this.showToast("No invites sent");
+      this.hideModal();
+    }
+  }
+
+  loadPeople(event:any, cache:boolean=true) {
+    this.loading = true;
+    if (cache) {
+      return this.database.getPeople(this.organization).then((people:Person[]) => {
+        this.logger.info(this, "loadPeople", people);
+        if (people && people.length > 0) {
+          this.people = people.filter(person => person.needsInvite() == true);
+          this.logger.info(this, "loadPeople", this.people);
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+        }
+        else {
+          this.loadPeople(event, false);
+        }
+      });
+    }
+    else {
+      return this.api.getPeople(this.organization).then(
+        (people:Person[]) => {
+          this.people = people.filter(person => person.needsInvite() == true);
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          this.showToast(error);
+        });
+    }
+  }
+
+  invitePerson(person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.api.invitePerson(this.organization, person).then((invited:Person) => {
+        resolve(invited);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
   }
 
 }

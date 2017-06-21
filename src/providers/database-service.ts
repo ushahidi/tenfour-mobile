@@ -59,26 +59,55 @@ export class DatabaseService extends SqlService {
   }
 
   getPeople(organization:Organization, ids:number[]=null):Promise<Person[]> {
-    let where = { };
-    if (organization) {
-      where["organization_id"] = organization.id;
-    }
-    if (ids) {
-      where["id"] = ids;
-    }
-    let order = { name: "ASC" };
-    return this.getModels<Person>(new Person(), where, order);
+    return new Promise((resolve, reject) => {
+      let where = { };
+      if (organization) {
+        where["organization_id"] = organization.id;
+      }
+      if (ids) {
+        where["id"] = ids;
+      }
+      let order = { name: "ASC" };
+      this.getModels<Person>(new Person(), where, order).then((people:Person[]) => {
+        let people_ids = people.map((people:Person) => people.id);
+        this.getContacts(null, people_ids).then((contacts:Contact[]) => {
+          for (let person of people) {
+            person.contacts = contacts.filter(contact => contact.person_id == person.id);
+          }
+          resolve(people);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
   }
 
   getPerson(id:number, me:boolean=false):Promise<Person> {
-    let where = { };
-    if (id) {
-      where["id"] = id;
-    }
-    if (me) {
-      where["me"] = true;
-    }
-    return this.getModel<Person>(new Person(), where);
+    return new Promise((resolve, reject) => {
+      let where = { };
+      if (id) {
+        where["id"] = id;
+      }
+      if (me) {
+        where["me"] = true;
+      }
+      this.getModel<Person>(new Person(), where).then((person:Person) => {
+        this.getContacts(person).then((contacts:Contact[]) => {
+          person.contacts = contacts;
+          resolve(person);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
   }
 
   removePerson(person:Person):Promise<any> {
@@ -102,8 +131,14 @@ export class DatabaseService extends SqlService {
     return this.saveModel(contact);
   }
 
-  getContacts(person:Person):Promise<Contact[]> {
-    let where = { person_id: person.id };
+  getContacts(person:Person, people_ids:number[]=null):Promise<Contact[]> {
+    let where = { };
+    if (person) {
+      where['id'] = person.id;
+    }
+    if (people_ids) {
+      where['person_id'] = people_ids;
+    }
     let order = { };
     return this.getModels<Contact>(new Contact(), where, order);
   }
@@ -358,7 +393,7 @@ export class DatabaseService extends SqlService {
 
   getNotifications(organization:Organization):Promise<Notification[]> {
     let where = { organization_id: organization.id };
-    let order = { };
+    let order = { created_at: "DESC" };
     return this.getModels<Notification>(new Notification(), where, order);
   }
 

@@ -8,13 +8,13 @@
     <ion-title></ion-title>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
   <ion-refresher (ionRefresh)="loadUpdates($event, false)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="rollcall">
     <ion-item text-wrap text-center color="white">
-      <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <person-avatar [scrollTarget]="scrollTarget" [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
       <h1>{{rollcall.message}}</h1>
       <p>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
       <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
@@ -28,7 +28,7 @@
     <ion-list *ngFor="let answer of rollcall.answers">
       <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
       <ion-item color="white" tappable (click)="editReply($event, reply)" *ngFor="let reply of rollcall.answerReplies(answer)">
-        <person-avatar item-left [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
+        <person-avatar item-left [scrollTarget]="scrollTarget" [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
         <ion-row no-padding>
           <ion-col text-left no-padding>
             <h2>{{reply.user_name}}</h2>
@@ -43,7 +43,7 @@
     <ion-list *ngIf="rollcall.replies.length < rollcall.recipients.length">
       <ion-list-header>No Response</ion-list-header>
       <ion-item color="white" *ngFor="let recipient of rollcall.recipientsPending()">
-        <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
+        <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
         <ion-row no-padding>
           <ion-col text-left no-padding>
             <h2>{{recipient.name}}</h2>

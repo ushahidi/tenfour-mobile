@@ -47,6 +47,9 @@ export class NotificationListPage extends BasePage {
       let loading = this.showLoading("Loading...");
       this.loadUpdates(null, true).then(updated => {
         loading.dismiss();
+      },
+      (error:any) => {
+        loading.dismiss();
       });
     }
     else {

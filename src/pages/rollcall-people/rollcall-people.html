@@ -9,7 +9,7 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
   <ion-refresher (ionRefresh)="loadPeople($event, false)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -18,7 +18,7 @@
     <ion-item color="white" *ngFor="let person of organization.people">
       <ion-label>{{person.name}}</ion-label>
       <ion-checkbox item-left [(ngModel)]="person.selected"></ion-checkbox>
-      <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+      <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
     </ion-item>
   </ion-list>
 </ion-content>

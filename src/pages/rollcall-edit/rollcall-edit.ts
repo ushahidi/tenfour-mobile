@@ -56,6 +56,10 @@ export class RollcallEditPage extends BasePage {
     }
   }
 
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+  }
+
   initRollcall() {
     this.rollcall = new Rollcall({
       organization_id: this.organization.id,

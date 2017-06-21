@@ -3,8 +3,24 @@
     <ion-buttons start>
       <button ion-button color="primary" (click)="cancelInvite($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Invite Person</ion-title>
+    <ion-title>Invite People</ion-title>
+    <ion-buttons end *ngIf="people">
+      <button ion-button color="primary" (click)="invitePeople($event)">Invite</button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
+  <ion-refresher (ionRefresh)="loadPeople($event, false)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-item no-lines text-wrap *ngIf="loading == false && people && people.length == 0">
+    <h2 text-center padding-top margin-top>There currently are no people to invite...</h2>
+  </ion-item>
+  <ion-list *ngIf="people">
+    <ion-item color="white" *ngFor="let person of people">
+      <ion-label>{{person.name}}</ion-label>
+      <ion-checkbox item-left [(ngModel)]="person.selected"></ion-checkbox>
+      <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+    </ion-item>
+  </ion-list>
 </ion-content>

@@ -21,7 +21,7 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="organization && organization.rollcalls">
-    <ion-item no-lines *ngIf="loading == false && organization.rollcalls.length == 0">
+    <ion-item no-lines text-wrap *ngIf="loading == false && organization.rollcalls.length == 0">
       <h2 text-center padding-top margin-top>There currently are no RollCalls...</h2>
     </ion-item>
     <ion-card color="white" *ngFor="let rollcall of organization.rollcalls">

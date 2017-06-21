@@ -21,7 +21,7 @@ export class PersonAvatarComponent {
   @Input()
   scrollTarget:any = null;
 
-  offset:number = 100;
+  offset:number = 0;
 
   errorImage:string = 'assets/images/user.jpg';
 

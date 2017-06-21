@@ -6,11 +6,11 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content #scrollTarget>
   <ion-list *ngIf="rollcall">
     <ion-item text-wrap text-center color="white">
-      <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
-      <h1>{{rollcall.message}}</h1>
+      <person-avatar [scrollTarget]="scrollTarget" [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <h1 padding-top>{{rollcall.message}}</h1>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="rollcall">
