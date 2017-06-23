@@ -1,6 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { StatusBar } from '@ionic-native/status-bar';
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { Camera, CameraOptions } from '@ionic-native/camera';
 
@@ -42,6 +43,7 @@ export class PersonEditPage extends BasePage {
       protected database:DatabaseService,
       protected events:Events,
       protected camera:Camera,
+      protected statusBar:StatusBar,
       protected diagnostic:Diagnostic) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -59,12 +61,20 @@ export class PersonEditPage extends BasePage {
       this.editing = true;
     }
     else {
+      this.statusBar.overlaysWebView(false);
       this.editing = false;
       this.person = new Person({
         name: null,
         description: null,
         organization_id: this.organization.id
       });
+    }
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    if (this.editing == false) {
+      this.statusBar.overlaysWebView(true);
     }
   }
 

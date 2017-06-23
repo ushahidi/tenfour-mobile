@@ -61,8 +61,7 @@ export class HttpService {
         .catch((error:any) => {
           this.logger.error(this, "GET", url, error);
           if (error instanceof Response) {
-            let json:any = error.json();
-            return Observable.throw(json.error || json.message || 'Request Error');
+            return Observable.throw(this.errorMessage(error) || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -70,11 +69,11 @@ export class HttpService {
           return Observable.throw(error || 'Request Error');
         })
         .subscribe(
-          (items) => {
+          (items:any) => {
             this.logger.info(this, "GET", url, items);
             resolve(items);
           },
-          (error) => {
+          (error:any) => {
             this.logger.error(this, "GET", url, error);
             reject(this.errorMessage(error));
           });
@@ -101,8 +100,7 @@ export class HttpService {
         .catch((error:any) => {
           this.logger.error(this, "POST", url, error);
           if (error instanceof Response) {
-            let json:any = error.json();
-            return Observable.throw(json.error || json.message || 'Request Error');
+            return Observable.throw(this.errorMessage(error) || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -110,11 +108,11 @@ export class HttpService {
           return Observable.throw(error || 'Request Error');
         })
         .subscribe(
-          (json) => {
+          (json:any) => {
             this.logger.info(this, "POST", url, json);
             resolve(json);
           },
-          (error) => {
+          (error:any) => {
             this.logger.error(this, "POST", url, params, error);
             reject(this.errorMessage(error));
           }
@@ -142,8 +140,7 @@ export class HttpService {
         .catch((error:any) => {
           this.logger.error(this, "PUT", url, error);
           if (error instanceof Response) {
-            let json:any = error.json();
-            return Observable.throw(json.error || json.message || 'Request Error');
+            return Observable.throw(this.errorMessage(error) || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -151,11 +148,11 @@ export class HttpService {
           return Observable.throw(error || 'Request Error');
         })
         .subscribe(
-          (json) => {
+          (json:any) => {
             this.logger.info(this, "PUT", url, json);
             resolve(json);
           },
-          (error) => {
+          (error:any) => {
             this.logger.error(this, "PUT", url, error);
             reject(this.errorMessage(error));
           }
@@ -183,8 +180,7 @@ export class HttpService {
         .catch((error:any) => {
           this.logger.error(this, "PATCH", url, error);
           if (error instanceof Response) {
-            let json:any = error.json();
-            return Observable.throw(json.error || json.message || 'Request Error');
+            return Observable.throw(this.errorMessage(error) || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -192,11 +188,11 @@ export class HttpService {
           return Observable.throw(error || 'Request Error');
         })
         .subscribe(
-          (json) => {
+          (json:any) => {
             this.logger.info(this, "PATCH", url, json);
             resolve(json);
           },
-          (error) => {
+          (error:any) => {
             this.logger.error(this, "PATCH", url, error);
             reject(this.errorMessage(error));
           }
@@ -227,8 +223,7 @@ export class HttpService {
         .catch((error:any) => {
           this.logger.error(this, "DELETE", url, error);
           if (error instanceof Response) {
-            let json:any = error.json();
-            return Observable.throw(json.error || json.message || 'Request Error');
+            return Observable.throw(this.errorMessage(error) || 'Request Error');
           }
           else if (error.name === "TimeoutError") {
             return Observable.throw("Request Timeout");
@@ -236,11 +231,11 @@ export class HttpService {
           return Observable.throw(error || 'Request Error');
         })
         .subscribe(
-          (items) => {
+          (items:any) => {
             this.logger.info(this, "DELETE", url, items);
             resolve(items);
           },
-          (error) => {
+          (error:any) => {
             this.logger.error(this, "DELETE", url, error);
             reject(this.errorMessage(error));
           });
@@ -345,32 +340,29 @@ export class HttpService {
   }
 
   errorMessage(error:any):string {
-    try {
-      if (typeof error === 'string') {
-        return error;
-      }
-      else {
-        let json = error.json();
-        if (json['error']) {
-          return json['error'];
-        }
-        else if (json['message']) {
-          return json['message'];
-        }
-        else if (json['errors']) {
-          let errors = json['errors'];
-          let messages = [];
-          for (let _error of errors) {
-            if (_error['message']) {
-              messages.push(_error['message']);
-            }
-          }
-          return messages.join(", ");
-        }
-      }
+    this.logger.error(this, "errorMessage", error);
+    if (typeof error === 'string') {
+      return error;
     }
-    catch (err) {
-      this.logger.error(this, "errorMessage", err);
+    else if (error instanceof Response){
+      let json = error.json();
+      if (json['errors']) {
+        let errors = json['errors'];
+        let messages = [];
+        for (let key of Object.keys(errors)) {
+          let error = errors[key];
+          if (error) {
+            messages.push(error);
+          }
+        }
+        return messages.join(", ");
+      }
+      else if (json['error']) {
+        return json['error'];
+      }
+      else if (json['message']) {
+        return json['message'];
+      }
     }
     return JSON.stringify(error);
   }

@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelRollcall($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons end *ngIf="rollcall">
+      <button ion-button color="primary"  (click)="sendRollcall($event)">Send</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content #scrollTarget>
+  <ion-list *ngIf="rollcall">
+    <ion-item text-wrap text-center color="white">
+      <person-avatar [scrollTarget]="scrollTarget" [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+      <h1 padding-top>{{rollcall.message}}</h1>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="rollcall">
+    <ion-list-header>Send To</ion-list-header>
+    <ion-item color="white" *ngFor="let recipient of rollcall.recipients">
+      <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
+      <h2>{{recipient.name}}</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

@@ -49,22 +49,19 @@ export class PersonAddPage extends BasePage {
 
   addPerson(event) {
     this.logger.info(this, "addPerson");
-    let modal = this.showModal(PersonEditPage,
+    this.showPage(PersonEditPage,
       { organization: this.organization });
-    modal.onDidDismiss((data:any) => {
-      this.logger.info(this, "addPerson", "Modal", data);
-    });
   }
 
   invitePerson(event) {
     this.logger.info(this, "invitePerson");
-    this.showModal(PersonInvitePage,
+    this.showPage(PersonInvitePage,
       { organization: this.organization });
   }
 
   importPerson(event) {
     this.logger.info(this, "importPerson");
-    this.showModal(PersonImportPage,
+    this.showPage(PersonImportPage,
       { organization: this.organization });
   }
 

@@ -2,6 +2,9 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { PersonAddPage } from '../../pages/person-add/person-add';
+import { PersonEditPage } from '../../pages/person-edit/person-edit';
+import { RollcallTestPage } from '../../pages/rollcall-test/rollcall-test';
 import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
 
 import { ApiService } from '../../providers/api-service';
@@ -15,7 +18,7 @@ import { Person } from '../../models/person';
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallListPage ]
+  entryComponents:[ PersonAddPage, PersonEditPage, RollcallTestPage, RollcallListPage ]
 })
 export class OnboardListPage extends BasePage {
 
@@ -38,34 +41,118 @@ export class OnboardListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    this.person.config_added_people = false;
-    this.person.config_profile_reviewed = false;
-    this.person.config_self_test_sent = false;
+    let loading = this.showLoading("Loading...");
+    Promise.resolve()
+      .then(() => { return this.loadPerson(); })
+      .then(() => { return this.loadPeople(); })
+      .then(() => {
+        loading.dismiss();
+      })
+      .catch((error) => {
+        loading.dismiss();
+        this.showToast(error);
+      });
+  }
+
+  loadPerson():Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.api.getPerson(this.organization, "me").then((person:Person) => {
+        this.logger.info(this, "loadPerson", person);
+        this.database.savePerson(this.organization, person).then(saved => {
+          this.person = person;
+          resolve(person);
+        });
+      });
+    });
+  }
+
+  loadPeople():Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.api.getPeople(this.organization).then((people:Person[]) => {
+        let saves = [];
+        for (let person of people) {
+          this.logger.info(this, "loadPeople", person);
+          saves.push(this.database.savePerson(this.organization, person));
+        }
+        Promise.all(saves).then(saved => {
+          if (people && people.length > 1) {
+            this.person.config_people_invited = true;
+          }
+          else {
+            this.person.config_people_invited = false;
+          }
+          resolve();
+        });
+      });
+    });
   }
 
   taskAddPeople(event) {
     this.logger.info(this, "taskAddPeople");
-    this.person.config_added_people = true;
+    let modal = this.showModal(PersonAddPage, {
+      organization: this.organization,
+      person: this.person });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "taskAddPeople", "Modal", data);
+      this.database.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
+   });
   }
 
   taskReviewContact(event) {
     this.logger.info(this, "taskReviewContact");
-    this.person.config_profile_reviewed = true;
+    if (this.person.config_people_invited) {
+      let modal = this.showModal(PersonEditPage, {
+        organization: this.organization,
+        person: this.person });
+      modal.onDidDismiss(data => {
+        this.logger.info(this, "taskReviewContact", "Modal", data);
+        if (data) {
+          this.person.config_profile_reviewed = true;
+        }
+        else {
+          this.person.config_profile_reviewed = false;
+        }
+     });
+    }
   }
 
   taskSendRollCall(event) {
     this.logger.info(this, "taskSendRollCall");
-    this.person.config_self_test_sent = true;
+    if (this.person.config_people_invited && this.person.config_people_invited) {
+      let modal = this.showModal(RollcallTestPage, {
+        organization: this.organization,
+        person: this.person });
+      modal.onDidDismiss(data => {
+        this.logger.info(this, "taskSendRollCall", "Modal", data);
+        if (data) {
+          this.person.config_self_test_sent = true;
+        }
+        else {
+          this.person.config_self_test_sent = false;
+        }
+     });
+    }
   }
 
   showRollcallList(event) {
     this.logger.info(this, "showRollcallList");
-    this.showRootPage(RollcallListPage,
-      { organization: this.organization });
+    let loading = this.showLoading("Loading...");
+    this.loadPerson().then(loaded => {
+      loading.dismiss();
+      this.showRootPage(RollcallListPage,
+        { organization: this.organization });
+    });
   }
 
 }

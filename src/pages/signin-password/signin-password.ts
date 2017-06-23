@@ -60,6 +60,8 @@ export class SigninPasswordPage extends BasePage {
           this.api.getPerson(this.organization, "me").then((person:Person) => {
             this.logger.info(this, "showNext", "Person", person);
             this.organization.user_id = person.id;
+            this.organization.email = this.email;
+            this.organization.password = password;
             let saves = [
               this.database.saveOrganization(this.organization),
               this.database.savePerson(this.organization, person)];

@@ -119,20 +119,19 @@ export class RollcallApp {
             this.organizations = organizations;
             this.organization = organizations[0];
             this.logger.info(this, "loadApplication", "Organization", this.organization);
-            this.database.getPerson(this.organization.user_id).then(
+            this.database.getPerson(null, true).then(
               (person:Person) => {
                 this.logger.info(this, "loadApplication", "Person", person);
-                this.showRollcallList();
-                // if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                //   this.showRollcallList();
-                // }
-                // else {
-                //   this.showOnboardList(person);
-                // }
+                if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRollcallList();
+                }
+                else {
+                  this.showOnboardList(person);
+                }
               },
               (error:any) => {
                 this.logger.error(this, "loadApplication", "Person", error);
-                this.showOnboardList(null);
+                this.showOnboardList();
               });
           }
           else {
@@ -270,7 +269,7 @@ export class RollcallApp {
     this.splashScreen.hide();
   }
 
-  showOnboardList(person:Person) {
+  showOnboardList(person:Person=null) {
     this.logger.info(this, "showOnboardList");
     this.nav.setRoot(OnboardListPage,
       { organization: this.organization,

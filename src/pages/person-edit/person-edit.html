@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons start>
-      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+      <button ion-button color="primary" *ngIf="editing == true" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
     <ion-title *ngIf="editing == true">Edit Person</ion-title>
     <ion-title *ngIf="editing == false">Add Person</ion-title>

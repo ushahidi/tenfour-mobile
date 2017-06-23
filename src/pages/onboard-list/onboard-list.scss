@@ -15,6 +15,9 @@ page-onboard-list {
         ion-icon {
           font-size: 60px;
         }
+        p {
+          margin-top: 0;
+        }
       }
       ion-card {
         ion-card-content {
@@ -23,6 +26,12 @@ page-onboard-list {
         ion-icon {
           font-size: 50px;
           color: #888;
+        }
+        &.disabled {
+          opacity: 0.8;
+          ion-card-content {
+            opacity: 0.4;
+          }
         }
         .icon-border {
           width: 60px;

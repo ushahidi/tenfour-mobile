@@ -68,6 +68,7 @@ export class SignupPasswordPage extends BasePage {
             this.api.getPerson(organization, "me").then((person:Person) => {
               this.logger.info(this, "userLogin", "Person", person);
               organization.user_id = person.id;
+              organization.password = this.password.value;
               let saves = [
                 this.database.saveOrganization(organization),
                 this.database.savePerson(organization, person)];

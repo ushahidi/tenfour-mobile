@@ -53,6 +53,7 @@ import { RollcallListModule } from '../pages/rollcall-list/rollcall-list.module'
 import { RollcallEditModule } from '../pages/rollcall-edit/rollcall-edit.module';
 import { RollcallPeopleModule } from '../pages/rollcall-people/rollcall-people.module';
 import { RollcallSendModule } from '../pages/rollcall-send/rollcall-send.module';
+import { RollcallTestModule } from '../pages/rollcall-test/rollcall-test.module';
 
 import { ReplyListModule } from '../pages/reply-list/reply-list.module';
 import { ReplySendModule } from '../pages/reply-send/reply-send.module';
@@ -107,6 +108,7 @@ import { CountryService } from '../providers/country-service';
     RollcallEditModule,
     RollcallPeopleModule,
     RollcallSendModule,
+    RollcallTestModule,
     ReplyListModule,
     ReplySendModule,
     GroupListModule,

@@ -67,7 +67,7 @@ export class Person extends Model {
   public gravatar:string = null;
 
   @Column("invite_sent", BOOLEAN)
-  public invite_sent:boolean = null;
+  public invite_sent:boolean = false;
 
   @Column("config_profile_reviewed", BOOLEAN)
   public config_profile_reviewed:boolean = null;
@@ -75,8 +75,8 @@ export class Person extends Model {
   @Column("config_self_test_sent", BOOLEAN)
   public config_self_test_sent:boolean = null;
 
-  @Column("config_added_people", BOOLEAN)
-  public config_added_people:boolean = null;
+  @Column("config_people_invited", BOOLEAN)
+  public config_people_invited:boolean = null;
 
   @Column("first_time_login", BOOLEAN)
   public first_time_login:boolean = null;
@@ -114,19 +114,28 @@ export class Person extends Model {
     });
   }
 
-  hasEmail():boolean {
+  hasEmails():boolean {
     let emails = this.getEmails();
     return emails && emails.length > 0;
   }
 
-  hasPhone():boolean {
+  hasPhones():boolean {
     let phones = this.getPhones();
     return phones && phones.length > 0;
   }
 
+  hasEmail(email:string):boolean {
+    for (let contact of this.getEmails()) {
+      if (contact.contact == email) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   needsInvite():boolean {
     if (this.role == 'member' && this.has_logged_in == false) {
-      return this.hasEmail();
+      return this.hasEmails();
     }
     return false;
   }

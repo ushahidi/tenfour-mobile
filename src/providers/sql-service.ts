@@ -413,7 +413,18 @@ export class SqlService {
                 values[column.property] = row[column.name];
               }
               else if (column.type == BOOLEAN) {
-                values[column.property] = (row[column.name] == 'true');
+                if (row[column.name] == 'true') {
+                  values[column.property] = true;
+                }
+                else if (row[column.name] == "1") {
+                  values[column.property] = true;
+                }
+                else if (row[column.name] == 1) {
+                  values[column.property] = true;
+                }
+                else {
+                  values[column.property] = false;
+                }
               }
               else if (column.type == TEXT) {
                 values[column.property] = row[column.name];
@@ -447,7 +458,18 @@ export class SqlService {
               values[column.property] = row[column.name];
             }
             else if (column.type == BOOLEAN) {
-              values[column.property] = (row[column.name] == 'true');
+              if (row[column.name] == 'true') {
+                values[column.property] = true;
+              }
+              else if (row[column.name] == "1") {
+                values[column.property] = true;
+              }
+              else if (row[column.name] == 1) {
+                values[column.property] = true;
+              }
+              else {
+                values[column.property] = false;
+              }
             }
             else if (column.type == TEXT) {
               values[column.property] = row[column.name];

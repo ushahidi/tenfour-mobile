@@ -302,6 +302,7 @@ export class ApiService extends HttpService {
             if (data && data.people) {
               for (let _person of data.people) {
                 let person = new Person(_person);
+                person.me = person.hasEmail(token.username);
                 people.push(person);
               }
             }
@@ -325,10 +326,7 @@ export class ApiService extends HttpService {
           (data:any) => {
             if (data && data.person) {
               let person = new Person(data.person);
-              if (id && id === "me") {
-                this.logger.info(this, "getPerson", "Me", true);
-                person.me = true;
-              }
+              person.me = person.hasEmail(token.username);
               resolve(person);
             }
             else {
@@ -567,6 +565,9 @@ export class ApiService extends HttpService {
           recipients: rollcall.recipients,
           send_via: [rollcall.send_via]
         };
+        if (rollcall.self_test_roll_call) {
+          params['self_test_roll_call'] = 1;
+        }
         this.httpPost(url, token.access_token, params).then(
           (data:any) => {
             if (data && data.rollcall) {

@@ -4,6 +4,7 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { Sim } from '@ionic-native/sim';
 import { Contacts } from '@ionic-native/contacts';
 import { IsDebug } from '@ionic-native/is-debug';
+import { StatusBar } from '@ionic-native/status-bar';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -48,6 +49,7 @@ export class PersonImportPage extends BasePage {
       protected countries:CountryService,
       protected contacts:Contacts,
       protected isDebug:IsDebug,
+      protected statusBar:StatusBar,
       protected sim:Sim) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -55,6 +57,7 @@ export class PersonImportPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.statusBar.overlaysWebView(false);
     let loading = this.showLoading("Loading...");
     Promise.resolve()
       .then(() => { return this.loadDebug(); })
@@ -67,6 +70,11 @@ export class PersonImportPage extends BasePage {
         loading.dismiss();
         this.showToast(error);
       });
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    this.statusBar.overlaysWebView(true);
   }
 
   cancelImport(event:any) {
@@ -230,7 +238,7 @@ export class PersonImportPage extends BasePage {
             creates.push(this.createContact(newPerson, contact));
           }
           Promise.all(creates).then((created:any) => {
-            if (this.invite == true && person.hasEmail()) {
+            if (this.invite == true && person.hasEmails()) {
               this.api.invitePerson(this.organization, person).then((invited:Person) => {
                 resolve(newPerson);
               },

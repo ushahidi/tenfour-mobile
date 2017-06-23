@@ -113,6 +113,9 @@ export class Rollcall extends Model {
   @Column("replied", BOOLEAN)
   public replied:boolean = null;
 
+  @Column("self_test_roll_call", BOOLEAN)
+  public self_test_roll_call:boolean = null;
+
   @Column("sent", BOOLEAN)
   public sent:boolean = null;
 
