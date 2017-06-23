@@ -1,8 +1,13 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title></ion-title>
+    <ion-buttons start>
+      <button ion-button icon-only menuToggle color="primary" *ngIf="title">
+        <ion-icon name="menu"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>{{title}}</ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" (click)="editPerson($event)">Edit</button>
+      <button ion-button color="primary" *ngIf="person && (person.me == true || person.role == 'owner')" (click)="editPerson($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

@@ -102,6 +102,14 @@ export class Person extends Model {
 
   public notifications:Notification[] = [];
 
+  isOwner():boolean {
+    return this.role === 'owner';
+  }
+
+  isMember():boolean {
+    return this.role === 'member';
+  }
+
   getEmails():Contact[] {
     return this.contacts.filter(function(contact) {
       return contact.type == 'email';

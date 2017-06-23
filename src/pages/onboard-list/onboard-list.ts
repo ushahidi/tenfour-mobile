@@ -111,7 +111,7 @@ export class OnboardListPage extends BasePage {
 
   taskReviewContact(event) {
     this.logger.info(this, "taskReviewContact");
-    if (this.person.config_people_invited) {
+    if (this.person.config_people_invited || this.person.role == 'member') {
       let modal = this.showModal(PersonEditPage, {
         organization: this.organization,
         person: this.person });
@@ -148,10 +148,20 @@ export class OnboardListPage extends BasePage {
   showRollcallList(event) {
     this.logger.info(this, "showRollcallList");
     let loading = this.showLoading("Loading...");
-    this.loadPerson().then(loaded => {
+    this.api.updatePerson(this.organization, this.person).then((person:Person) => {
+      person.config_people_invited = true;
+      person.config_profile_reviewed = true;
+      person.config_self_test_sent = true;
+      this.database.savePerson(this.organization, this.person).then(saved => {
+        loading.dismiss();
+        this.showRootPage(RollcallListPage,
+          { organization: this.organization });
+      });
+    },
+    (error:any) => {
+      this.logger.error(this, "showRollcallList", error);
       loading.dismiss();
-      this.showRootPage(RollcallListPage,
-        { organization: this.organization });
+      this.showAlert("Problem Updating User", error);
     });
   }
 

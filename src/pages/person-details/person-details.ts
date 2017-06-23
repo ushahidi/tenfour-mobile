@@ -22,6 +22,7 @@ export class PersonDetailsPage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
+  title:string = null;
   loading:boolean = false;
 
   constructor(
@@ -45,6 +46,7 @@ export class PersonDetailsPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
+    this.title = this.getParameter<string>("title");
     this.loadUpdates(null, true);
   }
 

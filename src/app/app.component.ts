@@ -14,6 +14,7 @@ import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
+import { PersonDetailsPage } from '../pages/person-details/person-details';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 
 import { ApiService } from '../providers/api-service';
@@ -304,6 +305,15 @@ export class RollcallApp {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage,
       { organization: this.organization });
+    this.menuController.close();
+  }
+
+  showPersonDetails() {
+    this.logger.info(this, "showPersonDetails");
+    this.nav.setRoot(PersonDetailsPage,
+      { organization: this.organization,
+        person: this.person,
+        title: "Profile" });
     this.menuController.close();
   }
 

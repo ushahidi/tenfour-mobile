@@ -10,7 +10,7 @@
       <button #notifications ion-button icon-only color="primary" (click)="showNotifications($event)">
         <ion-icon ios="ios-notifications-outline" md="md-notifications"></ion-icon>
       </button>
-      <button #create ion-button icon-only color="primary" (click)="createRollcall($event)">
+      <button #create ion-button icon-only color="primary" *ngIf="person && person.role == 'owner'" (click)="createRollcall($event)">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
       </button>
     </ion-buttons>

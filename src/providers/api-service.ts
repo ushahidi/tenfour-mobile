@@ -384,6 +384,9 @@ export class ApiService extends HttpService {
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
         }
+        if (person.config_self_test_sent) {
+          params['config_self_test_sent'] = true;
+        }
         this.httpPut(url, token.access_token, params).then(
           (data:any) => {
             if (data && data.person) {
