@@ -84,7 +84,13 @@ export class NotificationListPage extends BasePage {
             resolve(notifications);
           }
           else {
-            this.loadNotifications(false);
+            this.loadNotifications(false).then((notifications:Notification[]) => {
+              this.person.notifications = notifications;
+              resolve(notifications);
+            },
+            (error:any) => {
+              reject(error);
+            });
           }
         });
       }

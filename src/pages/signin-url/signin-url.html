@@ -15,11 +15,12 @@
     </ion-item>
     <ion-item class="input">
       <ion-label fixed>URL</ion-label>
-      <ion-input #subdomain type="url" autocorrect="off" autocapitalize="none" placeholder="rollcall.io" (keypress)="showNextOnReturn($event)"></ion-input>
+      <h3 item-text item-right>.rollcall.io</h3>
+      <ion-input #subdomain type="url" autocorrect="off" autocapitalize="none" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
     <ion-item no-lines class="other">
       <h4>New to RollCall?</h4>
-      <button ion-button clear color="primary" (click)="createOrganization($event)">Create an Organization</button>
+      <button ion-button clear color="primary" (click)="createOrganization($event)">Create an organization</button>
     </ion-item>
   </ion-list>
 </ion-content>
