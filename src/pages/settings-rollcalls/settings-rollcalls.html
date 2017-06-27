@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-buttons start>
+    <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+  </ion-buttons>
+  <ion-title>Rollcalls</ion-title>
+  <ion-buttons end>
+    <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
+  </ion-buttons>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="organization">
+    <ion-item color="white">
+      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+      <ion-label>App</ion-label>
+      <ion-toggle [(ngModel)]="organization.app_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
+      <ion-label>Email</ion-label>
+      <ion-toggle [(ngModel)]="organization.email_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
+      <ion-label>SMS</ion-label>
+      <ion-toggle [(ngModel)]="organization.sms_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="logo-twitter" md="logo-twitter" item-left></ion-icon>
+      <ion-label>Twitter</ion-label>
+      <ion-toggle [(ngModel)]="organization.twitter_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+      <ion-label>Slack</ion-label>
+      <ion-toggle [(ngModel)]="organization.slack_enabled"></ion-toggle>
+    </ion-item>
+  </ion-list>
+</ion-content>

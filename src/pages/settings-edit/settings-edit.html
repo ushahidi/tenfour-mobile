@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Edit organization</ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" (click)="doneEdit($event)">Save</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="organization">
+    <ion-item color="white" text-center>
+      <person-avatar item-center [image]="logo" [large]="true" *ngIf="organization.profile_picture == null"></person-avatar>
+      <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization.profile_picture != null"></person-avatar>
+      <button ion-button clear color="primary" *ngIf="organization.profile_picture" (click)="showCameraRoll($event)">Change photo</button>
+      <button ion-button clear color="primary" *ngIf="organization.profile_picture == null" (click)="showCameraRoll($event)">Add photo</button>
+    </ion-item>
+    <ion-item color="white">
+      <ion-label floating>Name</ion-label>
+      <ion-input type="text" [(ngModel)]="organization.name"></ion-input>
+    </ion-item>
+    <ion-item color="white">
+      <ion-label floating>Location</ion-label>
+      <ion-input type="text" [(ngModel)]="organization.location"></ion-input>
+    </ion-item>
+  </ion-list>
+</ion-content>

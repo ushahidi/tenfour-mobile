@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { SettingsListPage } from './settings-list';
+import { SettingsEditPage } from './settings-edit';
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 
 @NgModule({
   declarations: [
-    SettingsListPage,
+    SettingsEditPage,
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(SettingsListPage),
+    IonicPageModule.forChild(SettingsEditPage),
   ],
   exports: [
-    SettingsListPage
+    SettingsEditPage
   ]
 })
-export class SettingsListModule {}
+export class SettingsEditModule {}

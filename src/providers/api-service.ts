@@ -20,6 +20,8 @@ import { Rollcall } from '../models/rollcall';
 import { Reply } from '../models/reply';
 import { Answer } from '../models/answer';
 import { Group } from '../models/group';
+import { Settings } from '../models/settings';
+import { Subscription } from '../models/subscription';
 import { Notification } from '../models/notification';
 
 @Injectable()
@@ -54,7 +56,7 @@ export class ApiService extends HttpService {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveToken", token);
       let json = JSON.stringify(token);
-      this.storage.setItem(organization.name, json).then(
+      this.storage.setItem(organization.subdomain, json).then(
         (data:any) => {
           resolve(data);
         },
@@ -67,7 +69,7 @@ export class ApiService extends HttpService {
 
   getToken(organization:Organization):Promise<Token> {
     return new Promise((resolve, reject) => {
-      this.storage.getItem(organization.name).then(
+      this.storage.getItem(organization.subdomain).then(
         (data:any) => {
           this.logger.info(this, "getToken", data);
           if (data) {
@@ -102,7 +104,7 @@ export class ApiService extends HttpService {
 
   removeToken(organization:Organization):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.storage.remove(organization.name).then(
+      this.storage.remove(organization.subdomain).then(
         (removed:any) => {
           resolve(true);
         },
@@ -259,6 +261,28 @@ export class ApiService extends HttpService {
     });
   }
 
+  getOrganization(organization:Organization):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let params = { };
+        let url = this.api + `/api/v1/organizations/${organization.id}`;
+        this.httpGet(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.organization) {
+              let organization = new Organization(data.organization);
+              resolve(organization);
+            }
+            else {
+              reject("Organization Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      });
+    });
+  }
+
   createOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/api/v1/organizations";
@@ -280,6 +304,50 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Organization Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  updateOrganization(organization:Organization):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      let url = this.api + `/api/v1/organizations/${organization.id}`;
+      let settings = {
+        channels: {
+          app: { enabled: organization.app_enabled == true },
+			    email: { enabled: organization.email_enabled == true },
+			    sms: { enabled: organization.sms_enabled == true },
+			    slack: { enabled: organization.slack_enabled == true }
+		    },
+		    location: {
+          name: organization.location
+		    },
+		  };
+      if (organization.types) {
+        settings['organization_types'] = organization.types.split(",");
+      }
+      let params = {
+        id: organization.id,
+        name: organization.name,
+        settings: settings };
+      this.getToken(organization).then((token:Token) => {
+        this.httpPut(url, token.access_token, params).then(
+          (data:any) => {
+            if (data && data.organization) {
+              let _organization:Organization = new Organization(data.organization);
+              _organization.email = organization.email;
+              _organization.password = organization.password;
+              resolve(_organization);
+            }
+            else {
+              reject("Organization Not Updated");
             }
           },
           (error:any) => {
@@ -742,6 +810,34 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Groups Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  getSubscriptions(organization:Organization):Promise<Subscription[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/subscriptions`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.subscriptions) {
+              let subscriptions = [];
+              for (let _subscription of data.subscriptions) {
+                let subscription = new Subscription(_subscription);
+                subscriptions.push(subscription);
+              }
+              resolve(subscriptions);
+            }
+            else {
+              reject("Subscriptions Not Found");
             }
           },
           (error:any) => {

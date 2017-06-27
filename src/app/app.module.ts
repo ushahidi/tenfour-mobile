@@ -65,6 +65,11 @@ import { GroupListModule } from '../pages/group-list/group-list.module';
 import { NotificationListModule } from '../pages/notification-list/notification-list.module';
 
 import { SettingsListModule } from '../pages/settings-list/settings-list.module';
+import { SettingsEditModule } from '../pages/settings-edit/settings-edit.module';
+import { SettingsTypesModule } from '../pages/settings-types/settings-types.module';
+import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
+import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
+import { SettingsRollcallsModule } from '../pages/settings-rollcalls/settings-rollcalls.module';
 
 import { DateTimeModule } from '../pipes/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago.module';
@@ -120,6 +125,11 @@ import { CountryService } from '../providers/country-service';
     PersonInviteModule,
     PersonImportModule,
     SettingsListModule,
+    SettingsEditModule,
+    SettingsTypesModule,
+    SettingsRolesModule,
+    SettingsPaymentsModule,
+    SettingsRollcallsModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,

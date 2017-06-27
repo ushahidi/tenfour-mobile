@@ -56,27 +56,31 @@ export class SigninPasswordPage extends BasePage {
       let password = this.password.value;
       this.api.userLogin(this.organization, this.email, password).then(
         (token:Token) => {
-          this.logger.info(this, "showNext", "User Token", token);
+          this.logger.info(this, "showNext", "Token", token);
           this.api.getPerson(this.organization, "me").then((person:Person) => {
             this.logger.info(this, "showNext", "Person", person);
-            this.organization.user_id = person.id;
-            this.organization.email = this.email;
-            this.organization.password = password;
-            let saves = [
-              this.database.saveOrganization(this.organization),
-              this.database.savePerson(this.organization, person)];
-            Promise.all(saves).then(saved => {
-              loading.dismiss();
-              this.showToast(`Logged in to ${this.organization.name}`);
-              if (person.config_profile_reviewed && person.config_self_test_sent) {
-                this.showRootPage(RollcallListPage,
-                  { organization: this.organization });
-              }
-              else {
-                this.showRootPage(OnboardListPage,
-                  { organization: this.organization,
-                    person: person });
-              }
+            this.api.getOrganization(this.organization).then((organization:Organization) => {
+              this.logger.info(this, "showNext", "Organization", organization);
+              organization.user_id = person.id;
+              organization.user_name = person.name;
+              organization.email = this.email;
+              organization.password = password;
+              let saves = [
+                this.database.saveOrganization(organization),
+                this.database.savePerson(organization, person)];
+              Promise.all(saves).then(saved => {
+                loading.dismiss();
+                this.showToast(`Logged in to ${organization.name}`);
+                if (person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRootPage(RollcallListPage,
+                    { organization: organization });
+                }
+                else {
+                  this.showRootPage(OnboardListPage,
+                    { organization: organization,
+                      person: person });
+                }
+              });
             });
           });
         },

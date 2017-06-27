@@ -14,6 +14,8 @@ import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
 import { Group } from '../models/group';
+import { Settings } from '../models/settings';
+import { Subscription } from '../models/subscription';
 import { Notification } from '../models/notification';
 
 @Injectable()
@@ -444,6 +446,68 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Group>(new Group(), where);
+  }
+
+  // ########## SETTINGS ##########
+
+  saveSettings(organization:Organization, settings:Settings):Promise<any> {
+    settings.organization_id = organization.id;
+    return this.saveModel(settings);
+  }
+
+  getSettings(organization:Organization):Promise<Settings[]> {
+    let where = { organization_id: organization.id };
+    let order = { key: "ASC" };
+    return this.getModels<Settings>(new Settings(), where, order);
+  }
+
+  getSetting(id:number):Promise<Settings> {
+    let where = { id: id };
+    return this.getModel<Settings>(new Settings(), where);
+  }
+
+  removeSetting(settings:Settings):Promise<any> {
+    let where = { id: settings.id };
+    return this.removeModel<Settings>(new Settings(), where);
+  }
+
+  removeSettings(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Settings>(new Settings(), where);
+  }
+
+  // ########## SUBSCRIPTIONS ##########
+
+  saveSubscription(organization:Organization, subscription:Subscription):Promise<any> {
+    subscription.organization_id = organization.id;
+    return this.saveModel(subscription);
+  }
+
+  getSubscriptions(organization:Organization):Promise<Subscription[]> {
+    let where = { organization_id: organization.id };
+    let order = { created_at: "ASC" };
+    return this.getModels<Subscription>(new Subscription(), where, order);
+  }
+
+  getSubscription(id:number):Promise<Subscription> {
+    let where = { id: id };
+    return this.getModel<Subscription>(new Subscription(), where);
+  }
+
+  removeSubscription(subscription:Settings):Promise<any> {
+    let where = { id: subscription.id };
+    return this.removeModel<Subscription>(new Subscription(), where);
+  }
+
+  removeSubscriptions(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Subscription>(new Subscription(), where);
   }
 
 }

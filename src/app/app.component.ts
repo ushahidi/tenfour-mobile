@@ -33,6 +33,8 @@ import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
 import { Group } from '../models/group';
 import { Notification } from '../models/notification';
+import { Settings } from '../models/settings';
+import { Subscription } from '../models/subscription';
 
 @Component({
   templateUrl: 'app.html'
@@ -86,7 +88,9 @@ export class RollcallApp {
         new Reply(),
         new Recipient(),
         new Group(),
-        new Notification()
+        new Notification(),
+        new Settings(),
+        new Subscription()
       ]);
     });
   }
@@ -282,7 +286,8 @@ export class RollcallApp {
   showRollcallList() {
     this.logger.info(this, "showRollcallList");
     this.nav.setRoot(RollcallListPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        person: this.person });
     this.menuController.close();
     this.splashScreen.hide();
   }
@@ -290,21 +295,24 @@ export class RollcallApp {
   showGroupList() {
     this.logger.info(this, "showGroupList");
     this.nav.setRoot(GroupListPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        person: this.person });
     this.menuController.close();
   }
 
   showPersonList() {
     this.logger.info(this, "showPersonList");
     this.nav.setRoot(PersonListPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        person: this.person });
     this.menuController.close();
   }
 
   showSettingsList() {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        person: this.person });
     this.menuController.close();
   }
 
