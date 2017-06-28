@@ -189,7 +189,7 @@ export class RollcallListPage extends BasePage {
       rollcall: rollcall });
     modal.onDidDismiss(data => {
       if (data) {
-        this.loadRollCalls(true);
+        this.loadRollCalls(false);
       }
    });
   }
@@ -200,7 +200,7 @@ export class RollcallListPage extends BasePage {
       person: this.person });
     modal.onDidDismiss(data => {
       if (data) {
-        this.loadRollCalls(true);
+        this.loadRollCalls(false);
       }
     });
   }

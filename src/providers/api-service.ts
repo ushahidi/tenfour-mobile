@@ -336,6 +336,7 @@ export class ApiService extends HttpService {
       let params = {
         id: organization.id,
         name: organization.name,
+        subdomain: organization.subdomain,
         settings: settings };
       this.getToken(organization).then((token:Token) => {
         this.httpPut(url, token.access_token, params).then(

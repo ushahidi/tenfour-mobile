@@ -59,25 +59,28 @@ export class SignupPasswordPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Creating...");
-      this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then(
         (organization:Organization) => {
           this.logger.info(this, "createOrganization", "Organization", organization);
           this.api.userLogin(organization, organization.email, this.password.value).then((token:Token) => {
             this.logger.info(this, "createOrganization", "Token", token);
             this.api.getPerson(organization, "me").then((person:Person) => {
-              this.logger.info(this, "userLogin", "Person", person);
-              organization.user_id = person.id;
-              organization.password = this.password.value;
-              let saves = [
-                this.database.saveOrganization(organization),
-                this.database.savePerson(organization, person)];
-              Promise.all(saves).then(saved => {
-                loading.dismiss();
-                this.showToast(`Logged in to ${organization.name}`);
-                this.showRootPage(OnboardListPage,
-                  { organization: organization,
-                    person: person });
+              this.logger.info(this, "createOrganization", "Person", person);
+              this.api.getOrganization(this.organization).then((organization:Organization) => {
+                this.logger.info(this, "createOrganization", "Organization", organization);
+                organization.user_id = person.id;
+                organization.user_name = person.name;
+                organization.password = this.password.value;
+                let saves = [
+                  this.database.saveOrganization(organization),
+                  this.database.savePerson(organization, person)];
+                Promise.all(saves).then(saved => {
+                  loading.dismiss();
+                  this.showToast(`Logged in to ${organization.name}`);
+                  this.showRootPage(OnboardListPage,
+                    { organization: organization,
+                      person: person });
+                });
               });
             });
           },

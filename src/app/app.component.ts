@@ -88,8 +88,8 @@ export class RollcallApp {
         new Reply(),
         new Recipient(),
         new Group(),
-        new Notification(),
         new Settings(),
+        new Notification(),
         new Subscription()
       ]);
     });
@@ -246,25 +246,19 @@ export class RollcallApp {
   }
 
   loadPerson():Promise<any> {
-    if (this.person) {
-      this.logger.info(this, "loadPerson", this.person);
-      return Promise.resolve();
-    }
-    else {
-      return this.database.getPerson(null, true).then(
-        (person:Person) => {
-          this.zone.run(() => {
-            this.logger.info(this, "loadPerson", person);
-            this.person = person;
-          });
-        },
-        (error:any) => {
-          this.zone.run(() => {
-            this.logger.error(this, "loadPerson", error);
-            this.person = null;
-          });
+    return this.database.getPerson(null, true).then(
+      (person:Person) => {
+        this.zone.run(() => {
+          this.logger.info(this, "loadPerson", person);
+          this.person = person;
         });
-    }
+      },
+      (error:any) => {
+        this.zone.run(() => {
+          this.logger.error(this, "loadPerson", error);
+          this.person = null;
+        });
+      });
   }
 
   showSigninUrl() {
