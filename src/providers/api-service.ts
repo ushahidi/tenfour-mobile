@@ -148,7 +148,7 @@ export class ApiService extends HttpService {
         scope: this.scope,
         username: username,
         password: password,
-        organization: organization.name,
+        subdomain: organization.subdomain,
         client_id: this.clientId,
         client_secret: this.clientSecret };
       this.httpPost(url, null, params).then(

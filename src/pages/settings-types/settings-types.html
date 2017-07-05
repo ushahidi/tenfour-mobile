@@ -11,6 +11,7 @@
 </ion-header>
 <ion-content>
   <ion-list *ngIf="organization && types">
+    <ion-list-header>Organization types</ion-list-header>
     <ion-item color="white" text-wrap *ngFor="let type of types">
       <ion-label>{{type.name}}</ion-label>
       <ion-checkbox color="primary" [(ngModel)]="type.selected"></ion-checkbox>

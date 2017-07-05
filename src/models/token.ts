@@ -7,6 +7,8 @@ export interface Token {
 
   organization:string;
 
+  subdomain:string;
+
   token_type:string;
 
   access_token:string;
