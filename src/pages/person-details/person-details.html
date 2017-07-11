@@ -7,7 +7,7 @@
     </ion-buttons>
     <ion-title>{{title}}</ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" *ngIf="person && (person.me == true || person.role == 'owner')" (click)="editPerson($event)">Edit</button>
+      <button ion-button color="primary" *ngIf="person && person.me == true" (click)="editPerson($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

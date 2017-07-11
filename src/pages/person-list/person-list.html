@@ -16,9 +16,16 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="organization && organization.people">
-    <ion-item color="white" detail-push tappable (click)="showPerson($event, person)" *ngFor="let person of organization.people">
-      <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
-      <h2>{{person.name}}</h2>
-    </ion-item>
+    <ion-item-sliding color="white" *ngFor="let _person of organization.people">
+      <ion-item detail-push tappable (click)="showPerson($event, _person)">
+        <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
+        <h2>{{_person.name}}</h2>
+      </ion-item>
+      <ion-item-options side="right" *ngIf="person && person.role == 'owner'">
+        <button ion-button color="danger" (click)="removePerson(_person)">
+          <ion-icon name="trash"></ion-icon> Remove
+        </button>
+      </ion-item-options>
+    </ion-item-sliding>
   </ion-list>
 </ion-content>

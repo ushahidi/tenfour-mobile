@@ -21,6 +21,7 @@ import { Person } from '../../models/person';
 export class PersonListPage extends BasePage {
 
   organization:Organization = null;
+  person:Person = null;
   loading:boolean = false;
 
   constructor(
@@ -42,6 +43,7 @@ export class PersonListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.person = this.getParameter<Person>("person");
     this.loadPeople(null, true);
   }
 
@@ -93,6 +95,29 @@ export class PersonListPage extends BasePage {
     this.showPage(PersonDetailsPage,
       { organization: this.organization,
         person: person })
+  }
+
+  removePerson(person:Person) {
+    this.logger.info(this, "removePerson", person);
+    let loading = this.showLoading("Removing...");
+    this.api.deletePerson(this.organization, person).then((deleted:any) => {
+      let removes = [];
+      removes.push(this.database.removePerson(person));
+      for (let contact of person.contacts) {
+        removes.push(this.database.removeContact(contact));
+      }
+      Promise.all(removes).then(removed => {
+        let index = this.organization.people.indexOf(person);
+        if (index > -1) {
+          this.organization.people.splice(index, 1);
+        }
+        loading.dismiss();
+      });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Removing Person", error);
+    });
   }
 
 }
