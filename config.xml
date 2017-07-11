@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ushahidi.rollcall" version="0.6.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ushahidi.rollcall" version="0.7.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Rollcall</name>
     <description>Rollcall App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
@@ -9,6 +9,7 @@
     <allow-navigation href="http://localhost:3000" />
     <allow-navigation href="http://192.168.0.12:8100" />
     <allow-navigation href="http://localhost:3001" />
+    <allow-navigation href="http://192.168.0.13:8100" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
     <allow-intent href="tel:*" />
