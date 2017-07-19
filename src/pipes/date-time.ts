@@ -11,9 +11,9 @@ export class DateTimePipe {
     if (value) {
       if (args) {
         let format = args;
-        return moment(value).format(format);
+        return moment.utc(value).local().format(format);
       }
-      return moment(value).calendar(null, {
+      return moment.utc(value).local().calendar(null, {
         lastDay: 'h:mm A [Yesterday]',
         sameDay: 'h:mm A [Today]',
         nextDay: 'h:mm A [Tomorrow]',

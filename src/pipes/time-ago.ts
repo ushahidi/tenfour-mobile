@@ -26,7 +26,7 @@ export class TimeAgoPipe implements PipeTransform {
             yy: "%d years"
         }
     });
-    return moment(date).fromNow();
+    return moment.utc(date).local().fromNow();
   }
-  
+
 }
