@@ -22,6 +22,8 @@
 }
 ion-menu {
   ion-select {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     .select-ios {
       padding-left: 0;
     }

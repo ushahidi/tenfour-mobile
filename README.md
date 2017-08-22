@@ -261,19 +261,19 @@ cordova requirements ios
 Build the project for iOS
 
 ```
-ionic build ios
+ionic cordova build ios
 ```
 
 Run the app in the iOS Simulator or attached iOS device
 
 ```
-ionic run ios --livereload --consolelogs --serverlogs
+ionic cordova run ios --livereload --consolelogs --serverlogs
 ```
 
 Build the app in release and production mode for archiving
 
 ```
-ionic build ios --prod --release
+ionic cordova build ios --prod --release
 ```
 
 More information on Cordova's [iOS Platform Guide](https://cordova.apache.org/docs/en/latest/guide/platforms/ios/)
@@ -296,19 +296,19 @@ cordova requirements android
 Build the project for Android
 
 ```
-ionic build android
+ionic cordova build android
 ```
 
 Run the app in the Android Emulator or attached Android device
 
 ```
-ionic run android --livereload --consolelogs --serverlogs
+ionic cordova run android --livereload --consolelogs --serverlogs
 ```
 
 Build the app in release and production mode for archiving
 
 ```
-ionic build android --prod --release
+ionic cordova build android --prod --release
 ```
 
 ```

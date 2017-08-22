@@ -1,8 +1,6 @@
 {
   "name": "rollcall",
   "app_id": "",
-  "v2": true,
-  "typescript": true,
   "proxies": [
     {
       "path": "/api.dev.rollcall.io",
@@ -12,5 +10,9 @@
       "path": "/api.staging.rollcall.io",
       "proxyUrl": "https://api.staging.rollcall.io"
     }
-  ]
+  ],
+  "integrations": {
+    "cordova": {}
+  },
+  "type": "ionic-angular"
 }
