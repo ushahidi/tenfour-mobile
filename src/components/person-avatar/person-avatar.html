@@ -1,5 +1,5 @@
 <ion-avatar class="person-avatar" [class.large]="large" [style.background-color]="color" *ngIf="image && image.length > 0">
-  <img [class.border]="color" [style.border-color]="color" [src]="image">
+  <img [class.border]="color" [style.border-color]="color" [src]="image" [@fadeInOut]="fadeIn">
   <!-- <img class="ng-lazyload" [class.border]="color" [style.border-color]="color" [offset]="offset" [lazyLoad]="image" [errorImage]="errorImage" [scrollObservable]="scrollTarget.ionScroll" *ngIf="scrollTarget != null"> -->
 </ion-avatar>
 <div class="person-avatar" [class.large]="large" *ngIf="image == null">

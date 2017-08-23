@@ -2,6 +2,7 @@ import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { LazyLoadImageModule } from 'ng-lazyload-image';
@@ -138,6 +139,7 @@ import { CountryService } from '../providers/country-service';
     TruncateModule,
     HtmlParserModule,
     LazyLoadImageModule,
+    BrowserAnimationsModule,
     IonicModule.forRoot(RollcallApp)
   ],
   bootstrap: [IonicApp],

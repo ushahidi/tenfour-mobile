@@ -102,8 +102,16 @@ export class Person extends Model {
 
   public notifications:Notification[] = [];
 
+  isOwnerOrAdmin() {
+    return this.role === 'owner' || this.role === 'admin';
+  }
+
   isOwner():boolean {
     return this.role === 'owner';
+  }
+
+  isAdmin():boolean {
+    return this.role === 'admin';
   }
 
   isMember():boolean {

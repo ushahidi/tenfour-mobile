@@ -21,7 +21,7 @@
         <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
         <h2>{{_person.name}}</h2>
       </ion-item>
-      <ion-item-options side="right" *ngIf="person && person.role == 'owner'">
+      <ion-item-options side="right" *ngIf="person && person.isOwnerOrAdmin()">
         <button ion-button color="danger" (click)="removePerson(_person)">
           <ion-icon name="trash"></ion-icon> Remove
         </button>

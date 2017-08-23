@@ -13,7 +13,7 @@
       <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization.profile_picture != null"></person-avatar>
       <h1>{{organization.name}}</h1>
       <p *ngIf="organization.location">{{organization.location}}</p>
-      <button ion-button outline color="primary" *ngIf="person && person.role == 'owner'" (click)="settingsEdit($event)">Edit</button>
+      <button ion-button outline color="primary" *ngIf="person && person.isOwnerOrAdmin()" (click)="settingsEdit($event)">Edit</button>
     </ion-item>
     <ion-item color="white" tappable detail-push (click)="settingsTypes($event)">
       Organization type
