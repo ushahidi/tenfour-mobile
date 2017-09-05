@@ -40,48 +40,75 @@ export class PersonListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadPeople(null, false).then((finished:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
+  }
+
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.loadPeople(null, true);
+    if (this.loading == false) {
+      this.person = this.getParameter<Person>("person");
+      this.loadPeople(null, true);
+    }
   }
 
   loadPeople(event:any, cache:boolean=true) {
-    if (cache) {
-      return this.database.getPeople(this.organization).then((people:Person[]) => {
-        if (people && people.length > 1) {
-          this.organization.people = people;
-          if (event) {
-            event.complete();
+    this.loading = true;
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.database.getPeople(this.organization).then((people:Person[]) => {
+          if (people && people.length > 1) {
+            this.organization.people = people;
+            if (event) {
+              event.complete();
+              this.loading = false;
+              resolve(people);
+            }
           }
-        }
-        else {
-          this.loadPeople(event, false);
-        }
-      });
-    }
-    else {
-      return this.api.getPeople(this.organization).then(
-        (people:Person[]) => {
-          this.organization.people = people;
-          let saves = [];
-          for (let person of people) {
-            saves.push(this.database.savePerson(this.organization, person));
+          else {
+            this.loadPeople(event, false).then((people:Person[]) => {
+              resolve(people);
+            },
+            (error:any) => {
+              reject(error);
+            });
           }
-          Promise.all(saves).then(saved => {
+        });
+      }
+      else {
+        this.api.getPeople(this.organization).then(
+          (people:Person[]) => {
+            this.organization.people = people;
+            let saves = [];
+            for (let person of people) {
+              saves.push(this.database.savePerson(this.organization, person));
+            }
+            Promise.all(saves).then(saved => {
+              if (event) {
+                event.complete();
+              }
+              this.loading = false;
+              resolve(people);
+            });
+          },
+          (error:any) => {
             if (event) {
               event.complete();
             }
+            this.showToast(error);
+            this.loading = false;
+            reject(error);
           });
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          this.showToast(error);
-        });
-    }
+      }
+    });
   }
 
   addPeople(event:any) {

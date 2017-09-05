@@ -39,20 +39,24 @@ export class NotificationListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    if (this.person.notifications == null || this.person.notifications.length == 0) {
-      let loading = this.showLoading("Loading...");
-      this.loadUpdates(null, true).then(updated => {
-        loading.dismiss();
-      },
-      (error:any) => {
-        loading.dismiss();
-      });
-    }
-    else {
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(null, false).then(updated => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
+  }
+
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    if (this.loading == false) {
+      this.organization = this.getParameter<Organization>("organization");
+      this.person = this.getParameter<Person>("person");
       this.loadUpdates(null, true);
     }
   }
@@ -111,7 +115,6 @@ export class NotificationListPage extends BasePage {
           });
       }
     });
-
   }
 
 }
