@@ -38,6 +38,8 @@ export class PersonAvatarComponent {
 
   fadeIn:boolean = false;
 
+  hasImage:boolean = false;
+
   constructor(private elementRef:ElementRef) {
   }
 
@@ -47,6 +49,7 @@ export class PersonAvatarComponent {
 
   ngAfterContentInit() {
     this.fadeIn = this.image && this.image.length > 0;
+    this.hasImage = this.image != null && this.image.length > 0 && this.image.startsWith("http");
   }
 
 }
