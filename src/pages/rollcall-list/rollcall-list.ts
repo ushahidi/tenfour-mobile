@@ -49,15 +49,26 @@ export class RollcallListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(null, false).then(finished => {
+      loading.dismiss();
+    });
+  }
+
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.loadUpdates(null, true);
+    if (this.loading == false) {
+      this.loadUpdates(null, true);
+    }
   }
 
   loadUpdates(event:any, cache:boolean=true) {
     this.loading = true;
-    Promise.all([
+    return Promise.all([
       this.loadPerson(cache),
       this.loadRollCalls(cache)]).then(
       (loaded:any) =>{

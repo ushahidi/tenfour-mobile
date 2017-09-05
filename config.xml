@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ushahidi.rollcall" version="0.9.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ushahidi.rollcall" version="0.10.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Rollcall</name>
     <description>Rollcall App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
-    <content src="index.html" />
+    <content original-src="index.html" src="http://localhost:3000" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://localhost:3000" />
