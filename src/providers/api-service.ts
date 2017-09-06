@@ -456,6 +456,9 @@ export class ApiService extends HttpService {
         if (person.config_self_test_sent) {
           params['config_self_test_sent'] = true;
         }
+        if (person.config_profile_reviewed) {
+          params['config_profile_reviewed'] = true;
+        }
         this.httpPut(url, token.access_token, params).then(
           (data:any) => {
             if (data && data.person) {

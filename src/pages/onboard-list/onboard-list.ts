@@ -112,6 +112,7 @@ export class OnboardListPage extends BasePage {
   taskReviewContact(event) {
     this.logger.info(this, "taskReviewContact");
     if (this.person.config_people_invited || this.person.role == 'member') {
+      this.person.config_profile_reviewed = true;
       let modal = this.showModal(PersonEditPage, {
         organization: this.organization,
         person: this.person });
