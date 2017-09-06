@@ -30,7 +30,7 @@
         <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of rollcall.answers">{{answer.replies}}</ion-badge>
         <ion-badge color="waiting" *ngIf="rollcall.waiting_count > 0">{{rollcall.waiting_count}}</ion-badge>
       </ion-card-content>
-      <button ion-button clear color="primary" tappable *ngIf="rollcall.replied == null || rollcall.replied == false" (click)="sendReply($event, rollcall)">Respond</button>
+      <button ion-button clear color="primary" tappable *ngIf="rollcall.canRespond(person)" (click)="sendReply($event, rollcall)">Respond</button>
     </ion-card>
   </ion-list>
 </ion-content>

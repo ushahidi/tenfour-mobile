@@ -159,4 +159,11 @@ export class Rollcall extends Model {
     return _recipients;
   }
 
+  canRespond(person:Person):boolean {
+    if (person && this.recipients.filter(recipient => recipient.id == person.id).length > 0) {
+      return this.replied == null || this.replied == false;
+    }
+    return false;
+  }
+
 }

@@ -71,23 +71,40 @@ export class RollcallListPage extends BasePage {
 
   loadUpdates(event:any, cache:boolean=true) {
     this.loading = true;
-    return Promise.all([
-      this.loadPerson(cache),
-      this.loadRollCalls(cache)]).then(
-      (loaded:any) =>{
-        this.logger.info(this, "loadUpdates", "Done");
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      },
-      (error:any) => {
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
+    return Promise.resolve()
+          .then(() => { return this.loadPerson(cache); })
+          .then(() => { return this.loadRollCalls(cache); })
+          .then(() => {
+            this.logger.info(this, "loadUpdates", "Done");
+            if (event) {
+              event.complete();
+            }
+            this.loading = false;
+          })
+          .catch((error) => {
+            if (event) {
+              event.complete();
+            }
+            this.loading = false;
+            this.showToast(error);
+          });
+    // return Promise.all([
+    //   this.loadPerson(cache),
+    //   this.loadRollCalls(cache)]).then(
+    //   (loaded:any) =>{
+    //     this.logger.info(this, "loadUpdates", "Done");
+    //     if (event) {
+    //       event.complete();
+    //     }
+    //     this.loading = false;
+    //   },
+    //   (error:any) => {
+    //     if (event) {
+    //       event.complete();
+    //     }
+    //     this.loading = false;
+    //     this.showToast(error);
+    //   });
   }
 
   loadPerson(cache:boolean=true):Promise<Person> {
