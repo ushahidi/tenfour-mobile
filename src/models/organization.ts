@@ -29,6 +29,12 @@ export class Organization extends Model {
               this.types = _settings.values.join(",");
             }
             else if (_settings.key == 'channels') {
+              if (_settings.values.preferred) {
+                this.preferred_enabled = _settings.values.preferred.enabled;
+              }
+              else {
+                this.preferred_enabled = null;
+              }
               if (_settings.values.app) {
                 this.app_enabled = _settings.values.app.enabled;
               }
@@ -123,6 +129,9 @@ export class Organization extends Model {
 
   @Column("slack_enabled", BOOLEAN)
   public slack_enabled:boolean = null;
+
+  @Column("preferred_enabled", BOOLEAN)
+  public preferred_enabled:boolean = null;
 
   @Column("credits", INTEGER)
   public credits:number = null;

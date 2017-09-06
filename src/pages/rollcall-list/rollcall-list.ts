@@ -73,6 +73,7 @@ export class RollcallListPage extends BasePage {
     this.loading = true;
     return Promise.resolve()
           .then(() => { return this.loadPerson(cache); })
+          .then(() => { return this.loadOrganization(cache); })
           .then(() => { return this.loadRollCalls(cache); })
           .then(() => {
             this.logger.info(this, "loadUpdates", "Done");
@@ -88,23 +89,6 @@ export class RollcallListPage extends BasePage {
             this.loading = false;
             this.showToast(error);
           });
-    // return Promise.all([
-    //   this.loadPerson(cache),
-    //   this.loadRollCalls(cache)]).then(
-    //   (loaded:any) =>{
-    //     this.logger.info(this, "loadUpdates", "Done");
-    //     if (event) {
-    //       event.complete();
-    //     }
-    //     this.loading = false;
-    //   },
-    //   (error:any) => {
-    //     if (event) {
-    //       event.complete();
-    //     }
-    //     this.loading = false;
-    //     this.showToast(error);
-    //   });
   }
 
   loadPerson(cache:boolean=true):Promise<Person> {
@@ -140,6 +124,25 @@ export class RollcallListPage extends BasePage {
           this.database.savePerson(this.organization, person).then(saved => {
             this.person = person;
             resolve(person);
+          });
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+    });
+  }
+
+  loadOrganization(cache:boolean=true):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        resolve(this.organization);
+      }
+      else {
+        this.api.getOrganization(this.organization).then((organization:Organization) => {
+          this.database.saveOrganization(this.organization).then(saved => {
+            this.organization = organization;
+            resolve(organization);
           });
         },
         (error:any) => {
