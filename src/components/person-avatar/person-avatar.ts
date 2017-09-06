@@ -49,7 +49,10 @@ export class PersonAvatarComponent {
 
   ngAfterContentInit() {
     this.fadeIn = this.image && this.image.length > 0;
-    this.hasImage = this.image != null && this.image.length > 0 && this.image.startsWith("http");
+  }
+
+  ngOnChanges() {
+    this.hasImage = this.image != null && this.image.length > 0 && (this.image.startsWith("http") || this.image.startsWith("data:image"));
   }
 
 }

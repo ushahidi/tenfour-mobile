@@ -235,7 +235,12 @@ export class PersonEditPage extends BasePage {
     }
     this.camera.getPicture(options).then((imageData:any) => {
       this.logger.info(this, "showCameraRoll", "Selected");
-      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
+      if (imageData) {
+        this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
+      }
+      else {
+        this.person.profile_picture = null;
+      }
     },
     (error:any) => {
       this.logger.error(this, "showCameraRoll", error);
