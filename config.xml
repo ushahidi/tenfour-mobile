@@ -3,7 +3,7 @@
     <name>Rollcall</name>
     <description>Rollcall App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
-    <content original-src="index.html" src="http://localhost:3000" />
+    <content src="index.html" />
     <access origin="*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://localhost:3000" />
