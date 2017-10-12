@@ -13,11 +13,6 @@
   <ion-list *ngIf="organization">
     <ion-list-header>How to send RollCalls</ion-list-header>
     <ion-item color="white">
-      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-      <ion-label>App Only</ion-label>
-      <ion-toggle [(ngModel)]="organization.app_enabled"></ion-toggle>
-    </ion-item>
-    <ion-item color="white">
       <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
       <ion-label>Email</ion-label>
       <ion-toggle [(ngModel)]="organization.email_enabled"></ion-toggle>
@@ -36,6 +31,11 @@
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
       <ion-label>Slack</ion-label>
       <ion-toggle [(ngModel)]="organization.slack_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+      <ion-label>App Only</ion-label>
+      <ion-toggle [(ngModel)]="organization.app_enabled" (ionChange)="onAppOnly($event)"></ion-toggle>
     </ion-item>
   </ion-list>
 </ion-content>

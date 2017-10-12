@@ -58,4 +58,14 @@ export class SettingsRollcallsPage extends BasePage {
     });
   }
 
+  onAppOnly(event:any) {
+    this.logger.info(this, "onAppOnly", this.organization.app_enabled);
+    if (this.organization.app_enabled) {
+      this.organization.email_enabled = false;
+      this.organization.sms_enabled = false;
+      this.organization.twitter_enabled = false;
+      this.organization.slack_enabled = false;
+    }
+  }
+
 }
