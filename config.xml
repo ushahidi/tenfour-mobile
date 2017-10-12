@@ -97,9 +97,9 @@
         <splash height="1024" src="resources/ios/splash/Default-Portrait~ipad.png" width="768" />
         <splash height="960" src="resources/ios/splash/Default@2x~iphone.png" width="640" />
         <splash height="480" src="resources/ios/splash/Default~iphone.png" width="320" />
+        <icon height="1024" src="resources/ios/icon/icon-1024.png" width="1024" />
+        <splash height="2732" src="resources/ios/splash/Default@2x~universal~anyany.png" width="2732" />
     </platform>
-    <engine name="android" spec="^6.2.3" />
-    <engine name="ios" spec="^4.4.0" />
     <plugin name="cordova-custom-config" spec="^4.0.2" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
@@ -135,4 +135,6 @@
         <variable name="ANDROID_PATH_PREFIX" value="/" />
     </plugin>
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
+    <engine name="ios" spec="~4.4.0" />
+    <engine name="android" spec="~6.2.3" />
 </widget>

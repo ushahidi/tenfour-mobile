@@ -16,13 +16,13 @@
   <ion-list *ngIf="rollcall">
     <ion-item color="white">
       <ion-label>Send via</ion-label>
-      <ion-select [(ngModel)]="rollcall.send_via" multiple="true">
-        <ion-option value="preferred" *ngIf="organization.preferred_enabled">Recipients' Preferred Method</ion-option>
+      <ion-select #select [(ngModel)]="rollcall.send_via" multiple="true">
+        <!-- <ion-option value="preferred" *ngIf="organization.preferred_enabled">Recipients' Preferred Method</ion-option> -->
         <ion-option value="sms" *ngIf="organization.sms_enabled">SMS</ion-option>
         <ion-option value="email" *ngIf="organization.email_enabled">Email</ion-option>
         <ion-option value="slack" *ngIf="organization.slack_enabled">Slack</ion-option>
         <ion-option value="twitter" *ngIf="organization.twitter_enabled">Twitter</ion-option>
-        <ion-option value="apponly" *ngIf="organization.app_enabled">RollCall App Only</ion-option>
+        <ion-option value="apponly" *ngIf="organization.app_enabled" (ionSelect)="onAppOnly($event)">App Only</ion-option>
       </ion-select>
     </ion-item>
   </ion-list>

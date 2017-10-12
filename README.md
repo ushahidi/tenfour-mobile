@@ -171,6 +171,13 @@ List the root level NPM packages
 npm list --depth=0
 ```
 
+Remove, Clean, Install
+```
+rm -rf node_modules/
+npm cache clean
+npm install
+```
+
 ---
 
 ## Java
@@ -268,6 +275,9 @@ Run the app in the iOS Simulator or attached iOS device
 
 ```
 ionic cordova run ios --livereload --consolelogs --serverlogs
+```
+```
+ionic cordova run ios --livereload --consolelogs --serverlogs --target "iPhone-SE"
 ```
 
 Build the app in release and production mode for archiving

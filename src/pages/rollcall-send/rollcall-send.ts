@@ -1,5 +1,5 @@
-import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, ViewChild, NgZone } from '@angular/core';
+import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { StatusBar } from '@ionic-native/status-bar';
 
@@ -24,6 +24,9 @@ export class RollcallSendPage extends BasePage {
 
   organization:Organization = null;
   rollcall:Rollcall = null;
+
+  @ViewChild('select')
+  select: Select;
 
   constructor(
       protected zone:NgZone,
@@ -97,4 +100,10 @@ export class RollcallSendPage extends BasePage {
     });
   }
 
+  onAppOnly(event:any) {
+    this.logger.info(this, "onAppOnly", event);
+    this.rollcall.send_via = 'apponly';
+    this.select.close();
+  }
+  
 }
