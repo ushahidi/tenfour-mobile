@@ -5,59 +5,41 @@ person-avatar {
     margin-left: auto;
     margin-right: auto;
     background-color: black;
-    text-align: center;
+    overflow: hidden;
     border-radius: 50%;
     -webkit-border-radius: 50%;
-    img {
-      width:100%;
-      height:100%;
-      border-radius: 50%;
-      -webkit-border-radius: 50%;
-      transition: opacity 1s;
-      &.border {
-        border-color: transparent;
-        border-width: 3px;
-        border-style: solid;
-        border-radius: 50%;
-        -webkit-border-radius: 50%;
-      }
-      &.ng-lazyload {
-        opacity: 0;
-      }
-      &.ng-lazyloaded {
-        opacity: 1;
-      }
+    .image {
+      width:100% !important;
+      height:auto !important;
     }
-    div {
+    .initials {
       width:100%;
       height:100%;
       color: white;
       font-size: 14px;
       padding-top: 8px;
-      &.border {
-        font-size: 12px;
+      text-align: center;
+      font-weight: 500;
+    }
+    &.border {
+      border-color: transparent;
+      border-width: 3px;
+      border-style: solid;
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      .initials {
         padding-top: 5px;
-        border-color: transparent;
-        border-width: 3px;
-        border-style: solid;
-        border-radius: 50%;
-        -webkit-border-radius: 50%;
       }
     }
     &.large {
-      width:60px;
-      height:60px;
-      img {
-        &.border {
-          border-width: 4px;
-        }
+      width:60px !important;
+      height:60px !important;
+      .initials {
+        font-size: 25px;
+        padding-top: 15px;
       }
-      div {
-        font-size: 22px;
-        padding-top: 16px;
-        &.border {
-          border-width: 4px;
-        }
+      &.border {
+        border-width: 6px;
       }
     }
   }
