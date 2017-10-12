@@ -27,30 +27,48 @@
       <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
       <ion-item color="white" tappable (click)="editReply($event, reply)" *ngFor="let reply of rollcall.answerReplies(answer)">
         <person-avatar item-left [scrollTarget]="scrollTarget" [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
-        <ion-row no-padding>
-          <ion-col text-left no-padding>
-            <h2>{{reply.user_name}}</h2>
-          </ion-col>
-          <ion-col text-right no-padding class="truncate">
-            <small>{{reply.created_at | dateTime}}</small>
-          </ion-col>
-        </ion-row>
-        <p text-wrap>{{reply.message}}</p>
+        <ion-grid no-padding>
+          <ion-row no-padding>
+            <ion-col col-7 text-left no-padding>
+              <h2>{{reply.user_name}}</h2>
+            </ion-col>
+            <ion-col col-5 text-right no-padding>
+              <small>{{reply.created_at | dateTime}}</small>
+            </ion-col>
+          </ion-row>
+          <ion-row no-padding>
+            <ion-col text-left no-padding>
+              <p text-wrap>{{reply.message}}</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-item>
     </ion-list>
     <ion-list *ngIf="rollcall.replies.length < rollcall.recipients.length">
       <ion-list-header>No Response</ion-list-header>
       <ion-item color="white" *ngFor="let recipient of rollcall.recipientsPending()">
         <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
-        <ion-row no-padding>
+        <ion-grid no-padding>
+          <ion-row no-padding>
+            <ion-col text-left no-padding>
+              <h2>{{recipient.name}}</h2>
+            </ion-col>
+          </ion-row>
+          <ion-row no-padding>
+            <ion-col text-left no-padding>
+              <p text-wrap>{{recipient.response_status}}</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <!-- <ion-row no-padding>
           <ion-col text-left no-padding>
             <h2>{{recipient.name}}</h2>
           </ion-col>
-          <ion-col text-right no-padding class="truncate">
+          <ion-col text-right no-padding>
             <small>{{recipient.created_at | dateTime}}</small>
           </ion-col>
         </ion-row>
-        <p text-wrap>{{recipient.response_status}}</p>
+        <p text-wrap>{{recipient.response_status}}</p> -->
       </ion-item>
     </ion-list>
   </div>
