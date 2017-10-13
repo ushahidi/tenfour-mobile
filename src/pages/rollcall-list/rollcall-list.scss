@@ -2,8 +2,11 @@ page-rollcall-list {
   ion-card {
     ion-card-content {
       border-bottom: 1px solid #ccc;
+      person-avatar {
+      }
       h1 {
-
+        padding-top: 3px;
+        padding-bottom: 2px;
       }
       p {
         color: #888 !important;

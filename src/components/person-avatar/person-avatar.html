@@ -1,4 +1,7 @@
 <div class="person-avatar" [class.large]="large" [class.border]="color" [style.border-color]="color">
   <div class="initials" *ngIf="hasImage == false">{{initials}}</div>
-  <img class="image" [src]="image" [@fadeInOut]="fadeIn" *ngIf="hasImage == true">
+  <div class="image" *ngIf="hasImage == true">
+    <!-- <img [src]="image" [@fadeInOut]="fadeIn"> -->
+    <img [src]="image">
+  </div>
 </div>

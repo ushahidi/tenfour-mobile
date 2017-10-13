@@ -48,7 +48,9 @@ export class PersonAvatarComponent {
   }
 
   ngAfterContentInit() {
-    this.fadeIn = this.image && this.image.length > 0;
+    setTimeout(()=> {
+      this.fadeIn = this.image && this.image.length > 0;
+    }, 2000);
   }
 
   ngOnChanges() {

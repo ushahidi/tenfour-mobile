@@ -5,12 +5,23 @@ person-avatar {
     margin-left: auto;
     margin-right: auto;
     background-color: black;
-    overflow: hidden;
+    overflow: hidden !important;
     border-radius: 50%;
     -webkit-border-radius: 50%;
     .image {
-      width:100% !important;
-      height:auto !important;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      overflow: hidden;
+      img {
+        transition: opacity 1s;
+        -webkit-transition: opacity 1s;
+        -moz-transition: opacity 1s;
+        -o-transition: opacity 1s;
+        width:100% !important;
+        height:auto !important;
+      }
     }
     .initials {
       width:100%;
