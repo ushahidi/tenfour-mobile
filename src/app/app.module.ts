@@ -80,6 +80,7 @@ import { TruncateModule } from '../pipes/truncate.module';
 import { HtmlParserModule } from '../pipes/html-parser.module';
 
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
+import { SendViaModule } from '../components/send-via/send-via.module';
 
 import { LoggerService } from '../providers/logger-service';
 import { ApiService } from '../providers/api-service';
@@ -96,6 +97,7 @@ import { CountryService } from '../providers/country-service';
     FormsModule,
     ReactiveFormsModule,
     PersonAvatarModule,
+    SendViaModule,
     GroupListModule,
     SigninUrlModule,
     SigninEmailModule,

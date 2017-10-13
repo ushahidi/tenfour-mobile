@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { StatusBar } from '@ionic-native/status-bar';
 
@@ -8,6 +8,8 @@ import { RollcallPeoplePage } from '../../pages/rollcall-people/rollcall-people'
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
+
+import { SendViaComponent } from '../../components/send-via/send-via';
 
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
@@ -39,6 +41,7 @@ export class RollcallSendPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected popoverController:PopoverController,
       protected api:ApiService,
       protected database:DatabaseService,
       protected statusBar:StatusBar) {
@@ -105,5 +108,26 @@ export class RollcallSendPage extends BasePage {
     this.rollcall.send_via = 'apponly';
     this.select.close();
   }
-  
+
+  showPopover(event:any) {
+    this.logger.info(this, "showPopover", event, this.rollcall.send_via);
+    let popover = this.popoverController.create(SendViaComponent,
+      { send_via: this.rollcall.send_via,
+        app_enabled: this.organization.app_enabled,
+        email_enabled: this.organization.email_enabled,
+        sms_enabled: this.organization.sms_enabled,
+        twitter_enabled: this.organization.twitter_enabled,
+        slack_enabled: this.organization.slack_enabled,
+        on_changed:(send_via:any) => {
+            this.logger.info(this, "sendViaChanged", send_via);
+            this.rollcall.send_via = send_via;
+          }
+        },
+      { showBackdrop: true,
+        enableBackdropDismiss: true });
+    popover.present({
+      ev: event
+    });
+  }
+
 }

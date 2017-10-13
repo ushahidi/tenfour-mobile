@@ -15,22 +15,22 @@
     <ion-item color="white">
       <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
       <ion-label>Email</ion-label>
-      <ion-toggle [(ngModel)]="organization.email_enabled"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.email_enabled" (ionChange)="onEmailEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
       <ion-label>SMS</ion-label>
-      <ion-toggle [(ngModel)]="organization.sms_enabled"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.sms_enabled" (ionChange)="onSmsEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="logo-twitter" md="logo-twitter" item-left></ion-icon>
       <ion-label>Twitter</ion-label>
-      <ion-toggle [(ngModel)]="organization.twitter_enabled"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.twitter_enabled" (ionChange)="onTwitterEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
       <ion-label>Slack</ion-label>
-      <ion-toggle [(ngModel)]="organization.slack_enabled"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.slack_enabled" (ionChange)="onSlackEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>

@@ -1,5 +1,3 @@
-import { Injectable } from '@angular/core';
-
 import { TABLE } from '../decorators/table';
 import { COLUMNS } from '../decorators/column';
 
@@ -9,7 +7,6 @@ export let DOUBLE:string = "DOUBLE";
 export let BOOLEAN:string = "BOOLEAN";
 export let PRIMARY_KEY:boolean = true;
 
-@Injectable()
 export class Model {
 
   public saved_at: Date = null;

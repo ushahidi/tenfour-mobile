@@ -14,16 +14,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="rollcall">
-    <ion-item color="white">
+    <ion-item color="white" detail-push tappable (click)="showPopover($event)">
       <ion-label>Send via</ion-label>
-      <ion-select #select [(ngModel)]="rollcall.send_via" multiple="true">
-        <!-- <ion-option value="preferred" *ngIf="organization.preferred_enabled">Recipients' Preferred Method</ion-option> -->
-        <ion-option value="sms" *ngIf="organization.sms_enabled">SMS</ion-option>
-        <ion-option value="email" *ngIf="organization.email_enabled">Email</ion-option>
-        <ion-option value="slack" *ngIf="organization.slack_enabled">Slack</ion-option>
-        <ion-option value="twitter" *ngIf="organization.twitter_enabled">Twitter</ion-option>
-        <ion-option value="apponly" *ngIf="organization.app_enabled" (ionSelect)="onAppOnly($event)">App Only</ion-option>
-      </ion-select>
+      <ion-note item-end>{{rollcall.send_via}}</ion-note>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="rollcall">

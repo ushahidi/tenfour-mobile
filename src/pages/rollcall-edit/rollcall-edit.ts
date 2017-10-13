@@ -65,8 +65,10 @@ export class RollcallEditPage extends BasePage {
       user_id: this.person.id,
       user_initials: this.person.initials,
       user_picture: this.person.profile_picture
-      // send_via: 'apponly'
     });
+    if (this.organization.app_enabled) {
+      this.rollcall.send_via = 'apponly';
+    }
     this.addDefaults();
   }
 
@@ -128,5 +130,5 @@ export class RollcallEditPage extends BasePage {
   changeColor(answer:Answer) {
     this.logger.info(this, "changeColor", answer);
   }
-  
+
 }
