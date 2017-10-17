@@ -54,7 +54,12 @@ export class PersonAvatarComponent {
   }
 
   ngOnChanges() {
-    this.hasImage = this.image != null && this.image.length > 0 && (this.image.startsWith("http") || this.image.startsWith("data:image"));
+    if (this.image != null && this.image.length > 0) {
+      this.hasImage = this.image.startsWith("http") || this.image.startsWith("data:image") || this.image.startsWith("assets/");
+    }
+    else {
+      this.hasImage = false;
+    }
   }
 
 }

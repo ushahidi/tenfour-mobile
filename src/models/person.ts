@@ -26,6 +26,9 @@ export class Person extends Model {
           this.notifications.push(notification);
         }
       }
+      if (data.name && data.initials == null) {
+        this.initials = data.name.split(" ").map((n)=>n[0]).join("").substring(0, 3);
+      }
     }
   }
 

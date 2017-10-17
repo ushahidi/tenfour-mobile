@@ -89,6 +89,14 @@ export class GroupEditPage extends BasePage {
     else {
       let loading = this.showLoading("Creating...");
       this.api.createGroup(this.organization, this.group).then((group:Group) => {
+        if (this.group.members && this.group.members.length > 0) {
+          group.member_count = this.group.members.length;
+          group.member_ids = this.group.members.map(member => member.id).join(",");
+        }
+        else {
+          group.member_count = 0;
+          group.member_ids = "";
+        }
         this.database.saveGroup(this.organization, group).then((saved:any) => {
           loading.dismiss();
           this.hideModal({ group: group });
@@ -105,6 +113,14 @@ export class GroupEditPage extends BasePage {
     this.logger.info(this, "updateGroup");
     let loading = this.showLoading("Saving...");
     this.api.updateGroup(this.organization, this.group).then((group:Group) => {
+      if (this.group.members && this.group.members.length > 0) {
+        group.member_count = this.group.members.length;
+        group.member_ids = this.group.members.map(member => member.id).join(",");
+      }
+      else {
+        group.member_count = 0;
+        group.member_ids = "";
+      }
       this.database.saveGroup(this.organization, group).then((saved:any) => {
         loading.dismiss();
         this.hideModal({ group: group });
