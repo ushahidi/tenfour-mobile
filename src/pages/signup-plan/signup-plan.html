@@ -12,8 +12,23 @@
       <img src="assets/images/dots.png"/>
       <h2>Ready to choose your plan?</h2>
     </ion-item>
-    <ion-item text-wrap no-lines class="info">
-      <p>Actually, on second thought let's just skip that for now...</p>
+    <ion-item text-wrap no-lines text-center class="info">
+      <h1 text-center no-padding no-margin>$3</h1>
+      <p class="usage">per user,<br>per month</p>
+      <p class="features">
+        <strong>Unlimited in-app messages</strong><br>
+        <strong>Unlimited email messages</strong><br>
+        <strong>Unlimited Slack messages</strong><br>
+        <strong>5 text messages (SMS) credits per user, per month</strong>
+        <!-- <button ion-button clear color="primary" (click)="needMore($event)">Need to send more text messages?</button> -->
+      </p>
+    </ion-item>
+    <ion-item no-lines class="action">
+      <button ion-button block color="primary" *ngIf="trial == false" tappable (click)="startPlan($event)">Signup for this plan</button>
+      <button ion-button block outline color="primary" *ngIf="trial == true" tappable (click)="startPlan($event)">Signup for this plan</button>
+
+      <button ion-button block color="secondary" *ngIf="trial == true" tappable (click)="startTrial($event)">Try free for 7 days</button>
+      <button ion-button block outline color="primary" *ngIf="trial == false" tappable (click)="startTrial($event)">Try free for 7 days</button>
     </ion-item>
   </ion-list>
 </ion-content>

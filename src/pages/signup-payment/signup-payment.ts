@@ -3,7 +3,6 @@ import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupPaymentPage } from '../../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { ApiService } from '../../providers/api-service';
@@ -12,15 +11,15 @@ import { Organization } from '../../models/organization';
 
 @IonicPage()
 @Component({
-  selector: 'page-signup-plan',
-  templateUrl: 'signup-plan.html',
+  selector: 'page-signup-payment',
+  templateUrl: 'signup-payment.html',
   providers: [ ApiService ],
-  entryComponents:[ SignupPaymentPage, SignupPasswordPage ]
+  entryComponents:[ SignupPasswordPage ]
 })
-export class SignupPlanPage extends BasePage {
+export class SignupPaymentPage extends BasePage {
 
-  trial:boolean = false;
   organization:Organization;
+  paypal:boolean = null;
 
   constructor(
       protected zone:NgZone,
@@ -42,30 +41,19 @@ export class SignupPlanPage extends BasePage {
   }
 
   showNext(event) {
-    if (this.trial) {
-      this.logger.info(this, "showNext", "SignupPasswordPage");
-      this.showPage(SignupPasswordPage,
-        { organization: this.organization });
-    }
-    else {
-      this.logger.info(this, "showNext", "SignupPaymentPage");
-      this.showPage(SignupPaymentPage,
-        { organization: this.organization });
-    }
+    this.logger.info(this, "showNext");
+    this.showPage(SignupPasswordPage,
+      { organization: this.organization });
   }
 
-  startPlan(event:any) {
-    this.logger.info(this, "startPlan");
-    this.trial = false;
+  selectPaypal(event:any) {
+    this.logger.info(this, "selectPaypal");
+    this.paypal = true;
   }
 
-  startTrial(event:any) {
-    this.logger.info(this, "startTrial");
-    this.trial = true;
-  }
-
-  needMore(event:any) {
-    this.logger.info(this, "needMore");
+  selectCreditCard(event:any) {
+    this.logger.info(this, "selectCreditCard");
+    this.paypal = false;
   }
 
 }

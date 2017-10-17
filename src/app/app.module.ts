@@ -41,6 +41,7 @@ import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
 import { SignupConfirmModule } from '../pages/signup-confirm/signup-confirm.module';
 import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
+import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.module';
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
 
 import { PersonListModule } from '../pages/person-list/person-list.module';
@@ -114,6 +115,7 @@ import { CountryService } from '../providers/country-service';
     SignupCheckModule,
     SignupConfirmModule,
     SignupPlanModule,
+    SignupPaymentModule,
     SignupPasswordModule,
     OnboardListModule,
     RollcallListModule,

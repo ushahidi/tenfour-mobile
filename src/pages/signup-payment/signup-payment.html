@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>How would you like to pay?</h2>
+    </ion-item>
+    <ion-item no-lines class="action">
+      <button ion-button block color="primary" *ngIf="paypal == false" tappable (click)="selectCreditCard($event)">Credit Card</button>
+      <button ion-button block outline color="primary" *ngIf="paypal == null || paypal == true" tappable (click)="selectCreditCard($event)">Credit Card</button>
+      <br>
+      <button ion-button block color="primary" *ngIf="paypal == true" tappable (click)="selectPaypal($event)">PayPal</button>
+      <button ion-button block outline color="primary" *ngIf="paypal == null || paypal == false" tappable (click)="selectPaypal($event)">PayPal</button>
+    </ion-item>
+  </ion-list>
+</ion-content>
