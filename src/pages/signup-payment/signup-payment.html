@@ -2,22 +2,23 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons end>
-      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
+      <button color="primary" ion-button text-only [disabled]="number.value.length == 0 || expiry.value.length == 0" (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
-    <ion-item class="heading">
+    <ion-item text-wrap class="heading">
       <img src="assets/images/dots.png"/>
-      <h2>How would you like to pay?</h2>
+      <h2 text-wrap>Add your credit card information.</h2>
     </ion-item>
-    <ion-item no-lines class="action">
-      <button ion-button block color="primary" *ngIf="paypal == false" tappable (click)="selectCreditCard($event)">Credit Card</button>
-      <button ion-button block outline color="primary" *ngIf="paypal == null || paypal == true" tappable (click)="selectCreditCard($event)">Credit Card</button>
-      <br>
-      <button ion-button block color="primary" *ngIf="paypal == true" tappable (click)="selectPaypal($event)">PayPal</button>
-      <button ion-button block outline color="primary" *ngIf="paypal == null || paypal == false" tappable (click)="selectPaypal($event)">PayPal</button>
+    <ion-item class="input number">
+      <ion-label fixed>Number</ion-label>
+      <ion-input #number type="tel" autocorrect="off" autocapitalize="none" placeholder="Credit card number" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item class="input expiry">
+      <ion-label fixed>Expiry</ion-label>
+      <ion-input #expiry type="tel" autocorrect="off" autocapitalize="none" placeholder="MMYY" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
   </ion-list>
 </ion-content>

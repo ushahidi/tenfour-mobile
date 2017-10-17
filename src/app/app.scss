@@ -44,6 +44,16 @@ ion-list {
     p {
       color: #ccc;
     }
+    .group {
+      height:50px;
+      width:50px;
+      color: #fff;
+      background-color: #000;
+      font-size: 40px;
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      padding: 5px;
+    }
     &.heading {
       text-align: center;
       margin-bottom: 20px;
@@ -85,6 +95,7 @@ ion-list {
     &.action {
       .item-button {
         padding: 1.4em;
+        font-weight: 500;
       }
     }
     &.other {

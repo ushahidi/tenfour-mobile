@@ -55,10 +55,11 @@ export class SignupPasswordPage extends BasePage {
       this.showToast("Password is too short");
     }
     else if (this.password.value != this.confirm.value) {
-      this.showToast("Password and conform do not match");
+      this.showToast("Password and confirm do not match");
     }
     else {
       let loading = this.showLoading("Creating...");
+      this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then(
         (organization:Organization) => {
           this.logger.info(this, "createOrganization", "Organization", organization);
@@ -100,8 +101,16 @@ export class SignupPasswordPage extends BasePage {
 
   createOrganizationOnReturn(event) {
     if (event.keyCode == 13) {
-      this.hideKeyboard();
-      this.createOrganization(event);
+      if (this.password.value.length == 0) {
+        this.password.setFocus();
+      }
+      else if (this.confirm.value.length == 0) {
+        this.confirm.setFocus();
+      }
+      else {
+        this.hideKeyboard();
+        this.createOrganization(event);
+      }
       return false;
     }
     return true;

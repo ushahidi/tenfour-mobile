@@ -19,7 +19,12 @@ import { Organization } from '../../models/organization';
 export class SignupPaymentPage extends BasePage {
 
   organization:Organization;
-  paypal:boolean = null;
+
+  @ViewChild('number')
+  number:TextInput;
+
+  @ViewChild('expiry')
+  expiry:TextInput;
 
   constructor(
       protected zone:NgZone,
@@ -40,20 +45,27 @@ export class SignupPaymentPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
+  showNext(event:any) {
     this.logger.info(this, "showNext");
     this.showPage(SignupPasswordPage,
       { organization: this.organization });
   }
 
-  selectPaypal(event:any) {
-    this.logger.info(this, "selectPaypal");
-    this.paypal = true;
-  }
-
-  selectCreditCard(event:any) {
-    this.logger.info(this, "selectCreditCard");
-    this.paypal = false;
+  showNextOnReturn(event:any) {
+    if (event.keyCode == 13) {
+      if (this.number.value.length == 0) {
+        this.number.setFocus();
+      }
+      else if (this.expiry.value.length == 0) {
+        this.expiry.setFocus();
+      }
+      else {
+        this.hideKeyboard();
+        this.showNext(event);
+      }
+      return false;
+    }
+    return true;
   }
 
 }
