@@ -92,6 +92,10 @@ export class GroupDetailsPage extends BasePage {
 
   editGroup(event:any) {
     this.logger.info(this, "editGroup");
+    this.showModal(GroupEditPage,
+      { organization: this.organization,
+        person: this.person,
+        group: this.group })
   }
 
   showPerson(_person:Person) {

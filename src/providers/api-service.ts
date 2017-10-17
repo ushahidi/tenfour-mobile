@@ -857,7 +857,7 @@ export class ApiService extends HttpService {
         let params = {
           name: group.name,
           description: group.description || "",
-          members: group.members };
+          members: group.memberIds() };
         this.httpPost(url, token.access_token, params).then(
           (data:any) => {
             this.logger.info(this, "createGroup", data);
@@ -866,6 +866,35 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Group Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  updateGroup(organization:Organization, group:Group):Promise<Group> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/groups/${group.id}`;
+        let params = {
+          name: group.name,
+          description: group.description || "",
+          members: group.memberIds() 
+        };
+        this.httpPut(url, token.access_token, params).then(
+          (data:any) => {
+            this.logger.info(this, "updateGroup", data);
+            if (data && data.group) {
+              resolve(new Group(data.group));
+            }
+            else {
+              reject("Group Not Updated");
             }
           },
           (error:any) => {

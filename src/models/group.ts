@@ -64,4 +64,14 @@ export class Group extends Model {
     }
   }
 
+  memberIds():number[] {
+    let ids = [];
+    if (this.members && this.members.length > 0) {
+      for (let member of this.members) {
+        ids.push({id: member.id});
+      }
+    }
+    return ids;
+  }
+
 }

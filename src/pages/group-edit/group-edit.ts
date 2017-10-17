@@ -78,10 +78,6 @@ export class GroupEditPage extends BasePage {
      });
   }
 
-  updateGroup(event:any) {
-    this.logger.info(this, "updateGroup");
-  }
-
   createGroup(event:any) {
     this.logger.info(this, "createGroup");
     if (this.group.name.length == 0) {
@@ -103,6 +99,21 @@ export class GroupEditPage extends BasePage {
         this.showAlert("Problem Creating Group", error);
       });
     }
+  }
+
+  updateGroup(event:any) {
+    this.logger.info(this, "updateGroup");
+    let loading = this.showLoading("Saving...");
+    this.api.updateGroup(this.organization, this.group).then((group:Group) => {
+      this.database.saveGroup(this.organization, group).then((saved:any) => {
+        loading.dismiss();
+        this.hideModal({ group: group });
+      });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Updatig Group", error);
+    });
   }
 
   deleteGroup(event:any) {
