@@ -2,11 +2,14 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { GroupEditPage } from '../../pages/group-edit/group-edit';
+import { GroupDetailsPage } from '../../pages/group-details/group-details';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 @IonicPage()
@@ -14,11 +17,12 @@ import { Group } from '../../models/group';
   selector: 'page-group-list',
   templateUrl: 'group-list.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  ]
+  entryComponents:[ GroupEditPage, GroupDetailsPage ]
 })
 export class GroupListPage extends BasePage {
 
   organization:Organization = null;
+  person:Person = null;
   loading:boolean = false;
 
   constructor(
@@ -40,12 +44,16 @@ export class GroupListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.loadUpdates(null, true);
+    this.person = this.getParameter<Person>("person");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    })
   }
 
-  loadUpdates(event:any, cache:boolean=true) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
-    Promise.all([
+    return Promise.all([
       this.loadGroups(cache)]).then(
       (loaded:any) =>{
         this.logger.info(this, "loadUpdates", "Done");
@@ -64,35 +72,62 @@ export class GroupListPage extends BasePage {
   }
 
   loadGroups(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getGroups(this.organization).then((groups:Group[]) => {
+        this.database.getGroups(this.organization).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
             this.organization.groups = groups;
             resolve(groups);
           }
           else {
-            this.loadGroups(false);
+            this.loadGroups(false).then((groups:Group[]) => {
+              this.organization.groups = groups;
+              resolve(groups);
+            },
+            (error:any) => {
+              this.organization.groups = [];
+              reject(error);
+            });
           }
         });
       }
       else {
-        return this.api.getGroups(this.organization).then(
+        this.api.getGroups(this.organization).then(
           (groups:Group[]) => {
+            this.logger.info(this, "loadGroups", "API", groups);
             let saves = [];
             for (let group of groups) {
               saves.push(this.database.saveGroup(this.organization, group));
             }
             Promise.all(saves).then(saved => {
               this.organization.groups = groups;
+              this.logger.info(this, "loadGroups", "API", "Done");
               resolve(groups);
             });
           },
           (error:any) => {
+            this.organization.groups = [];
             reject(error);
           });
       }
     });
+  }
+
+  createGroup(event:any) {
+    this.logger.info(this, "createGroup");
+    this.showModal(GroupEditPage,
+      { organization: this.organization,
+        person: this.person });
+  }
+
+  showGroup(group:Group) {
+    this.logger.info(this, "showGroup", group);
+    this.showPage(GroupDetailsPage,
+      { organization: this.organization,
+        person: this.person,
+        group: group });
   }
 
 }

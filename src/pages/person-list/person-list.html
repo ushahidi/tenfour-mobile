@@ -17,7 +17,7 @@
   </ion-refresher>
   <ion-list *ngIf="organization && organization.people">
     <ion-item-sliding color="white" *ngFor="let _person of organization.people">
-      <ion-item detail-push tappable (click)="showPerson($event, _person)">
+      <ion-item color="white" detail-push tappable (click)="showPerson($event, _person)">
         <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
         <h2>{{_person.name}}</h2>
       </ion-item>

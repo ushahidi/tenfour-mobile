@@ -57,6 +57,9 @@ export class Person extends Model {
   @Column("profile_picture", TEXT)
   public profile_picture:string = null;
 
+  @Column("group_ids", TEXT)
+  public group_ids:string = null;
+
   @Column("role", TEXT)
   public role:string = null;
 

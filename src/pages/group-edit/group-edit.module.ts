@@ -1,19 +1,19 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { RollcallPeoplePage } from './rollcall-people';
+import { GroupEditPage } from './group-edit';
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 
 @NgModule({
   declarations: [
-    RollcallPeoplePage,
+    GroupEditPage,
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(RollcallPeoplePage),
+    IonicPageModule.forChild(GroupEditPage),
   ],
   exports: [
-    RollcallPeoplePage
+    GroupEditPage
   ]
 })
-export class RollcallPeopleModule {}
+export class GroupEditModule {}

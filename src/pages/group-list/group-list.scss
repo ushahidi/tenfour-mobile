@@ -1,3 +1,22 @@
 page-group-list {
+  ion-item {
+    ion-label {
+      h2 {
 
+      }
+      p {
+        color: #ccc;
+      }
+    }
+    ion-icon {
+      height:38px;
+      width:38px;
+      color: #fff;
+      background-color: #000;
+      font-size: 45px;
+      border-radius: 50%;
+      -webkit-border-radius: 50%;
+      padding: 4px;
+    }
+  }
 }

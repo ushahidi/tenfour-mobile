@@ -49,10 +49,10 @@ import { PersonEditModule } from '../pages/person-edit/person-edit.module';
 import { PersonDetailsModule } from '../pages/person-details/person-details.module';
 import { PersonInviteModule } from '../pages/person-invite/person-invite.module';
 import { PersonImportModule } from '../pages/person-import/person-import.module';
+import { PersonSelectModule } from '../pages/person-select/person-select.module';
 
 import { RollcallListModule } from '../pages/rollcall-list/rollcall-list.module';
 import { RollcallEditModule } from '../pages/rollcall-edit/rollcall-edit.module';
-import { RollcallPeopleModule } from '../pages/rollcall-people/rollcall-people.module';
 import { RollcallSendModule } from '../pages/rollcall-send/rollcall-send.module';
 import { RollcallTestModule } from '../pages/rollcall-test/rollcall-test.module';
 
@@ -62,6 +62,8 @@ import { ReplySendModule } from '../pages/reply-send/reply-send.module';
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
 import { GroupListModule } from '../pages/group-list/group-list.module';
+import { GroupEditModule } from '../pages/group-edit/group-edit.module';
+import { GroupDetailsModule } from '../pages/group-details/group-details.module';
 
 import { NotificationListModule } from '../pages/notification-list/notification-list.module';
 
@@ -99,6 +101,8 @@ import { CountryService } from '../providers/country-service';
     PersonAvatarModule,
     SendViaModule,
     GroupListModule,
+    GroupEditModule,
+    GroupDetailsModule,
     SigninUrlModule,
     SigninEmailModule,
     SigninUrlModule,
@@ -114,12 +118,10 @@ import { CountryService } from '../providers/country-service';
     OnboardListModule,
     RollcallListModule,
     RollcallEditModule,
-    RollcallPeopleModule,
     RollcallSendModule,
     RollcallTestModule,
     ReplyListModule,
     ReplySendModule,
-    GroupListModule,
     NotificationListModule,
     PersonListModule,
     PersonAddModule,
@@ -127,6 +129,7 @@ import { CountryService } from '../providers/country-service';
     PersonDetailsModule,
     PersonInviteModule,
     PersonImportModule,
+    PersonSelectModule,
     SettingsListModule,
     SettingsEditModule,
     SettingsTypesModule,

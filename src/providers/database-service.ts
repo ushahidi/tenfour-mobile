@@ -425,14 +425,37 @@ export class DatabaseService extends SqlService {
   }
 
   getGroups(organization:Organization):Promise<Group[]> {
-    let where = { organization_id: organization.id };
-    let order = { name: "ASC" };
-    return this.getModels<Group>(new Group(), where, order);
+    return new Promise((resolve, reject) => {
+      let where = { organization_id: organization.id };
+      let order = { name: "ASC" };
+      Promise.all([
+        this.getModels<Group>(new Group(), where, order),
+        this.getPeople(organization)]).then((results:any[]) => {
+          let groups = <Group[]>results[0];
+          let people = <Person[]>results[1];
+          for(let group of groups) {
+            group.loadMembers(people);
+          }
+          resolve(groups);
+      });
+    });
   }
 
-  getGroup(id:number):Promise<Group> {
-    let where = { id: id };
-    return this.getModel<Group>(new Group(), where);
+  getGroup(organization:Organization, id:number):Promise<Group> {
+    return new Promise((resolve, reject) => {
+      let where = {
+        organization_id: organization.id,
+        id: id };
+      this.getModel<Group>(new Group(), where).then((group:Group) => {
+        if (group.member_ids) {
+          let member_ids = group.member_ids.split(",").map(id => Number(id));
+          this.getPeople(organization, member_ids).then((people:Person[]) => {
+            group.members = people;
+          });
+        }
+        resolve(group);
+      });
+    });
   }
 
   removeGroup(group:Group):Promise<any> {

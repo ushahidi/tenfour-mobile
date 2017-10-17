@@ -47,12 +47,15 @@ export class PersonDetailsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     this.title = this.getParameter<string>("title");
-    this.loadUpdates(null, true);
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    });
   }
 
-  loadUpdates(event:any, cache:boolean=true) {
+  loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
     this.loading = true;
-    Promise.all([this.loadPerson(cache)]).then(
+    return Promise.all([this.loadPerson(cache)]).then(
       (loaded:any) =>{
         if (event) {
           event.complete();

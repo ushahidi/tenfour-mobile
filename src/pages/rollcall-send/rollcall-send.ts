@@ -4,7 +4,7 @@ import { IonicPage, Select, Platform, NavParams, NavController, ViewController, 
 import { StatusBar } from '@ionic-native/status-bar';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { RollcallPeoplePage } from '../../pages/rollcall-people/rollcall-people';
+import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -20,7 +20,7 @@ import { Recipient } from '../../models/recipient';
   selector: 'page-rollcall-send',
   templateUrl: 'rollcall-send.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallPeoplePage ]
+  entryComponents:[ PersonSelectPage ]
 })
 export class RollcallSendPage extends BasePage {
 
@@ -61,9 +61,8 @@ export class RollcallSendPage extends BasePage {
   }
 
   addPerson() {
-    let modal = this.showModal(RollcallPeoplePage, {
-      organization: this.organization,
-      rollcall: this.rollcall });
+    let modal = this.showModal(PersonSelectPage, {
+      organization: this.organization });
     modal.onDidDismiss(data => {
        if (data && data.people) {
          let recipients = [];

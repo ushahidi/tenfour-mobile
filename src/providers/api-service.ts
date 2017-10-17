@@ -826,6 +826,58 @@ export class ApiService extends HttpService {
     });
   }
 
+  getGroup(organization:Organization, id:number):Promise<Group> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/groups/${id}`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.group) {
+              let group = new Group(data.group);
+              resolve(group);
+            }
+            else {
+              reject("Group Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  createGroup(organization:Organization, group:Group):Promise<Group> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/groups`;
+        let params = {
+          name: group.name,
+          description: group.description || "",
+          members: group.members };
+        this.httpPost(url, token.access_token, params).then(
+          (data:any) => {
+            this.logger.info(this, "createGroup", data);
+            if (data && data.group) {
+              resolve(new Group(data.group));
+            }
+            else {
+              reject("Group Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   getSubscriptions(organization:Organization):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {

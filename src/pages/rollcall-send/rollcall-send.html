@@ -27,7 +27,7 @@
     <ion-item color="white" *ngFor="let recipient of rollcall.recipients">
       <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
       <h2>{{recipient.name}}</h2>
-      <button ion-button icon-only item-right clear color="black" (click)="removeRecipient(recipient)">
+      <button ion-button icon-only item-right clear color="black" tappable (click)="removeRecipient(recipient)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
     </ion-item>

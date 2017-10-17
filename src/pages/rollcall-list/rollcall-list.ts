@@ -52,6 +52,7 @@ export class RollcallListPage extends BasePage {
   ionViewDidLoad() {
     super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
+    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(null, false).then((finished:any) => {
       loading.dismiss();

@@ -8,11 +8,11 @@
   </ion-header>
   <ion-content>
     <ion-list *ngIf="organization">
-      <ion-item detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
-      <ion-item detail-push tappable (click)="showPersonList($event)">People</ion-item>
-      <!-- <ion-item detail-push tappable (click)="showGroupList($event)">Groups</ion-item> -->
-      <ion-item detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
-      <ion-item detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
+      <ion-item color="white" detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
+      <ion-item color="white" detail-push tappable (click)="showPersonList($event)">People</ion-item>
+      <ion-item color="white" detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
+      <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+      <ion-item color="white" detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
     </ion-list>
     <div text-center margin-top>
       <button ion-button clear color="primary" (click)="userLogout($event)">Log out</button>
