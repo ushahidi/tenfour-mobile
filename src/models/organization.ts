@@ -25,8 +25,12 @@ export class Organization extends Model {
             if (_settings.key == 'location') {
               this.location = _settings.values.name;
             }
-            if (_settings.key == 'organization_types') {
+            else if (_settings.key == 'organization_types') {
               this.types = _settings.values.join(",");
+            }
+            else if (_settings.key == 'organization_size') {
+              console.log(`Size ${JSON.stringify(_settings)}`);
+              this.size = _settings.values.toString();
             }
             else if (_settings.key == 'channels') {
               if (_settings.values.preferred) {
@@ -112,7 +116,7 @@ export class Organization extends Model {
   @Column("types", TEXT)
   public types:string = null;
 
-  @Column("size", TEXT)
+  @Column("_size", TEXT)
   public size:string = null;
 
   @Column("location", TEXT)

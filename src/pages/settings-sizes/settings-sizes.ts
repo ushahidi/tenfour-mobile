@@ -54,11 +54,7 @@ export class SettingsSizesPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    // if (this.organization.size) {
-    //   for (let size of this.sizes) {
-    //     size.selected = this.organization.size == size.key;
-    //   }
-    // }
+    this.logger.info(this, "ionViewWillEnter", "Size", this.organization.size);
   }
 
   cancelEdit(event:any) {
@@ -66,11 +62,7 @@ export class SettingsSizesPage extends BasePage {
   }
 
   doneEdit(event:any) {
-    // for (let size of this.sizes) {
-    //   if (size.selected == true) {
-    //     this.organization.size = size.key;
-    //   }
-    // }
+    this.logger.info(this, "doneEdit", "Size", this.organization.size)
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       this.database.saveOrganization(organization).then(saved => {

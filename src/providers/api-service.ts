@@ -334,7 +334,7 @@ export class ApiService extends HttpService {
         settings['organization_types'] = organization.types.split(",");
       }
       if (organization.size) {
-        settings['organization_size'] = organization.size;
+        settings['organization_size'] = {size: organization.size};
       }
       let params = {
         id: organization.id,
