@@ -8,6 +8,8 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
 import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
 import { SettingsTypesPage } from '../../pages/settings-types/settings-types';
+import { SettingsSizesPage } from '../../pages/settings-sizes/settings-sizes';
+import { SettingsRegionsPage } from '../../pages/settings-regions/settings-regions';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 import { SettingsRollcallsPage } from '../../pages/settings-rollcalls/settings-rollcalls';
 
@@ -19,7 +21,7 @@ import { Person } from '../../models/person';
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
   providers: [ ApiService ],
-  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsRolesPage, SettingsPaymentsPage, SettingsRollcallsPage ]
+  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsRollcallsPage ]
 })
 export class SettingsListPage extends BasePage {
 
@@ -60,6 +62,20 @@ export class SettingsListPage extends BasePage {
   settingsTypes(event:any) {
     this.logger.info(this, "settingsTypes");
     this.showModal(SettingsTypesPage,
+      { organization: this.organization,
+        person: this.person });
+  }
+
+  settingsSizes(event:any) {
+    this.logger.info(this, "settingsSizes");
+    this.showModal(SettingsSizesPage,
+      { organization: this.organization,
+        person: this.person });
+  }
+
+  settingsRegions(event:any) {
+    this.logger.info(this, "settingsRegions");
+    this.showModal(SettingsRegionsPage,
       { organization: this.organization,
         person: this.person });
   }

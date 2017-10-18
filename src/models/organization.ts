@@ -112,6 +112,9 @@ export class Organization extends Model {
   @Column("types", TEXT)
   public types:string = null;
 
+  @Column("size", TEXT)
+  public size:string = null;
+
   @Column("location", TEXT)
   public location:string = null;
 

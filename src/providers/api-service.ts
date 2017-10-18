@@ -333,6 +333,9 @@ export class ApiService extends HttpService {
       if (organization.types) {
         settings['organization_types'] = organization.types.split(",");
       }
+      if (organization.size) {
+        settings['organization_size'] = organization.size;
+      }
       let params = {
         id: organization.id,
         name: organization.name,
@@ -885,7 +888,7 @@ export class ApiService extends HttpService {
         let params = {
           name: group.name,
           description: group.description || "",
-          members: group.memberIds() 
+          members: group.memberIds()
         };
         this.httpPut(url, token.access_token, params).then(
           (data:any) => {

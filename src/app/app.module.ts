@@ -71,6 +71,8 @@ import { NotificationListModule } from '../pages/notification-list/notification-
 import { SettingsListModule } from '../pages/settings-list/settings-list.module';
 import { SettingsEditModule } from '../pages/settings-edit/settings-edit.module';
 import { SettingsTypesModule } from '../pages/settings-types/settings-types.module';
+import { SettingsSizesModule } from '../pages/settings-sizes/settings-sizes.module';
+import { SettingsRegionsModule } from '../pages/settings-regions/settings-regions.module';
 import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsRollcallsModule } from '../pages/settings-rollcalls/settings-rollcalls.module';
@@ -138,6 +140,8 @@ import { CountryService } from '../providers/country-service';
     SettingsRolesModule,
     SettingsPaymentsModule,
     SettingsRollcallsModule,
+    SettingsSizesModule,
+    SettingsRegionsModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,

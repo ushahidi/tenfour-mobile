@@ -10,11 +10,11 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-list *ngIf="organization && types">
-    <ion-list-header>Organization Type</ion-list-header>
-    <ion-item color="white" text-wrap *ngFor="let type of types">
-      <ion-label>{{type.name}}</ion-label>
-      <ion-checkbox color="primary" [(ngModel)]="type.selected"></ion-checkbox>
+  <ion-list radio-group [(ngModel)]="organization.size" *ngIf="organization && sizes">
+    <ion-list-header>Organization Size</ion-list-header>
+    <ion-item color="white" text-wrap *ngFor="let size of sizes">
+      <ion-label>{{size.name}}</ion-label>
+      <ion-radio [value]="size.key" color="primary"></ion-radio>
     </ion-item>
   </ion-list>
 </ion-content>
