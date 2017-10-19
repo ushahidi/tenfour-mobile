@@ -88,7 +88,13 @@ export class SettingsRegionsPage extends BasePage {
           this.countries.getCountries(codes).then((countries:Country[]) => {
             let saves = [];
             for (let country of countries) {
-              country.image = `https://ui-flag.firebaseapp.com/flags/1x1/${country.code.toLowerCase()}.svg`;
+              if (this.organization.regions) {
+                let codes = this.organization.regions.split(",");
+                country.selected = codes.indexOf(country.code) != -1;
+              }
+              else {
+                country.selected = false;
+              }
               saves.push(this.database.saveCountry(this.organization, country));
             }
             Promise.all(saves).then(saved => {
@@ -118,9 +124,14 @@ export class SettingsRegionsPage extends BasePage {
   doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     let saves = [];
+    let regions = [];
     for (let country of this.organization.countries) {
+      if (country.selected) {
+        regions.push(country.code);
+      }
       saves.push(this.database.saveCountry(this.organization, country));
     }
+    this.organization.regions = regions.join(",");
     Promise.all(saves).then(saved => {
       this.api.updateOrganization(this.organization).then((organization:Organization) => {
         this.database.saveOrganization(organization).then(saved => {

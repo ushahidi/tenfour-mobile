@@ -343,7 +343,7 @@ export class ApiService extends HttpService {
           if (country.selected == true) {
             regions.push({
               code: country.code,
-              country_code: country.country_code});  
+              country_code: country.country_code});
           }
         }
         settings['channels']['sms']['regions'] = regions;

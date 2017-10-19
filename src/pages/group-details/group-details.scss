@@ -2,6 +2,9 @@ page-group-details {
   ion-list {
     ion-item {
       ion-label {
+        p {
+          color: #888 !important;
+        }
         ion-icon {
           height:50px;
           width:50px;

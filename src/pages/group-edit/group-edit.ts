@@ -110,7 +110,7 @@ export class GroupEditPage extends BasePage {
   }
 
   updateGroup(event:any) {
-    this.logger.info(this, "updateGroup");
+    this.logger.info(this, "updateGroup", this.group.name, this.group.description);
     let loading = this.showLoading("Saving...");
     this.api.updateGroup(this.organization, this.group).then((group:Group) => {
       if (this.group.members && this.group.members.length > 0) {
