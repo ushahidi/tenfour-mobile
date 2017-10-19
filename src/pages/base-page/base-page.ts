@@ -208,7 +208,7 @@ export class BasePage {
     return this.socialSharing.share(message, subject, file, url);
   }
 
-  showUrl(url:string, target:string="_blank"):ThemeableBrowserObject {
+  showUrl(url:string, target:string="_blank", event:any=null):ThemeableBrowserObject {
     this.logger.info(this, "showUrl", url, target);
     let options:ThemeableBrowserOptions = {
       statusbar: {
@@ -245,6 +245,9 @@ export class BasePage {
     let browser = this.themeableBrowser.create(url, target, options);
     if (this.platform.is("ios")) {
       browser.show();
+    }
+    if (event) {
+      event.stopPropagation();
     }
     return browser;
   }

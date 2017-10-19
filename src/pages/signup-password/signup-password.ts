@@ -27,9 +27,10 @@ export class SignupPasswordPage extends BasePage {
   confirm:TextInput;
 
   organization:Organization;
-  
+
   accepted:boolean = false;
-  terms:string = "http://www.rollcall.io/terms-of-service";
+  termsOfService:string = "https://www.rollcall.io/terms-of-service";
+  privacyPolicy:string = "https://www.rollcall.io/privacy-policy";
 
   constructor(
       protected zone:NgZone,
@@ -61,7 +62,7 @@ export class SignupPasswordPage extends BasePage {
       this.showToast("Password and confirm do not match");
     }
     else if (this.accepted == false) {
-      this.showAlert("Terms of Service", "You must accept the Terms of Service before you can signup.");
+      this.showAlert("Terms of Service", "You must accept the Terms of Service before you can continue.");
     }
     else {
       let loading = this.showLoading("Creating...");
@@ -123,13 +124,6 @@ export class SignupPasswordPage extends BasePage {
       return false;
     }
     return true;
-  }
-
-  showTermsOfService(event:any) {
-    this.logger.info(this, "showTermsOfService");
-    this.showUrl(this.terms, "_blank");
-    event.stopPropagation();
-    return false;
   }
 
 }
