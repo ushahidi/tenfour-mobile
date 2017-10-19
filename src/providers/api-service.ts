@@ -21,6 +21,7 @@ import { Reply } from '../models/reply';
 import { Answer } from '../models/answer';
 import { Group } from '../models/group';
 import { Settings } from '../models/settings';
+import { Region } from '../models/region';
 import { Subscription } from '../models/subscription';
 import { Notification } from '../models/notification';
 
@@ -926,6 +927,34 @@ export class ApiService extends HttpService {
             }
             else {
               reject("Subscriptions Not Found");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  getRegions(organization:Organization):Promise<Region[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = this.api + `/api/v1/organizations/${organization.id}/regions`;
+        this.httpGet(url, token.access_token).then(
+          (data:any) => {
+            if (data && data.regions) {
+              let regions = [];
+              for (let _region of data.regions) {
+                let region = <Region>_region;
+                regions.push(region);
+              }
+              resolve(regions);
+            }
+            else {
+              reject("Regions Not Found");
             }
           },
           (error:any) => {

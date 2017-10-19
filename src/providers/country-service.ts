@@ -9,7 +9,7 @@ import { LoggerService } from '../providers/logger-service';
 @Injectable()
 export class CountryService {
 
-  file:string = "assets/countries/codes.json";
+  file:string = "assets/data/countries.json";
   countries:Country[] = null;
 
   constructor(
@@ -17,7 +17,7 @@ export class CountryService {
     private logger:LoggerService) {
   }
 
-  getCodes():Promise<Country[]> {
+  getCountries(codes:string[]=null):Promise<Country[]> {
     return new Promise((resolve, reject) => {
       if (this.countries) {
         resolve(this.countries);
@@ -27,17 +27,19 @@ export class CountryService {
           .map((res:Response) => res.json())
           .subscribe(
             (data:any) => {
-              this.logger.info(this, "getCodes", data);
+              this.logger.info(this, "getcountries", data);
               let countries = [];
               for (let _country of data) {
-                let country = <Country>_country;
-                countries.push(country);
+                if (codes == null || codes.indexOf(_country.code) != -1) {
+                  let country = new Country(_country);
+                  countries.push(country);  
+                }
               }
               this.countries = countries;
               resolve(countries);
             },
             (error:any) => {
-              this.logger.error(this, "getCodes", error);
+              this.logger.error(this, "getcountries", error);
               this.countries = null;
               reject(error);
             }
@@ -46,17 +48,17 @@ export class CountryService {
     });
   }
 
-  getCode(countryCode:string):Promise<Country> {
+  getCountry(countryCode:string):Promise<Country> {
     return new Promise((resolve, reject) => {
       if (countryCode && countryCode.length > 0) {
-        this.getCodes().then((countries:Country[]) => {
+        this.getCountries().then((countries:Country[]) => {
           let country = countries.find(country => country.code.toUpperCase() === countryCode.toUpperCase());
           if (country) {
-            this.logger.info(this, "getCode", countryCode, country);
+            this.logger.info(this, "getCountry", countryCode, country);
             resolve(country);
           }
           else {
-            this.logger.error(this, "getCode", countryCode, "Not Found");
+            this.logger.error(this, "getCountry", countryCode, "Not Found");
             reject("Country Not Found");
           }
         });

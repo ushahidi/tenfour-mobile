@@ -102,11 +102,11 @@ export class PersonImportPage extends BasePage {
       this.sim.getSimInfo().then(
         (info:any) => {
           this.logger.info(this, 'loadCountry', 'SIM', info);
-          this.countries.getCode(info.countryCode).then(
+          this.countries.getCountry(info.countryCode).then(
             (country:Country) => {
               this.logger.info(this, 'loadCountry', 'Country', country);
               if (country) {
-                this.countryCode == country.dial_code;
+                this.countryCode = `+${country.country_code}`;
               }
               else {
                 this.countryCode = "+1";

@@ -34,6 +34,7 @@ import { Recipient } from '../models/recipient';
 import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 import { Settings } from '../models/settings';
+import { Country } from '../models/country';
 import { Subscription } from '../models/subscription';
 
 @Component({
@@ -89,6 +90,7 @@ export class RollcallApp {
         new Recipient(),
         new Group(),
         new Settings(),
+        new Country(),
         new Notification(),
         new Subscription()
       ]);

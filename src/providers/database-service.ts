@@ -15,6 +15,7 @@ import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
 import { Group } from '../models/group';
 import { Settings } from '../models/settings';
+import { Country } from '../models/country';
 import { Subscription } from '../models/subscription';
 import { Notification } from '../models/notification';
 
@@ -520,7 +521,7 @@ export class DatabaseService extends SqlService {
     return this.getModel<Subscription>(new Subscription(), where);
   }
 
-  removeSubscription(subscription:Settings):Promise<any> {
+  removeSubscription(subscription:Subscription):Promise<any> {
     let where = { id: subscription.id };
     return this.removeModel<Subscription>(new Subscription(), where);
   }
@@ -531,6 +532,37 @@ export class DatabaseService extends SqlService {
       where['organization_id'] = organization.id;
     }
     return this.removeModel<Subscription>(new Subscription(), where);
+  }
+
+  // ########## COUNTRIES ##########
+
+  saveCountry(organization:Organization, country:Country):Promise<any> {
+    country.organization_id = organization.id;
+    return this.saveModel(country);
+  }
+
+  getCountries(organization:Organization):Promise<Country[]> {
+    let where = { organization_id: organization.id };
+    let order = { created_at: "ASC" };
+    return this.getModels<Country>(new Country(), where, order);
+  }
+
+  getCountry(id:number):Promise<Country> {
+    let where = { id: id };
+    return this.getModel<Country>(new Country(), where);
+  }
+
+  removeCountry(region:Country):Promise<any> {
+    let where = { id: region.id };
+    return this.removeModel<Country>(new Country(), where);
+  }
+
+  removeCountries(organization:Organization=null) {
+    let where = { };
+    if (organization) {
+      where['organization_id'] = organization.id;
+    }
+    return this.removeModel<Country>(new Country(), where);
   }
 
 }

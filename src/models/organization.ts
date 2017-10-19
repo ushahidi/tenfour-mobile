@@ -6,6 +6,8 @@ import { Person } from '../models/person';
 import { Rollcall } from '../models/rollcall';
 import { Settings } from '../models/settings';
 import { Group } from '../models/group';
+import { Region } from '../models/region';
+import { Country } from '../models/country';
 
 @Table("organizations")
 export class Organization extends Model {
@@ -29,7 +31,6 @@ export class Organization extends Model {
               this.types = _settings.values.join(",");
             }
             else if (_settings.key == 'organization_size') {
-              console.log(`Size ${JSON.stringify(_settings)}`);
               this.size = _settings.values.toString();
             }
             else if (_settings.key == 'channels') {
@@ -53,6 +54,12 @@ export class Organization extends Model {
               }
               if (_settings.values.sms) {
                 this.sms_enabled = _settings.values.sms.enabled;
+                if (_settings.values.sms.regions) {
+                  for (let region of _settings.values.sms.regions) {
+
+                  }
+                  this.regions = _settings.values.sms.regions.map(region => region.code).join(",");
+                }
               }
               else {
                 this.sms_enabled = null;
@@ -116,7 +123,10 @@ export class Organization extends Model {
   @Column("types", TEXT)
   public types:string = null;
 
-  @Column("_size", TEXT)
+  @Column("regions", TEXT)
+  public regions:string = null;
+
+  @Column("size", TEXT)
   public size:string = null;
 
   @Column("location", TEXT)
@@ -159,5 +169,7 @@ export class Organization extends Model {
   public rollcalls:Rollcall[] = [];
 
   public groups:Group[] = [];
+
+  public countries:Country[] = [];
 
 }
