@@ -337,6 +337,17 @@ export class ApiService extends HttpService {
       if (organization.size) {
         settings['organization_size'] = {size: organization.size};
       }
+      if (organization.countries && organization.countries.length > 0) {
+        let regions = [];
+        for (let country of organization.countries) {
+          if (country.selected == true) {
+            regions.push({
+              code: country.code,
+              country_code: country.country_code});  
+          }
+        }
+        settings['channels']['sms']['regions'] = regions;
+      }
       let params = {
         id: organization.id,
         name: organization.name,

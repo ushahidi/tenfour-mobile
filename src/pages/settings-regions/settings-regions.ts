@@ -88,8 +88,6 @@ export class SettingsRegionsPage extends BasePage {
           this.countries.getCountries(codes).then((countries:Country[]) => {
             let saves = [];
             for (let country of countries) {
-              // country.default = false;
-              // country.selected = false;
               country.image = `https://ui-flag.firebaseapp.com/flags/1x1/${country.code.toLowerCase()}.svg`;
               saves.push(this.database.saveCountry(this.organization, country));
             }
