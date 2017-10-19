@@ -27,6 +27,9 @@ export class SignupPasswordPage extends BasePage {
   confirm:TextInput;
 
   organization:Organization;
+  
+  accepted:boolean = false;
+  terms:string = "http://www.rollcall.io/terms-of-service";
 
   constructor(
       protected zone:NgZone,
@@ -56,6 +59,9 @@ export class SignupPasswordPage extends BasePage {
     }
     else if (this.password.value != this.confirm.value) {
       this.showToast("Password and confirm do not match");
+    }
+    else if (this.accepted == false) {
+      this.showAlert("Terms of Service", "You must accept the Terms of Service before you can signup.");
     }
     else {
       let loading = this.showLoading("Creating...");
@@ -99,13 +105,16 @@ export class SignupPasswordPage extends BasePage {
     }
   }
 
-  createOrganizationOnReturn(event) {
+  createOrganizationOnReturn(event:any) {
     if (event.keyCode == 13) {
       if (this.password.value.length == 0) {
         this.password.setFocus();
       }
       else if (this.confirm.value.length == 0) {
         this.confirm.setFocus();
+      }
+      else if (this.accepted == false) {
+        this.hideKeyboard();
       }
       else {
         this.hideKeyboard();
@@ -114,6 +123,13 @@ export class SignupPasswordPage extends BasePage {
       return false;
     }
     return true;
+  }
+
+  showTermsOfService(event:any) {
+    this.logger.info(this, "showTermsOfService");
+    this.showUrl(this.terms, "_blank");
+    event.stopPropagation();
+    return false;
   }
 
 }

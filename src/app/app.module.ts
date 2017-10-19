@@ -15,7 +15,7 @@ import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { Network } from '@ionic-native/network';
-import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { ThemeableBrowser } from '@ionic-native/themeable-browser';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -171,7 +171,7 @@ import { CountryService } from '../providers/country-service';
     { provide: Diagnostic, useClass: Diagnostic },
     { provide: Geolocation, useClass: Geolocation },
     { provide: SplashScreen, useClass: SplashScreen },
-    { provide: InAppBrowser, useClass: InAppBrowser },
+    { provide: ThemeableBrowser, useClass: ThemeableBrowser },
     { provide: SocialSharing, useClass: SocialSharing },
     { provide: NativeStorage, useClass: NativeStorage },
     { provide: AppAvailability, useClass: AppAvailability },

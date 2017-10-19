@@ -5,7 +5,7 @@ import { Network } from '@ionic-native/network';
 import { Keyboard } from '@ionic-native/keyboard';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SocialSharing } from '@ionic-native/social-sharing';
-import { InAppBrowser, InAppBrowserObject } from '@ionic-native/in-app-browser';
+import { ThemeableBrowser, ThemeableBrowserOptions, ThemeableBrowserObject } from '@ionic-native/themeable-browser';
 
 import { LoggerService } from '../../providers/logger-service';
 import { InjectorService } from '../../providers/injector-service';
@@ -26,7 +26,7 @@ export class BasePage {
   protected network:Network;
   protected keyboard:Keyboard;
   protected statusBar:StatusBar;
-  protected inAppBrowser:InAppBrowser;
+  protected themeableBrowser:ThemeableBrowser;
   protected socialSharing:SocialSharing;
 
   @ViewChild(Content)
@@ -48,7 +48,7 @@ export class BasePage {
     this.network = InjectorService.injector.get(Network);
     this.keyboard = InjectorService.injector.get(Keyboard);
     this.statusBar = InjectorService.injector.get(StatusBar);
-    this.inAppBrowser = InjectorService.injector.get(InAppBrowser);
+    this.themeableBrowser = InjectorService.injector.get(ThemeableBrowser);
     this.socialSharing = InjectorService.injector.get(SocialSharing);
   }
 
@@ -208,10 +208,44 @@ export class BasePage {
     return this.socialSharing.share(message, subject, file, url);
   }
 
-  showUrl(url:string, target:string="_system"):InAppBrowserObject {
+  showUrl(url:string, target:string="_blank"):ThemeableBrowserObject {
     this.logger.info(this, "showUrl", url, target);
-    let browser = this.inAppBrowser.create(url, target);
-    browser.show();
+    let options:ThemeableBrowserOptions = {
+      statusbar: {
+        color: "f5f5f1"
+      },
+        toolbar: {
+        height: 44,
+        color: "f5f5f1"
+      },
+        title: {
+        color: '#ffffff',
+        showPageTitle: true
+      },
+      backButton: {
+        wwwImage: 'assets/images/back.png',
+        wwwImageDensity: 2,
+        align: 'right',
+        event: 'backPressed'
+      },
+      forwardButton: {
+        wwwImage: 'assets/images/forward.png',
+        wwwImageDensity: 2,
+        align: 'right',
+        event: 'forwardPressed'
+      },
+      closeButton: {
+        wwwImage: 'assets/images/close.png',
+        wwwImageDensity: 2,
+        align: 'left',
+        event: 'closePressed'
+      },
+      backButtonCanClose: true
+    };
+    let browser = this.themeableBrowser.create(url, target, options);
+    if (this.platform.is("ios")) {
+      browser.show();
+    }
     return browser;
   }
 
