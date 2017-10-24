@@ -18,6 +18,7 @@ node_modules
 *.ap_
 *.dex
 *.class
+.sourcemaps/
 bin/
 gen/
 out/
