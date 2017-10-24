@@ -9,16 +9,19 @@ import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
+import { CountryService } from '../../providers/country-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
+import { Country } from '../../models/country';
+import { Region } from '../../models/region';
 
 @IonicPage()
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiService, DatabaseService, CountryService ],
   entryComponents:[  ]
 })
 export class PersonEditPage extends BasePage {
@@ -27,6 +30,9 @@ export class PersonEditPage extends BasePage {
   person:Person = null;
   editing:boolean = true;
   cameraPresent: boolean = true;
+  selectOptions:any = {};
+  countryCodes:any = [];
+  selectType:string = "action-sheet";
 
   constructor(
       protected zone:NgZone,
@@ -41,6 +47,7 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
+      protected countryService:CountryService,
       protected events:Events,
       protected camera:Camera,
       protected statusBar:StatusBar,
@@ -51,6 +58,10 @@ export class PersonEditPage extends BasePage {
   ionViewDidLoad() {
     super.ionViewDidLoad();
     this.loadCamera();
+    this.selectOptions = {
+      multiple: false,
+      title: 'Country Code'
+    }
   }
 
   ionViewWillEnter() {
@@ -69,6 +80,12 @@ export class PersonEditPage extends BasePage {
         organization_id: this.organization.id
       });
     }
+    this.loadCountryCodes(true).then((countryCodes:number[]) => {
+      this.countryCodes = countryCodes;
+    },
+    (error:any) => {
+      this.countryCodes = [1];
+    });
   }
 
   ionViewWillLeave() {
@@ -76,6 +93,63 @@ export class PersonEditPage extends BasePage {
     if (this.editing == false) {
       this.statusBar.overlaysWebView(true);
     }
+  }
+
+  loadCountryCodes(cache:boolean=true):Promise<number[]> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadRegions");
+      if (cache) {
+        this.database.getCountries(this.organization).then((countries:Country[]) => {
+          if (countries && countries.length > 0) {
+            let countryCodes = [];
+            for (let country of countries) {
+              if (country.selected && countryCodes.indexOf(country.country_code) == -1) {
+                countryCodes.push(country.country_code);
+              }
+            }
+            resolve(countryCodes);
+          }
+          else {
+            this.loadCountryCodes(false).then((countryCodes:number[]) => {
+              resolve(countryCodes);
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }
+        });
+      }
+      else {
+        this.api.getRegions(this.organization).then((regions:Region[]) => {
+          let codes = regions.map(region => region.code);
+          this.countryService.getCountries(codes).then((countries:Country[]) => {
+            let saves = [];
+            for (let country of countries) {
+              if (this.organization.regions) {
+                let codes = this.organization.regions.split(",");
+                country.selected = codes.indexOf(country.code) != -1;
+              }
+              else {
+                country.selected = false;
+              }
+              saves.push(this.database.saveCountry(this.organization, country));
+            }
+            Promise.all(saves).then(saved => {
+              let countryCodes = [];
+              for (let country of countries) {
+                if (country.selected && countryCodes.indexOf(country.country_code) == -1) {
+                  countryCodes.push(country.country_code);
+                }
+              }
+              resolve(countryCodes);
+            });
+          });
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+    });
   }
 
   loadCamera() {
@@ -172,7 +246,10 @@ export class PersonEditPage extends BasePage {
   }
 
   addPhone(event) {
-    let contact = new Contact({type: 'phone'});
+    let countryCode = this.countryCodes && this.countryCodes.length > 0 ? this.countryCodes[0] : 1;
+    let contact = new Contact({
+      type: 'phone',
+      country_code: countryCode});
     this.person.contacts.push(contact)
   }
 
@@ -266,6 +343,11 @@ export class PersonEditPage extends BasePage {
       loading.dismiss();
       this.showAlert("Problem Removing Person", error);
     });
+  }
+
+  phoneChange(contact:Contact) {
+    this.logger.info(this, "phoneChange", contact.country_code, contact.national_number, contact.contact);
+    contact.contact = `+${ contact.country_code}${contact.national_number}`;
   }
 
 }

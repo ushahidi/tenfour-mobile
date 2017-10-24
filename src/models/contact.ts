@@ -9,6 +9,11 @@ export class Contact extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+    if (data && data.meta) {
+      this.carrier = data.meta.carrier;
+      this.country_code = data.meta.country_code;
+      this.national_number = data.meta.national_number;
+    }
   }
 
   public newInstance<M extends Contact>(data:any=null):Contact {
@@ -29,6 +34,15 @@ export class Contact extends Model {
 
   @Column("contact", TEXT)
   public contact:string = null;
+
+  @Column("carrier", TEXT)
+  public carrier:string = null;
+
+  @Column("country_code", INTEGER)
+  public country_code:number = null;
+
+  @Column("national_number", TEXT)
+  public national_number:string = null;
 
   @Column("gravatar", TEXT)
   public gravatar:string = null;

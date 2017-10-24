@@ -31,18 +31,24 @@
     <ion-item color="white" tappable (click)="addPhone($event)">
       <ion-label color="primary">Add phone</ion-label>
     </ion-item>
-    <ion-item color="white" *ngFor="let contact of person.getPhones()">
-      <ion-label fixed>Phone</ion-label>
-      <ion-input type="tel" autocorrect="off" autocapitalize="none"  [(ngModel)]="contact.contact"></ion-input>
+    <ion-item class="phone" color="white" *ngFor="let contact of person.getPhones()">
+      <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
+      <ion-select item-right [interface]="selectType" [selectOptions]="selectOptions" [(ngModel)]="contact.country_code" (ionSelect)="phoneChange(contact)" *ngIf="countryCodes">
+        <ion-option [value]="countryCode" *ngFor="let countryCode of countryCodes">
+          +{{countryCode}}
+        </ion-option>
+      </ion-select>
+      <ion-input item-right type="tel" autocorrect="off" autocapitalize="none" placeholder="phone number" [(ngModel)]="contact.national_number" (keypress)="phoneChange(contact)"></ion-input>
+      <ion-input type="tel" hidden [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person">
     <ion-item color="white" tappable (click)="addEmail($event)">
       <ion-label color="primary">Add email</ion-label>
     </ion-item>
-    <ion-item color="white" *ngFor="let contact of person.getEmails()">
-      <ion-label fixed>Email</ion-label>
-      <ion-input type="email" autocorrect="off" autocapitalize="none" [(ngModel)]="contact.contact"></ion-input>
+    <ion-item class="email" color="white" *ngFor="let contact of person.getEmails()">
+      <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
+      <ion-input type="email" autocorrect="off" autocapitalize="none" placeholder="email address" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
   <div padding-left padding-right padding-bottom *ngIf="person && person.id">
