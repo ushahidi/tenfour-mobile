@@ -29,7 +29,7 @@
     </ion-item>
     <ion-item detail-push tappable color="white" class="contact"
               (click)="phoneContact(contact)"
-              [hidden]="contact.contact == null || contact.contact.length == 0" 
+              [hidden]="contact.contact == null || contact.contact.length == 0"
               *ngFor="let contact of person.getPhones()">
       <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
       <div item-content class="content">{{contact.contact}}</div>

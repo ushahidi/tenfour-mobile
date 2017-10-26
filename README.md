@@ -154,7 +154,7 @@ npm install -g cordova-common@latest
 npm install -g cordova-ios@latest
 npm install -g cordova-android@latest
 npm install -g cordova-browser@latest
-npm install -g ios-sim@latest
+sudo npm install -g ios-sim@latest
 npm install -g ios-deploy@latest
 npm install -g android-simulator@latest
 ```

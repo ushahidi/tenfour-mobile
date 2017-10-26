@@ -46,6 +46,7 @@
     "@ionic-native/transfer": "^3.14.0",
     "@ionic/storage": "2.0.1",
     "call-number": "git+https://github.com/Rohfosho/CordovaCallNumberPlugin.git",
+    "cordova-android": "~6.3.0",
     "cordova-custom-config": "^4.0.2",
     "cordova-ios": "~4.5.2",
     "cordova-plugin-app-version": "^0.1.9",
@@ -78,8 +79,7 @@
     "ng-lazyload-image": "^3.3.1",
     "rxjs": "5.4.3",
     "sw-toolbox": "3.6.0",
-    "zone.js": "0.8.18",
-    "cordova-android": "~6.3.0"
+    "zone.js": "0.8.18"
   },
   "devDependencies": {
     "@ionic/app-scripts": "3.0.1",
@@ -141,8 +141,8 @@
       "call-number": {}
     },
     "platforms": [
-      "ios",
-      "android"
+      "android",
+      "ios"
     ]
   }
 }

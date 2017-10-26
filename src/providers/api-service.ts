@@ -28,10 +28,11 @@ import { Notification } from '../models/notification';
 @Injectable()
 export class ApiService extends HttpService {
 
-  api:string = null;
   clientId:string = "webapp";
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
+
   scope:string = "user";
+  api:string = "https://api.staging.rollcall.io";
 
   constructor(
     protected device:Device,
@@ -43,14 +44,6 @@ export class ApiService extends HttpService {
     protected storage:NativeStorage,
     protected database:DatabaseService) {
     super(http, file, transfer, logger);
-    this.platform.ready().then(() => {
-      if (this.device.isVirtual) {
-        this.api = "/api.staging.rollcall.io";
-      }
-      else {
-        this.api = "https://api.staging.rollcall.io";
-      }
-    });
   }
 
   saveToken(organization:Organization, token:Token) {
@@ -65,7 +58,6 @@ export class ApiService extends HttpService {
           reject(error);
         });
     });
-
   }
 
   getToken(organization:Organization):Promise<Token> {
