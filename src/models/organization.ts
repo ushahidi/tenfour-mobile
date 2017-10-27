@@ -22,7 +22,6 @@ export class Organization extends Model {
       if (data.settings) {
         this.settings = [];
         for (let _settings of data.settings) {
-          console.log(`Settings ${JSON.stringify(_settings)}`);
           if (_settings.key && _settings.values) {
             if (_settings.key == 'location') {
               this.location = _settings.values.name;

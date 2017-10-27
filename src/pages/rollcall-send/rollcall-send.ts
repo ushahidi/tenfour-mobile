@@ -68,6 +68,8 @@ export class RollcallSendPage extends BasePage {
          let recipients = [];
          for (let person of data.people) {
            let recipient = new Recipient(person);
+           recipient.id = Number(`${this.rollcall.id}${person.id}`);
+           recipient.user_id = person.id;
            recipients.push(recipient);
          }
          this.rollcall.recipients = recipients;

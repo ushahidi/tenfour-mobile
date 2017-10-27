@@ -24,6 +24,9 @@ export class Recipient extends Model {
   @Column("rollcall_id", INTEGER)
   public rollcall_id:number = null;
 
+  @Column("user_id", INTEGER)
+  public user_id:number = null;
+
   @Column("name", TEXT)
   public name:string = null;
 

@@ -68,6 +68,8 @@ export class RollcallTestPage extends BasePage {
     this.rollcall.recipients = [];
     if (this.person) {
       let recipient = new Recipient(this.person);
+      recipient.id = Number(`${this.rollcall.id}${this.person.id}`);
+      recipient.user_id = this.person.id;
       this.rollcall.recipients.push(recipient);
     }
   }

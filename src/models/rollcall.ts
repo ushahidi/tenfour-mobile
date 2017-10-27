@@ -38,8 +38,10 @@ export class Rollcall extends Model {
       if (data.recipients) {
         this.recipients = [];
         for (let _recipient of data.recipients) {
-          let person = new Recipient(_recipient);
-          this.recipients.push(person);
+          let recipient = new Recipient(_recipient);
+          recipient.id = Number(`${data.id}${_recipient.id}`);
+          recipient.user_id = _recipient.id;
+          this.recipients.push(recipient);
         }
       }
       if (data.replies) {
@@ -47,7 +49,7 @@ export class Rollcall extends Model {
         for (let _reply of data.replies) {
           let reply = new Reply(_reply);
           if (data.recipients) {
-            let recipient = data.recipients.find(recipient => recipient.id == _reply.user_id);
+            let recipient = data.recipients.find(recipient => recipient.user_id == _reply.user_id);
             if (recipient) {
               reply.user_name = recipient.name;
               reply.user_initials = recipient.initials;
@@ -139,6 +141,8 @@ export class Rollcall extends Model {
 
   public replies:Reply[] = [];
 
+  public reply:Reply = null;
+
   answerReplies(answer:Answer):Reply[] {
     if (this.replies && this.replies.length > 0) {
       return this.replies.filter(reply => reply.answer == answer.answer);
@@ -152,7 +156,7 @@ export class Rollcall extends Model {
       if (this.replies == null || this.replies.length == 0) {
         _recipients.push(recipient);
       }
-      else if (this.replies.filter(reply => reply.user_id == recipient.id).length == 0) {
+      else if (this.replies.filter(reply => reply.user_id == recipient.user_id).length == 0) {
         _recipients.push(recipient);
       }
     }
@@ -160,7 +164,7 @@ export class Rollcall extends Model {
   }
 
   canRespond(person:Person):boolean {
-    if (person && this.recipients.filter(recipient => recipient.id == person.id).length > 0) {
+    if (person && this.recipients.filter(recipient => recipient.user_id == person.id).length > 0) {
       return this.replied == null || this.replied == false;
     }
     return false;

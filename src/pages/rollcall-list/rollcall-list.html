@@ -15,14 +15,21 @@
   </ion-navbar>
 </ion-header>
 <ion-content #scrollTarget>
-  <ion-refresher (ionRefresh)="loadUpdates($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-list *ngIf="organization && organization.rollcalls">
-    <ion-item no-lines text-wrap *ngIf="loading == false && organization.rollcalls.length == 0">
-      <h2 text-center padding-top margin-top>There currently are no RollCalls...</h2>
+  <div padding-top padding-left padding-right>
+    <ion-segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
+      <ion-segment-button value="all">All RollCalls</ion-segment-button>
+      <ion-segment-button value="waiting">Waiting Response</ion-segment-button>
+    </ion-segment>
+  </div>
+  <ion-list *ngIf="rollcalls">
+    <ion-item no-lines text-wrap margin-top *ngIf="loading == false && rollcalls.length == 0">
+      <h2 text-center padding-top margin-top *ngIf="filter == 'all'">There currently are no RollCalls...</h2>
+      <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no RollCalls waiting response...</h2>
     </ion-item>
-    <ion-card color="white" *ngFor="let rollcall of organization.rollcalls">
+    <ion-card color="white" *ngFor="let rollcall of rollcalls">
       <ion-card-content text-center tappable (click)="showReplies($event, rollcall)">
         <person-avatar [scrollTarget]="scrollTarget" [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
         <h1>{{rollcall.message}}</h1>

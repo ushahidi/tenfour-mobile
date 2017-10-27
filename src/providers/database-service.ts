@@ -177,7 +177,7 @@ export class DatabaseService extends SqlService {
       let order = { created_at: "DESC" };
       this.getModels<Rollcall>(new Rollcall(), where, order).then((rollcalls:Rollcall[]) => {
         let rollcall_ids = rollcalls.map((rollcall:Rollcall) => rollcall.id);
-        this.logger.info(this, "getRollcalls", rollcall_ids);
+        this.logger.info(this, "getRollcalls", "IDs", rollcall_ids);
         Promise.all([
           this.getAnswers(null, rollcall_ids),
           this.getReplies(null, rollcall_ids),
@@ -192,7 +192,6 @@ export class DatabaseService extends SqlService {
             }
             resolve(rollcalls);
         });
-        resolve(rollcalls);
       });
     });
   }
@@ -321,8 +320,8 @@ export class DatabaseService extends SqlService {
   // ########## RECIPIENT ##########
 
   saveRecipient(rollcall:Rollcall, recipient:Recipient):Promise<any> {
-    recipient.organization_id = rollcall.organization_id;
     recipient.rollcall_id = rollcall.id;
+    recipient.organization_id = rollcall.organization_id;
     return this.saveModel(recipient);
   }
 

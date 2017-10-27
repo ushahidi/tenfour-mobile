@@ -29,7 +29,11 @@ export class RollcallListPage extends BasePage {
   @ViewChild('create')
   create:Button;
 
+  filter:string = "all";
+
   organization:Organization = null;
+  rollcalls:Rollcall[] = [];
+
   person:Person = null;
   loading:boolean = false;
 
@@ -54,8 +58,26 @@ export class RollcallListPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(null, false).then((finished:any) => {
+    this.loadUpdates(false).then((finished:any) => {
       loading.dismiss();
+      if (this.organization.rollcalls) {
+        let rollcalls = [];
+        for (let rollcall of this.organization.rollcalls) {
+          if (rollcall.canRespond(this.person)) {
+            rollcalls.push(rollcall);
+          }
+        }
+        if (rollcalls.length > 0) {
+          let modal = this.showModal(ReplySendPage, {
+            organization: this.organization,
+            rollcalls: rollcalls });
+          modal.onDidDismiss(data => {
+            if (data) {
+              this.loadRollCalls(false);
+            }
+          });
+        }
+      }
     },
     (error:any) => {
       loading.dismiss();
@@ -66,11 +88,11 @@ export class RollcallListPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     if (this.loading == false) {
-      this.loadUpdates(null, true);
+      this.loadUpdates(true);
     }
   }
 
-  loadUpdates(event:any, cache:boolean=true) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     return Promise.resolve()
           .then(() => { return this.loadPerson(cache); })
@@ -157,17 +179,21 @@ export class RollcallListPage extends BasePage {
     return new Promise((resolve, reject) => {
       if (cache) {
         return this.database.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
+          this.logger.info(this, "loadRollCalls", rollcalls.length);
           if (rollcalls && rollcalls.length > 0) {
             this.organization.rollcalls = rollcalls;
-            resolve(rollcalls);
+            this.rollcalls = this.filterRollcalls(rollcalls);
+            resolve(this.rollcalls);
           }
           else {
             this.loadRollCalls(false).then((rollcalls:Rollcall[]) => {
               this.organization.rollcalls = rollcalls;
-              resolve(rollcalls);
+              this.rollcalls = this.filterRollcalls(rollcalls);
+              resolve(this.rollcalls);
             },
             (error:any) => {
               this.organization.rollcalls = [];
+              this.rollcalls = [];
               reject(error);
             });
           }
@@ -195,16 +221,19 @@ export class RollcallListPage extends BasePage {
               }
               Promise.all(saves).then(saved => {
                 this.organization.rollcalls = rollcalls;
-                resolve(rollcalls);
+                this.rollcalls = this.filterRollcalls(rollcalls);
+                resolve(this.rollcalls);
               });
             }
             else {
               this.organization.rollcalls = [];
+              this.rollcalls = [];
               resolve([]);
             }
           },
           (error:any) => {
             this.organization.rollcalls = [];
+            this.rollcalls = [];
             reject(error);
           });
       }
@@ -244,6 +273,36 @@ export class RollcallListPage extends BasePage {
     this.showPage(NotificationListPage, {
       organization: this.organization,
       person: this.person });
+  }
+
+  filterChanged(event:any) {
+    this.logger.info(this, "filterChanged", this.filter);
+    let loading = this.showLoading("Filtering...");
+    this.loadRollCalls(true).then((filtered:any) => {
+      loading.dismiss();
+    })
+  }
+
+  filterRollcalls(rollcalls:Rollcall[]) {
+    this.logger.info(this, "filterRollcalls", this.filter, "Rollcalls", rollcalls.length);
+    let filtered = [];
+    for (let rollcall of rollcalls) {
+      if (this.filter === "all") {
+        this.logger.info(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
+        filtered.push(rollcall);
+      }
+      else if (this.filter === "waiting") {
+        if (rollcall.canRespond(this.person)) {
+          this.logger.info(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
+          filtered.push(rollcall);
+        }
+        else {
+          this.logger.error(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
+        }
+      }
+    }
+    this.logger.info(this, "filterRollcalls", this.filter, "Rollcalls", rollcalls.length, "Filtered", filtered.length);
+    return filtered;
   }
 
 }

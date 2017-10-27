@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Slides, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -21,19 +21,15 @@ import { Person } from '../../models/person';
 })
 export class ReplySendPage extends BasePage {
 
-  @ViewChild('notifications')
-  notifications:Button;
+  @ViewChild(Slides)
+  slides:Slides;
 
-  @ViewChild('create')
-  create:Button;
+  index:number = 0;
+  loading:boolean = false;
 
   organization:Organization = null;
-
+  rollcalls:Rollcall[] = [];
   rollcall:Rollcall = null;
-
-  reply:Reply = null;
-
-  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -54,19 +50,38 @@ export class ReplySendPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.rollcalls = this.getParameter<Rollcall[]>("rollcalls");
     this.rollcall = this.getParameter<Rollcall>("rollcall");
-    this.reply = this.getParameter<Reply>("reply");
-    if (this.reply == null) {
-      this.reply = new Reply();
-      this.reply.organization_id = this.organization.id;
-      this.reply.rollcall_id = this.rollcall.id;
+    if (this.rollcalls && this.rollcall) {
+      this.index = this.rollcalls.indexOf(this.rollcall);
+    }
+    else if (this.rollcalls) {
+      this.index = 0;
+      this.rollcall = this.rollcalls[0];
+    }
+    else {
+      this.index = 0;
+      this.rollcalls = [this.rollcall];
+      this.rollcall.reply = this.getParameter<Reply>("reply");
+    }
+    for (let rollcall of this.rollcalls) {
+      if (rollcall.reply == null) {
+        rollcall.reply = new Reply();
+        rollcall.reply.organization_id = this.organization.id;
+        rollcall.reply.rollcall_id = this.rollcall.id;
+      }
     }
   }
 
-  selectAnswer(event:any, answer:Answer) {
-    if (answer) {
-      this.reply.answer = answer.answer;
-    }
+  slideChanged() {
+    this.index = this.slides.getActiveIndex();
+    this.logger.info(this, "slideChanged", this.index);
+    this.rollcall = this.rollcalls[this.index];
+  }
+
+  selectAnswer(rollcall:Rollcall, reply:Reply, answer:Answer) {
+    this.logger.info(this, "selectAnswer", answer);
+    reply.answer = answer.answer;
   }
 
   cancelReply(event:any) {
@@ -74,10 +89,10 @@ export class ReplySendPage extends BasePage {
     this.hideModal();
   }
 
-  sendReply(event:any) {
-    this.logger.info(this, "sendReply");
+  sendReply(rollcall:Rollcall, reply:Reply) {
+    this.logger.info(this, "sendReply", reply);
     let loading = this.showLoading("Sending...");
-    this.api.postReply(this.organization, this.rollcall, this.reply).then(
+    this.api.postReply(this.organization, rollcall, reply).then(
       (replied:Reply) => {
         this.logger.info(this, "sendReply", "Reply", replied);
         this.database.getPerson(replied.user_id).then((person:Person) => {
@@ -86,10 +101,9 @@ export class ReplySendPage extends BasePage {
           replied.user_description = person.description;
           replied.user_initials = person.initials;
           replied.user_picture = person.profile_picture;
-          this.database.saveReply(this.rollcall, replied).then(saved => {
+          this.database.saveReply(rollcall, replied).then(saved => {
             loading.dismiss();
-            this.showToast("Rollcall Reply Sent");
-            this.hideModal({reply: replied});
+            this.hideRollcall(rollcall, replied);
           });
         });
       },
@@ -99,10 +113,10 @@ export class ReplySendPage extends BasePage {
       });
   }
 
-  saveReply(event:any) {
-    this.logger.info(this, "saveReply");
+  saveReply(rollcall:Rollcall, reply:Reply) {
+    this.logger.info(this, "saveReply", reply);
     let loading = this.showLoading("Sending...");
-    this.api.putReply(this.organization, this.rollcall, this.reply).then(
+    this.api.putReply(this.organization, rollcall, reply).then(
       (replied:Reply) => {
         this.logger.info(this, "saveReply", "Reply", replied);
         this.database.getPerson(replied.user_id).then((person:Person) => {
@@ -111,10 +125,9 @@ export class ReplySendPage extends BasePage {
           replied.user_description = person.description;
           replied.user_initials = person.initials;
           replied.user_picture = person.profile_picture;
-          this.database.saveReply(this.rollcall, replied).then(saved => {
+          this.database.saveReply(rollcall, replied).then(saved => {
             loading.dismiss();
-            this.showToast("Rollcall Reply Saved");
-            this.hideModal({reply: replied});
+            this.hideRollcall(rollcall, replied);
           });
         });
       },
@@ -122,6 +135,27 @@ export class ReplySendPage extends BasePage {
         loading.dismiss();
         this.showAlert("Problem Saving Reply", error);
       });
+  }
+
+  hideRollcall(rollcall:Rollcall, reply:Reply) {
+    this.logger.info(this, "hideRollcall", reply);
+    if (this.rollcalls.length > 1) {
+      let speed = 600;
+      let index = this.rollcalls.indexOf(rollcall);
+      if (index + 1 < this.rollcalls.length) {
+        this.slides.slideNext(speed, true);
+      }
+      else {
+        this.slides.slidePrev(speed, true);
+      }
+      setTimeout(() => {
+        this.rollcalls.splice(index, 1);
+      }, speed + 100);
+    }
+    else {
+      this.showToast("Rollcall Reply Sent");
+      this.hideModal({reply: reply});
+    }
   }
 
 }
