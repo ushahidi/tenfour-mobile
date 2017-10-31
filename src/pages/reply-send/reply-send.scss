@@ -1,10 +1,18 @@
 page-reply-send {
+  ion-slides {
+    height: auto;
+    ion-slide {
+      .slide-zoom {
+        height: 100%;
+        overflow-y: auto;
+      }
+    }
+  }
   ion-slide.swiper-slide {
     align-items: flex-start;
   }
   ion-item {
     h1 {
-      padding-top: 5px;
     }
     p {
 

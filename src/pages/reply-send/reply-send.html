@@ -14,29 +14,31 @@
 <ion-content>
   <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged()">
     <ion-slide *ngFor="let rollcall of rollcalls">
-      <ion-list no-margin>
-        <ion-item text-wrap color="white">
-          <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
-          <h1 text-center>{{rollcall.message}}</h1>
-          <p text-center>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
-        </ion-item>
-      </ion-list>
-      <div class="buttons" margin-top margin-bottom *ngIf="rollcall.reply">
-        <div padding-left padding-right *ngFor="let answer of rollcall.answers">
-          <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
-          <button ion-button block outline color="grey" *ngIf="answer.answer != rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
+      <!-- <ion-content scroll="true"> -->
+        <ion-list no-margin>
+          <ion-item text-wrap color="white">
+            <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
+            <h1 text-center>{{rollcall.message}}</h1>
+            <p text-center>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
+          </ion-item>
+        </ion-list>
+        <div class="buttons" margin-top margin-bottom *ngIf="rollcall.reply">
+          <div padding-left padding-right *ngFor="let answer of rollcall.answers">
+            <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
+            <button ion-button block outline color="grey" *ngIf="answer.answer != rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
+          </div>
         </div>
-      </div>
-      <ion-list *ngIf="rollcall.reply">
-        <ion-item color="dark">
-          <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add message" [(ngModel)]="rollcall.reply.message"></ion-input>
-        </ion-item>
-        <ion-item color="dark">
-          <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add location" [(ngModel)]="rollcall.reply.location_text"></ion-input>
-        </ion-item>
-      </ion-list>
+        <ion-list *ngIf="rollcall.reply">
+          <ion-item color="dark">
+            <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+            <ion-input type="text" placeholder="Add message" [(ngModel)]="rollcall.reply.message"></ion-input>
+          </ion-item>
+          <ion-item color="dark">
+            <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+            <ion-input type="text" placeholder="Add location" [(ngModel)]="rollcall.reply.location_text"></ion-input>
+          </ion-item>
+        </ion-list>
+      <!-- </ion-content> -->
     </ion-slide>
   </ion-slides>
 </ion-content>

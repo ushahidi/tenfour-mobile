@@ -27,7 +27,6 @@ import { Deeplinks } from '@ionic-native/deeplinks';
 import { Contacts } from '@ionic-native/contacts';
 import { Device } from '@ionic-native/device';
 import { Sim } from '@ionic-native/sim';
-import { CallNumber } from '@ionic-native/call-number';
 
 import { RollcallApp } from './app.component';
 
@@ -179,7 +178,6 @@ import { CountryService } from '../providers/country-service';
     { provide: Deeplinks, useClass: Deeplinks },
     { provide: Contacts, useClass: Contacts },
     { provide: Sim, useClass: Sim },
-    { provide: CallNumber, useClass: CallNumber },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: CountryService, useClass: CountryService },

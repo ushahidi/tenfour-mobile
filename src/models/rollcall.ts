@@ -49,7 +49,7 @@ export class Rollcall extends Model {
         for (let _reply of data.replies) {
           let reply = new Reply(_reply);
           if (data.recipients) {
-            let recipient = data.recipients.find(recipient => recipient.user_id == _reply.user_id);
+            let recipient = data.recipients.find(recipient => recipient.id == _reply.user_id);
             if (recipient) {
               reply.user_name = recipient.name;
               reply.user_initials = recipient.initials;

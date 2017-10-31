@@ -9,6 +9,10 @@
     {
       "path": "/api.staging.rollcall.io",
       "proxyUrl": "https://api.staging.rollcall.io"
+    },
+    {
+      "path": "/api.app.rollcall.io",
+      "proxyUrl": "https://api.app.rollcall.io"
     }
   ],
   "integrations": {

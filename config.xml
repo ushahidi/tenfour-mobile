@@ -5,6 +5,7 @@
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
     <content src="index.html" />
     <access origin="*" />
+    <access launch-external="yes" origin="tel:*" />
     <allow-navigation href="http://ionic.local/*" />
     <allow-navigation href="http://localhost:3000" />
     <allow-navigation href="http://192.168.0.12:8100" />
@@ -16,6 +17,7 @@
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
     <preference name="orientation" value="portrait" />
+    <preference name="ScrollEnabled" value="false" />
     <preference name="webviewbounce" value="false" />
     <preference name="UIWebViewBounce" value="false" />
     <preference name="DisallowOverscroll" value="true" />
@@ -25,7 +27,7 @@
     <preference name="SplashScreenDelay" value="1000" />
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="FadeSplashScreenDuration" value="500" />
-    <preference name="StatusBarStyle" value="default" />
+    <preference name="StatusBarStyle" value="lightcontent" />
     <preference name="StatusBarOverlaysWebView" value="true" />
     <preference name="StatusBarBackgroundColor" value="#F8F7F3" />
     <preference name="ShowSplashScreenSpinner" value="true" />
@@ -116,9 +118,6 @@
         <param name="ios-package" value="CDVWKWebViewEngine" />
     </feature>
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
-    <allow-navigation href="http://192.168.0.12:8101" />
-    <engine name="android" spec="~6.3.0" />
-    <engine name="ios" spec="~4.5.2" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
@@ -154,5 +153,6 @@
     <plugin name="cordova-custom-config" spec="^4.0.2" />
     <plugin name="cordova-plugin-themeablebrowser" spec="^0.2.17" />
     <plugin name="cordova-plugin-ionic-webview" spec="^1.1.16" />
-    <plugin name="call-number" spec="git+https://github.com/Rohfosho/CordovaCallNumberPlugin.git" />
+    <engine name="ios" spec="~4.5.3" />
+    <engine name="android" spec="~6.3.0" />
 </widget>

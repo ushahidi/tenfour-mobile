@@ -1,8 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { CallNumber } from '@ionic-native/call-number';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 
@@ -40,8 +38,7 @@ export class PersonDetailsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
-      protected events:Events,
-      protected callNumber: CallNumber) {
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -148,14 +145,7 @@ export class PersonDetailsPage extends BasePage {
   phoneContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
-      this.callNumber.callNumber(contact.contact, true)
-        .then(() => {
-          this.logger.info(this, "phoneContact", contact.contact, "Called");
-        })
-        .catch(() => {
-          this.logger.error(this, "phoneContact", "Error");
-          this.showToast("Phone is not available...");
-        });
+      window.open("tel:" + contact.contact);
     }
   }
 
