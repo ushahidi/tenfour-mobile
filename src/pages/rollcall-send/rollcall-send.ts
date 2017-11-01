@@ -14,6 +14,7 @@ import { SendViaComponent } from '../../components/send-via/send-via';
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Recipient } from '../../models/recipient';
+import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
 @IonicPage()
@@ -76,13 +77,30 @@ export class RollcallSendPage extends BasePage {
          }
          this.rollcall.recipients = recipients;
        }
+       if (data && data.groups) {
+         this.rollcall.groups = data.groups;
+       }
+       else {
+         this.rollcall.groups = [];
+       }
      });
   }
 
   removeRecipient(recipient:Recipient) {
+    this.logger.info(this, "removeRecipient", recipient);
     for (let i = 0; i < this.rollcall.recipients.length; i++) {
       if (this.rollcall.recipients[i] === recipient) {
         this.rollcall.recipients.splice(i, 1);
+        break;
+      }
+    }
+  }
+
+  removeGroup(group:Group) {
+    this.logger.info(this, "removeGroup", group);
+    for (let i = 0; i < this.rollcall.groups.length; i++) {
+      if (this.rollcall.groups[i] === group) {
+        this.rollcall.groups.splice(i, 1);
         break;
       }
     }

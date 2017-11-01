@@ -57,6 +57,8 @@ export class Group extends Model {
 
   public members:Person[] = [];
 
+  public selected:boolean = null;
+
   loadMembers(people:Person[]) {
     if (this.member_ids) {
       let memberIds = this.member_ids.split(",");

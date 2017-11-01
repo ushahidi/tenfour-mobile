@@ -10,15 +10,23 @@
   </ion-navbar>
 </ion-header>
 <ion-content #scrollTarget>
-  <ion-refresher (ionRefresh)="loadPeople($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <ion-list *ngIf="organization && organization.groups">
+    <ion-list-header>Groups</ion-list-header>
+    <ion-item color="white" *ngFor="let group of organization.groups">
+      <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
+      <ion-label>{{group.name}}</ion-label>
+      <ion-checkbox item-right [(ngModel)]="group.selected"></ion-checkbox>
+    </ion-item>
+  </ion-list>
   <ion-list *ngIf="organization && organization.people">
     <ion-list-header>People</ion-list-header>
     <ion-item color="white" *ngFor="let person of organization.people">
-      <ion-label>{{person.name}}</ion-label>
-      <ion-checkbox item-left [(ngModel)]="person.selected"></ion-checkbox>
       <person-avatar item-left [scrollTarget]="scrollTarget" [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+      <ion-label>{{person.name}}</ion-label>
+      <ion-checkbox item-right [(ngModel)]="person.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -7,6 +7,7 @@ import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
 @IonicPage()
@@ -39,44 +40,116 @@ export class PersonSelectPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.loadPeople(null, true);
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    });
   }
 
-  loadPeople(event:any, cache:boolean=true) {
-    if (cache) {
-      return this.database.getPeople(this.organization).then((people:Person[]) => {
-        if (people && people.length > 1) {
-          this.organization.people = people;
-          if (event) {
-            event.complete();
-          }
+  loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates", cache);
+    return Promise.all([
+      this.loadPeople(cache),
+      this.loadGroups(cache)]).then(
+      (loaded:any) =>{
+        this.logger.info(this, "loadUpdates", cache, "Done");
+        if (event) {
+          event.complete();
         }
-        else {
-          this.loadPeople(event, false);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadUpdates", cache, error);
+        if (event) {
+          event.complete();
         }
+        this.showToast(error);
       });
-    }
-    else {
-      return this.api.getPeople(this.organization).then(
-        (people:Person[]) => {
-          this.organization.people = people;
-          let saves = [];
-          for (let person of people) {
-            saves.push(this.database.savePerson(this.organization, person));
+  }
+
+  loadPeople(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadPeople", cache);
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        return this.database.getPeople(this.organization).then((people:Person[]) => {
+          this.logger.info(this, "loadPeople", "Database", people);
+          if (people && people.length > 1) {
+            this.organization.people = people;
+            resolve(people);
           }
-          Promise.all(saves).then(saved => {
-            if (event) {
-              event.complete();
-            }
-          });
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
+          else {
+            this.loadPeople(false).then((people:Person[]) => {
+              this.organization.people = people;
+              resolve(people);
+            },
+            (error:any) => {
+              this.organization.people = [];
+              reject(error);
+            });
           }
-          this.showToast(error);
         });
-    }
+      }
+      else {
+        return this.api.getPeople(this.organization).then(
+          (people:Person[]) => {
+            this.logger.info(this, "loadPeople", "API", people);
+            this.organization.people = people;
+            let saves = [];
+            for (let person of people) {
+              saves.push(this.database.savePerson(this.organization, person));
+            }
+            Promise.all(saves).then(saved => {
+              resolve(people);
+            });
+          },
+          (error:any) => {
+            reject(error);
+          });
+      }
+    });
+  }
+
+  loadGroups(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadGroups", cache);
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.database.getGroups(this.organization).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "Database", groups);
+          if (groups && groups.length > 0) {
+            this.organization.groups = groups;
+            resolve(groups);
+          }
+          else {
+            this.loadGroups(false).then((groups:Group[]) => {
+              this.organization.groups = groups;
+              resolve(groups);
+            },
+            (error:any) => {
+              this.organization.groups = [];
+              reject(error);
+            });
+          }
+        });
+      }
+      else {
+        this.api.getGroups(this.organization).then(
+          (groups:Group[]) => {
+            this.logger.info(this, "loadGroups", "API", groups);
+            let saves = [];
+            for (let group of groups) {
+              saves.push(this.database.saveGroup(this.organization, group));
+            }
+            Promise.all(saves).then(saved => {
+              this.organization.groups = groups;
+              this.logger.info(this, "loadGroups", "API", "Done");
+              resolve(groups);
+            });
+          },
+          (error:any) => {
+            this.organization.groups = [];
+            reject(error);
+          });
+      }
+    });
   }
 
   cancelAdd(event) {
@@ -85,13 +158,20 @@ export class PersonSelectPage extends BasePage {
 
   doneAdd(event) {
     let people = [];
+    let groups = [];
     for (let person of this.organization.people) {
       if (person.selected) {
         people.push(person);
       }
     }
+    for (let group of this.organization.groups) {
+      if (group.selected) {
+        groups.push(group);
+      }
+    }
     this.hideModal({
-      people: people });
+      people: people,
+      groups: groups });
   }
 
 }

@@ -644,6 +644,7 @@ export class ApiService extends HttpService {
           organization_id: organization.id,
           message: rollcall.message,
           answers: rollcall.answers,
+          groups: rollcall.groupIds(),
           recipients: rollcall.recipientIds(),
           send_via: [rollcall.send_via]
         };

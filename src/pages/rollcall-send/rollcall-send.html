@@ -24,6 +24,13 @@
     <ion-item color="white" tappable (click)="addPerson()">
       <h2 ion-text color="primary">Add people</h2>
     </ion-item>
+    <ion-item color="white" *ngFor="let group of rollcall.groups">
+      <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
+      <h2>{{group.name}}</h2>
+      <button ion-button icon-only item-right clear color="black" tappable (click)="removeGroup(group)">
+        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+      </button>
+    </ion-item>
     <ion-item color="white" *ngFor="let recipient of rollcall.recipients">
       <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
       <h2>{{recipient.name}}</h2>

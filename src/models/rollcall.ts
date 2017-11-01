@@ -2,6 +2,7 @@ import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
+import { Group } from '../models/group';
 import { Person } from '../models/person';
 import { Recipient } from '../models/recipient';
 import { Answer } from '../models/answer';
@@ -139,6 +140,8 @@ export class Rollcall extends Model {
 
   public recipients:Recipient[] = [];
 
+  public groups:Group[] = [];
+
   public replies:Reply[] = [];
 
   public reply:Reply = null;
@@ -168,6 +171,16 @@ export class Rollcall extends Model {
       return this.replied == null || this.replied == false;
     }
     return false;
+  }
+
+  groupIds():number[] {
+    let ids = [];
+    if (this.groups && this.groups.length > 0) {
+      for (let group of this.groups) {
+        ids.push({id: group.id});
+      }
+    }
+    return ids;
   }
 
   recipientIds():number[] {
