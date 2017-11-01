@@ -102,7 +102,8 @@ export class GroupDetailsPage extends BasePage {
     this.logger.info(this, "showPerson", _person);
     this.showPage(PersonDetailsPage,
       { organization: this.organization,
-        person: _person })
+        person: _person,
+        user: this.person })
   }
 
 }

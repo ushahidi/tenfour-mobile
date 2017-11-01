@@ -121,7 +121,8 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "showPerson");
     this.showPage(PersonDetailsPage,
       { organization: this.organization,
-        person: person })
+        person: person,
+        user: this.person })
   }
 
   removePerson(person:Person) {
