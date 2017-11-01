@@ -317,6 +317,7 @@ export class RollcallApp {
     this.nav.setRoot(PersonDetailsPage,
       { organization: this.organization,
         person: this.person,
+        user: this.person,
         title: "Profile" });
     this.menuController.close();
   }

@@ -23,6 +23,7 @@ export class PersonDetailsPage extends BasePage {
   organization:Organization = null;
   person:Person = null;
   user:Person = null;
+  title:string = null;
   loading:boolean = false;
 
   constructor(
@@ -47,6 +48,7 @@ export class PersonDetailsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     this.user = this.getParameter<Person>("user");
+    this.title = this.getParameter<string>("title");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

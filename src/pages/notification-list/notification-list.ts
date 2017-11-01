@@ -21,6 +21,7 @@ export class NotificationListPage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
+  pictures:any = {};
   loading:boolean = false;
 
   constructor(
@@ -39,12 +40,12 @@ export class NotificationListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(null, false).then(updated => {
+    this.loadUpdates(false).then(updated => {
       loading.dismiss();
     },
     (error:any) => {
@@ -52,16 +53,7 @@ export class NotificationListPage extends BasePage {
     });
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
-    if (this.loading == false) {
-      this.organization = this.getParameter<Organization>("organization");
-      this.person = this.getParameter<Person>("person");
-      this.loadUpdates(null, true);
-    }
-  }
-
-  loadUpdates(event:any, cache:boolean=true) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     return Promise.all([this.loadNotifications(cache)]).then(
       (loaded:any) =>{

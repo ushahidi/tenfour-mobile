@@ -30,7 +30,7 @@
   <ion-list *ngIf="group">
     <ion-list-header>People In This Group</ion-list-header>
     <ion-item color="white" tappable (click)="addPerson($event)">
-        <ion-label>Add people</ion-label>
+        <ion-label color="primary">Add people</ion-label>
     </ion-item>
     <ion-item color="white" *ngFor="let _person of group.members">
       <person-avatar item-left [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>

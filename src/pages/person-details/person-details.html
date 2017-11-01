@@ -5,7 +5,7 @@
         <ion-icon name="menu"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title></ion-title>
+    <ion-title>{{title}}</ion-title>
     <ion-buttons end>
       <button ion-button color="primary" *ngIf="user && (user.isMe() || user.isOwnerOrAdmin())" (click)="editPerson($event)">Edit</button>
     </ion-buttons>
