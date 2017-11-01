@@ -170,4 +170,14 @@ export class Rollcall extends Model {
     return false;
   }
 
+  recipientIds():number[] {
+    let ids = [];
+    if (this.recipients && this.recipients.length > 0) {
+      for (let recipient of this.recipients) {
+        ids.push({id: recipient.user_id});
+      }
+    }
+    return ids;
+  }
+
 }

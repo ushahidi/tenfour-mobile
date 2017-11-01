@@ -284,20 +284,14 @@ export class RollcallListPage extends BasePage {
   }
 
   filterRollcalls(rollcalls:Rollcall[]) {
-    this.logger.info(this, "filterRollcalls", this.filter, "Rollcalls", rollcalls.length);
     let filtered = [];
     for (let rollcall of rollcalls) {
       if (this.filter === "all") {
-        this.logger.info(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
         filtered.push(rollcall);
       }
       else if (this.filter === "waiting") {
         if (rollcall.canRespond(this.person)) {
-          this.logger.info(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
           filtered.push(rollcall);
-        }
-        else {
-          this.logger.error(this, "filterRollcalls", this.filter, "Rollcall", rollcall.id);
         }
       }
     }

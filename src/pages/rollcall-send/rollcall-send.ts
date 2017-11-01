@@ -14,6 +14,7 @@ import { SendViaComponent } from '../../components/send-via/send-via';
 import { Organization } from '../../models/organization';
 import { Rollcall } from '../../models/rollcall';
 import { Recipient } from '../../models/recipient';
+import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
@@ -26,6 +27,7 @@ export class RollcallSendPage extends BasePage {
 
   organization:Organization = null;
   rollcall:Rollcall = null;
+  person:Person = null;
 
   @ViewChild('select')
   select: Select;
@@ -52,6 +54,7 @@ export class RollcallSendPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.rollcall = this.getParameter<Rollcall>("rollcall");
+    this.person = this.getParameter<Person>("person");
     this.statusBar.overlaysWebView(false);
   }
 
@@ -68,7 +71,6 @@ export class RollcallSendPage extends BasePage {
          let recipients = [];
          for (let person of data.people) {
            let recipient = new Recipient(person);
-           recipient.id = Number(`${this.rollcall.id}${person.id}`);
            recipient.user_id = person.id;
            recipients.push(recipient);
          }
@@ -89,7 +91,18 @@ export class RollcallSendPage extends BasePage {
   sendRollcall(event:any) {
     let loading = this.showLoading("Sending...");
     this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
-      this.database.saveRollcall(this.organization, rollcall).then(saved => {
+      let saves = [];
+      for (let answer of rollcall.answers) {
+        saves.push(this.database.saveAnswer(rollcall, answer));
+      }
+      for (let recipient of rollcall.recipients) {
+        saves.push(this.database.saveRecipient(rollcall, recipient));
+      }
+      for (let reply of rollcall.replies) {
+        saves.push(this.database.saveReply(rollcall, reply));
+      }
+      saves.push(this.database.saveRollcall(this.organization, rollcall));
+      Promise.all(saves).then(saved => {
         loading.dismiss();
         this.showToast("RollCall sent");
         let firstViewController = this.navController.first();

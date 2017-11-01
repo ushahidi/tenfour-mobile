@@ -68,7 +68,6 @@ export class RollcallTestPage extends BasePage {
     this.rollcall.recipients = [];
     if (this.person) {
       let recipient = new Recipient(this.person);
-      recipient.id = Number(`${this.rollcall.id}${this.person.id}`);
       recipient.user_id = this.person.id;
       this.rollcall.recipients.push(recipient);
     }
@@ -81,7 +80,18 @@ export class RollcallTestPage extends BasePage {
   sendRollcall(event:any) {
     let loading = this.showLoading("Sending...");
     this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
-      this.database.saveRollcall(this.organization, rollcall).then(saved => {
+      let saves = [];
+      for (let answer of rollcall.answers) {
+        saves.push(this.database.saveAnswer(rollcall, answer));
+      }
+      for (let recipient of rollcall.recipients) {
+        saves.push(this.database.saveRecipient(rollcall, recipient));
+      }
+      for (let reply of rollcall.replies) {
+        saves.push(this.database.saveReply(rollcall, reply));
+      }
+      saves.push(this.database.saveRollcall(this.organization, rollcall));
+      Promise.all(saves).then(saved => {
         loading.dismiss();
         this.showToast("RollCall test sent");
         this.hideModal({ rollcall: Rollcall });
