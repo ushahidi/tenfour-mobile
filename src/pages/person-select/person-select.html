@@ -13,7 +13,7 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-list *ngIf="organization && organization.groups">
+  <ion-list *ngIf="show_groups && organization && organization.groups">
     <ion-list-header>Groups</ion-list-header>
     <ion-item color="white" *ngFor="let group of organization.groups">
       <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>

@@ -22,6 +22,7 @@ export class PersonSelectPage extends BasePage {
   organization:Organization = null;
   people:Person[] = null;
   groups:Group[] = null;
+  show_groups:boolean = true;
 
   constructor(
       protected zone:NgZone,
@@ -44,6 +45,7 @@ export class PersonSelectPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.groups = this.getParameter<Group[]>("groups");
     this.people = this.getParameter<Person[]>("people");
+    this.show_groups = this.getParameter<boolean>("show_groups");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

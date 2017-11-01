@@ -69,7 +69,8 @@ export class RollcallSendPage extends BasePage {
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
       groups: this.rollcall.groups,
-      people: this.rollcall.recipients });
+      people: this.rollcall.recipients,
+      show_groups: true });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);
        if (data && data.people) {

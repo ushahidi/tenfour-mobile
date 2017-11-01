@@ -117,9 +117,20 @@ export class GroupListPage extends BasePage {
 
   createGroup(event:any) {
     this.logger.info(this, "createGroup");
-    this.showModal(GroupEditPage,
+    let modal = this.showModal(GroupEditPage,
       { organization: this.organization,
         person: this.person });
+    modal.onDidDismiss(data => {
+      if (data && data.group) {
+        let loading = this.showLoading("Loading...");
+        this.loadGroups(false).then(loaded => {
+          loading.dismiss();
+        },
+        (error:any) => {
+          loading.dismiss();
+        });
+      }
+    });
   }
 
   showGroup(group:Group) {

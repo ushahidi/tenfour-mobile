@@ -66,7 +66,8 @@ export class GroupEditPage extends BasePage {
   addPerson(event:any) {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
-      organization: this.organization });
+      organization: this.organization,
+      show_groups: false });
     modal.onDidDismiss(data => {
        if (data && data.people) {
          let members = [];
