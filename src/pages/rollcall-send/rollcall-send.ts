@@ -65,9 +65,13 @@ export class RollcallSendPage extends BasePage {
   }
 
   addPerson() {
+    this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
-      organization: this.organization });
+      organization: this.organization,
+      groups: this.rollcall.groups,
+      people: this.rollcall.recipients });
     modal.onDidDismiss(data => {
+      this.logger.info(this, "addPerson", data);
        if (data && data.people) {
          let recipients = [];
          for (let person of data.people) {
@@ -79,9 +83,6 @@ export class RollcallSendPage extends BasePage {
        }
        if (data && data.groups) {
          this.rollcall.groups = data.groups;
-       }
-       else {
-         this.rollcall.groups = [];
        }
      });
   }

@@ -4,17 +4,17 @@
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons end *ngIf="rollcall">
-      <button ion-button color="primary" [disabled]="rollcall.message == null || rollcall.message.length == 0" (click)="showNext($event)">Next</button>
+    <ion-buttons end>
+      <button ion-button color="primary" [disabled]="rollcall.message == null || rollcall.message.length == 0" (click)="showNext($event)" *ngIf="rollcall">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content #scrollTarget>
+<ion-content>
   <ion-list *ngIf="rollcall">
-    <ion-item text-center no-lines color="white">
+    <ion-item text-center no-lines color="white" class="avatar">
       <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
     </ion-item>
-    <ion-item text-wrap text-center no-lines color="white">
+    <ion-item text-wrap text-center no-lines color="white" class="textarea">
       <ion-textarea text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message" [(ngModel)]="rollcall.message"></ion-textarea>
     </ion-item>
   </ion-list>

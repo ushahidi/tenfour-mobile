@@ -15,11 +15,13 @@ import { Person } from '../../models/person';
   selector: 'page-person-select',
   templateUrl: 'person-select.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class PersonSelectPage extends BasePage {
 
   organization:Organization = null;
+  people:Person[] = null;
+  groups:Group[] = null;
 
   constructor(
       protected zone:NgZone,
@@ -40,6 +42,8 @@ export class PersonSelectPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.groups = this.getParameter<Group[]>("groups");
+    this.people = this.getParameter<Person[]>("people");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -73,16 +77,16 @@ export class PersonSelectPage extends BasePage {
         return this.database.getPeople(this.organization).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Database", people);
           if (people && people.length > 1) {
-            this.organization.people = people;
+            this.updatePeople(people);
             resolve(people);
           }
           else {
             this.loadPeople(false).then((people:Person[]) => {
-              this.organization.people = people;
+              this.updatePeople(people);
               resolve(people);
             },
             (error:any) => {
-              this.organization.people = [];
+              this.updatePeople([]);
               reject(error);
             });
           }
@@ -92,20 +96,40 @@ export class PersonSelectPage extends BasePage {
         return this.api.getPeople(this.organization).then(
           (people:Person[]) => {
             this.logger.info(this, "loadPeople", "API", people);
-            this.organization.people = people;
             let saves = [];
             for (let person of people) {
               saves.push(this.database.savePerson(this.organization, person));
             }
             Promise.all(saves).then(saved => {
+              this.updatePeople(people);
               resolve(people);
             });
           },
           (error:any) => {
+            this.updatePeople([]);
             reject(error);
           });
       }
     });
+  }
+
+  updatePeople(people:Person[]) {
+    if (this.people && this.people.length > 0) {
+      for (let person of people) {
+        let previous = this.people.filter(_person => _person.id == person.id);
+        if (previous && previous.length > 0) {
+          if (previous[0].selected == true) {
+            person.selected = true;
+            this.logger.error(this, "updatePeople", person.name, "Selected");
+          }
+          else {
+            person.selected = false;
+            this.logger.info(this, "updatePeople", person.name, "Not Selected");
+          }
+        }
+      }
+    }
+    this.organization.people = people;
   }
 
   loadGroups(cache:boolean=true):Promise<any> {
@@ -115,16 +139,16 @@ export class PersonSelectPage extends BasePage {
         this.database.getGroups(this.organization).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
-            this.organization.groups = groups;
+            this.updateGroups(groups);
             resolve(groups);
           }
           else {
             this.loadGroups(false).then((groups:Group[]) => {
-              this.organization.groups = groups;
+              this.updateGroups(groups);
               resolve(groups);
             },
             (error:any) => {
-              this.organization.groups = [];
+              this.updateGroups([]);
               reject(error);
             });
           }
@@ -139,34 +163,57 @@ export class PersonSelectPage extends BasePage {
               saves.push(this.database.saveGroup(this.organization, group));
             }
             Promise.all(saves).then(saved => {
-              this.organization.groups = groups;
+              this.updateGroups(groups);
               this.logger.info(this, "loadGroups", "API", "Done");
               resolve(groups);
             });
           },
           (error:any) => {
-            this.organization.groups = [];
+            this.updateGroups([]);
             reject(error);
           });
       }
     });
   }
 
-  cancelAdd(event) {
+  updateGroups(groups:Group[]) {
+    if (this.groups && this.groups.length > 0) {
+      for (let group of groups) {
+        let previous = this.groups.filter(_group => _group.id == group.id);
+        if (previous && previous.length > 0) {
+          if (previous[0].selected == true) {
+            group.selected = true;
+            this.logger.error(this, "updateGroups", group.name, "Selected");
+          }
+          else {
+            group.selected = false;
+            this.logger.info(this, "updateGroups", group.name, "Not Selected");
+          }
+        }
+      }
+    }
+    this.organization.groups = groups;
+  }
+
+  cancelSelect(event) {
     this.hideModal();
   }
 
-  doneAdd(event) {
+  doneSelect(event) {
     let people = [];
     let groups = [];
-    for (let person of this.organization.people) {
-      if (person.selected) {
-        people.push(person);
+    if (this.organization.people && this.organization.people.length > 0) {
+      for (let person of this.organization.people) {
+        if (person.selected == true) {
+          people.push(person);
+        }
       }
     }
-    for (let group of this.organization.groups) {
-      if (group.selected) {
-        groups.push(group);
+    if (this.organization.groups && this.organization.groups.length > 0) {
+      for (let group of this.organization.groups) {
+        if (group.selected == true) {
+          groups.push(group);
+        }
       }
     }
     this.hideModal({
