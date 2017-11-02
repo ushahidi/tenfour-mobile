@@ -23,7 +23,6 @@ export class ReplySendPage extends BasePage {
 
   @ViewChild(Slides)
   slides:Slides;
-
   index:number = 0;
   loading:boolean = false;
 
@@ -140,17 +139,8 @@ export class ReplySendPage extends BasePage {
   hideRollcall(rollcall:Rollcall, reply:Reply) {
     this.logger.info(this, "hideRollcall", reply);
     if (this.rollcalls.length > 1) {
-      let speed = 600;
-      let index = this.rollcalls.indexOf(rollcall);
-      if (index + 1 < this.rollcalls.length) {
-        this.slides.slideNext(speed, true);
-      }
-      else {
-        this.slides.slidePrev(speed, true);
-      }
-      setTimeout(() => {
-        this.rollcalls.splice(index, 1);
-      }, speed + 100);
+      this.rollcalls.splice(this.index, 1);
+      this.slides.slidePrev(0);
     }
     else {
       this.showToast("Rollcall Reply Sent");
