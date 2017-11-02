@@ -24,7 +24,7 @@
       <h2 ion-text color="primary">Add answer</h2>
     </ion-item>
     <ion-item color="white" *ngFor="let answer of rollcall.answers">
-      <button ion-button item-left clear tappable (click)="changeColor(answer)">
+      <button ion-button item-left clear tappable (click)="changeColor(answer, $event)">
         <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
       </button>
       <ion-input type="text" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>

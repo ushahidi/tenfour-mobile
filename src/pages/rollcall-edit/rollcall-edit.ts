@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallSendPage } from '../../pages/rollcall-send/rollcall-send';
@@ -11,6 +11,8 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Rollcall } from '../../models/rollcall';
 import { Answer } from '../../models/answer';
+
+import { ColorPickerComponent } from '../../components/color-picker/color-picker';
 
 @IonicPage()
 @Component({
@@ -36,6 +38,7 @@ export class RollcallEditPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected popoverController:PopoverController,
       protected api:ApiService,
       protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -101,10 +104,10 @@ export class RollcallEditPage extends BasePage {
 
   addCustom() {
     let colors = [
-      "#E8C440", "#58AC5D", "#B835C4", "#577BAB",
-      "#A28AD9", "#19AEE9", "#0273A3", "#4B9183",
-      "#D3BAEB", "#304170", "#99238C", "#1DB7ED",
-      "#793EE8", "#8FDEDC", "#507BBE", "#0F7E70"];
+      "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
+      "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
+      "#A28AD9", "#19AEE9", "#0273A3", "#304170",
+      "#99238C", "#C7470D", "#793EE8", "#1E9545"];
     let color = colors[this.rollcall.answers.length];
     this.rollcall.answers.push(new Answer({
       icon: "",
@@ -127,8 +130,20 @@ export class RollcallEditPage extends BasePage {
     this.rollcall.answers = [];
   }
 
-  changeColor(answer:Answer) {
+  changeColor(answer:Answer, event:any) {
     this.logger.info(this, "changeColor", answer);
+    let popover = this.popoverController.create(ColorPickerComponent,
+      { color: answer.color,
+        on_changed:(color:any) => {
+            this.logger.info(this, "changeColor", color);
+            answer.color = color;
+          }
+        },
+      { showBackdrop: true,
+        enableBackdropDismiss: true });
+    popover.present({
+      ev: event
+    });
   }
 
 }

@@ -1,0 +1,9 @@
+<ion-grid>
+  <ion-row align-items-center>
+    <ion-col col-3 text-center *ngFor="let color of colors">
+      <button ion-button clear tappable (click)="selectColor(color)">
+        <ion-badge [style.background]="color">&nbsp;</ion-badge>
+      </button>
+    </ion-col>
+  </ion-row>
+</ion-grid>
