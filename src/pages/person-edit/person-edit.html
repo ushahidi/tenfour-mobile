@@ -33,7 +33,7 @@
     </ion-item>
     <ion-item class="phone" color="white" *ngFor="let contact of person.getPhones()">
       <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
-      <ion-select item-right [interface]="selectType" [selectOptions]="selectOptions" [(ngModel)]="contact.country_code" (ionSelect)="phoneChange(contact)" *ngIf="countryCodes">
+      <ion-select item-right [interface]="selectType" [disabled]="countryCodes.length <= 1" [selectOptions]="selectOptions" [(ngModel)]="contact.country_code" *ngIf="countryCodes">
         <ion-option [value]="countryCode" *ngFor="let countryCode of countryCodes">
           +{{countryCode}}
         </ion-option>

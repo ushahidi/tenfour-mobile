@@ -197,7 +197,10 @@ export class PersonEditPage extends BasePage {
     this.api.updatePerson(this.organization, this.person).then(
       (person:Person) => {
         let updates = [];
-        for (let contact of this.person.contacts) {
+        for (let contact of this.person.getPhones()) {
+          updates.push(this.updateContact(this.organization, person, contact));
+        }
+        for (let contact of this.person.getEmails()) {
           updates.push(this.updateContact(this.organization, person, contact));
         }
         Promise.all(updates).then((updated:any) => {
@@ -220,11 +223,16 @@ export class PersonEditPage extends BasePage {
   updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.contact == null || contact.contact.length == 0) {
+        this.logger.info(this, "updateContact", "Ignore", contact);
         resolve(contact);
       }
       else if (contact.id) {
+        this.logger.info(this, "updateContact", "Update", contact);
+        if (contact.type == 'phone') {
+          contact.contact = `+${contact.country_code}${contact.national_number}`;
+        }
         this.api.updateContact(organization, person, contact).then((updated:Contact) => {
-          this.database.saveContact(person, contact).then((saved:any) => {
+          this.database.saveContact(person, updated).then((saved:any) => {
             resolve(updated);
           });
         },
@@ -233,8 +241,12 @@ export class PersonEditPage extends BasePage {
         });
       }
       else {
+        this.logger.info(this, "updateContact", "Create", contact);
+        if (contact.type == 'phone') {
+          contact.contact = `+${contact.country_code}${contact.national_number}`;
+        }
         this.api.createContact(organization, person, contact).then((created:Contact) => {
-          this.database.saveContact(person, contact).then((saved:any) => {
+          this.database.saveContact(person, created).then((saved:any) => {
             resolve(created);
           });
         },
@@ -343,11 +355,6 @@ export class PersonEditPage extends BasePage {
       loading.dismiss();
       this.showAlert("Problem Removing Person", error);
     });
-  }
-
-  phoneChange(contact:Contact) {
-    this.logger.info(this, "phoneChange", contact.country_code, contact.national_number, contact.contact);
-    contact.contact = `+${ contact.country_code}${contact.national_number}`;
   }
 
 }
