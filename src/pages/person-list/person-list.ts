@@ -43,6 +43,7 @@ export class PersonListPage extends BasePage {
   ionViewDidLoad() {
     super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
+    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
     this.loadPeople(null, false).then((finished:any) => {
       loading.dismiss();
@@ -50,14 +51,6 @@ export class PersonListPage extends BasePage {
     (error:any) => {
       loading.dismiss();
     });
-  }
-
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
-    if (this.loading == false) {
-      this.person = this.getParameter<Person>("person");
-      this.loadPeople(null, true);
-    }
   }
 
   loadPeople(event:any, cache:boolean=true) {
