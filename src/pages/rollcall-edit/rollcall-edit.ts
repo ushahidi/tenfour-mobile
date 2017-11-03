@@ -102,7 +102,7 @@ export class RollcallEditPage extends BasePage {
     }));
   }
 
-  addCustom() {
+  addAnswer() {
     let colors = [
       "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
       "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
