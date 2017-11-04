@@ -151,7 +151,6 @@ export class NotificationListPage extends BasePage {
     let saves = [];
     for (let notification of this.notifications) {
       notification.viewed_at = new Date();
-      this.logger.error(this, "viewNotifications", "Viewed", notification.id);
       saves.push(this.database.saveNotification(this.organization, notification));
     }
     Promise.all(saves).then(saved => {

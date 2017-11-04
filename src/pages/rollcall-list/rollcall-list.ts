@@ -259,11 +259,7 @@ export class RollcallListPage extends BasePage {
         this.database.getNotifications(this.organization, 10, 0).then((notifications:Notification[]) => {
           this.notifications = notifications;
           for (let notification of notifications) {
-            if (notification.viewed_at) {
-              this.logger.info(this, "loadNotifications", "Viewed", notification.id, notification.viewed_at);
-            }
-            else {
-              this.logger.error(this, "loadNotifications", "New", notification.id);
+            if (notification.viewed_at == null) {
               this.notify = true;
             }
           }
@@ -280,11 +276,7 @@ export class RollcallListPage extends BasePage {
             this.database.getNotifications(this.organization, 10, 0).then((_notifications:Notification[]) => {
               this.notifications = _notifications;
               for (let notification of _notifications) {
-                if (notification.viewed_at) {
-                  this.logger.info(this, "loadNotifications", "Viewed", notification.id, notification.viewed_at);
-                }
-                else {
-                  this.logger.error(this, "loadNotifications", "New", notification.id);
+                if (notification.viewed_at == null) {
                   this.notify = true;
                 }
               }

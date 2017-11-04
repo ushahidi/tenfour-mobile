@@ -24,32 +24,13 @@
       <h2 ion-text color="primary">Add answer</h2>
     </ion-item>
     <ion-item color="white" *ngFor="let answer of rollcall.answers">
-      <button ion-button item-left clear tappable (click)="changeColor(answer, $event)">
+      <button ion-button icon-only item-start clear tappable (click)="changeColor(answer, $event)">
         <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
       </button>
       <ion-input type="text" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
-      <button ion-button icon-only item-right clear color="black" tappable (click)="removeAnswer(answer)">
+      <button ion-button icon-only item-end clear color="black" tappable (click)="removeAnswer(answer)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
-      <!-- <ion-grid no-padding no-margin>
-        <ion-row no-padding no-margin>
-          <ion-col col-2 no-padding no-margin>
-            <ion-item color="white" no-padding no-margin no-lines>
-              <button ion-button item-left clear tappable (click)="changeColor(answer, $event)">
-                <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
-              </button>
-            </ion-item>
-          </ion-col>
-          <ion-col col-10 no-padding no-margin>
-            <ion-item color="white" no-padding no-margin no-lines>
-              <ion-input type="text" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
-              <button ion-button icon-only item-right clear color="black" (click)="removeAnswer(answer)">
-                <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
-              </button>
-            </ion-item>
-          </ion-col>
-        </ion-row>
-      </ion-grid> -->
     </ion-item>
   </ion-list>
   <div padding-left padding-right text-center>
