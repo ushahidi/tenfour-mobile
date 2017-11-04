@@ -15,22 +15,22 @@
       <ion-item color="white" text-wrap *ngIf="notification.type == 'ReplyReceived'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h3><strong>{{notification.reply_from}}</strong> responded to a RollCall.</h3>
-        <p><small>{{notification.created_at | dateTime}}</small></p>
+        <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
       <ion-item color="white" text-wrap *ngIf="notification.type == 'RollCallReceived'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h3>You received a Rollcall: <strong>{{notification.rollcall_message}}</strong></h3>
-        <p><small>{{notification.created_at | dateTime}}</small></p>
+        <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
       <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonJoinedOrganization'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h3><strong>{{notification.person_name}}</strong> joined the organization.</h3>
-        <p><small>{{notification.created_at | dateTime}}</small></p>
+        <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
       <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonLeftOrganization'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h3><strong>{{notification.person_name}}</strong> left the organization.</h3>
-        <p><small>{{notification.created_at | dateTime}}</small></p>
+        <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
     </ion-card>
   </ion-list>
