@@ -30,7 +30,4 @@ export class Email extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
-  @Column("saved_at", TEXT)
-  public saved_at:Date = null;
-
 }

@@ -39,7 +39,4 @@ export class Answer extends Model {
   @Column("replies", INTEGER)
   public replies:number = null;
 
-  @Column("saved_at", TEXT)
-  public saved_at:Date = null;
-
 }

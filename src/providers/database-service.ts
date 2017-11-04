@@ -390,7 +390,7 @@ export class DatabaseService extends SqlService {
 
   saveNotification(organization:Organization, notification:Notification):Promise<any> {
     notification.organization_id = organization.id;
-    return this.saveModel(notification);
+    return this.saveModel(notification, false);
   }
 
   getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {

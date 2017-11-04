@@ -222,7 +222,7 @@ export class SqlService {
     });
   }
 
-  executeInsert(table:string, columns:any, values:{}) {
+  executeInsert(table:string, columns:any, values:{}):Promise<any> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.insertStatement(table, columns, values);
@@ -245,16 +245,16 @@ export class SqlService {
     });
   }
 
-  executeUpdate(table:string, columns:any[], values:{}) {
+  executeUpdate(table:string, columns:any[], values:{}, nulls:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
-        let statement = this.updateStatement(table, columns, values);
-        let parameters = this.updateParameters(table, columns, values);
+        let statement = this.updateStatement(table, columns, values, nulls);
+        let parameters = this.updateParameters(table, columns, values, nulls);
         this.logger.info(this, "executeUpdate", "Updating", statement, parameters);
         database.executeSql(statement, parameters).then(
           (results) => {
             this.logger.info(this, "executeUpdate", "Updated", statement, parameters, results);
-            resolve(true);
+            resolve(results['rowsAffected'] > 0);
           },
           (error) => {
             this.logger.error(this, "executeUpdate", "Failed", statement, parameters, error);
@@ -268,7 +268,7 @@ export class SqlService {
     });
   }
 
-  executeDelete(table:string, where:{}) {
+  executeDelete(table:string, where:{}):Promise<any> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.deleteStatement(table, where);
@@ -358,7 +358,7 @@ export class SqlService {
     return parameters;
   }
 
-  insertStatement(table:string, columns:any[], values:{}) : string {
+  insertStatement(table:string, columns:any[], values:{}):string {
     let names = [];
     let params = [];
     for (let column of columns) {
@@ -368,10 +368,10 @@ export class SqlService {
         params.push("?");
       }
     }
-    return `INSERT OR REPLACE INTO ${table} (${names.join(", ")}) VALUES (${params.join(", ")})`;
+    return `INSERT INTO ${table} (${names.join(", ")}) VALUES (${params.join(", ")})`;
   }
 
-  insertParameters(table:string, columns:any[], values:{}) : any {
+  insertParameters(table:string, columns:any[], values:{}):any {
     let params:any[] = [];
     for (let column of columns) {
       let value = values[column.name];
@@ -382,7 +382,7 @@ export class SqlService {
     return params;
   }
 
-  updateStatement(table:string, columns:any[], values:{}) : string {
+  updateStatement(table:string, columns:any[], values:{}, nulls:boolean=true):string {
     let params:any[] = [];
     let clause = [];
     for (let column of columns) {
@@ -390,13 +390,19 @@ export class SqlService {
         clause.push(`${column.name} = ?`);
       }
       else if (column.property in values) {
-        params.push(`${column.name} = ?`);
+        let value = values[column.name];
+        if (nulls) {
+          params.push(`${column.name} = ?`);
+        }
+        else if (value != null) {
+          params.push(`${column.name} = ?`);
+        }
       }
     }
     return `UPDATE ${table} SET ${params.join(", ")} WHERE ${clause.join(" AND ")}`;
   }
 
-  updateParameters(table:string, columns:any[], values:{}) : any {
+  updateParameters(table:string, columns:any[], values:{}, nulls:boolean=true):any {
     let params:any[] = [];
     let clause = [];
     for (let column of columns) {
@@ -405,13 +411,18 @@ export class SqlService {
         clause.push(value);
       }
       else if (column.property in values) {
-        params.push(value);
+        if (nulls) {
+          params.push(value);
+        }
+        else if (value != null) {
+          params.push(value);
+        }
       }
     }
     return params.concat(clause);
   }
 
-  deleteStatement(table:string, where:{}) : string {
+  deleteStatement(table:string, where:{}):string {
     let clause = [];
     if (where && Object.keys(where).length > 0) {
       for (let column in where) {
@@ -527,33 +538,41 @@ export class SqlService {
     });
   }
 
-  saveModel<M extends Model>(model:M):Promise<any> {
+  saveModel<M extends Model>(model:M, nulls:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
       let table:string = model.getTable();
       let columns:any[] = model.getColumns();
       let values:any[] = model.getValues();
-      if (model.isPersisted()) {
-        this.logger.info(this, "saveModel", "Updating", model);
-        values['saved_at'] = new Date();
-        this.executeUpdate(table, columns, values).then(
-          (results) => {
-            resolve(results);
-          },
-          (error) => {
-            reject(error);
-          });
-      }
-      else {
-        this.logger.info(this, "saveModel", "Inserting", model);
-        values['saved_at'] = new Date();
-        this.executeInsert(table, columns, values).then(
-          (results) => {
-            resolve(results);
-          },
-          (error) => {
-            reject(error);
-          });
-      }
+      this.executeUpdate(table, columns, values, nulls).then(
+        (updated:boolean) => {
+          if (updated) {
+            this.logger.info(this, "saveModel", table, "Updated", updated, model);
+            resolve(updated);
+          }
+          else {
+            this.executeInsert(table, columns, values).then(
+              (inserted:any) => {
+                this.logger.info(this, "saveModel", table, "Inserted", inserted, model);
+                resolve(inserted != null);
+              },
+              (_error:any) => {
+                this.logger.error(this, "saveModel", table, "Inserted", _error);
+                reject(_error);
+              });
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "saveModel", table, "Updated", error);
+          this.executeInsert(table, columns, values).then(
+            (inserted:any) => {
+              this.logger.info(this, "saveModel", table, "Inserted", inserted);
+              resolve(inserted);
+            },
+            (_error:any) => {
+              this.logger.error(this, "saveModel", table, "Inserted", _error);
+              reject(_error);
+            });
+        });
     });
   }
 
