@@ -35,8 +35,8 @@ export class DatabaseService extends SqlService {
     return this.saveModel(organization);
   }
 
-  getOrganizations(where:{}=null, order:{}=null):Promise<Organization[]> {
-    return this.getModels<Organization>(new Organization(), where, order);
+  getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
+    return this.getModels<Organization>(new Organization(), where, order, limit, offset);
   }
 
   getOrganization(id:number):Promise<Organization> {
@@ -61,7 +61,7 @@ export class DatabaseService extends SqlService {
     return this.saveModel(person);
   }
 
-  getPeople(organization:Organization, ids:number[]=null):Promise<Person[]> {
+  getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (organization) {
@@ -71,7 +71,7 @@ export class DatabaseService extends SqlService {
         where["id"] = ids;
       }
       let order = { name: "ASC" };
-      this.getModels<Person>(new Person(), where, order).then((people:Person[]) => {
+      this.getModels<Person>(new Person(), where, order, limit, offset).then((people:Person[]) => {
         let people_ids = people.map((people:Person) => people.id);
         this.getContacts(null, people_ids).then((contacts:Contact[]) => {
           for (let person of people) {
@@ -134,7 +134,7 @@ export class DatabaseService extends SqlService {
     return this.saveModel(contact);
   }
 
-  getContacts(person:Person, people_ids:number[]=null):Promise<Contact[]> {
+  getContacts(person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
     let where = { };
     if (person) {
       where['id'] = person.id;
@@ -143,7 +143,7 @@ export class DatabaseService extends SqlService {
       where['person_id'] = people_ids;
     }
     let order = { };
-    return this.getModels<Contact>(new Contact(), where, order);
+    return this.getModels<Contact>(new Contact(), where, order, limit, offset);
   }
 
   getContact(id:number):Promise<Contact> {
@@ -171,11 +171,11 @@ export class DatabaseService extends SqlService {
     return this.saveModel(rollcall);
   }
 
-  getRollcalls(organization:Organization):Promise<Rollcall[]> {
+  getRollcalls(organization:Organization, limit:number=null, offset:number=null):Promise<Rollcall[]> {
     return new Promise((resolve, reject) => {
       let where = { organization_id: organization.id };
       let order = { created_at: "DESC" };
-      this.getModels<Rollcall>(new Rollcall(), where, order).then((rollcalls:Rollcall[]) => {
+      this.getModels<Rollcall>(new Rollcall(), where, order, limit, offset).then((rollcalls:Rollcall[]) => {
         let rollcall_ids = rollcalls.map((rollcall:Rollcall) => rollcall.id);
         this.logger.info(this, "getRollcalls", "IDs", rollcall_ids);
         Promise.all([
@@ -234,7 +234,7 @@ export class DatabaseService extends SqlService {
     return this.saveModel(answer);
   }
 
-  getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Answer[]> {
+  getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -243,7 +243,7 @@ export class DatabaseService extends SqlService {
       where['rollcall_id'] = rollcall_ids;
     }
     let order = { };
-    return this.getModels<Answer>(new Answer(), where, order);
+    return this.getModels<Answer>(new Answer(), where, order, limit, offset);
   }
 
   getAnswer(id:number):Promise<Answer> {
@@ -272,7 +272,7 @@ export class DatabaseService extends SqlService {
     return this.saveModel(reply);
   }
 
-  getReplies(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Reply[]> {
+  getReplies(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (rollcall) {
@@ -282,7 +282,7 @@ export class DatabaseService extends SqlService {
         where['rollcall_id'] = rollcall_ids;
       }
       let order = {  created_at: "DESC" };
-      this.getModels<Reply>(new Reply(), where, order).then((replies:Reply[]) => {
+      this.getModels<Reply>(new Reply(), where, order, limit, offset).then((replies:Reply[]) => {
         resolve(replies);
         // let user_ids = replies.map((reply) => reply.user_id);
         // this.getPeople(null, user_ids).then((users:User[]) => {
@@ -325,7 +325,7 @@ export class DatabaseService extends SqlService {
     return this.saveModel(recipient);
   }
 
-  getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null):Promise<Recipient[]> {
+  getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -334,7 +334,7 @@ export class DatabaseService extends SqlService {
       where['rollcall_id'] = rollcall_ids;
     }
     let order = { };
-    return this.getModels<Recipient>(new Recipient(), where, order);
+    return this.getModels<Recipient>(new Recipient(), where, order, limit, offset);
   }
 
   getRecipient(id:number):Promise<Recipient> {
@@ -362,10 +362,10 @@ export class DatabaseService extends SqlService {
     return this.saveModel(email);
   }
 
-  getEmails(organization:Organization):Promise<Email[]> {
+  getEmails(organization:Organization, limit:number=null, offset:number=null):Promise<Email[]> {
     let where = { organization_id: organization.id };
     let order = { };
-    return this.getModels<Email>(new Email(), where, order);
+    return this.getModels<Email>(new Email(), where, order, limit, offset);
   }
 
   getEmail(id:number):Promise<Email> {
@@ -393,10 +393,10 @@ export class DatabaseService extends SqlService {
     return this.saveModel(notification);
   }
 
-  getNotifications(organization:Organization):Promise<Notification[]> {
+  getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "DESC" };
-    return this.getModels<Notification>(new Notification(), where, order);
+    return this.getModels<Notification>(new Notification(), where, order, limit, offset);
   }
 
   getNotification(id:number):Promise<Notification> {
@@ -424,12 +424,12 @@ export class DatabaseService extends SqlService {
     return this.saveModel(group);
   }
 
-  getGroups(organization:Organization):Promise<Group[]> {
+  getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       let where = { organization_id: organization.id };
       let order = { name: "ASC" };
       Promise.all([
-        this.getModels<Group>(new Group(), where, order),
+        this.getModels<Group>(new Group(), where, order, limit, offset),
         this.getPeople(organization)]).then((results:any[]) => {
           let groups = <Group[]>results[0];
           let people = <Person[]>results[1];
@@ -509,10 +509,10 @@ export class DatabaseService extends SqlService {
     return this.saveModel(subscription);
   }
 
-  getSubscriptions(organization:Organization):Promise<Subscription[]> {
+  getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "ASC" };
-    return this.getModels<Subscription>(new Subscription(), where, order);
+    return this.getModels<Subscription>(new Subscription(), where, order, limit, offset);
   }
 
   getSubscription(id:number):Promise<Subscription> {
@@ -540,10 +540,10 @@ export class DatabaseService extends SqlService {
     return this.saveModel(country);
   }
 
-  getCountries(organization:Organization):Promise<Country[]> {
+  getCountries(organization:Organization, limit:number=null, offset:number=null):Promise<Country[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "ASC" };
-    return this.getModels<Country>(new Country(), where, order);
+    return this.getModels<Country>(new Country(), where, order, limit, offset);
   }
 
   getCountry(id:number):Promise<Country> {

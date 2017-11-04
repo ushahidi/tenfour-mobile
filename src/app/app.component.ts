@@ -82,13 +82,13 @@ export class RollcallApp {
       this.loadApplication([
         new Organization(),
         new Email(),
+        new Group(),
         new Person(),
         new Contact(),
         new Rollcall(),
         new Answer(),
         new Reply(),
         new Recipient(),
-        new Group(),
         new Settings(),
         new Country(),
         new Notification(),
@@ -184,19 +184,26 @@ export class RollcallApp {
       this.database.createTables(models).then(
         (created:any) => {
           this.logger.info(this, "loadDatabase", "Created");
-          let tests = [];
-          for (let model of models) {
-            tests.push(this.database.testModel(model));
-          }
-          Promise.all(tests).then(
-            (passed) => {
-              this.logger.info(this, "loadDatabase", "Tested");
-              resolve();
-            },
-            (error) => {
-              this.logger.error(this, "loadDatabase", "Failed", error);
-              reject(error);
-            });
+          this.database.createIndexes(models).then((indexed:any) => {
+            this.logger.info(this, "loadDatabase", "Indexed");
+            let tests = [];
+            for (let model of models) {
+              tests.push(this.database.testModel(model));
+            }
+            Promise.all(tests).then(
+              (passed) => {
+                this.logger.info(this, "loadDatabase", "Tested");
+                resolve();
+              },
+              (error) => {
+                this.logger.error(this, "loadDatabase", "Failed", error);
+                reject(error);
+              });
+          },
+          (error:any) => {
+            this.logger.error(this, "loadDatabase", "Failed", error);
+            reject(error);
+          });
         },
         (error:any) => {
           this.logger.error(this, "loadDatabase", "Failed", error);
@@ -327,6 +334,13 @@ export class RollcallApp {
     let loading = this.showLoading("Logging out...");
     let removes = [
       this.database.removeOrganizations(),
+      this.database.removeSubscriptions(),
+      this.database.removeNotifications(),
+      this.database.removeRollcalls(),
+      this.database.removeAnswers(),
+      this.database.removeReplies(),
+      this.database.removeRecipients(),
+      this.database.removeGroups(),
       this.database.removeEmails(),
       this.database.removePeople(),
       this.database.removeContacts()];

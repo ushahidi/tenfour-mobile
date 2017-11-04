@@ -12,7 +12,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadPeople($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="organization && organization.people">
@@ -28,4 +28,7 @@
       </ion-item-options>
     </ion-item-sliding>
   </ion-list>
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>

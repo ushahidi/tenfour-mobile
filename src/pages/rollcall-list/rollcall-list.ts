@@ -13,6 +13,7 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Rollcall } from '../../models/rollcall';
+import { Notification } from '../../models/notification';
 
 @IonicPage()
 @Component({
@@ -23,19 +24,15 @@ import { Rollcall } from '../../models/rollcall';
 })
 export class RollcallListPage extends BasePage {
 
-  @ViewChild('notifications')
-  notifications:Button;
-
-  @ViewChild('create')
-  create:Button;
-
   filter:string = "all";
-
   organization:Organization = null;
   rollcalls:Rollcall[] = [];
-
+  notifications:Notification[] = [];
   person:Person = null;
   loading:boolean = false;
+  notify:boolean = false;
+  limit:number = 10;
+  offset:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -86,61 +83,76 @@ export class RollcallListPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
     if (this.loading == false) {
-      this.loadUpdates(true);
+      this.loadNotifications(true);
     }
   }
 
   loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
-          .then(() => { return this.loadPerson(cache); })
-          .then(() => { return this.loadOrganization(cache); })
-          .then(() => { return this.loadRollCalls(cache); })
-          .then(() => {
-            this.logger.info(this, "loadUpdates", "Done");
-            if (event) {
-              event.complete();
-            }
-            this.loading = false;
-          })
-          .catch((error) => {
-            if (event) {
-              event.complete();
-            }
-            this.loading = false;
-            this.showToast(error);
-          });
+      .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadRollCalls(cache); })
+      .then(() => { return this.loadNotifications(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  loadMore(event:any) {
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+      this.database.getRollcalls(this.organization, this.limit, this.offset).then((rollcalls:Rollcall[]) => {
+        this.organization.rollcalls = [...this.organization.rollcalls, ...rollcalls];
+        this.rollcalls = [...this.rollcalls, ...this.filterRollcalls(rollcalls)];
+        if (event) {
+          event.complete();
+        }
+        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.rollcalls.length);
+        resolve(this.rollcalls);
+      });
+    });
   }
 
   loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        this.database.getPerson(null, true).then(
-          (person:Person) => {
-            this.logger.info(this, "loadPerson", "Database");
-            if (person) {
-              this.person = person;
-              resolve(person);
-            }
-            else {
-              this.loadPerson(false).then((person:Person) => {
-                resolve(person);
-              },
-              (error:any) => {
-                reject(error);
-              });
-            }
-          },
-          (error:any) => {
+        this.database.getPerson(null, true).then((person:Person) => {
+          if (person) {
+            this.person = person;
+            resolve(person);
+          }
+          else {
             this.loadPerson(false).then((person:Person) => {
               resolve(person);
             },
             (error:any) => {
               reject(error);
             });
+          }
+        },
+        (error:any) => {
+          this.loadPerson(false).then((person:Person) => {
+            resolve(person);
+          },
+          (error:any) => {
+            reject(error);
           });
+        });
       }
       else {
         this.api.getPerson(this.organization, "me").then((person:Person) => {
@@ -178,8 +190,7 @@ export class RollcallListPage extends BasePage {
   loadRollCalls(cache:boolean=true):Promise<Rollcall[]> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
-          this.logger.info(this, "loadRollCalls", rollcalls.length);
+        this.database.getRollcalls(this.organization, this.limit, this.offset).then((rollcalls:Rollcall[]) => {
           if (rollcalls && rollcalls.length > 0) {
             this.organization.rollcalls = rollcalls;
             this.rollcalls = this.filterRollcalls(rollcalls);
@@ -200,42 +211,93 @@ export class RollcallListPage extends BasePage {
         });
       }
       else {
-        return this.api.getRollcalls(this.organization).then(
-          (rollcalls:Rollcall[]) => {
-            if (rollcalls && rollcalls.length > 0) {
-              let saves = [];
-              for (let rollcall of rollcalls) {
-                for (let answer of rollcall.answers) {
-                  saves.push(this.database.saveAnswer(rollcall, answer));
-                }
-                for (let recipient of rollcall.recipients) {
-                  saves.push(this.database.saveRecipient(rollcall, recipient));
-                }
-                for (let reply of rollcall.replies) {
-                  saves.push(this.database.saveReply(rollcall, reply));
-                  if (this.person && this.person.id == reply.user_id) {
-                    rollcall.replied = true;
-                  }
-                }
-                saves.push(this.database.saveRollcall(this.organization, rollcall));
+        this.api.getRollcalls(this.organization).then((rollcalls:Rollcall[]) => {
+          if (rollcalls && rollcalls.length > 0) {
+            let saves = [];
+            for (let rollcall of rollcalls) {
+              for (let answer of rollcall.answers) {
+                saves.push(this.database.saveAnswer(rollcall, answer));
               }
-              Promise.all(saves).then(saved => {
-                this.organization.rollcalls = rollcalls;
-                this.rollcalls = this.filterRollcalls(rollcalls);
-                resolve(this.rollcalls);
+              for (let recipient of rollcall.recipients) {
+                saves.push(this.database.saveRecipient(rollcall, recipient));
+              }
+              for (let reply of rollcall.replies) {
+                saves.push(this.database.saveReply(rollcall, reply));
+                if (this.person && this.person.id == reply.user_id) {
+                  rollcall.replied = true;
+                }
+              }
+              saves.push(this.database.saveRollcall(this.organization, rollcall));
+            }
+            Promise.all(saves).then(saved => {
+              this.database.getRollcalls(this.organization, this.limit, this.offset).then((_rollcalls:Rollcall[]) => {
+                this.organization.rollcalls = _rollcalls;
+                this.rollcalls = this.filterRollcalls(_rollcalls);
+                resolve(_rollcalls);
               });
-            }
-            else {
-              this.organization.rollcalls = [];
-              this.rollcalls = [];
-              resolve([]);
-            }
-          },
-          (error:any) => {
+            });
+          }
+          else {
             this.organization.rollcalls = [];
             this.rollcalls = [];
-            reject(error);
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.organization.rollcalls = [];
+          this.rollcalls = [];
+          reject(error);
+        });
+      }
+    });
+  }
+
+  loadNotifications(cache:boolean=true):Promise<any> {
+    this.notify = false;
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.database.getNotifications(this.organization, 10, 0).then((notifications:Notification[]) => {
+          this.notifications = notifications;
+          for (let notification of notifications) {
+            if (notification.viewed_at) {
+              this.logger.info(this, "loadNotifications", "Viewed", notification.id, notification.viewed_at);
+            }
+            else {
+              this.logger.error(this, "loadNotifications", "New", notification.id);
+              this.notify = true;
+            }
+          }
+          resolve(notifications);
+        });
+      }
+      else {
+        this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
+          let saves = [];
+          for (let notification of notifications) {
+            saves.push(this.database.saveNotification(this.organization, notification));
+          }
+          Promise.all(saves).then(saved => {
+            this.database.getNotifications(this.organization, 10, 0).then((_notifications:Notification[]) => {
+              this.notifications = _notifications;
+              for (let notification of _notifications) {
+                if (notification.viewed_at) {
+                  this.logger.info(this, "loadNotifications", "Viewed", notification.id, notification.viewed_at);
+                }
+                else {
+                  this.logger.error(this, "loadNotifications", "New", notification.id);
+                  this.notify = true;
+                }
+              }
+              resolve(_notifications);
+            },
+            (error:any) => {
+              resolve(notifications);
+            });
           });
+        },
+        (error:any) => {
+          reject(error);
+        });
       }
     });
   }
@@ -272,7 +334,8 @@ export class RollcallListPage extends BasePage {
   showNotifications(event:any) {
     this.showPage(NotificationListPage, {
       organization: this.organization,
-      person: this.person });
+      person: this.person,
+      notifications: this.notifications });
   }
 
   filterChanged(event:any) {

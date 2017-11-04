@@ -1,5 +1,8 @@
 page-notification-list {
   ion-card {
+    &.viewed {
+      opacity: 0.5 !important;
+    }
     ion-item {
       h3 {
 

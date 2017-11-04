@@ -1,7 +1,7 @@
 import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
-import { Model, TEXT, INTEGER, PRIMARY_KEY } from '../models/model';
+import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 
 @Table("notifications")
 export class Notification extends Model {
@@ -76,6 +76,9 @@ export class Notification extends Model {
 
   @Column("read_at", TEXT)
   public read_at:Date = null;
+
+  @Column("viewed_at", TEXT)
+  public viewed_at:Date = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;

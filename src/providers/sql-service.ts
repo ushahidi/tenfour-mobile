@@ -114,6 +114,46 @@ export class SqlService {
     });
   }
 
+  createIndexes(models:Model[]):Promise<any> {
+    let indexes = [];
+    for (let model of models) {
+      indexes.push(this.createIndex(model));
+    }
+    return Promise.all(indexes);
+  }
+
+  createIndex<M extends Model>(model:M):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then(
+        (database:SQLiteObject) => {
+          let table:string = model.getTable();
+          let columns:any[] = model.getColumns();
+          this.logger.info(this, "createIndex", table, columns);
+          let keys:string[] = [];
+          for (let column of columns) {
+            if (column.key == true) {
+              keys.push(column.name);
+            }
+          }
+          let sql = `CREATE UNIQUE INDEX IF NOT EXISTS idx_${table} ON ${table} (${keys.join(", ")});`;
+          this.logger.info(this, "createIndex", "Creating", sql);
+          database.executeSql(sql, []).then(
+            (data) => {
+              this.logger.info(this, "createIndex", "Created", sql, data);
+              resolve(data);
+            },
+            (error) => {
+              this.logger.error(this, "createIndex", "Failed", sql, error);
+              reject(JSON.stringify(error));
+            });
+      },
+      (error) => {
+        this.logger.error(this, "createIndex", "Failed", error);
+        reject(`Error Creating Database Indexes`);
+      });
+    });
+  }
+
   executeFirst(table:string, where:{}=null, order:{}=null):Promise<any[]> {
     return new Promise((resolve, reject) => {
       this.executeSelect(table, where, order, 1, 0).then(rows => {

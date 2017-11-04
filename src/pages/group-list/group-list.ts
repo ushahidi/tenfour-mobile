@@ -24,6 +24,8 @@ export class GroupListPage extends BasePage {
   organization:Organization = null;
   person:Person = null;
   loading:boolean = false;
+  limit:number = 20;
+  offset:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -53,8 +55,7 @@ export class GroupListPage extends BasePage {
 
   loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
-    return Promise.all([
-      this.loadGroups(cache)]).then(
+    return Promise.all([this.loadGroups(cache)]).then(
       (loaded:any) =>{
         this.logger.info(this, "loadUpdates", "Done");
         if (event) {
@@ -71,11 +72,27 @@ export class GroupListPage extends BasePage {
       });
   }
 
+  loadMore(event:any) {
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+      this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+        this.organization.groups = [...this.organization.groups, ...groups];
+        if (event) {
+          event.complete();
+        }
+        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
+        resolve(this.organization.groups);
+      });
+    });
+  }
+
   loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
+      this.offset = 0;
       if (cache) {
-        this.database.getGroups(this.organization).then((groups:Group[]) => {
+        this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
             this.organization.groups = groups;
@@ -94,23 +111,24 @@ export class GroupListPage extends BasePage {
         });
       }
       else {
-        this.api.getGroups(this.organization).then(
-          (groups:Group[]) => {
-            this.logger.info(this, "loadGroups", "API", groups);
-            let saves = [];
-            for (let group of groups) {
-              saves.push(this.database.saveGroup(this.organization, group));
-            }
-            Promise.all(saves).then(saved => {
+        this.api.getGroups(this.organization).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "API", groups);
+          let saves = [];
+          for (let group of groups) {
+            saves.push(this.database.saveGroup(this.organization, group));
+          }
+          Promise.all(saves).then(saved => {
+            this.logger.info(this, "loadGroups", "API", "Done");
+            this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
               this.organization.groups = groups;
-              this.logger.info(this, "loadGroups", "API", "Done");
               resolve(groups);
             });
-          },
-          (error:any) => {
-            this.organization.groups = [];
-            reject(error);
           });
+        },
+        (error:any) => {
+          this.organization.groups = [];
+          reject(error);
+        });
       }
     });
   }

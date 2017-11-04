@@ -6,7 +6,8 @@
     <ion-title>RollCalls</ion-title>
     <ion-buttons end>
       <button #notifications ion-button icon-only color="primary" (click)="showNotifications($event)">
-        <ion-icon ios="ios-notifications-outline" md="md-notifications"></ion-icon>
+        <ion-icon ios="ios-notifications" md="md-notifications" *ngIf="notify == true"></ion-icon>
+        <ion-icon ios="ios-notifications-outline" md="md-notifications" *ngIf="notify == false"></ion-icon>
       </button>
       <button #create ion-button icon-only color="primary" *ngIf="person && person.isOwnerOrAdmin()" (click)="createRollcall($event)">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
@@ -40,4 +41,7 @@
       <button ion-button clear color="primary" tappable *ngIf="rollcall.canRespond(person)" (click)="sendReply($event, rollcall)">Respond</button>
     </ion-card>
   </ion-list>
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
