@@ -12,7 +12,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged()">
+  <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged($event)">
     <ion-slide *ngFor="let rollcall of rollcalls">
       <ion-list no-margin>
         <ion-item text-wrap color="white">

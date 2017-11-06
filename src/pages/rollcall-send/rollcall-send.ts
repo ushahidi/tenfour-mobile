@@ -109,32 +109,37 @@ export class RollcallSendPage extends BasePage {
   }
 
   sendRollcall(event:any) {
-    let loading = this.showLoading("Sending...");
-    this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
-      let saves = [];
-      for (let answer of rollcall.answers) {
-        saves.push(this.database.saveAnswer(rollcall, answer));
-      }
-      for (let recipient of rollcall.recipients) {
-        saves.push(this.database.saveRecipient(rollcall, recipient));
-      }
-      for (let reply of rollcall.replies) {
-        saves.push(this.database.saveReply(rollcall, reply));
-      }
-      saves.push(this.database.saveRollcall(this.organization, rollcall));
-      Promise.all(saves).then(saved => {
-        loading.dismiss();
-        this.showToast("RollCall sent");
-        let firstViewController = this.navController.first();
-        this.navController.popToRoot({ animate: false }).then(() => {
-          firstViewController.dismiss({ rollcall: Rollcall });
+    if (this.rollcall.send_via == null || this.rollcall.send_via.length == 0) {
+      this.showToast("Please select how the RollCall will be sent");
+    }
+    else {
+      let loading = this.showLoading("Sending...");
+      this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
+        let saves = [];
+        for (let answer of rollcall.answers) {
+          saves.push(this.database.saveAnswer(rollcall, answer));
+        }
+        for (let recipient of rollcall.recipients) {
+          saves.push(this.database.saveRecipient(rollcall, recipient));
+        }
+        for (let reply of rollcall.replies) {
+          saves.push(this.database.saveReply(rollcall, reply));
+        }
+        saves.push(this.database.saveRollcall(this.organization, rollcall));
+        Promise.all(saves).then(saved => {
+          loading.dismiss();
+          this.showToast("RollCall sent");
+          let firstViewController = this.navController.first();
+          this.navController.popToRoot({ animate: false }).then(() => {
+            firstViewController.dismiss({ rollcall: Rollcall });
+          });
         });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Creating Rollcall", error);
       });
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Creating Rollcall", error);
-    });
+    }
   }
 
   onAppOnly(event:any) {

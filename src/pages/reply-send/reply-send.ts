@@ -72,10 +72,16 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  slideChanged() {
-    this.index = this.slides.getActiveIndex();
-    this.logger.info(this, "slideChanged", this.index);
-    this.rollcall = this.rollcalls[this.index];
+  slideChanged(event:any) {
+    let index = this.slides.getActiveIndex();
+    if (index >= 0 && index < this.rollcalls.length) {
+      this.logger.info(this, "slideChanged", event, index);
+      this.index = index;
+      this.rollcall = this.rollcalls[this.index];
+    }
+    else {
+      this.logger.error(this, "slideChanged", event, index);
+    }
   }
 
   selectAnswer(rollcall:Rollcall, reply:Reply, answer:Answer) {
@@ -90,26 +96,31 @@ export class ReplySendPage extends BasePage {
 
   sendReply(rollcall:Rollcall, reply:Reply) {
     this.logger.info(this, "sendReply", reply);
-    let loading = this.showLoading("Sending...");
-    this.api.postReply(this.organization, rollcall, reply).then(
-      (replied:Reply) => {
-        this.logger.info(this, "sendReply", "Reply", replied);
-        this.database.getPerson(replied.user_id).then((person:Person) => {
-          this.logger.info(this, "sendReply", "Person", person);
-          replied.user_name = person.name;
-          replied.user_description = person.description;
-          replied.user_initials = person.initials;
-          replied.user_picture = person.profile_picture;
-          this.database.saveReply(rollcall, replied).then(saved => {
-            loading.dismiss();
-            this.hideRollcall(rollcall, replied);
+    if (reply.answer == null || reply.answer.length == 0) {
+      this.showToast("Answer is required, please select your response");
+    }
+    else {
+      let loading = this.showLoading("Sending...");
+      this.api.postReply(this.organization, rollcall, reply).then(
+        (replied:Reply) => {
+          this.logger.info(this, "sendReply", "Reply", replied);
+          this.database.getPerson(replied.user_id).then((person:Person) => {
+            this.logger.info(this, "sendReply", "Person", person);
+            replied.user_name = person.name;
+            replied.user_description = person.description;
+            replied.user_initials = person.initials;
+            replied.user_picture = person.profile_picture;
+            this.database.saveReply(rollcall, replied).then(saved => {
+              loading.dismiss();
+              this.hideRollcall(rollcall, replied);
+            });
           });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem Sending Reply", error);
         });
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Sending Reply", error);
-      });
+    }
   }
 
   saveReply(rollcall:Rollcall, reply:Reply) {
@@ -137,10 +148,17 @@ export class ReplySendPage extends BasePage {
   }
 
   hideRollcall(rollcall:Rollcall, reply:Reply) {
-    this.logger.info(this, "hideRollcall", reply);
     if (this.rollcalls.length > 1) {
-      this.rollcalls.splice(this.index, 1);
-      this.slides.slidePrev(0);
+      let index = this.slides.getActiveIndex();
+      this.logger.info(this, "hideRollcall", index);
+      if (index == 0) {
+        this.rollcalls.shift();
+        this.slides.slideTo(0, 0, true);
+      }
+      else {
+        this.rollcalls.splice(index, 1);
+        this.slides.slideTo(index-1, 0, true);
+      }
     }
     else {
       this.showToast("Rollcall Reply Sent");
