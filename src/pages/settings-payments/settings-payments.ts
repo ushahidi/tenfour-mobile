@@ -18,6 +18,7 @@ import { Organization } from '../../models/organization';
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
+  website:string = "https://app.rollcall.io/settings/plan-and-credits";
 
   constructor(
       protected zone:NgZone,

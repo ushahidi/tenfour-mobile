@@ -219,7 +219,7 @@ export class BasePage {
         color: "f5f5f1"
       },
         title: {
-        color: '#ffffff',
+        color: '#000000',
         showPageTitle: true
       },
       backButton: {

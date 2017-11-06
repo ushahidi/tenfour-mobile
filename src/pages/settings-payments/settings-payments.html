@@ -3,8 +3,12 @@
     <ion-title>Payments</ion-title>
   </ion-navbar>
 </ion-header>
-<ion-content>
-  <ion-list *ngIf="organization">
+<ion-content padding>
+  <p text-center>
+    You can edit your plan or add more credits to your organization from the RollCall website.
+  </p>
+  <button ion-button block color="primary" (click)="showUrl(website, '_blank', $event)">Visit Website</button>
+  <!-- <ion-list *ngIf="organization">
     <ion-list-header>Payment options</ion-list-header>
     <ion-item color="white" tappable>
       <ion-icon ios="ios-card" md="md-card" item-left></ion-icon>
@@ -14,5 +18,5 @@
       <ion-icon ios="ios-cash" md="md-cash" item-left></ion-icon>
       <ion-label>PayPal</ion-label>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
 </ion-content>
