@@ -84,7 +84,7 @@ export class SignupPasswordPage extends BasePage {
                   this.database.savePerson(organization, person)];
                 Promise.all(saves).then(saved => {
                   loading.dismiss();
-                  this.showToast(`Logged in to ${organization.name}`);
+                  this.showToast(`Welcome to ${organization.name}`);
                   this.showRootPage(OnboardListPage,
                     { organization: organization,
                       person: person });

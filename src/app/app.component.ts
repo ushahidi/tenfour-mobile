@@ -345,6 +345,9 @@ export class RollcallApp {
       this.database.removePeople(),
       this.database.removeContacts()];
     Promise.all(removes).then((removed:any) => {
+      this.organizations = null;
+      this.organization = null;
+      this.person = null;
       loading.dismiss();
       this.showSigninUrl();
     });

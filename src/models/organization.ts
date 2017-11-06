@@ -77,7 +77,7 @@ export class Organization extends Model {
               }
             }
             else if (_settings.key == 'plan_and_credits') {
-              this.credits = _settings.values.monthlyCreditsExtra;
+              this.credits_extra = _settings.values.monthlyCreditsExtra;
             }
           }
           let settings = new Settings(_settings);
@@ -151,6 +151,12 @@ export class Organization extends Model {
 
   @Column("credits", INTEGER)
   public credits:number = null;
+
+  @Column("credits_extra", INTEGER)
+  public credits_extra:number = null;
+
+  @Column("subscription_status", TEXT)
+  public subscription_status:string = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;

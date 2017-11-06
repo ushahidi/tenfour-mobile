@@ -70,7 +70,7 @@ export class SigninPasswordPage extends BasePage {
                 this.database.savePerson(organization, person)];
               Promise.all(saves).then(saved => {
                 loading.dismiss();
-                this.showToast(`Logged in to ${organization.name}`);
+                this.showToast(`Welcome to ${organization.name}`);
                 if (person.config_profile_reviewed && person.config_self_test_sent) {
                   this.showRootPage(RollcallListPage,
                     { organization: organization });

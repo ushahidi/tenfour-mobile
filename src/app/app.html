@@ -14,9 +14,11 @@
       <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
       <ion-item color="white" detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
     </ion-list>
-    <div text-center margin-top>
-      <button ion-button clear color="primary" (click)="userLogout($event)">Log out</button>
-    </div>
+    <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
+    <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>
+    <p text-center *ngIf="person">
+      <button ion-button clear color="primary"(click)="userLogout($event)">Log out</button>
+    </p>
   </ion-content>
 </ion-menu>
 <ion-nav  #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
