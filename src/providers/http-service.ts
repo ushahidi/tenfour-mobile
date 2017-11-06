@@ -340,29 +340,41 @@ export class HttpService {
   }
 
   errorMessage(error:any):string {
-    this.logger.error(this, "errorMessage", error);
-    if (typeof error === 'string') {
-      return error;
-    }
-    else if (error instanceof Response){
-      let json = error.json();
-      if (json['errors']) {
-        let errors = json['errors'];
-        let messages = [];
-        for (let key of Object.keys(errors)) {
-          let error = errors[key];
-          if (error) {
-            messages.push(error);
+    try {
+      this.logger.error(this, "errorMessage", error);
+      if (typeof error === 'string') {
+        return error;
+      }
+      else if (error instanceof Response) {
+        let response = <Response>error;
+        if (response.statusText) {
+          return response.statusText;
+        }
+        else {
+          let json = response.json();
+          this.logger.error(this, "errorMessage", "JSON", json);
+          if (json['errors']) {
+            let errors = json['errors'];
+            let messages = [];
+            for (let key of Object.keys(errors)) {
+              let error = errors[key];
+              if (error) {
+                messages.push(error);
+              }
+            }
+            return messages.join(", ");
+          }
+          else if (json['error']) {
+            return json['error'];
+          }
+          else if (json['message']) {
+            return json['message'];
           }
         }
-        return messages.join(", ");
       }
-      else if (json['error']) {
-        return json['error'];
-      }
-      else if (json['message']) {
-        return json['message'];
-      }
+    }
+    catch (err) {
+      this.logger.error(this, "errorMessage", "Error", err);
     }
     return JSON.stringify(error);
   }
