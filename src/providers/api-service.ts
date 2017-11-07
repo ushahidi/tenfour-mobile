@@ -736,6 +736,17 @@ export class ApiService extends HttpService {
           else {
             params["location_text"] = "";
           }
+          if (reply.latitude != null && reply.longitude != null) {
+            params["location_geo"] = {
+              location: {
+                lat: reply.latitude,
+                lng: reply.longitude
+              }
+            };
+          }
+          else {
+            params["location_geo"] = "";
+          }
         }
         this.httpPut(url, token.access_token, params).then(
           (data:any) => {
