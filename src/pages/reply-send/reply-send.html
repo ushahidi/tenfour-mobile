@@ -31,10 +31,18 @@
         <ion-item color="dark">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
           <ion-input type="text" placeholder="Add message" [(ngModel)]="rollcall.reply.message"></ion-input>
+          <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(rollcall.reply)"
+                  *ngIf="rollcall.reply.message && rollcall.reply.message.length > 0">
+            <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+          </button>
         </ion-item>
         <ion-item color="dark">
           <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
           <ion-input type="text" placeholder="Add location" [(ngModel)]="rollcall.reply.location_text"></ion-input>
+          <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(rollcall.reply)"
+                  *ngIf="rollcall.reply.location_text && rollcall.reply.location_text.length > 0">
+            <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+          </button>
         </ion-item>
       </ion-list>
     </ion-slide>

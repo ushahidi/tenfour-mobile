@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import { File, Entry, Metadata } from '@ionic-native/file';
-import { Transfer, TransferObject, FileUploadOptions, FileUploadResult, FileTransferError } from '@ionic-native/transfer';
+import { FileTransfer, FileTransferObject, FileUploadOptions, FileUploadResult, FileTransferError } from '@ionic-native/file-transfer';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
@@ -20,7 +20,7 @@ export class HttpService {
   constructor(
     protected http:Http,
     protected file:File,
-    protected transfer:Transfer,
+    protected transfer:FileTransfer,
     protected logger:LoggerService) {
   }
 
@@ -275,7 +275,7 @@ export class HttpService {
         params: params
       };
       this.logger.info(this, "UPLOAD", url, file, options);
-      let fileTransfer:TransferObject = this.transfer.create();
+      let fileTransfer:FileTransferObject = this.transfer.create();
       fileTransfer.upload(file, url, options, true).then(
         (data:FileUploadResult) => {
           this.logger.info(this, "UPLOAD", url, file, data);

@@ -5,12 +5,10 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { LazyLoadImageModule } from 'ng-lazyload-image';
-
 import { AppVersion } from '@ionic-native/app-version';
 import { IsDebug } from '@ionic-native/is-debug';
 import { StatusBar } from '@ionic-native/status-bar';
-import { Transfer } from '@ionic-native/transfer';
+import { FileTransfer } from '@ionic-native/file-transfer';
 import { File } from '@ionic-native/file';
 import { Camera } from '@ionic-native/camera';
 import { SocialSharing } from '@ionic-native/social-sharing';
@@ -27,6 +25,7 @@ import { Deeplinks } from '@ionic-native/deeplinks';
 import { Contacts } from '@ionic-native/contacts';
 import { Device } from '@ionic-native/device';
 import { Sim } from '@ionic-native/sim';
+import { NativeGeocoder } from '@ionic-native/native-geocoder';
 
 import { RollcallApp } from './app.component';
 
@@ -151,7 +150,6 @@ import { CountryService } from '../providers/country-service';
     CapitalizeModule,
     TruncateModule,
     HtmlParserModule,
-    LazyLoadImageModule,
     BrowserAnimationsModule,
     IonicModule.forRoot(RollcallApp)
   ],
@@ -167,11 +165,12 @@ import { CountryService } from '../providers/country-service';
     { provide: IsDebug, useClass: IsDebug },
     { provide: Network, useClass: Network },
     { provide: Keyboard, useClass: Keyboard },
-    { provide: Transfer, useClass: Transfer },
+    { provide: FileTransfer, useClass: FileTransfer },
     { provide: StatusBar, useClass: StatusBar },
     { provide: AppVersion, useClass: AppVersion },
     { provide: Diagnostic, useClass: Diagnostic },
     { provide: Geolocation, useClass: Geolocation },
+    { provide: NativeGeocoder, useClass: NativeGeocoder },
     { provide: SplashScreen, useClass: SplashScreen },
     { provide: ThemeableBrowser, useClass: ThemeableBrowser },
     { provide: SocialSharing, useClass: SocialSharing },

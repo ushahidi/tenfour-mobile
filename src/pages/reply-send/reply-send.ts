@@ -1,5 +1,8 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Slides, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+
+import { Geolocation } from '@ionic-native/geolocation';
+import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -11,6 +14,7 @@ import { Rollcall } from '../../models/rollcall';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Person } from '../../models/person';
+import { Location } from '../../models/location';
 
 @IonicPage()
 @Component({
@@ -31,19 +35,21 @@ export class ReplySendPage extends BasePage {
   rollcall:Rollcall = null;
 
   constructor(
-      protected zone:NgZone,
-      protected platform:Platform,
-      protected navParams:NavParams,
-      protected navController:NavController,
-      protected viewController:ViewController,
-      protected modalController:ModalController,
-      protected toastController:ToastController,
-      protected alertController:AlertController,
-      protected loadingController:LoadingController,
-      protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+    protected zone:NgZone,
+    protected platform:Platform,
+    protected navParams:NavParams,
+    protected navController:NavController,
+    protected viewController:ViewController,
+    protected modalController:ModalController,
+    protected toastController:ToastController,
+    protected alertController:AlertController,
+    protected loadingController:LoadingController,
+    protected actionController:ActionSheetController,
+    protected api:ApiService,
+    protected database:DatabaseService,
+    protected geolocation:Geolocation,
+    protected geocoder:NativeGeocoder) {
+    super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
@@ -70,6 +76,77 @@ export class ReplySendPage extends BasePage {
         rollcall.reply.rollcall_id = this.rollcall.id;
       }
     }
+    this.loadLocation().then((location:Location) => {
+      this.logger.info(this, "Location", location);
+      if (location) {
+        for (let rollcall of this.rollcalls) {
+          if (rollcall.reply.location_text == null) {
+            rollcall.reply.latitude = location.latitude;
+            rollcall.reply.longitude = location.longitude;
+            rollcall.reply.location_text = location.address;
+          }
+        }
+      }
+    },
+    (error:any) => {
+      this.logger.error(this, "Location", error);
+    });
+  }
+
+  loadLocation():Promise<Location> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadLocation");
+      this.geolocation.getCurrentPosition().then((position:any) => {
+        this.logger.info(this, "loadLocation", position);
+        if (position && position.coords) {
+          let location = <Location>{
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          this.loadAddress(position.coords.latitude, position.coords.longitude).then((address:string) => {
+            location.address = address;
+            resolve(location);
+          },
+          (error:any) => {
+            resolve(location);
+          });
+        }
+        else {
+          reject(null);
+        }
+      }).catch((error:any) => {
+        this.logger.error(this, "loadLocation", error);
+        reject(null);
+      });
+    });
+  }
+
+  loadAddress(latitude:number, longitude:number):Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadAddress", latitude, longitude);
+      this.geocoder.reverseGeocode(latitude, longitude)
+        .then((result:NativeGeocoderReverseResult) => {
+          this.logger.info(this, "loadAddress", latitude, longitude, result);
+          let location:any[] = [];
+          if (result.thoroughfare) {
+            location.push(result.thoroughfare);
+          }
+          if (result.locality) {
+            location.push(result.locality);
+          }
+          if (result.administrativeArea) {
+            location.push(result.administrativeArea);
+          }
+          if (result.countryName) {
+            location.push(result.countryName);
+          }
+          resolve(location.join(", "));
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadAddress", latitude, longitude, error);
+          reject(error);
+        });
+    });
   }
 
   slideChanged(event:any) {
@@ -125,26 +202,31 @@ export class ReplySendPage extends BasePage {
 
   saveReply(rollcall:Rollcall, reply:Reply) {
     this.logger.info(this, "saveReply", reply);
-    let loading = this.showLoading("Sending...");
-    this.api.putReply(this.organization, rollcall, reply).then(
-      (replied:Reply) => {
-        this.logger.info(this, "saveReply", "Reply", replied);
-        this.database.getPerson(replied.user_id).then((person:Person) => {
-          this.logger.info(this, "saveReply", "Person", person);
-          replied.user_name = person.name;
-          replied.user_description = person.description;
-          replied.user_initials = person.initials;
-          replied.user_picture = person.profile_picture;
-          this.database.saveReply(rollcall, replied).then(saved => {
-            loading.dismiss();
-            this.hideRollcall(rollcall, replied);
+    if (reply.answer == null || reply.answer.length == 0) {
+      this.showToast("Answer is required, please select your response");
+    }
+    else {
+      let loading = this.showLoading("Sending...");
+      this.api.putReply(this.organization, rollcall, reply).then(
+        (replied:Reply) => {
+          this.logger.info(this, "saveReply", "Reply", replied);
+          this.database.getPerson(replied.user_id).then((person:Person) => {
+            this.logger.info(this, "saveReply", "Person", person);
+            replied.user_name = person.name;
+            replied.user_description = person.description;
+            replied.user_initials = person.initials;
+            replied.user_picture = person.profile_picture;
+            this.database.saveReply(rollcall, replied).then(saved => {
+              loading.dismiss();
+              this.hideRollcall(rollcall, replied);
+            });
           });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem Saving Reply", error);
         });
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Saving Reply", error);
-      });
+    }
   }
 
   hideRollcall(rollcall:Rollcall, reply:Reply) {
@@ -164,6 +246,18 @@ export class ReplySendPage extends BasePage {
       this.showToast("Rollcall Reply Sent");
       this.hideModal({reply: reply});
     }
+  }
+
+  removeMessage(reply:Reply) {
+    this.logger.info(this, "removeMessage", reply);
+    reply.message = null;
+  }
+
+  removeLocation(reply:Reply) {
+    this.logger.info(this, "removeLocation", reply);
+    reply.location_text = null;
+    reply.latitude = null;
+    reply.longitude = null;
   }
 
 }

@@ -1,7 +1,7 @@
 import { Table } from '../decorators/table';
 import { Column } from '../decorators/column';
 
-import { Model, TEXT, INTEGER, PRIMARY_KEY } from '../models/model';
+import { Model, TEXT, INTEGER, DOUBLE, PRIMARY_KEY } from '../models/model';
 
 @Table("replies")
 export class Reply extends Model {
@@ -9,6 +9,10 @@ export class Reply extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+    if (data && data.location_geo && data.location_geo.location) {
+      this.latitude = data.location_geo.location.lat;
+      this.longitude = data.location_geo.location.lng;
+    }
   }
 
   public newInstance<M extends Reply>(data:any=null):Reply {
@@ -50,6 +54,15 @@ export class Reply extends Model {
 
   @Column("location_text", TEXT)
   public location_text:string = null;
+
+  @Column("location_geo", TEXT)
+  public location_geo:string = null;
+
+  @Column("latitude", DOUBLE)
+  public latitude:number = null;
+
+  @Column("longitude", DOUBLE)
+  public longitude:number = null;
 
   @Column("answer", TEXT)
   public answer:string = null;

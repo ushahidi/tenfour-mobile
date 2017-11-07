@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { Http } from '@angular/http';
 
-import { Transfer} from '@ionic-native/transfer';
+import { FileTransfer } from '@ionic-native/file-transfer';
 import { File } from '@ionic-native/file';
 import { NativeStorage } from '@ionic-native/native-storage';
 import { Device } from '@ionic-native/device';
@@ -39,7 +39,7 @@ export class ApiService extends HttpService {
     protected platform:Platform,
     protected http:Http,
     protected file:File,
-    protected transfer:Transfer,
+    protected transfer:FileTransfer,
     protected logger:LoggerService,
     protected storage:NativeStorage,
     protected database:DatabaseService) {
@@ -685,6 +685,14 @@ export class ApiService extends HttpService {
           }
           if (reply.location_text) {
             params["location_text"] = reply.location_text;
+          }
+          if (reply.latitude != null && reply.longitude != null) {
+            params["location_geo"] = {
+              location: {
+                lat: reply.latitude,
+                lng: reply.longitude
+              }
+            };
           }
         }
         this.httpPost(url, token.access_token, params).then(
