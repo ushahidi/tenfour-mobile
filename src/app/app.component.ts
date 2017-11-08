@@ -1,6 +1,9 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
+import { Device } from '@ionic-native/device';
+import { SegmentService } from 'ngx-segment-analytics';
+
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Deeplinks } from '@ionic-native/deeplinks';
@@ -72,13 +75,16 @@ export class RollcallApp {
     protected loadingController:LoadingController,
     protected alertController: AlertController,
     protected menuController: MenuController,
-    protected deeplinks:Deeplinks) {
+    protected deeplinks:Deeplinks,
+    protected segment:SegmentService,
+    protected device:Device) {
     this.zone = _zone;
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
       this.logger.info(this, "Platform", "Ready");
       this.loadStatusBar();
       this.loadDeepLinks();
+      this.loadAnalytics();
       this.loadApplication([
         new Organization(),
         new Email(),
@@ -97,12 +103,20 @@ export class RollcallApp {
     });
   }
 
-  loadStatusBar() {
+  private loadStatusBar() {
     this.logger.info(this, "loadStatusBar");
     this.statusBar.styleDefault();
   }
 
-  loadDeepLinks() {
+  private loadAnalytics() {
+    this.logger.info(this, "loadAnalytics");
+    this.segment.ready().then((ready:SegmentService) => {
+      this.logger.info(this, "loadAnalytics", "Ready");
+      this.segment.debug(this.device.isVirtual);
+    });
+  }
+
+  private loadDeepLinks() {
     this.logger.info(this, "loadDeepLinks");
     this.deeplinks.routeWithNavController(this.navController, {
       '/organization': SigninUrlPage,
@@ -116,7 +130,7 @@ export class RollcallApp {
       });
   }
 
-  loadApplication(models:Model[]) {
+  private loadApplication(models:Model[]) {
     this.logger.info(this, "loadApplication");
     this.loadDatabase(models).then(
       (loaded:any) => {
@@ -178,7 +192,7 @@ export class RollcallApp {
       });
   }
 
-  loadDatabase(models:Model[]):Promise<any> {
+  private loadDatabase(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadDatabase");
       this.database.createTables(models).then(
@@ -212,12 +226,12 @@ export class RollcallApp {
     });
   }
 
-  resetDatabase():Promise<any> {
+  private resetDatabase():Promise<any> {
     this.logger.info(this, "resetDatabase");
     return this.database.deleteDatabase();
   }
 
-  loadMenu() {
+  private loadMenu() {
     this.logger.info(this, "loadMenu");
     Promise.all([
       this.loadOrganizations(),
@@ -230,7 +244,7 @@ export class RollcallApp {
       });
   }
 
-  loadOrganizations():Promise<any> {
+  private loadOrganizations():Promise<any> {
     if (this.organizations && this.organizations.length > 0) {
       this.logger.info(this, "loadOrganizations", this.organizations);
       return Promise.resolve();
@@ -254,7 +268,7 @@ export class RollcallApp {
     }
   }
 
-  loadPerson():Promise<any> {
+  private loadPerson():Promise<any> {
     return this.database.getPerson(null, true).then(
       (person:Person) => {
         this.zone.run(() => {
@@ -270,14 +284,14 @@ export class RollcallApp {
       });
   }
 
-  showSigninUrl() {
+  private showSigninUrl() {
     this.logger.info(this, "showSigninUrl");
     this.nav.setRoot(SigninUrlPage, { });
     this.menuController.close();
     this.splashScreen.hide();
   }
 
-  showOnboardList(person:Person=null) {
+  private showOnboardList(person:Person=null) {
     this.logger.info(this, "showOnboardList");
     this.nav.setRoot(OnboardListPage,
       { organization: this.organization,
@@ -286,7 +300,7 @@ export class RollcallApp {
     this.splashScreen.hide();
   }
 
-  showRollcallList() {
+  private showRollcallList() {
     this.logger.info(this, "showRollcallList");
     this.nav.setRoot(RollcallListPage,
       { organization: this.organization,
@@ -295,7 +309,7 @@ export class RollcallApp {
     this.splashScreen.hide();
   }
 
-  showGroupList() {
+  private showGroupList() {
     this.logger.info(this, "showGroupList");
     this.nav.setRoot(GroupListPage,
       { organization: this.organization,
@@ -303,7 +317,7 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  showPersonList() {
+  private showPersonList() {
     this.logger.info(this, "showPersonList");
     this.nav.setRoot(PersonListPage,
       { organization: this.organization,
@@ -311,7 +325,7 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  showSettingsList() {
+  private showSettingsList() {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage,
       { organization: this.organization,
@@ -319,7 +333,7 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  showPersonDetails() {
+  private showPersonDetails() {
     this.logger.info(this, "showPersonDetails");
     this.nav.setRoot(PersonDetailsPage,
       { organization: this.organization,
@@ -329,7 +343,7 @@ export class RollcallApp {
     this.menuController.close();
   }
 
-  userLogout() {
+  private userLogout() {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...");
     let removes = [
@@ -353,7 +367,7 @@ export class RollcallApp {
     });
   }
 
-  showLoading(message:string):Loading {
+  private showLoading(message:string):Loading {
     let loading = this.loadingController.create({
       content: message
     });
@@ -361,7 +375,7 @@ export class RollcallApp {
     return loading;
   }
 
-  showAlert(title:string, subTitle:string, buttons:any=['OK']):Alert {
+  private showAlert(title:string, subTitle:string, buttons:any=['OK']):Alert {
     let alert = this.alertController.create({
       title: title,
       subTitle: subTitle,
@@ -371,13 +385,19 @@ export class RollcallApp {
     return alert;
   }
 
-  showToast(message:string, duration:number=1500):Toast {
+  private showToast(message:string, duration:number=1500):Toast {
     let toast = this.toastController.create({
       message: message,
       duration: duration
     });
     toast.present();
     return toast;
+  }
+
+  private trackEvent(event:string, properties:any=null) {
+    return this.segment.track(event, properties).then(() => {
+      this.logger.info(this, "Segment", "trackEvent", event);
+    });
   }
 
 }

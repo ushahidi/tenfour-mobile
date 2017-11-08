@@ -71,11 +71,18 @@ export class SettingsTypesPage extends BasePage {
     }
   }
 
-  cancelEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private cancelEdit(event:any) {
     this.hideModal();
   }
 
-  doneEdit(event:any) {
+  private doneEdit(event:any) {
     let selected = [];
     for (let type of this.types) {
       if (type.selected == true) {

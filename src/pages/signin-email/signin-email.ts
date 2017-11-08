@@ -42,7 +42,12 @@ export class SigninEmailPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
       let email = this.email.value;
@@ -52,7 +57,7 @@ export class SigninEmailPage extends BasePage {
     }
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

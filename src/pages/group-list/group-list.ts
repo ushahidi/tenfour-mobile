@@ -53,7 +53,14 @@ export class GroupListPage extends BasePage {
     })
   }
 
-  loadUpdates(cache:boolean=true, event:any=null) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     return Promise.all([this.loadGroups(cache)]).then(
       (loaded:any) =>{
@@ -72,7 +79,7 @@ export class GroupListPage extends BasePage {
       });
   }
 
-  loadMore(event:any) {
+  private loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
@@ -87,7 +94,7 @@ export class GroupListPage extends BasePage {
     });
   }
 
-  loadGroups(cache:boolean=true):Promise<any> {
+  private loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       this.offset = 0;
@@ -133,7 +140,7 @@ export class GroupListPage extends BasePage {
     });
   }
 
-  createGroup(event:any) {
+  private createGroup(event:any) {
     this.logger.info(this, "createGroup");
     let modal = this.showModal(GroupEditPage,
       { organization: this.organization,
@@ -151,7 +158,7 @@ export class GroupListPage extends BasePage {
     });
   }
 
-  showGroup(group:Group) {
+  private showGroup(group:Group) {
     this.logger.info(this, "showGroup", group);
     this.showPage(GroupDetailsPage,
       { organization: this.organization,

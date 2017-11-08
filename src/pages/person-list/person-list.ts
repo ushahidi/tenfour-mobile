@@ -55,7 +55,14 @@ export class PersonListPage extends BasePage {
     });
   }
 
-  loadUpdates(cache:boolean=true, event:any=null) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.all([this.loadPeople(cache)]).then(
@@ -75,7 +82,7 @@ export class PersonListPage extends BasePage {
       });
   }
 
-  loadMore(event:any) {
+  private loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
@@ -90,7 +97,7 @@ export class PersonListPage extends BasePage {
     });
   }
 
-  loadPeople(cache:boolean=true) {
+  private loadPeople(cache:boolean=true) {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       if (cache) {
@@ -135,13 +142,13 @@ export class PersonListPage extends BasePage {
     });
   }
 
-  addPeople(event:any) {
+  private addPeople(event:any) {
     this.logger.info(this, "addPeople");
     this.showModal(PersonAddPage,
       { organization: this.organization });
   }
 
-  showPerson(event:any, person:Person) {
+  private showPerson(event:any, person:Person) {
     this.logger.info(this, "showPerson");
     this.showPage(PersonDetailsPage,
       { organization: this.organization,
@@ -149,7 +156,7 @@ export class PersonListPage extends BasePage {
         user: this.person })
   }
 
-  removePerson(person:Person) {
+  private removePerson(person:Person) {
     this.logger.info(this, "removePerson", person);
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, person).then((deleted:any) => {

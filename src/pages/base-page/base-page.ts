@@ -1,6 +1,10 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
+import { Device } from '@ionic-native/device';
+import { AppVersion } from '@ionic-native/app-version';
+import { SegmentService } from 'ngx-segment-analytics';
+
 import { Network } from '@ionic-native/network';
 import { Keyboard } from '@ionic-native/keyboard';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -9,6 +13,9 @@ import { ThemeableBrowser, ThemeableBrowserOptions, ThemeableBrowserObject } fro
 
 import { LoggerService } from '../../providers/logger-service';
 import { InjectorService } from '../../providers/injector-service';
+
+import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 
 @Component({
   selector: 'base-page',
@@ -28,6 +35,9 @@ export class BasePage {
   protected statusBar:StatusBar;
   protected themeableBrowser:ThemeableBrowser;
   protected socialSharing:SocialSharing;
+  protected segment:SegmentService;
+  protected device:Device;
+  protected appVersion:AppVersion;
 
   @ViewChild(Content)
   content: Content;
@@ -50,6 +60,9 @@ export class BasePage {
     this.statusBar = InjectorService.injector.get(StatusBar);
     this.themeableBrowser = InjectorService.injector.get(ThemeableBrowser);
     this.socialSharing = InjectorService.injector.get(SocialSharing);
+    this.segment = InjectorService.injector.get(SegmentService);
+    this.device = InjectorService.injector.get(Device);
+    this.appVersion = InjectorService.injector.get(AppVersion)
   }
 
   ionViewDidLoad() {
@@ -78,7 +91,7 @@ export class BasePage {
     this.logger.info(this, "ionViewWillUnload");
   }
 
-  subscribeNetwork() {
+  protected subscribeNetwork() {
     this.logger.info(this, "subscribeNetwork", "Network", this.network.type);
     if (this.network.type == 'none') {
       this.zone.run(() => {
@@ -107,7 +120,7 @@ export class BasePage {
     });
   }
 
-  unsubscribeNetwork() {
+  protected unsubscribeNetwork() {
     this.logger.info(this, "unsubscribeNetwork", "Network", this.network.type);
     if (this.connection) {
       this.connection.unsubscribe();
@@ -119,7 +132,7 @@ export class BasePage {
     }
   }
 
-  loadStatusBar(lightContent:boolean=true) {
+  protected loadStatusBar(lightContent:boolean=true) {
     this.platform.ready().then(() => {
       if (lightContent) {
         this.statusBar.styleLightContent();
@@ -132,11 +145,11 @@ export class BasePage {
     });
   }
 
-  getParameter<T extends Object>(param:string):T {
+  protected getParameter<T extends Object>(param:string):T {
     return <T>this.navParams.get(param);
   }
 
-  showLoading(message:string):Loading {
+  protected showLoading(message:string):Loading {
     let loading = this.loadingController.create({
       content: message
     });
@@ -144,7 +157,7 @@ export class BasePage {
     return loading;
   }
 
-  showToast(message:string, duration:number=1500):Toast {
+  protected showToast(message:string, duration:number=1500):Toast {
     let toast = this.toastController.create({
       message: message,
       duration: duration
@@ -153,7 +166,7 @@ export class BasePage {
     return toast;
   }
 
-  showAlert(title:string, subTitle:string, buttons:any=['OK']):Alert {
+  protected showAlert(title:string, subTitle:string, buttons:any=['OK']):Alert {
     let alert = this.alertController.create({
       title: title,
       subTitle: subTitle,
@@ -163,7 +176,7 @@ export class BasePage {
     return alert;
   }
 
-  showConfirm(title:string, subTitle:string, buttons:any=['OK']):Alert {
+  protected showConfirm(title:string, subTitle:string, buttons:any=['OK']):Alert {
     let alert = this.alertController.create({
       title: title,
       subTitle: subTitle,
@@ -173,7 +186,7 @@ export class BasePage {
     return alert;
   }
 
-  showActionSheet(title:string, buttons:any):ActionSheet {
+  protected showActionSheet(title:string, buttons:any):ActionSheet {
     let actionSheet = this.actionController.create({
       title: title,
       buttons: buttons
@@ -182,33 +195,33 @@ export class BasePage {
     return actionSheet;
   }
 
-  showModal(page:any, params:any={}, options:any={}):Modal {
+  protected showModal(page:any, params:any={}, options:any={}):Modal {
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
   }
 
-  hideModal(data:any=null, options:any={}) {
+  protected hideModal(data:any=null, options:any={}) {
     return this.viewController.dismiss(data, options);
   }
 
-  showPage(page:any, params:any={}, options:any={}) {
+  protected showPage(page:any, params:any={}, options:any={}) {
     return this.navController.push(page, params, options);
   }
 
-  showRootPage(page:any, params:any={}, options:any={}) {
+  protected showRootPage(page:any, params:any={}, options:any={}) {
     return this.navController.setRoot(page, params, options);
   }
 
-  closePage(data:any=null, options:any={}) {
+  protected closePage(data:any=null, options:any={}) {
     return this.viewController.dismiss(data, options);
   }
 
-  showShare(subject:string, message:string=null, file:string=null, url:string=null) {
+  protected showShare(subject:string, message:string=null, file:string=null, url:string=null) {
     return this.socialSharing.share(message, subject, file, url);
   }
 
-  showUrl(url:string, target:string="_blank", event:any=null):ThemeableBrowserObject {
+  protected showUrl(url:string, target:string="_blank", event:any=null):ThemeableBrowserObject {
     this.logger.info(this, "showUrl", url, target);
     let options:ThemeableBrowserOptions = {
       statusbar: {
@@ -252,11 +265,11 @@ export class BasePage {
     return browser;
   }
 
-  showOfflineAlert() {
+  protected showOfflineAlert() {
     this.showAlert("Internet Offline", "There currently is no internet connection available.")
   }
 
-  resizeContent(delay:number=100) {
+  protected resizeContent(delay:number=100) {
     setTimeout(() => {
       if (this.content) {
         this.logger.info(this, "resizeContent");
@@ -268,12 +281,75 @@ export class BasePage {
     }, delay);
   }
 
-  showKeyboard() {
+  protected showKeyboard() {
     this.keyboard.show();
   }
 
-  hideKeyboard() {
+  protected hideKeyboard() {
     this.keyboard.close();
+  }
+
+  protected trackLogin(organization:Organization, person:Person) {
+    if (organization && person) {
+      this.trackIdentify(person.id, {
+        app: this.appName(),
+        device: this.deviceName(),
+        organization: organization.name,
+        person: person.name,
+        email: organization.email
+      });
+    }
+  }
+
+  protected trackIdentify(user:any, traits:any=null) {
+    return this.segment.identify("" + user, traits).then(() => {
+      this.logger.info(this, "Segment", "trackIdentify", user, traits);
+    });
+  }
+
+  protected trackPage(properties:any=null) {
+    let name = this.pageName();
+    return this.segment.page(name, properties).then(() => {
+      this.logger.info(this, "Segment", "trackPage", name, properties);
+    });
+  }
+
+  protected trackEvent(event:string, properties:any=null) {
+    return this.segment.track(event, properties).then(() => {
+      this.logger.info(this, "Segment", "trackEvent", event);
+    });
+  }
+
+  protected appName():string {
+    return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
+  }
+
+  protected deviceName():string {
+    let name = [];
+    if (this.device.manufacturer) {
+      name.push(this.device.manufacturer);
+    }
+    if (this.device.platform) {
+      name.push(this.device.platform);
+    }
+    if (this.device.model) {
+      name.push(this.device.model);
+    }
+    if (this.device.version) {
+      name.push(this.device.version);
+    }
+    return name.join(" ");
+  }
+
+  protected pageName():string {
+    return this.constructor.name
+      .replace('Page', '')
+      .replace(/([A-Z])/g, function(match) {
+        return " " + match;
+      })
+      .replace(/^./, function(match) {
+        return match.toUpperCase();
+      });
   }
 
 }

@@ -37,7 +37,12 @@ export class SignupEmailPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
       let loading = this.showLoading("Registering...");
@@ -56,7 +61,7 @@ export class SignupEmailPage extends BasePage {
     }
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

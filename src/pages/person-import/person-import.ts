@@ -31,7 +31,6 @@ export class PersonImportPage extends BasePage {
   invite:boolean = true;
   invitation:string = "email";
   countryCode:string = "+1";
-  debug:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -60,7 +59,6 @@ export class PersonImportPage extends BasePage {
     this.statusBar.overlaysWebView(false);
     let loading = this.showLoading("Loading...");
     Promise.resolve()
-      .then(() => { return this.loadDebug(); })
       .then(() => { return this.loadCountry(); })
       .then(() => { return this.loadContacts(); })
       .then(() => {
@@ -72,32 +70,23 @@ export class PersonImportPage extends BasePage {
       });
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.statusBar.overlaysWebView(true);
   }
 
-  cancelImport(event:any) {
+  private cancelImport(event:any) {
     this.hideModal();
   }
 
-  loadDebug():Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.platform.ready().then(() => {
-        this.isDebug.getIsDebug()
-          .then((isDebug:boolean) => {
-            this.debug = isDebug;
-            resolve();
-          })
-          .catch((error: any) => {
-            this.debug = false;
-            resolve();
-          });
-      });
-    });
-  }
-
-  loadCountry():Promise<any> {
+  private loadCountry():Promise<any> {
     return new Promise((resolve, reject) => {
       this.sim.getSimInfo().then(
         (info:any) => {
@@ -128,13 +117,10 @@ export class PersonImportPage extends BasePage {
     });
   }
 
-  loadContacts(event:any=null):Promise<any> {
+  private loadContacts(event:any=null):Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadContacts");
       this.imports = [];
-      if (this.debug) {
-        this.imports.push(this.defaultContact());
-      }
       this.contacts.find(['*']).then((contacts:any[]) => {
         let sorted = contacts.sort(function(a, b) {
           var givenA = a.name.givenName;
@@ -163,13 +149,13 @@ export class PersonImportPage extends BasePage {
     });
   }
 
-  selectAll(event:any) {
+  private selectAll(event:any) {
     for (let contact of this.imports) {
       contact.checked = true;
     }
   }
 
-  importContacts(event:any) {
+  private importContacts(event:any) {
     this.logger.info(this, "importContacts");
     let loading = this.showLoading("Importing...");
     let imports = [];
@@ -229,7 +215,7 @@ export class PersonImportPage extends BasePage {
     });
   }
 
-  createPerson(person:Person):Promise<Person> {
+  private createPerson(person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.api.createPerson(this.organization, person).then((newPerson:Person) => {
         this.database.savePerson(this.organization, newPerson).then((saved:any) => {
@@ -264,7 +250,7 @@ export class PersonImportPage extends BasePage {
     });
   }
 
-  createContact(person:Person, contact:Contact):Promise<Contact> {
+  private createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.api.createContact(this.organization, person, contact).then((newContact:Contact) => {
         this.database.saveContact(person, newContact).then((saved:any) => {
@@ -278,37 +264,6 @@ export class PersonImportPage extends BasePage {
         reject(error);
       });
     });
-  }
-
-  defaultContact():any {
-    return {
-      "id":2,
-      "rawId":null,
-      "displayName":null,
-      "note":null,
-      "photos":null,
-      "categories":null,
-      "urls":null,
-      "ims":null,
-      "nickname":null,
-      "birthday":"1978-01-20T12:00:00.000Z",
-      "name":{
-        "givenName":"Dale",
-        "honorificSuffix":null,
-        "formatted":"Dale Zak",
-        "middleName":null,
-        "familyName":"Zak",
-        "honorificPrefix":null},
-      "phoneNumbers":[
-        {"value":"(306) 341-3644","pref":false,"id":0,"type":"mobile"}],
-      "emails":[
-        {"value":"dalezak@gmail.com","pref":false,"id":0,"type":"home"},
-        {"value":"dale@ushahidi.com","pref":false,"id":1,"type":"work"}],
-      "addresses":[
-        {"pref":"false","locality":"Saskatoon","region":"CA","id":0,"postalCode":"S7N0E1","country":"Canada","type":"home","streetAddress":"413 10th Street East"}],
-      "organizations":[
-        {"pref":"false","title":"Producer","name":"Creative Consulting","department":null,"type":null}]
-      }
   }
 
 }

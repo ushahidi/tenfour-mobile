@@ -51,7 +51,12 @@ export class SignupCheckPage extends BasePage {
     }
   }
 
-  checkMail(app:string) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private checkMail(app:string) {
     this.appAvailability.check(app).then(
       (yes:any) => {
         this.mailer = true;
@@ -61,7 +66,7 @@ export class SignupCheckPage extends BasePage {
       });
   }
 
-  openMail(event) {
+  private openMail(event) {
     this.logger.info(this, "openMail");
     if (this.platform.is('ios')) {
       this.showUrl(this.mailerApple, '_system');
@@ -71,7 +76,7 @@ export class SignupCheckPage extends BasePage {
     }
   }
 
-  showNext(event) {
+  private showNext(event) {
     this.showPage(SignupConfirmPage,
       { organization: this.organization });
   }

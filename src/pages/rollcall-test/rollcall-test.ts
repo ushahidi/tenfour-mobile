@@ -48,7 +48,14 @@ export class RollcallTestPage extends BasePage {
     this.initRollcall();
   }
 
-  initRollcall() {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private initRollcall() {
     this.rollcall = new Rollcall({
       organization_id: this.organization.id,
       user_id: this.person.id,
@@ -73,11 +80,11 @@ export class RollcallTestPage extends BasePage {
     }
   }
 
-  cancelRollcall(event:any) {
+  private cancelRollcall(event:any) {
     this.hideModal();
   }
 
-  sendRollcall(event:any) {
+  private sendRollcall(event:any) {
     let loading = this.showLoading("Sending...");
     this.api.postRollcall(this.organization, this.rollcall).then((rollcall:Rollcall) => {
       let saves = [];

@@ -53,7 +53,15 @@ export class GroupDetailsPage extends BasePage {
     });
   }
 
-  loadGroup(cache:boolean=true, event:any=null) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      group: this.group.name
+    });
+  }
+
+  private loadGroup(cache:boolean=true, event:any=null) {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
@@ -90,7 +98,7 @@ export class GroupDetailsPage extends BasePage {
     });
   }
 
-  editGroup(event:any) {
+  private editGroup(event:any) {
     this.logger.info(this, "editGroup");
     this.showModal(GroupEditPage,
       { organization: this.organization,
@@ -98,7 +106,7 @@ export class GroupDetailsPage extends BasePage {
         group: this.group })
   }
 
-  showPerson(_person:Person) {
+  private showPerson(_person:Person) {
     this.logger.info(this, "showPerson", _person);
     this.showPage(PersonDetailsPage,
       { organization: this.organization,

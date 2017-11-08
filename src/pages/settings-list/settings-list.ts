@@ -52,49 +52,56 @@ export class SettingsListPage extends BasePage {
     this.logger.info(this, "Organization", this.organization);
   }
 
-  settingsEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private settingsEdit(event:any) {
     this.logger.info(this, "settingsEdit");
     this.showModal(SettingsEditPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsTypes(event:any) {
+  private settingsTypes(event:any) {
     this.logger.info(this, "settingsTypes");
     this.showModal(SettingsTypesPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsSizes(event:any) {
+  private settingsSizes(event:any) {
     this.logger.info(this, "settingsSizes");
     this.showModal(SettingsSizesPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsRegions(event:any) {
+  private settingsRegions(event:any) {
     this.logger.info(this, "settingsRegions");
     this.showModal(SettingsRegionsPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsRoles(event:any) {
+  private settingsRoles(event:any) {
     this.logger.info(this, "settingsRoles");
     this.showPage(SettingsRolesPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsPayments(event:any) {
+  private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
     this.showPage(SettingsPaymentsPage,
       { organization: this.organization,
         person: this.person });
   }
 
-  settingsRollcalls(event:any) {
+  private settingsRollcalls(event:any) {
     this.logger.info(this, "settingsRollcalls");
     this.showModal(SettingsRollcallsPage,
       { organization: this.organization,

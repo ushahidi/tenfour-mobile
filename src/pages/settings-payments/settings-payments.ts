@@ -41,4 +41,11 @@ export class SettingsPaymentsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
 }

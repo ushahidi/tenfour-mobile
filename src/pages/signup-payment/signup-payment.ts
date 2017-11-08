@@ -45,13 +45,18 @@ export class SignupPaymentPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event:any) {
     this.logger.info(this, "showNext");
     this.showPage(SignupPasswordPage,
       { organization: this.organization });
   }
 
-  showNextOnReturn(event:any) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       if (this.number.value.length == 0) {
         this.number.setFocus();

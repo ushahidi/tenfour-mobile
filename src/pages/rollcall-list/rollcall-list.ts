@@ -88,7 +88,14 @@ export class RollcallListPage extends BasePage {
     }
   }
 
-  loadUpdates(cache:boolean=true, event:any=null) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
@@ -112,7 +119,7 @@ export class RollcallListPage extends BasePage {
       });
   }
 
-  loadMore(event:any) {
+  private loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
@@ -128,7 +135,7 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  loadPerson(cache:boolean=true):Promise<Person> {
+  private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.database.getPerson(null, true).then((person:Person) => {
@@ -168,7 +175,7 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  loadOrganization(cache:boolean=true):Promise<Person> {
+  private loadOrganization(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
         resolve(this.organization);
@@ -187,7 +194,7 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  loadRollCalls(cache:boolean=true):Promise<Rollcall[]> {
+  private loadRollCalls(cache:boolean=true):Promise<Rollcall[]> {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.database.getRollcalls(this.organization, this.limit, this.offset).then((rollcalls:Rollcall[]) => {
@@ -252,7 +259,7 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  loadNotifications(cache:boolean=true):Promise<any> {
+  private loadNotifications(cache:boolean=true):Promise<any> {
     this.notify = false;
     return new Promise((resolve, reject) => {
       if (cache) {
@@ -294,14 +301,14 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  showReplies(event:any, rollcall:Rollcall) {
+  private showReplies(event:any, rollcall:Rollcall) {
     this.showPage(ReplyListPage, {
       organization: this.organization,
       person: this.person,
       rollcall: rollcall })
   }
 
-  sendReply(event:any, rollcall:Rollcall) {
+  private sendReply(event:any, rollcall:Rollcall) {
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
       rollcall: rollcall });
@@ -312,7 +319,7 @@ export class RollcallListPage extends BasePage {
    });
   }
 
-  createRollcall(event:any) {
+  private createRollcall(event:any) {
     let modal = this.showModal(RollcallEditPage, {
       organization: this.organization,
       person: this.person });
@@ -323,14 +330,14 @@ export class RollcallListPage extends BasePage {
     });
   }
 
-  showNotifications(event:any) {
+  private showNotifications(event:any) {
     this.showPage(NotificationListPage, {
       organization: this.organization,
       person: this.person,
       notifications: this.notifications });
   }
 
-  filterChanged(event:any) {
+  private filterChanged(event:any) {
     this.logger.info(this, "filterChanged", this.filter);
     let loading = this.showLoading("Filtering...");
     this.loadRollCalls(true).then((filtered:any) => {
@@ -338,7 +345,7 @@ export class RollcallListPage extends BasePage {
     })
   }
 
-  filterRollcalls(rollcalls:Rollcall[]) {
+  private filterRollcalls(rollcalls:Rollcall[]) {
     let filtered = [];
     for (let rollcall of rollcalls) {
       if (this.filter === "all") {

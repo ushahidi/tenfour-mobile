@@ -43,23 +43,30 @@ export class PersonAddPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  onCancel(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private onCancel(event) {
     this.hideModal();
   }
 
-  addPerson(event) {
+  private addPerson(event) {
     this.logger.info(this, "addPerson");
     this.showPage(PersonEditPage,
       { organization: this.organization });
   }
 
-  invitePerson(event) {
+  private invitePerson(event) {
     this.logger.info(this, "invitePerson");
     this.showPage(PersonInvitePage,
       { organization: this.organization });
   }
 
-  importPerson(event) {
+  private importPerson(event) {
     this.logger.info(this, "importPerson");
     this.showPage(PersonImportPage,
       { organization: this.organization });

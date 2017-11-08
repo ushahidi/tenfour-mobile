@@ -62,7 +62,14 @@ export class RollcallEditPage extends BasePage {
     }
   }
 
-  initRollcall() {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      rollcall: this.rollcall.id
+    });
+  }
+
+  private initRollcall() {
     this.rollcall = new Rollcall({
       organization_id: this.organization.id,
       user_id: this.person.id,
@@ -75,18 +82,18 @@ export class RollcallEditPage extends BasePage {
     this.addDefaults();
   }
 
-  cancelEdit(event) {
+  private cancelEdit(event) {
     this.hideModal();
   }
 
-  showNext() {
+  private showNext() {
     this.showPage(RollcallSendPage, {
       organization: this.organization,
       person: this.person,
       rollcall: this.rollcall });
   }
 
-  addDefaults() {
+  private addDefaults() {
     this.rollcall.answers = [];
     this.rollcall.answers.push(new Answer({
       icon: "icon-exclaim",
@@ -102,7 +109,7 @@ export class RollcallEditPage extends BasePage {
     }));
   }
 
-  addAnswer() {
+  private addAnswer() {
     let colors = [
       "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
       "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
@@ -117,7 +124,7 @@ export class RollcallEditPage extends BasePage {
     }));
   }
 
-  removeAnswer(answer:Answer) {
+  private removeAnswer(answer:Answer) {
     for (let i = 0; i < this.rollcall.answers.length; i++) {
       if (this.rollcall.answers[i] === answer) {
         this.rollcall.answers.splice(i, 1);
@@ -126,11 +133,11 @@ export class RollcallEditPage extends BasePage {
     }
   }
 
-  removeAnswers() {
+  private removeAnswers() {
     this.rollcall.answers = [];
   }
 
-  changeColor(answer:Answer, event:any) {
+  private changeColor(answer:Answer, event:any) {
     this.logger.info(this, "changeColor", answer);
     let popover = this.popoverController.create(ColorPickerComponent,
       { color: answer.color,

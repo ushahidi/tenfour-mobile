@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { SegmentModule } from 'ngx-segment-analytics';
+
 import { AppVersion } from '@ionic-native/app-version';
 import { IsDebug } from '@ionic-native/is-debug';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -151,6 +153,7 @@ import { CountryService } from '../providers/country-service';
     TruncateModule,
     HtmlParserModule,
     BrowserAnimationsModule,
+    SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
     IonicModule.forRoot(RollcallApp)
   ],
   bootstrap: [IonicApp],

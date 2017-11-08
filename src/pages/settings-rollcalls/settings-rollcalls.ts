@@ -40,11 +40,18 @@ export class SettingsRollcallsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  cancelEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private cancelEdit(event:any) {
     this.hideModal();
   }
 
-  doneEdit(event:any) {
+  private doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       this.database.saveOrganization(organization).then(saved => {
@@ -58,7 +65,7 @@ export class SettingsRollcallsPage extends BasePage {
     });
   }
 
-  onAppOnly(event:any) {
+  private onAppOnly(event:any) {
     this.logger.info(this, "onAppOnly", this.organization.app_enabled);
     if (this.organization.app_enabled) {
       this.organization.email_enabled = false;
@@ -68,28 +75,28 @@ export class SettingsRollcallsPage extends BasePage {
     }
   }
 
-  onEmailEnabled(event:any) {
+  private onEmailEnabled(event:any) {
     this.logger.info(this, "onEmailEnabled", this.organization.email_enabled);
     if (this.organization.email_enabled) {
       this.organization.app_enabled = false;
     }
   }
 
-  onSmsEnabled(event:any) {
+  private onSmsEnabled(event:any) {
     this.logger.info(this, "onSmsEnabled", this.organization.sms_enabled);
     if (this.organization.sms_enabled) {
       this.organization.app_enabled = false;
     }
   }
 
-  onTwitterEnabled(event:any) {
+  private onTwitterEnabled(event:any) {
     this.logger.info(this, "onTwitterEnabled", this.organization.twitter_enabled);
     if (this.organization.twitter_enabled) {
       this.organization.app_enabled = false;
     }
   }
 
-  onSlackEnabled(event:any) {
+  private onSlackEnabled(event:any) {
     this.logger.info(this, "onSlackEnabled", this.organization.slack_enabled);
     if (this.organization.slack_enabled) {
       this.organization.app_enabled = false;

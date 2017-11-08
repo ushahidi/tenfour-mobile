@@ -57,10 +57,16 @@ export class SettingsRegionsPage extends BasePage {
       loading.dismiss();
       this.showToast(error);
     });
-    // this.loadCountries();
   }
 
-  loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadRegions");
       if (cache) {
@@ -117,11 +123,11 @@ export class SettingsRegionsPage extends BasePage {
     });
   }
 
-  cancelEdit(event:any) {
+  private cancelEdit(event:any) {
     this.hideModal();
   }
 
-  doneEdit(event:any) {
+  private doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     let saves = [];
     let regions = [];

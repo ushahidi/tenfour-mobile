@@ -41,7 +41,12 @@ export class SignupPlanPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     if (this.trial) {
       this.logger.info(this, "showNext", "SignupPasswordPage");
       this.showPage(SignupPasswordPage,
@@ -54,17 +59,17 @@ export class SignupPlanPage extends BasePage {
     }
   }
 
-  startPlan(event:any) {
+  private startPlan(event:any) {
     this.logger.info(this, "startPlan");
     this.trial = false;
   }
 
-  startTrial(event:any) {
+  private startTrial(event:any) {
     this.logger.info(this, "startTrial");
     this.trial = true;
   }
 
-  needMore(event:any) {
+  private needMore(event:any) {
     this.logger.info(this, "needMore");
   }
 

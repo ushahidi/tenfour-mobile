@@ -43,14 +43,19 @@ export class SignupOwnerPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     this.logger.info(this, "showNext");
     this.organization.user_name = this.owner.value;
     this.showPage(SignupNamePage,
       { organization: this.organization });
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

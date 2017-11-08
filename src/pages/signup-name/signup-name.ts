@@ -43,7 +43,12 @@ export class SignupNamePage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Loading...");
     this.api.getOrganizations(null, this.name.value).then(
@@ -66,7 +71,7 @@ export class SignupNamePage extends BasePage {
       });
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

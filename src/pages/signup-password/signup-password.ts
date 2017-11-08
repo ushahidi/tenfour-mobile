@@ -53,7 +53,7 @@ export class SignupPasswordPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  createOrganization(event) {
+  private createOrganization(event) {
     this.logger.info(this, "createOrganization");
     if (this.password.value.length < 6) {
       this.showToast("Password is too short");
@@ -83,6 +83,7 @@ export class SignupPasswordPage extends BasePage {
                   this.database.saveOrganization(organization),
                   this.database.savePerson(organization, person)];
                 Promise.all(saves).then(saved => {
+                  this.trackLogin(organization, person);
                   loading.dismiss();
                   this.showToast(`Welcome to ${organization.name}`);
                   this.showRootPage(OnboardListPage,
@@ -106,7 +107,7 @@ export class SignupPasswordPage extends BasePage {
     }
   }
 
-  createOrganizationOnReturn(event:any) {
+  private createOrganizationOnReturn(event:any) {
     if (event.keyCode == 13) {
       if (this.password.value.length == 0) {
         this.password.setFocus();

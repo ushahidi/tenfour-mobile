@@ -59,12 +59,20 @@ export class RollcallSendPage extends BasePage {
     this.statusBar.overlaysWebView(false);
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      rollcall: this.rollcall.message
+    });
+  }
+
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.statusBar.overlaysWebView(true);
   }
 
-  addPerson() {
+  private addPerson() {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
@@ -88,7 +96,7 @@ export class RollcallSendPage extends BasePage {
      });
   }
 
-  removeRecipient(recipient:Recipient) {
+  private removeRecipient(recipient:Recipient) {
     this.logger.info(this, "removeRecipient", recipient);
     for (let i = 0; i < this.rollcall.recipients.length; i++) {
       if (this.rollcall.recipients[i] === recipient) {
@@ -98,7 +106,7 @@ export class RollcallSendPage extends BasePage {
     }
   }
 
-  removeGroup(group:Group) {
+  private removeGroup(group:Group) {
     this.logger.info(this, "removeGroup", group);
     for (let i = 0; i < this.rollcall.groups.length; i++) {
       if (this.rollcall.groups[i] === group) {
@@ -108,7 +116,7 @@ export class RollcallSendPage extends BasePage {
     }
   }
 
-  sendRollcall(event:any) {
+  private sendRollcall(event:any) {
     if (this.rollcall.send_via == null || this.rollcall.send_via.length == 0) {
       this.showToast("Please select how the RollCall will be sent");
     }
@@ -142,13 +150,13 @@ export class RollcallSendPage extends BasePage {
     }
   }
 
-  onAppOnly(event:any) {
+  private onAppOnly(event:any) {
     this.logger.info(this, "onAppOnly", event);
     this.rollcall.send_via = 'apponly';
     this.select.close();
   }
 
-  showPopover(event:any) {
+  private showPopover(event:any) {
     this.logger.info(this, "showPopover", event, this.rollcall.send_via);
     let popover = this.popoverController.create(SendViaComponent,
       { send_via: this.rollcall.send_via,

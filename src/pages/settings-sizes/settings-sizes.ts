@@ -57,11 +57,18 @@ export class SettingsSizesPage extends BasePage {
     this.logger.info(this, "ionViewWillEnter", "Size", this.organization.size);
   }
 
-  cancelEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private cancelEdit(event:any) {
     this.hideModal();
   }
 
-  doneEdit(event:any) {
+  private doneEdit(event:any) {
     this.logger.info(this, "doneEdit", "Size", this.organization.size)
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {

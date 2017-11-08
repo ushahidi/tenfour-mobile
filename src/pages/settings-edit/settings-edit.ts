@@ -45,11 +45,18 @@ export class SettingsEditPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  cancelEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private cancelEdit(event:any) {
     this.hideModal();
   }
 
-  doneEdit(event:any) {
+  private doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       this.database.saveOrganization(organization).then(saved => {
@@ -63,7 +70,7 @@ export class SettingsEditPage extends BasePage {
     });
   }
 
-  showCameraRoll(event:any) {
+  private showCameraRoll(event:any) {
     this.logger.info(this, "showCameraRoll");
     let options:CameraOptions = {
       mediaType: this.camera.MediaType.PICTURE,

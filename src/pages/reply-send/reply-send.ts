@@ -93,7 +93,14 @@ export class ReplySendPage extends BasePage {
     });
   }
 
-  loadLocation():Promise<Location> {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadLocation():Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadLocation");
       this.geolocation.getCurrentPosition().then((position:any) => {
@@ -121,7 +128,7 @@ export class ReplySendPage extends BasePage {
     });
   }
 
-  loadAddress(latitude:number, longitude:number):Promise<string> {
+  private loadAddress(latitude:number, longitude:number):Promise<string> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadAddress", latitude, longitude);
       this.geocoder.reverseGeocode(latitude, longitude)
@@ -149,7 +156,7 @@ export class ReplySendPage extends BasePage {
     });
   }
 
-  slideChanged(event:any) {
+  private slideChanged(event:any) {
     let index = this.slides.getActiveIndex();
     if (index >= 0 && index < this.rollcalls.length) {
       this.logger.info(this, "slideChanged", event, index);
@@ -161,17 +168,17 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  selectAnswer(rollcall:Rollcall, reply:Reply, answer:Answer) {
+  private selectAnswer(rollcall:Rollcall, reply:Reply, answer:Answer) {
     this.logger.info(this, "selectAnswer", answer);
     reply.answer = answer.answer;
   }
 
-  cancelReply(event:any) {
+  private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
     this.hideModal();
   }
 
-  sendReply(rollcall:Rollcall, reply:Reply) {
+  private sendReply(rollcall:Rollcall, reply:Reply) {
     this.logger.info(this, "sendReply", reply);
     if (reply.answer == null || reply.answer.length == 0) {
       this.showToast("Answer is required, please select your response");
@@ -200,7 +207,7 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  saveReply(rollcall:Rollcall, reply:Reply) {
+  private saveReply(rollcall:Rollcall, reply:Reply) {
     this.logger.info(this, "saveReply", reply);
     if (reply.answer == null || reply.answer.length == 0) {
       this.showToast("Answer is required, please select your response");
@@ -229,7 +236,7 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  hideRollcall(rollcall:Rollcall, reply:Reply) {
+  private hideRollcall(rollcall:Rollcall, reply:Reply) {
     if (this.rollcalls.length > 1) {
       let index = this.slides.getActiveIndex();
       this.logger.info(this, "hideRollcall", index);
@@ -248,12 +255,12 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  removeMessage(reply:Reply) {
+  private removeMessage(reply:Reply) {
     this.logger.info(this, "removeMessage", reply);
     reply.message = null;
   }
 
-  removeLocation(reply:Reply) {
+  private removeLocation(reply:Reply) {
     this.logger.info(this, "removeLocation", reply);
     reply.location_text = null;
     reply.latitude = null;

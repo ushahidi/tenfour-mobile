@@ -49,7 +49,7 @@ export class SigninPasswordPage extends BasePage {
     this.email = this.getParameter<string>("email");
   }
 
-  showNext(event) {
+  private showNext(event) {
     this.logger.info(this, "showNext");
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
@@ -69,6 +69,7 @@ export class SigninPasswordPage extends BasePage {
                 this.database.saveOrganization(organization),
                 this.database.savePerson(organization, person)];
               Promise.all(saves).then(saved => {
+                this.trackLogin(organization, person);
                 loading.dismiss();
                 this.showToast(`Welcome to ${organization.name}`);
                 if (person.config_profile_reviewed && person.config_self_test_sent) {
@@ -92,7 +93,7 @@ export class SigninPasswordPage extends BasePage {
     }
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

@@ -49,16 +49,23 @@ export class PersonInvitePage extends BasePage {
     this.statusBar.overlaysWebView(false);
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.statusBar.overlaysWebView(true);
   }
 
-  cancelInvite(event:any) {
+  private cancelInvite(event:any) {
     this.hideModal();
   }
 
-  invitePeople(event:any) {
+  private invitePeople(event:any) {
     let invites = [];
     for (let person of this.people) {
       if (person.selected == true) {
@@ -82,7 +89,7 @@ export class PersonInvitePage extends BasePage {
     }
   }
 
-  loadPeople(event:any, cache:boolean=true) {
+  private loadPeople(event:any, cache:boolean=true) {
     this.loading = true;
     if (cache) {
       return this.database.getPeople(this.organization).then((people:Person[]) => {
@@ -119,7 +126,7 @@ export class PersonInvitePage extends BasePage {
     }
   }
 
-  invitePerson(person:Person):Promise<Person> {
+  private invitePerson(person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.api.invitePerson(this.organization, person).then((invited:Person) => {
         resolve(invited);

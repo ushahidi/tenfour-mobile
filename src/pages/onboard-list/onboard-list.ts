@@ -58,7 +58,14 @@ export class OnboardListPage extends BasePage {
       });
   }
 
-  loadPerson():Promise<any> {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadPerson():Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPerson(this.organization, "me").then((person:Person) => {
         this.logger.info(this, "loadPerson", person);
@@ -70,7 +77,7 @@ export class OnboardListPage extends BasePage {
     });
   }
 
-  loadPeople():Promise<any> {
+  private loadPeople():Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPeople(this.organization).then((people:Person[]) => {
         let saves = [];
@@ -91,7 +98,7 @@ export class OnboardListPage extends BasePage {
     });
   }
 
-  taskAddPeople(event) {
+  private taskAddPeople(event) {
     this.logger.info(this, "taskAddPeople");
     let modal = this.showModal(PersonAddPage, {
       organization: this.organization,
@@ -109,7 +116,7 @@ export class OnboardListPage extends BasePage {
    });
   }
 
-  taskReviewContact(event) {
+  private taskReviewContact(event) {
     this.logger.info(this, "taskReviewContact");
     if (this.person.config_people_invited || this.person.role == 'member') {
       this.person.config_profile_reviewed = true;
@@ -128,7 +135,7 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  taskSendRollCall(event) {
+  private taskSendRollCall(event) {
     this.logger.info(this, "taskSendRollCall");
     if (this.person.config_people_invited && this.person.config_people_invited) {
       let modal = this.showModal(RollcallTestPage, {
@@ -146,7 +153,7 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  showRollcallList(event) {
+  private showRollcallList(event) {
     this.logger.info(this, "showRollcallList");
     let loading = this.showLoading("Loading...");
     this.api.updatePerson(this.organization, this.person).then((person:Person) => {

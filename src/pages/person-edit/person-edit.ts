@@ -88,6 +88,14 @@ export class PersonEditPage extends BasePage {
     });
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      person: this.person.name
+    });
+  }
+
   ionViewWillLeave() {
     super.ionViewWillLeave();
     if (this.editing == false) {
@@ -95,7 +103,7 @@ export class PersonEditPage extends BasePage {
     }
   }
 
-  loadCountryCodes(cache:boolean=true):Promise<number[]> {
+  private loadCountryCodes(cache:boolean=true):Promise<number[]> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadRegions");
       if (cache) {
@@ -152,7 +160,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  loadCamera() {
+  private loadCamera() {
     return this.diagnostic.isCameraPresent().then(
       (cameraPresent:boolean) => {
         this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
@@ -164,11 +172,11 @@ export class PersonEditPage extends BasePage {
       });
   }
 
-  cancelEdit(event) {
+  private cancelEdit(event) {
     this.hideModal();
   }
 
-  createPerson(event) {
+  private createPerson(event) {
     let loading = this.showLoading("Creating...");
     this.api.createPerson(this.organization, this.person).then((person:Person) => {
       let updates = [];
@@ -192,7 +200,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  updatePerson(event) {
+  private updatePerson(event) {
     let loading = this.showLoading("Updating...");
     this.api.updatePerson(this.organization, this.person).then(
       (person:Person) => {
@@ -220,7 +228,7 @@ export class PersonEditPage extends BasePage {
       });
   }
 
-  updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
+  private updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.contact == null || contact.contact.length == 0) {
         this.logger.info(this, "updateContact", "Ignore", contact);
@@ -257,7 +265,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  addPhone(event) {
+  private addPhone(event) {
     let countryCode = this.countryCodes && this.countryCodes.length > 0 ? this.countryCodes[0] : 1;
     let contact = new Contact({
       type: 'phone',
@@ -265,12 +273,12 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
 
-  addEmail(event) {
+  private addEmail(event) {
     let contact = new Contact({type: 'email'});
     this.person.contacts.push(contact)
   }
 
-  showCameraOptions() {
+  private showCameraOptions() {
     let buttons = [];
     if (this.cameraPresent) {
       buttons.push({
@@ -296,7 +304,7 @@ export class PersonEditPage extends BasePage {
     actionSheet.present();
   }
 
-  showCamera() {
+  private showCamera() {
     this.logger.info(this, "showCamera");
     let options:CameraOptions = {
       mediaType: this.camera.MediaType.PICTURE,
@@ -314,7 +322,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  showCameraRoll() {
+  private showCameraRoll() {
     this.logger.info(this, "showCameraRoll");
     let options:CameraOptions = {
       mediaType: this.camera.MediaType.PICTURE,
@@ -337,7 +345,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  deletePerson(event:any) {
+  private deletePerson(event:any) {
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
       let removes = [];

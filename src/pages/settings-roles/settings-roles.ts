@@ -40,4 +40,11 @@ export class SettingsRolesPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
 }

@@ -36,7 +36,12 @@ export class SigninUrlPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  showNext(event) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private showNext(event) {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
@@ -62,12 +67,12 @@ export class SigninUrlPage extends BasePage {
     }
   }
 
-  createOrganization(event) {
+  private createOrganization(event) {
     this.logger.info(this, "createOrganization");
     this.showPage(SignupEmailPage, {});
   }
 
-  showNextOnReturn(event) {
+  private showNextOnReturn(event) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

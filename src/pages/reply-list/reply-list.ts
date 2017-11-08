@@ -60,7 +60,15 @@ export class ReplyListPage extends BasePage {
     this.loadUpdates(null, true);
   }
 
-  loadUpdates(event:any, cache:boolean=true) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      rollcall: this.rollcall.message
+    });
+  }
+
+  private loadUpdates(event:any, cache:boolean=true) {
     this.loading = true;
     Promise.all([this.loadReplies(cache)]).then(
       (loaded:any) =>{
@@ -78,7 +86,7 @@ export class ReplyListPage extends BasePage {
       });
   }
 
-  loadReplies(cache:boolean=true):Promise<any> {
+  private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       if (cache) {
         return this.database.getReplies(this.rollcall).then((replies:Reply[]) => {
@@ -114,7 +122,7 @@ export class ReplyListPage extends BasePage {
     });
   }
 
-  sendReply(event:any) {
+  private sendReply(event:any) {
     this.logger.info(this, "sendReply");
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
@@ -129,7 +137,7 @@ export class ReplyListPage extends BasePage {
    });
   }
 
-  editReply(event:any, reply:Reply) {
+  private editReply(event:any, reply:Reply) {
     this.logger.info(this, "editReply");
     if (reply.user_id == this.person.id) {
       let modal = this.showModal(ReplySendPage, {

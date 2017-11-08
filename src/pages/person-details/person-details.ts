@@ -55,7 +55,15 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      person: this.person.name
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
     this.loading = true;
     return Promise.all([this.loadPerson(cache)]).then(
       (loaded:any) =>{
@@ -73,7 +81,7 @@ export class PersonDetailsPage extends BasePage {
       });
   }
 
-  loadPerson(cache:boolean=true):Promise<Person> {
+  private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
         return this.database.getContacts(this.person).then((contacts:Contact[]) => {
@@ -105,7 +113,7 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  editPerson(event:any) {
+  private editPerson(event:any) {
     this.logger.info(this, "editPerson");
     let modal = this.showModal(PersonEditPage,
       { organization: this.organization,
@@ -127,7 +135,7 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  invitePerson(event:any) {
+  private invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
     let loading = this.showLoading("Inviting...");
     this.api.invitePerson(this.organization, this.person).then(
@@ -144,14 +152,14 @@ export class PersonDetailsPage extends BasePage {
       });
   }
 
-  phoneContact(contact:Contact) {
+  private phoneContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
       window.open("tel:" + contact.contact);
     }
   }
 
-  emailContact(contact:Contact) {
+  private emailContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
       this.socialSharing.canShareViaEmail().then(() => {

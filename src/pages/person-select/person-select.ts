@@ -52,7 +52,14 @@ export class PersonSelectPage extends BasePage {
     });
   }
 
-  loadUpdates(cache:boolean=true, event:any=null) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates", cache);
     return Promise.all([
       this.loadPeople(cache),
@@ -72,7 +79,7 @@ export class PersonSelectPage extends BasePage {
       });
   }
 
-  loadPeople(cache:boolean=true):Promise<any> {
+  private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
       if (cache) {
@@ -115,7 +122,7 @@ export class PersonSelectPage extends BasePage {
     });
   }
 
-  updatePeople(people:Person[]) {
+  private updatePeople(people:Person[]) {
     if (this.people && this.people.length > 0) {
       for (let person of people) {
         let previous = this.people.filter(_person => _person.id == person.id);
@@ -134,7 +141,7 @@ export class PersonSelectPage extends BasePage {
     this.organization.people = people;
   }
 
-  loadGroups(cache:boolean=true):Promise<any> {
+  private loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       if (cache) {
@@ -178,7 +185,7 @@ export class PersonSelectPage extends BasePage {
     });
   }
 
-  updateGroups(groups:Group[]) {
+  private updateGroups(groups:Group[]) {
     if (this.groups && this.groups.length > 0) {
       for (let group of groups) {
         let previous = this.groups.filter(_group => _group.id == group.id);
@@ -197,11 +204,11 @@ export class PersonSelectPage extends BasePage {
     this.organization.groups = groups;
   }
 
-  cancelSelect(event) {
+  private cancelSelect(event) {
     this.hideModal();
   }
 
-  doneSelect(event) {
+  private doneSelect(event) {
     let people = [];
     let groups = [];
     if (this.organization.people && this.organization.people.length > 0) {

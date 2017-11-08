@@ -45,7 +45,12 @@ export class SignupConfirmPage extends BasePage {
     }
   }
 
-  confirmEmail(name:string) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
+  }
+
+  private confirmEmail(name:string) {
     let loading = this.showLoading("Confirming...");
     this.api.checkEmail(this.organization.email).then(
       (data:any) => {

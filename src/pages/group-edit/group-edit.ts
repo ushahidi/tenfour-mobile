@@ -58,12 +58,20 @@ export class GroupEditPage extends BasePage {
     }
   }
 
-  cancelEdit(event:any) {
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage({
+      organization: this.organization.name,
+      group: this.group.name
+    });
+  }
+
+  private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     this.hideModal();
   }
 
-  addPerson(event:any) {
+  private addPerson(event:any) {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
@@ -79,7 +87,7 @@ export class GroupEditPage extends BasePage {
      });
   }
 
-  createGroup(event:any) {
+  private createGroup(event:any) {
     this.logger.info(this, "createGroup");
     if (this.group.name.length == 0) {
       this.showAlert("Group Name Required", "Please enter the name of the group.");
@@ -110,7 +118,7 @@ export class GroupEditPage extends BasePage {
     }
   }
 
-  updateGroup(event:any) {
+  private updateGroup(event:any) {
     this.logger.info(this, "updateGroup", this.group.name, this.group.description);
     let loading = this.showLoading("Saving...");
     this.api.updateGroup(this.organization, this.group).then((group:Group) => {
@@ -133,11 +141,11 @@ export class GroupEditPage extends BasePage {
     });
   }
 
-  deleteGroup(event:any) {
+  private deleteGroup(event:any) {
     this.logger.info(this, "createGroup");
   }
 
-  removePerson(person:Person) {
+  private removePerson(person:Person) {
     this.logger.info(this, "removePerson", person);
     for (let i = 0; i < this.group.members.length; i++) {
       if (this.group.members[i] === person) {
