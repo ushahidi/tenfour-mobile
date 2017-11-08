@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ushahidi.rollcall" version="0.20.2" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ushahidi.rollcall" version="0.21.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Rollcall</name>
     <description>Rollcall App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
@@ -121,6 +121,7 @@
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <engine name="ios" spec="~4.5.3" />
     <engine name="android" spec="~6.3.0" />
+    <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
         <variable name="CAMERA_USAGE_DESCRIPTION" value="This app would like to access your camera." />
@@ -158,5 +159,4 @@
     <plugin name="cordova-plugin-nativegeocoder" spec="^2.0.4">
         <variable name="LOCATION_WHEN_IN_USE_DESCRIPTION" value="This app would like to use a geocoder service." />
     </plugin>
-    <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
 </widget>

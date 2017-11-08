@@ -349,7 +349,8 @@ export class BasePage {
       })
       .replace(/^./, function(match) {
         return match.toUpperCase();
-      });
+      })
+      .trim();
   }
 
 }
