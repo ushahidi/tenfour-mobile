@@ -1,24 +1,26 @@
-<ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
-  <ion-header>
-    <ion-toolbar color="navbar">
-      <ion-select interface="action-sheet" [selectOptions]="selectOptions" [(ngModel)]="organization" *ngIf="organizations && organizations.length > 0">
-        <ion-option value="{{organization}}" *ngFor="let organization of organizations">{{organization.name}}</ion-option>
-      </ion-select>
-    </ion-toolbar>
-  </ion-header>
-  <ion-content>
-    <ion-list *ngIf="organization">
-      <ion-item color="white" detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
-      <ion-item color="white" detail-push tappable (click)="showPersonList($event)">People</ion-item>
-      <ion-item color="white" detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
-      <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
-      <ion-item color="white" detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
-    </ion-list>
-    <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
-    <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>
-    <p text-center *ngIf="person">
-      <button ion-button clear color="primary"(click)="userLogout($event)">Log out</button>
-    </p>
-  </ion-content>
-</ion-menu>
-<ion-nav  #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
+<ion-split-pane #splitPane [enabled]="organization != null && person != null && tablet == true">
+  <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
+    <ion-header>
+      <ion-toolbar color="navbar">
+        <ion-select interface="action-sheet" [selectOptions]="selectOptions" [(ngModel)]="organization" *ngIf="organizations && organizations.length > 0">
+          <ion-option value="{{organization}}" *ngFor="let organization of organizations">{{organization.name}}</ion-option>
+        </ion-select>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list *ngIf="organization">
+        <ion-item color="white" detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showPersonList($event)">People</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
+      </ion-list>
+      <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
+      <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>
+      <p text-center *ngIf="person">
+        <button ion-button clear color="primary"(click)="userLogout($event)">Log out</button>
+      </p>
+    </ion-content>
+  </ion-menu>
+  <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
+</ion-split-pane>

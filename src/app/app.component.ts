@@ -1,8 +1,9 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
-import { Platform, Nav, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
+import { Platform, Nav, SplitPane, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { Device } from '@ionic-native/device';
 import { SegmentService } from 'ngx-segment-analytics';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -50,13 +51,16 @@ export class RollcallApp {
   organizations:Organization[] = [];
   organization:Organization = null;
   person:Person = null;
-
+  tablet:boolean = false;
   selectOptions:any = {
     title: 'Organizations'
   };
 
   @ViewChild(Nav)
   nav:Nav;
+
+  @ViewChild('splitPane')
+  splitPane:SplitPane;
 
   @ViewChild('rootNavController')
   navController:NavController;
@@ -77,12 +81,15 @@ export class RollcallApp {
     protected menuController: MenuController,
     protected deeplinks:Deeplinks,
     protected segment:SegmentService,
-    protected device:Device) {
+    protected device:Device,
+    protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
     InjectorService.injector = injector;
     this.platform.ready().then(() => {
       this.logger.info(this, "Platform", "Ready");
       this.loadStatusBar();
+      this.loadOrientation();
+      this.loadSplitPane();
       this.loadDeepLinks();
       this.loadAnalytics();
       this.loadApplication([
@@ -101,6 +108,25 @@ export class RollcallApp {
         new Subscription()
       ]);
     });
+  }
+
+  private loadSplitPane() {
+    if (this.platform.is('tablet')) {
+      this.logger.info(this, "loadSplitPane", "YES");
+      this.tablet = true;
+    }
+    else {
+      this.logger.info(this, "loadSplitPane", "NO");
+      this.tablet = false;
+    }
+  }
+
+  private loadOrientation() {
+    this.logger.info(this, "loadOrientation", this.screenOrientation.type);
+    this.screenOrientation.unlock();
+    this.screenOrientation.onChange().subscribe(() => {
+      this.logger.info(this, "Orientation", this.screenOrientation.type);
+   });
   }
 
   private loadStatusBar() {
@@ -144,6 +170,7 @@ export class RollcallApp {
               (person:Person) => {
                 this.logger.info(this, "loadApplication", "Person", person);
                 if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.person = person;
                   this.showRollcallList();
                 }
                 else {

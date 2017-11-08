@@ -332,11 +332,11 @@ export class BasePage {
     if (this.device.platform) {
       name.push(this.device.platform);
     }
-    if (this.device.model) {
-      name.push(this.device.model);
-    }
     if (this.device.version) {
       name.push(this.device.version);
+    }
+    if (this.device.model) {
+      name.push(this.device.model);
     }
     return name.join(" ");
   }

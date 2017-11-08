@@ -28,6 +28,7 @@ import { Contacts } from '@ionic-native/contacts';
 import { Device } from '@ionic-native/device';
 import { Sim } from '@ionic-native/sim';
 import { NativeGeocoder } from '@ionic-native/native-geocoder';
+import { ScreenOrientation } from '@ionic-native/screen-orientation';
 
 import { RollcallApp } from './app.component';
 
@@ -179,6 +180,7 @@ import { CountryService } from '../providers/country-service';
     { provide: SocialSharing, useClass: SocialSharing },
     { provide: NativeStorage, useClass: NativeStorage },
     { provide: AppAvailability, useClass: AppAvailability },
+    { provide: ScreenOrientation, useClass: ScreenOrientation },
     { provide: Deeplinks, useClass: Deeplinks },
     { provide: Contacts, useClass: Contacts },
     { provide: Sim, useClass: Sim },

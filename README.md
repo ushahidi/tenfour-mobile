@@ -174,7 +174,6 @@ npm list --depth=0
 Remove, Clean, Install
 ```
 rm -rf node_modules/
-npm cache clean
 npm install
 ```
 
