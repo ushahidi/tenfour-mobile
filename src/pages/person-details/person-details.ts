@@ -122,7 +122,11 @@ export class PersonDetailsPage extends BasePage {
       this.logger.info(this, "editPerson", "Modal", data);
       if (data) {
         if (data.deleted) {
+          this.logger.info(this, "editPerson", "Modal", "Deleted");
           this.closePage();
+        }
+        else if (data.canceled) {
+          this.logger.info(this, "editPerson", "Modal", "Cancelled");
         }
         else {
           let loading = this.showLoading("Loading...");

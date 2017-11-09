@@ -48,14 +48,14 @@ export class SignupOwnerPage extends BasePage {
     this.trackPage();
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.logger.info(this, "showNext");
     this.organization.user_name = this.owner.value;
     this.showPage(SignupNamePage,
       { organization: this.organization });
   }
 
-  private showNextOnReturn(event) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

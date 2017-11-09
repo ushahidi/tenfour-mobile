@@ -49,7 +49,7 @@ export class SigninPasswordPage extends BasePage {
     this.email = this.getParameter<string>("email");
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.logger.info(this, "showNext");
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
@@ -93,7 +93,7 @@ export class SigninPasswordPage extends BasePage {
     }
   }
 
-  private showNextOnReturn(event) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

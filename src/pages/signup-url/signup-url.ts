@@ -48,7 +48,7 @@ export class SignupUrlPage extends BasePage {
     this.trackPage();
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Checking...");
     this.api.getOrganizations(this.subdomain.value).then(
@@ -71,7 +71,7 @@ export class SignupUrlPage extends BasePage {
       });
   }
 
-  private showNextOnReturn(event) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

@@ -25,7 +25,7 @@
   <div *ngIf="rollcall">
     <ion-list *ngFor="let answer of rollcall.answers">
       <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
-      <ion-item color="white" tappable (click)="editReply($event, reply)" *ngFor="let reply of rollcall.answerReplies(answer)">
+      <ion-item color="white" [attr.detail-push]="reply.user_id == person.id ? 'true' : ''" tappable (click)="editReply($event, reply)" *ngFor="let reply of rollcall.answerReplies(answer)">
         <person-avatar item-left [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
         <ion-grid no-padding>
           <ion-row no-padding>

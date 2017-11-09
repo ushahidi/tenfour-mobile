@@ -47,7 +47,7 @@ export class SigninEmailPage extends BasePage {
     this.trackPage();
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
       let email = this.email.value;
@@ -57,7 +57,7 @@ export class SigninEmailPage extends BasePage {
     }
   }
 
-  private showNextOnReturn(event) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

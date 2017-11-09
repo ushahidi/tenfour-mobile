@@ -61,7 +61,7 @@ export class GroupDetailsPage extends BasePage {
     });
   }
 
-  private loadGroup(cache:boolean=true, event:any=null) {
+  private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
@@ -100,10 +100,29 @@ export class GroupDetailsPage extends BasePage {
 
   private editGroup(event:any) {
     this.logger.info(this, "editGroup");
-    this.showModal(GroupEditPage,
+    let modal = this.showModal(GroupEditPage,
       { organization: this.organization,
         person: this.person,
-        group: this.group })
+        group: this.group });
+    modal.onDidDismiss((data:any) => {
+      this.logger.info(this, "editGroup", "Modal", data);
+      if (data) {
+        if (data.deleted) {
+          this.logger.info(this, "editGroup", "Modal", "Deleted");
+          this.closePage();
+        }
+        else if (data.canceled) {
+          this.logger.info(this, "editGroup", "Modal", "Canceled");
+        }
+        else {
+          let loading = this.showLoading("Loading...");
+          this.loadGroup(true).then(group => {
+            this.group = group;
+            loading.dismiss();
+          });
+        }
+      }
+    });
   }
 
   private showPerson(_person:Person) {

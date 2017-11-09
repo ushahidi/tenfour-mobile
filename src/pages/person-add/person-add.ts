@@ -50,23 +50,25 @@ export class PersonAddPage extends BasePage {
     });
   }
 
-  private onCancel(event) {
-    this.hideModal();
+  private onCancel(event:any) {
+    this.hideModal({
+      canceled: true
+    });
   }
 
-  private addPerson(event) {
+  private addPerson(event:any) {
     this.logger.info(this, "addPerson");
     this.showPage(PersonEditPage,
       { organization: this.organization });
   }
 
-  private invitePerson(event) {
+  private invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
     this.showPage(PersonInvitePage,
       { organization: this.organization });
   }
 
-  private importPerson(event) {
+  private importPerson(event:any) {
     this.logger.info(this, "importPerson");
     this.showPage(PersonImportPage,
       { organization: this.organization });

@@ -82,8 +82,11 @@ export class RollcallEditPage extends BasePage {
     this.addDefaults();
   }
 
-  private cancelEdit(event) {
-    this.hideModal();
+  private cancelEdit(event:any) {
+    this.logger.info(this, "cancelEdit");
+    this.hideModal({
+      canceled: true
+    });
   }
 
   private showNext() {

@@ -41,7 +41,7 @@ export class SigninUrlPage extends BasePage {
     this.trackPage();
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
@@ -67,12 +67,12 @@ export class SigninUrlPage extends BasePage {
     }
   }
 
-  private createOrganization(event) {
+  private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
     this.showPage(SignupEmailPage, {});
   }
 
-  private showNextOnReturn(event) {
+  private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();
       this.showNext(event);

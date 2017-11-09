@@ -66,7 +66,7 @@ export class SignupCheckPage extends BasePage {
       });
   }
 
-  private openMail(event) {
+  private openMail(event:any) {
     this.logger.info(this, "openMail");
     if (this.platform.is('ios')) {
       this.showUrl(this.mailerApple, '_system');
@@ -76,7 +76,7 @@ export class SignupCheckPage extends BasePage {
     }
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     this.showPage(SignupConfirmPage,
       { organization: this.organization });
   }

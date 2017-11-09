@@ -204,11 +204,13 @@ export class PersonSelectPage extends BasePage {
     this.organization.groups = groups;
   }
 
-  private cancelSelect(event) {
-    this.hideModal();
+  private cancelSelect(event:any) {
+    this.hideModal({
+      canceled: true
+    });
   }
 
-  private doneSelect(event) {
+  private doneSelect(event:any) {
     let people = [];
     let groups = [];
     if (this.organization.people && this.organization.people.length > 0) {

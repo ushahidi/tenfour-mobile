@@ -98,7 +98,7 @@ export class OnboardListPage extends BasePage {
     });
   }
 
-  private taskAddPeople(event) {
+  private taskAddPeople(event:any) {
     this.logger.info(this, "taskAddPeople");
     let modal = this.showModal(PersonAddPage, {
       organization: this.organization,
@@ -116,7 +116,7 @@ export class OnboardListPage extends BasePage {
    });
   }
 
-  private taskReviewContact(event) {
+  private taskReviewContact(event:any) {
     this.logger.info(this, "taskReviewContact");
     if (this.person.config_people_invited || this.person.role == 'member') {
       this.person.config_profile_reviewed = true;
@@ -135,7 +135,7 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  private taskSendRollCall(event) {
+  private taskSendRollCall(event:any) {
     this.logger.info(this, "taskSendRollCall");
     if (this.person.config_people_invited && this.person.config_people_invited) {
       let modal = this.showModal(RollcallTestPage, {
@@ -153,7 +153,7 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  private showRollcallList(event) {
+  private showRollcallList(event:any) {
     this.logger.info(this, "showRollcallList");
     let loading = this.showLoading("Loading...");
     this.api.updatePerson(this.organization, this.person).then((person:Person) => {

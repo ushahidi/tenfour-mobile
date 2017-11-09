@@ -81,7 +81,12 @@ export class PersonEditPage extends BasePage {
       });
     }
     this.loadCountryCodes(true).then((countryCodes:number[]) => {
-      this.countryCodes = countryCodes;
+      if (countryCodes && countryCodes.length > 0) {
+        this.countryCodes = countryCodes;
+      }
+      else {
+        this.countryCodes = [1];
+      }
     },
     (error:any) => {
       this.countryCodes = [1];
@@ -105,7 +110,7 @@ export class PersonEditPage extends BasePage {
 
   private loadCountryCodes(cache:boolean=true):Promise<number[]> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadRegions");
+      this.logger.info(this, "loadCountryCodes", cache);
       if (cache) {
         this.database.getCountries(this.organization).then((countries:Country[]) => {
           if (countries && countries.length > 0) {
@@ -172,11 +177,29 @@ export class PersonEditPage extends BasePage {
       });
   }
 
-  private cancelEdit(event) {
-    this.hideModal();
+  private cancelEdit(event:any) {
+    this.logger.info(this, "cancelEdit");
+    let loading = this.showLoading("Canceling...");
+    this.database.getPerson(this.person.id).then((person:Person) => {
+      this.person.name = person.name;
+      this.person.description = person.description;
+      this.person.profile_picture = person.profile_picture;
+      this.database.getContacts(person).then((contacts:Contact[]) => {
+        for (let contact of this.person.contacts) {
+          let _contact = contacts.filter(_contact => _contact.id == contact.id);
+          if (_contact && _contact.length > 0) {
+            contact.contact = _contact[0].contact;
+          }
+        }
+        loading.dismiss();
+        this.hideModal({
+          canceled: true
+        });
+      });
+    });
   }
 
-  private createPerson(event) {
+  private createPerson(event:any) {
     let loading = this.showLoading("Creating...");
     this.api.createPerson(this.organization, this.person).then((person:Person) => {
       let updates = [];
@@ -200,7 +223,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  private updatePerson(event) {
+  private updatePerson(event:any) {
     let loading = this.showLoading("Updating...");
     this.api.updatePerson(this.organization, this.person).then(
       (person:Person) => {
@@ -265,7 +288,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  private addPhone(event) {
+  private addPhone(event:any) {
     let countryCode = this.countryCodes && this.countryCodes.length > 0 ? this.countryCodes[0] : 1;
     let contact = new Contact({
       type: 'phone',
@@ -273,7 +296,7 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
 
-  private addEmail(event) {
+  private addEmail(event:any) {
     let contact = new Contact({type: 'email'});
     this.person.contacts.push(contact)
   }

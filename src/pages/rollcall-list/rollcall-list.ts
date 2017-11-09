@@ -313,8 +313,14 @@ export class RollcallListPage extends BasePage {
       organization: this.organization,
       rollcall: rollcall });
     modal.onDidDismiss(data => {
+      this.logger.info(this, "sendReply", "Modal", data);
       if (data) {
-        this.loadRollCalls(false);
+        if (data.canceled) {
+          this.logger.info(this, "sendReply", "Modal", "Canceled");
+        }
+        else {
+          this.loadRollCalls(false);
+        }
       }
    });
   }
@@ -324,8 +330,14 @@ export class RollcallListPage extends BasePage {
       organization: this.organization,
       person: this.person });
     modal.onDidDismiss(data => {
+      this.logger.info(this, "createRollcall", "Modal", data);
       if (data) {
-        this.loadRollCalls(false);
+        if (data.canceled) {
+          this.logger.info(this, "createRollcall", "Modal", "Canceled");
+        }
+        else {
+          this.loadRollCalls(false);
+        }
       }
     });
   }

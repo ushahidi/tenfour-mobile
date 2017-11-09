@@ -53,7 +53,7 @@ export class SignupPasswordPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
   }
 
-  private createOrganization(event) {
+  private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
     if (this.password.value.length < 6) {
       this.showToast("Password is too short");

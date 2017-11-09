@@ -46,7 +46,7 @@ export class SignupPlanPage extends BasePage {
     this.trackPage();
   }
 
-  private showNext(event) {
+  private showNext(event:any) {
     if (this.trial) {
       this.logger.info(this, "showNext", "SignupPasswordPage");
       this.showPage(SignupPasswordPage,

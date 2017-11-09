@@ -128,11 +128,17 @@ export class ReplyListPage extends BasePage {
       organization: this.organization,
       rollcall: this.rollcall });
     modal.onDidDismiss(data => {
+      this.logger.info(this, "sendReply", "Modal", data);
       if (data) {
-        let loading = this.showLoading("Refreshing...");
-        this.loadReplies(false).then((replies) => {
-          loading.dismiss();
-        });
+        if (data.canceled) {
+          this.logger.info(this, "sendReply", "Modal", "Canceled");
+        }
+        else {
+          let loading = this.showLoading("Refreshing...");
+          this.loadReplies(false).then((replies) => {
+            loading.dismiss();
+          });
+        }
       }
    });
   }
@@ -145,11 +151,17 @@ export class ReplyListPage extends BasePage {
         rollcall: this.rollcall,
         reply: reply });
       modal.onDidDismiss(data => {
+        this.logger.info(this, "editReply", "Modal", data);
         if (data) {
-          let loading = this.showLoading("Refreshing...");
-          this.loadReplies(false).then((replies) => {
-            loading.dismiss();
-          });
+          if (data.canceled) {
+            this.logger.info(this, "editReply", "Modal", "Canceled");
+          }
+          else {
+            let loading = this.showLoading("Refreshing...");
+            this.loadReplies(false).then((replies) => {
+              loading.dismiss();
+            });
+          }
         }
      });
     }
