@@ -86,12 +86,25 @@ export class PersonListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
-        this.organization.people = [...this.organization.people, ...people];
+      this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
+        let saves = [];
+        for (let person of people) {
+          saves.push(this.database.savePerson(this.organization, person));
+        }
+        Promise.all(saves).then(saved => {
+          this.organization.people = [...this.organization.people, ...people];
+          if (event) {
+            event.complete();
+          }
+          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.people.length);
+          resolve(this.organization.people);
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
         if (event) {
           event.complete();
         }
-        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.people.length);
         resolve(this.organization.people);
       });
     });

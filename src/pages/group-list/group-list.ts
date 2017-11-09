@@ -83,12 +83,25 @@ export class GroupListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-        this.organization.groups = [...this.organization.groups, ...groups];
+      this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+        let saves = [];
+        for (let group of groups) {
+          saves.push(this.database.saveGroup(this.organization, group));
+        }
+        Promise.all(saves).then(saved => {
+          this.organization.groups = [...this.organization.groups, ...groups];
+          if (event) {
+            event.complete();
+          }
+          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
+          resolve(this.organization.groups);
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
         if (event) {
           event.complete();
         }
-        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
         resolve(this.organization.groups);
       });
     });

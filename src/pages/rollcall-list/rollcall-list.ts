@@ -123,14 +123,27 @@ export class RollcallListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.database.getRollcalls(this.organization, this.limit, this.offset).then((rollcalls:Rollcall[]) => {
-        this.organization.rollcalls = [...this.organization.rollcalls, ...rollcalls];
-        this.rollcalls = [...this.rollcalls, ...this.filterRollcalls(rollcalls)];
-        if (event) {
-          event.complete();
+      this.api.getRollcalls(this.organization, this.limit, this.offset).then((rollcalls:Rollcall[]) => {
+        let saves = [];
+        for (let rollcall of rollcalls) {
+          saves.push(this.database.saveRollcall(this.organization, rollcall));
         }
-        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.rollcalls.length);
-        resolve(this.rollcalls);
+        Promise.all(saves).then(saved => {
+          this.organization.rollcalls = [...this.organization.rollcalls, ...rollcalls];
+          this.rollcalls = [...this.rollcalls, ...this.filterRollcalls(rollcalls)];
+          if (event) {
+            event.complete();
+          }
+          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.rollcalls.length);
+          resolve(this.rollcalls);
+        },
+        (error:any) => {
+          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
+          if (event) {
+            event.complete();
+          }
+          resolve(this.rollcalls);
+        });
       });
     });
   }

@@ -368,10 +368,10 @@ export class ApiService extends HttpService {
     });
   }
 
-  getPeople(organization:Organization):Promise<Person[]> {
+  getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/people/`;
+        let url = this.api + `/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
         this.httpGet(url, token.access_token).then(
           (data:any) => {
             let people = [];
@@ -825,10 +825,10 @@ export class ApiService extends HttpService {
     });
   }
 
-  getGroups(organization:Organization):Promise<Group[]> {
+  getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/groups`;
+        let url = this.api + `/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
         this.httpGet(url, token.access_token).then(
           (data:any) => {
             if (data && data.groups) {

@@ -175,14 +175,21 @@ export class ReplySendPage extends BasePage {
 
   private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
-    this.database.getReply(this.rollcall.reply.id).then((reply:Reply) => {
-      this.rollcall.reply.answer = reply.answer;
-      this.rollcall.reply.message = reply.message;
-      this.rollcall.reply.location_text = reply.location_text;
+    if (this.rollcall && this.rollcall.reply && this.rollcall.reply.id) {
+      this.database.getReply(this.rollcall.reply.id).then((reply:Reply) => {
+        this.rollcall.reply.answer = reply.answer;
+        this.rollcall.reply.message = reply.message;
+        this.rollcall.reply.location_text = reply.location_text;
+        this.hideModal({
+          canceled: true
+        });
+      });
+    }
+    else {
       this.hideModal({
         canceled: true
       });
-    });
+    }
   }
 
   private sendReply(rollcall:Rollcall, reply:Reply) {
