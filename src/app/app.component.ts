@@ -1,6 +1,7 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Nav, SplitPane, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
+import { Badge } from '@ionic-native/badge';
 import { Device } from '@ionic-native/device';
 import { SegmentService } from 'ngx-segment-analytics';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
@@ -82,6 +83,7 @@ export class RollcallApp {
     protected deeplinks:Deeplinks,
     protected segment:SegmentService,
     protected device:Device,
+    protected badge:Badge,
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
     InjectorService.injector = injector;
@@ -389,6 +391,7 @@ export class RollcallApp {
       this.organizations = null;
       this.organization = null;
       this.person = null;
+      this.badge.clear();
       loading.dismiss();
       this.showSigninUrl();
     });

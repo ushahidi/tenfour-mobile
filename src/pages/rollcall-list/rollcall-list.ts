@@ -1,6 +1,8 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { Badge } from '@ionic-native/badge';
+
 import { BasePage } from '../../pages/base-page/base-page';
 import { RollcallEditPage } from '../../pages/rollcall-edit/rollcall-edit';
 import { ReplyListPage } from '../../pages/reply-list/reply-list';
@@ -45,6 +47,7 @@ export class RollcallListPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected badge:Badge,
       protected api:ApiService,
       protected database:DatabaseService) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -70,7 +73,9 @@ export class RollcallListPage extends BasePage {
             rollcalls: rollcalls });
           modal.onDidDismiss(data => {
             if (data) {
-              this.loadRollCalls(false);
+              this.loadRollCalls(false).then(loaded => {
+                this.loadBadgeNumber();
+              })
             }
           });
         }
@@ -103,8 +108,10 @@ export class RollcallListPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadRollCalls(cache); })
       .then(() => { return this.loadNotifications(cache); })
+      // .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
+        this.loadBadgeNumber();
         if (event) {
           event.complete();
         }
@@ -117,6 +124,49 @@ export class RollcallListPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadBadgeNumber():Promise<number> {
+    return new Promise((resolve, reject) => {
+      try {
+        let badgeNumber = 0;
+        if (this.organization && this.organization.rollcalls) {
+          for (let rollcall of this.organization.rollcalls) {
+            if (rollcall.canRespond(this.person)) {
+              badgeNumber = badgeNumber + 1;
+            }
+          }
+        }
+        this.logger.info(this, "loadBadgeNumber", badgeNumber);
+        this.badge.hasPermission().then((permission:any) => {
+          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
+          if (badgeNumber > 0) {
+            this.badge.set(badgeNumber).then((result:any) => {
+              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
+              resolve(badgeNumber);
+            },
+            (error:any) => {
+              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+              resolve(0);
+            });
+          }
+          else {
+            this.badge.clear().then((cleared:boolean) => {
+              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
+              resolve(0);
+            },
+            (error:any) => {
+              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+              resolve(0);
+            });
+          }
+        });
+      }
+      catch(error) {
+        this.logger.error(this, "loadBadgeNumber", "Error", error);
+        resolve(0);
+      }
+    });
   }
 
   private loadMore(event:any) {

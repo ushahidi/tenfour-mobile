@@ -29,6 +29,7 @@ import { Device } from '@ionic-native/device';
 import { Sim } from '@ionic-native/sim';
 import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
+import { Badge } from '@ionic-native/badge';
 
 import { RollcallApp } from './app.component';
 
@@ -183,6 +184,7 @@ import { CountryService } from '../providers/country-service';
     { provide: ScreenOrientation, useClass: ScreenOrientation },
     { provide: Deeplinks, useClass: Deeplinks },
     { provide: Contacts, useClass: Contacts },
+    { provide: Badge, useClass: Badge },
     { provide: Sim, useClass: Sim },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
