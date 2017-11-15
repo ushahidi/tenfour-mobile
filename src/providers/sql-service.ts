@@ -19,29 +19,29 @@ export class SqlService {
     protected logger:LoggerService) {
   }
 
-  testDatabase() {
+  public testDatabase():boolean {
     return this.platform.platforms().indexOf('cordova') >= 0;
   }
 
-  openDatabase():Promise<SQLiteObject> {
+  public openDatabase():Promise<SQLiteObject> {
     return new Promise((resolve, reject) => {
       if (this.database) {
         resolve(this.database);
       }
       else if (this.testDatabase()) {
-        this.sqlite.create({
+        let config = {
           name: this.name,
           location: this.location
-        }).then(
-          (database:SQLiteObject) => {
-            this.logger.info(this, "openDatabase", "Opened", database);
-            this.database = database;
-            resolve(database);
-          },
-          (error) => {
-            this.logger.error(this, "openDatabase", "Failed", error);
-            reject(JSON.stringify(error));
-          });
+        };
+        this.sqlite.create(config).then((database:SQLiteObject) => {
+          this.logger.info(this, "openDatabase", "Opened", database);
+          this.database = database;
+          resolve(database);
+        },
+        (error:any) => {
+          this.logger.error(this, "openDatabase", "Failed", error);
+          reject(JSON.stringify(error));
+        });
       }
       else {
         this.logger.error(this, "openDatabase", "Failed", "Cordova Not Available");
@@ -50,25 +50,58 @@ export class SqlService {
     });
   }
 
-  deleteDatabase() {
-    this.logger.info(this, "deleteDatabase");
+  public loadDatabase(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.sqlite.deleteDatabase({
-        name: this.name,
-        location: this.location }).then(
-          (deleted) => {
-            this.database = null;
-            this.logger.info(this, "deleteDatabase", "Deleted");
-            resolve();
+      this.logger.info(this, "loadDatabase");
+      this.createTables(models).then((created:any) => {
+        this.logger.info(this, "loadDatabase", "Created", created);
+        this.createIndexes(models).then((indexed:any) => {
+          this.logger.info(this, "loadDatabase", "Indexed", indexed);
+          let tests = [];
+          for (let model of models) {
+            tests.push(this.testModel(model));
+          }
+          Promise.all(tests).then((tested:any) => {
+            this.logger.info(this, "loadDatabase", "Tested", tested);
+            resolve(true);
           },
-          (error) => {
-            this.logger.error(this, "deleteDatabase", "Failed", error);
+          (error:any) => {
+            this.logger.error(this, "loadDatabase", "Failed", error);
             reject(error);
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "loadDatabase", "Failed", error);
+          reject(error);
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "loadDatabase", "Failed", error);
+        reject(error);
       });
     });
   }
 
-  createTables(models:Model[]):Promise<any> {
+  public deleteDatabase():Promise<boolean> {
+    this.logger.info(this, "deleteDatabase");
+    return new Promise((resolve, reject) => {
+      let config = {
+        name: this.name,
+        location: this.location
+      };
+      this.sqlite.deleteDatabase(config).then((deleted:any) => {
+        this.database = null;
+        this.logger.info(this, "deleteDatabase", "Deleted");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "deleteDatabase", "Failed", error);
+        reject(error);
+      });
+    });
+  }
+
+  private createTables(models:Model[]):Promise<any> {
     let creates = [];
     for (let model of models) {
       creates.push(this.createTable(model));
@@ -76,45 +109,43 @@ export class SqlService {
     return Promise.all(creates);
   }
 
-  createTable<M extends Model>(model:M):Promise<any> {
+  private createTable<M extends Model>(model:M):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.openDatabase().then(
-        (database:SQLiteObject) => {
-          let table:string = model.getTable();
-          let columns:any[] = model.getColumns();
-          this.logger.info(this, "createTable", table, columns);
-          let keys:string[] = [];
-          let values:string[] = [];
-          for (let column of columns) {
-            values.push(column.name + ' ' + column.type);
-            if (column.key == true) {
-              keys.push(column.name);
-            }
+      this.openDatabase().then((database:SQLiteObject) => {
+        let table:string = model.getTable();
+        let columns:any[] = model.getColumns();
+        this.logger.info(this, "createTable", table, columns);
+        let keys:string[] = [];
+        let values:string[] = [];
+        for (let column of columns) {
+          values.push(column.name + ' ' + column.type);
+          if (column.key == true) {
+            keys.push(column.name);
           }
-          let key = "";
-          if (keys.length > 0) {
-            key = `, PRIMARY KEY (${keys.join(", ")})`;
-          }
-          let sql = `CREATE TABLE IF NOT EXISTS ${table} (${values.join(", ")}${key})`;
-          this.logger.info(this, "createTable", "Creating", sql);
-          database.executeSql(sql, []).then(
-            (data) => {
-              this.logger.info(this, "createTable", "Created", sql, data);
-              resolve(data);
-            },
-            (error) => {
-              this.logger.error(this, "createTable", "Failed", sql, error);
-              reject(JSON.stringify(error));
-            });
-      },
-      (error) => {
-        this.logger.error(this, "createTable", "Failed", error);
-        reject(`Error Creating Database Tables`);
-      });
+        }
+        let key = "";
+        if (keys.length > 0) {
+          key = `, PRIMARY KEY (${keys.join(", ")})`;
+        }
+        let sql = `CREATE TABLE IF NOT EXISTS ${table} (${values.join(", ")}${key})`;
+        this.logger.info(this, "createTable", "Creating", sql);
+        database.executeSql(sql, []).then((data:any) => {
+          this.logger.info(this, "createTable", "Created", sql, data);
+          resolve(data);
+        },
+        (error:any) => {
+          this.logger.error(this, "createTable", "Failed", sql, error);
+          reject(JSON.stringify(error));
+        });
+    },
+    (error:any) => {
+      this.logger.error(this, "createTable", "Failed", error);
+      reject(`Error Creating Database Tables`);
+    });
     });
   }
 
-  createIndexes(models:Model[]):Promise<any> {
+  private createIndexes(models:Model[]):Promise<any> {
     let indexes = [];
     for (let model of models) {
       indexes.push(this.createIndex(model));
@@ -122,41 +153,39 @@ export class SqlService {
     return Promise.all(indexes);
   }
 
-  createIndex<M extends Model>(model:M):Promise<any> {
+  private createIndex<M extends Model>(model:M):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.openDatabase().then(
-        (database:SQLiteObject) => {
-          let table:string = model.getTable();
-          let columns:any[] = model.getColumns();
-          this.logger.info(this, "createIndex", table, columns);
-          let keys:string[] = [];
-          for (let column of columns) {
-            if (column.key == true) {
-              keys.push(column.name);
-            }
+      this.openDatabase().then((database:SQLiteObject) => {
+        let table:string = model.getTable();
+        let columns:any[] = model.getColumns();
+        this.logger.info(this, "createIndex", table, columns);
+        let keys:string[] = [];
+        for (let column of columns) {
+          if (column.key == true) {
+            keys.push(column.name);
           }
-          let sql = `CREATE UNIQUE INDEX IF NOT EXISTS idx_${table} ON ${table} (${keys.join(", ")});`;
-          this.logger.info(this, "createIndex", "Creating", sql);
-          database.executeSql(sql, []).then(
-            (data) => {
-              this.logger.info(this, "createIndex", "Created", sql, data);
-              resolve(data);
-            },
-            (error) => {
-              this.logger.error(this, "createIndex", "Failed", sql, error);
-              reject(JSON.stringify(error));
-            });
+        }
+        let sql = `CREATE UNIQUE INDEX IF NOT EXISTS idx_${table} ON ${table} (${keys.join(", ")});`;
+        this.logger.info(this, "createIndex", "Creating", sql);
+        database.executeSql(sql, []).then((data:any) => {
+          this.logger.info(this, "createIndex", "Created", sql, data);
+          resolve(data);
+        },
+        (error:any) => {
+          this.logger.error(this, "createIndex", "Failed", sql, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "createIndex", "Failed", error);
         reject(`Error Creating Database Indexes`);
       });
     });
   }
 
-  executeFirst(table:string, where:{}=null, order:{}=null):Promise<any[]> {
+  private executeFirst(table:string, where:{}=null, order:{}=null):Promise<any[]> {
     return new Promise((resolve, reject) => {
-      this.executeSelect(table, where, order, 1, 0).then(rows => {
+      this.executeSelect(table, where, order, 1, 0).then((rows:any) => {
         let results = <any[]>rows;
         if (results && results.length > 0) {
           resolve(results[0]);
@@ -168,129 +197,124 @@ export class SqlService {
     });
   }
 
-  executeTest(table:string, columns:any):Promise<any[]> {
+  private executeTest(table:string, columns:any):Promise<any[]> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.testStatement(table, columns);
         let parameters = [];
         this.logger.info(this, "executeTest", "Testing", statement);
-        database.executeSql(statement, parameters).then(
-          (data) => {
-            this.logger.info(this, "executeTest", "Tested", statement);
-            resolve(true);
-          },
-          (error) => {
-            this.logger.error(this, "executeTest", "Failed", statement, error);
-            reject(JSON.stringify(error));
-          });
+        database.executeSql(statement, parameters).then((data:any) => {
+          this.logger.info(this, "executeTest", "Tested", statement);
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeTest", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "executeSelect", "Failed", error);
         reject(error);
       });
     });
   }
 
-  executeSelect(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<any[]> {
+  private executeSelect(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<any[]> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.selectStatement(table, where, order, limit, offset);
         let parameters = this.selectParameters(table, where, order);
         this.logger.info(this, "executeSelect", "Selecting", statement, parameters);
-        database.executeSql(statement, parameters).then(
-          (data) => {
-            let results = [];
-            if (data.rows && data.rows.length > 0) {
-              for (let i = 0; i < data.rows.length; i++) {
-                let row = data.rows.item(i);
-                this.logger.info(this, "executeSelect", table, row);
-                results.push(row);
-              }
+        database.executeSql(statement, parameters).then((data:any) => {
+          let results = [];
+          if (data.rows && data.rows.length > 0) {
+            for (let i = 0; i < data.rows.length; i++) {
+              let row = data.rows.item(i);
+              this.logger.info(this, "executeSelect", table, row);
+              results.push(row);
             }
-            this.logger.info(this, "executeSelect", "Selected", statement, results);
-            resolve(results);
-          },
-          (error) => {
-            this.logger.error(this, "executeSelect", "Failed", statement, error);
-            reject(JSON.stringify(error));
-          });
+          }
+          this.logger.info(this, "executeSelect", "Selected", statement, results);
+          resolve(results);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeSelect", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "executeSelect", "Failed", error);
         reject(error);
       });
     });
   }
 
-  executeInsert(table:string, columns:any, values:{}):Promise<any> {
+  private executeInsert(table:string, columns:any, values:{}):Promise<number> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.insertStatement(table, columns, values);
         let parameters = this.insertParameters(table, columns, values);
         this.logger.info(this, "executeInsert", "Inserting", statement, parameters);
-        database.executeSql(statement, parameters).then(
-          (results) => {
-            this.logger.info(this, "executeInsert", "Inserted", statement, parameters, results);
-            resolve(results['insertId']);
-          },
-          (error) => {
-            this.logger.error(this, "executeInsert", "Failed", statement, parameters, error);
-            reject(JSON.stringify(error));
-          });
+        database.executeSql(statement, parameters).then((results:any) => {
+          this.logger.info(this, "executeInsert", "Inserted", statement, parameters, results);
+          resolve(results['insertId']);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeInsert", "Failed", statement, parameters, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "executeInsert", "Failed", error);
         reject(JSON.stringify(error));
       });
     });
   }
 
-  executeUpdate(table:string, columns:any[], values:{}, nulls:boolean=true):Promise<boolean> {
+  private executeUpdate(table:string, columns:any[], values:{}, nulls:boolean=true):Promise<number> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.updateStatement(table, columns, values, nulls);
         let parameters = this.updateParameters(table, columns, values, nulls);
         this.logger.info(this, "executeUpdate", "Updating", statement, parameters);
-        database.executeSql(statement, parameters).then(
-          (results) => {
-            this.logger.info(this, "executeUpdate", "Updated", statement, parameters, results);
-            resolve(results['rowsAffected'] > 0);
-          },
-          (error) => {
-            this.logger.error(this, "executeUpdate", "Failed", statement, parameters, error);
-            reject(JSON.stringify(error));
-          });
+        database.executeSql(statement, parameters).then((results:any) => {
+          this.logger.info(this, "executeUpdate", "Updated", statement, parameters, results);
+          resolve(results['rowsAffected']);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeUpdate", "Failed", statement, parameters, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "executeUpdate", "Failed", error);
         reject(JSON.stringify(error));
       });
     });
   }
 
-  executeDelete(table:string, where:{}):Promise<any> {
+  private executeDelete(table:string, where:{}):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.deleteStatement(table, where);
         this.logger.info(this, "executeDelete", "Deleting", statement);
-        database.executeSql(statement, []).then(
-          (results) => {
-            this.logger.info(this, "executeDelete", "Deleted", statement, results);
-            resolve(results['insertId']);
-          },
-          (error) => {
-            this.logger.error(this, "executeDelete", "Failed", statement, error);
-            reject(JSON.stringify(error));
-          });
+        database.executeSql(statement, []).then((results:any) => {
+          this.logger.info(this, "executeDelete", "Deleted", statement, results);
+          resolve(results['rowsAffected'] > 0);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeDelete", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
       },
-      (error) => {
+      (error:any) => {
         this.logger.error(this, "executeDelete", "Failed", error);
         reject(JSON.stringify(error));
       });
     });
   }
 
-  testStatement(table:string, columns:any[]):string {
+  private testStatement(table:string, columns:any[]):string {
     let query = [`SELECT`];
     let names = [];
     for (let column of columns) {
@@ -302,7 +326,7 @@ export class SqlService {
     return query.join(" ");
   }
 
-  selectStatement(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null) {
+  private selectStatement(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null) {
     let query = [`SELECT * FROM ${table}`];
     if (where != null && Object.keys(where).length > 0) {
       let clause = [];
@@ -340,7 +364,7 @@ export class SqlService {
     return query.join(" ");
   }
 
-  selectParameters(table:string, where:{}=null, order:{}=null): any[] {
+  private selectParameters(table:string, where:{}=null, order:{}=null): any[] {
     let parameters = [];
     if (where != null && Object.keys(where).length > 0) {
       for (let column in where) {
@@ -358,7 +382,7 @@ export class SqlService {
     return parameters;
   }
 
-  insertStatement(table:string, columns:any[], values:{}):string {
+  private insertStatement(table:string, columns:any[], values:{}):string {
     let names = [];
     let params = [];
     for (let column of columns) {
@@ -371,7 +395,7 @@ export class SqlService {
     return `INSERT INTO ${table} (${names.join(", ")}) VALUES (${params.join(", ")})`;
   }
 
-  insertParameters(table:string, columns:any[], values:{}):any {
+  private insertParameters(table:string, columns:any[], values:{}):any {
     let params:any[] = [];
     for (let column of columns) {
       let value = values[column.name];
@@ -382,7 +406,7 @@ export class SqlService {
     return params;
   }
 
-  updateStatement(table:string, columns:any[], values:{}, nulls:boolean=true):string {
+  private updateStatement(table:string, columns:any[], values:{}, nulls:boolean=true):string {
     let params:any[] = [];
     let clause = [];
     for (let column of columns) {
@@ -402,7 +426,7 @@ export class SqlService {
     return `UPDATE ${table} SET ${params.join(", ")} WHERE ${clause.join(" AND ")}`;
   }
 
-  updateParameters(table:string, columns:any[], values:{}, nulls:boolean=true):any {
+  private updateParameters(table:string, columns:any[], values:{}, nulls:boolean=true):any {
     let params:any[] = [];
     let clause = [];
     for (let column of columns) {
@@ -422,7 +446,7 @@ export class SqlService {
     return params.concat(clause);
   }
 
-  deleteStatement(table:string, where:{}):string {
+  private deleteStatement(table:string, where:{}):string {
     let clause = [];
     if (where && Object.keys(where).length > 0) {
       for (let column in where) {
@@ -435,71 +459,24 @@ export class SqlService {
     return `DELETE FROM ${table} WHERE ${clause.join(' AND ')}`;
   }
 
-  testModel<M extends Model>(type:M):Promise<boolean> {
+  protected testModel<M extends Model>(type:M):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.executeTest(type.getTable(), type.getColumns()).then(
-        (rows:any) => {
-          resolve(true);
-        },
-        (error:any) => {
-          reject(error);
-        });
+      this.executeTest(type.getTable(), type.getColumns()).then((rows:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
-  getModels<M extends Model>(type:M, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<M[]> {
+  protected getModels<M extends Model>(type:M, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<M[]> {
     return new Promise((resolve, reject) => {
-      this.executeSelect(type.getTable(), where, order, limit, offset).then(
-        (rows:any) => {
-          let models = [];
-          let columns = type.getColumns();
-          for (let i = 0; i < rows.length; i++) {
-            let row = rows[i];
-            let values = {};
-            for (let column of columns) {
-              if (column.type == INTEGER) {
-                values[column.property] = row[column.name];
-              }
-              else if (column.type == DOUBLE) {
-                values[column.property] = row[column.name];
-              }
-              else if (column.type == BOOLEAN) {
-                if (row[column.name] == 'true') {
-                  values[column.property] = true;
-                }
-                else if (row[column.name] == "1") {
-                  values[column.property] = true;
-                }
-                else if (row[column.name] == 1) {
-                  values[column.property] = true;
-                }
-                else {
-                  values[column.property] = false;
-                }
-              }
-              else if (column.type == TEXT) {
-                values[column.property] = row[column.name];
-              }
-              else {
-                values[column.property] = row[column.name];
-              }
-            }
-            let model = type.newInstance<M>(values);
-            models.push(model);
-          }
-          resolve(models);
-        },
-        (error:any) => {
-          reject(error);
-        });
-    });
-  }
-
-  getModel<M extends Model>(type:M, where:{}=null, order:{}=null):Promise<M> {
-    return new Promise((resolve, reject) => {
-      this.executeFirst(type.getTable(), where, order).then(
-        (row:any) => {
-          let columns = type.getColumns();
+      this.executeSelect(type.getTable(), where, order, limit, offset).then((rows:any) => {
+        let models = [];
+        let columns = type.getColumns();
+        for (let i = 0; i < rows.length; i++) {
+          let row = rows[i];
           let values = {};
           for (let column of columns) {
             if (column.type == INTEGER) {
@@ -530,75 +507,136 @@ export class SqlService {
             }
           }
           let model = type.newInstance<M>(values);
-          resolve(model);
-        },
-        (error:any) => {
-          reject(error);
-        });
+          models.push(model);
+        }
+        resolve(models);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
-  saveModel<M extends Model>(model:M, nulls:boolean=true):Promise<boolean> {
+  protected getModel<M extends Model>(type:M, where:{}=null, order:{}=null):Promise<M> {
+    return new Promise((resolve, reject) => {
+      this.executeFirst(type.getTable(), where, order).then((row:any) => {
+        let columns = type.getColumns();
+        let values = {};
+        for (let column of columns) {
+          if (column.type == INTEGER) {
+            values[column.property] = row[column.name];
+          }
+          else if (column.type == DOUBLE) {
+            values[column.property] = row[column.name];
+          }
+          else if (column.type == BOOLEAN) {
+            if (row[column.name] == 'true') {
+              values[column.property] = true;
+            }
+            else if (row[column.name] == "1") {
+              values[column.property] = true;
+            }
+            else if (row[column.name] == 1) {
+              values[column.property] = true;
+            }
+            else {
+              values[column.property] = false;
+            }
+          }
+          else if (column.type == TEXT) {
+            values[column.property] = row[column.name];
+          }
+          else {
+            values[column.property] = row[column.name];
+          }
+        }
+        let model = type.newInstance<M>(values);
+        resolve(model);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  protected saveModel<M extends Model>(model:M, nulls:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
       let table:string = model.getTable();
       let columns:any[] = model.getColumns();
       let values:any[] = model.getValues();
-      this.executeUpdate(table, columns, values, nulls).then(
-        (updated:boolean) => {
-          if (updated) {
-            this.logger.info(this, "saveModel", table, "Updated", updated, model);
-            resolve(updated);
+      if (model.hasKeys()) {
+        this.executeUpdate(table, columns, values, nulls).then((updated:number) => {
+          if (updated > 0) {
+            this.logger.info(this, "saveModel", table, "Updated", updated);
+            resolve(updated > 0);
           }
           else {
-            this.executeInsert(table, columns, values).then(
-              (inserted:any) => {
-                this.logger.info(this, "saveModel", table, "Inserted", inserted, model);
-                resolve(inserted != null);
-              },
-              (_error:any) => {
-                this.logger.error(this, "saveModel", table, "Inserted", _error);
-                reject(_error);
-              });
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "saveModel", table, "Updated", error);
-          this.executeInsert(table, columns, values).then(
-            (inserted:any) => {
+            this.executeInsert(table, columns, values).then((inserted:number) => {
               this.logger.info(this, "saveModel", table, "Inserted", inserted);
-              resolve(inserted);
+              if (model.id == null) {
+                model.id = inserted;
+              }
+              resolve(inserted != null);
             },
             (_error:any) => {
               this.logger.error(this, "saveModel", table, "Inserted", _error);
               reject(_error);
             });
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "saveModel", table, "Updated", error);
+          this.executeInsert(table, columns, values).then((inserted:number) => {
+            this.logger.info(this, "saveModel", table, "Inserted", inserted);
+            if (model.id == null) {
+              model.id = inserted;
+            }
+            resolve(inserted != null);
+          },
+          (_error:any) => {
+            this.logger.error(this, "saveModel", table, "Inserted", _error);
+            reject(_error);
+          });
         });
+      }
+      else {
+        this.executeInsert(table, columns, values).then((inserted:number) => {
+          this.logger.info(this, "saveModel", table, "Inserted", inserted);
+          if (model.id == null) {
+            model.id = inserted;
+          }
+          resolve(inserted != null);
+        },
+        (error:any) => {
+          this.logger.error(this, "saveModel", table, "Inserted", error);
+          reject(error);
+        });
+      }
     });
   }
 
-  removeModel<M extends Model>(model:M, where:any) {
+  protected removeModel<M extends Model>(model:M, where:any):Promise<boolean> {
     return this.executeDelete(model.getTable(), where);
   }
 
-  getMinium<M extends Model>(type:M, column:string):Promise<number> {
+  protected getMinium<M extends Model>(type:M, column:string):Promise<number> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = `SELECT MIN(${column}) as value FROM ${type.getTable()}`;
-        database.executeSql(statement, []).then(
-          (data) => {
-            this.logger.info(this, "getMinium", type.getTable(), column, data);
-            if (data.rows && data.rows.length > 0) {
-              let row = data.rows.item(0);
-              resolve(row.value);
-            }
-            else {
-              resolve(0);
-            }
-          },
-          (error) => {
-            this.logger.error(this, "executeSelect", "Failed", statement, error);
-            reject(JSON.stringify(error));
-          });
+        database.executeSql(statement, []).then((data:any) => {
+          this.logger.info(this, "getMinium", type.getTable(), column, data);
+          if (data.rows && data.rows.length > 0) {
+            let row = data.rows.item(0);
+            resolve(row.value);
+          }
+          else {
+            resolve(0);
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "executeSelect", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
       });
     });
   }

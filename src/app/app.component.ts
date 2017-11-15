@@ -222,37 +222,8 @@ export class RollcallApp {
   }
 
   private loadDatabase(models:Model[]):Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadDatabase");
-      this.database.createTables(models).then(
-        (created:any) => {
-          this.logger.info(this, "loadDatabase", "Created");
-          this.database.createIndexes(models).then((indexed:any) => {
-            this.logger.info(this, "loadDatabase", "Indexed");
-            let tests = [];
-            for (let model of models) {
-              tests.push(this.database.testModel(model));
-            }
-            Promise.all(tests).then(
-              (passed) => {
-                this.logger.info(this, "loadDatabase", "Tested");
-                resolve();
-              },
-              (error) => {
-                this.logger.error(this, "loadDatabase", "Failed", error);
-                reject(error);
-              });
-          },
-          (error:any) => {
-            this.logger.error(this, "loadDatabase", "Failed", error);
-            reject(error);
-          });
-        },
-        (error:any) => {
-          this.logger.error(this, "loadDatabase", "Failed", error);
-          reject(error);
-        });
-    });
+    this.logger.info(this, "loadDatabase");
+    return this.database.loadDatabase(models);
   }
 
   private resetDatabase():Promise<any> {

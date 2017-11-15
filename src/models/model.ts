@@ -9,6 +9,8 @@ export let PRIMARY_KEY:boolean = true;
 
 export class Model {
 
+  public id:any = null;
+
   constructor(data:any=null) {
     this.copyInto(data);
   }

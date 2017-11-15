@@ -31,37 +31,37 @@ export class DatabaseService extends SqlService {
 
   // ########## ORGANIZATION ##########
 
-  saveOrganization(organization:Organization):Promise<any> {
+  public saveOrganization(organization:Organization):Promise<boolean> {
     return this.saveModel(organization);
   }
 
-  getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
+  public getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
     return this.getModels<Organization>(new Organization(), where, order, limit, offset);
   }
 
-  getOrganization(id:number):Promise<Organization> {
+  public getOrganization(id:number):Promise<Organization> {
     let where = { id: id };
     return this.getModel<Organization>(new Organization(), where);
   }
 
-  removeOrganization(organization:Organization):Promise<any> {
+  public removeOrganization(organization:Organization):Promise<any> {
     let where = { id: organization.id };
     return this.removeModel<Organization>(new Organization(), where);
   }
 
-  removeOrganizations():Promise<any> {
+  public removeOrganizations():Promise<any> {
     let where = { };
     return this.removeModel<Organization>(new Organization(), where);
   }
 
   // ########## PERSON ##########
 
-  savePerson(organization:Organization, person:Person):Promise<any> {
+  public savePerson(organization:Organization, person:Person):Promise<any> {
     person.organization_id = organization.id;
     return this.saveModel(person);
   }
 
-  getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
+  public getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (organization) {
@@ -89,7 +89,7 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  getPerson(id:number, me:boolean=false):Promise<Person> {
+  public getPerson(id:number, me:boolean=false):Promise<Person> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (id) {
@@ -113,12 +113,12 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  removePerson(person:Person):Promise<any> {
+  public removePerson(person:Person):Promise<any> {
     let where = { id: person.id };
     return this.removeModel<Person>(new Person(), where);
   }
 
-  removePeople(organization:Organization=null) {
+  public removePeople(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -128,13 +128,13 @@ export class DatabaseService extends SqlService {
 
   // ########## CONTACT ##########
 
-  saveContact(person:Person, contact:Contact):Promise<any> {
+  public saveContact(person:Person, contact:Contact):Promise<any> {
     contact.organization_id = person.organization_id;
     contact.person_id = person.id;
     return this.saveModel(contact);
   }
 
-  getContacts(person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
+  public getContacts(person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
     let where = { };
     if (person) {
       where['id'] = person.id;
@@ -146,17 +146,17 @@ export class DatabaseService extends SqlService {
     return this.getModels<Contact>(new Contact(), where, order, limit, offset);
   }
 
-  getContact(id:number):Promise<Contact> {
+  public getContact(id:number):Promise<Contact> {
     let where = { id: id };
     return this.getModel<Contact>(new Contact(), where);
   }
 
-  removeContact(contact:Contact):Promise<any> {
+  public removeContact(contact:Contact):Promise<any> {
     let where = { id: contact.id };
     return this.removeModel<Contact>(new Contact(), where);
   }
 
-  removeContacts(person:Person=null) {
+  public removeContacts(person:Person=null) {
     let where = { };
     if (person) {
       where['person_id'] = person.id;
@@ -166,7 +166,7 @@ export class DatabaseService extends SqlService {
 
   // ########## ROLLCALL ##########
 
-  saveRollcall(organization:Organization, rollcall:Rollcall):Promise<any> {
+  public saveRollcall(organization:Organization, rollcall:Rollcall):Promise<any> {
     rollcall.organization_id = organization.id;
     return this.saveModel(rollcall);
   }
@@ -196,7 +196,7 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  getRollcall(id:number):Promise<Rollcall> {
+  public getRollcall(id:number):Promise<Rollcall> {
     return new Promise((resolve, reject) => {
       let where = { id: id };
       this.getModel<Rollcall>(new Rollcall(), where).then((rollcall:Rollcall) => {
@@ -213,12 +213,12 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  removeRollcall(rollcall:Rollcall):Promise<any> {
+  public removeRollcall(rollcall:Rollcall):Promise<any> {
     let where = { id: rollcall.id };
     return this.removeModel<Rollcall>(new Rollcall(), where);
   }
 
-  removeRollcalls(organization:Organization=null) {
+  public removeRollcalls(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -228,13 +228,13 @@ export class DatabaseService extends SqlService {
 
   // ########## ANSWER ##########
 
-  saveAnswer(rollcall:Rollcall, answer:Answer):Promise<any> {
+  public saveAnswer(rollcall:Rollcall, answer:Answer):Promise<any> {
     answer.organization_id = rollcall.organization_id;
     answer.rollcall_id = rollcall.id;
     return this.saveModel(answer);
   }
 
-  getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
+  public getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -246,17 +246,17 @@ export class DatabaseService extends SqlService {
     return this.getModels<Answer>(new Answer(), where, order, limit, offset);
   }
 
-  getAnswer(id:number):Promise<Answer> {
+  public getAnswer(id:number):Promise<Answer> {
     let where = { id: id };
     return this.getModel<Answer>(new Answer(), where);
   }
 
-  removeAnswer(answer:Answer):Promise<any> {
+  public removeAnswer(answer:Answer):Promise<any> {
     let where = { id: answer.id };
     return this.removeModel<Answer>(new Answer(), where);
   }
 
-  removeAnswers(rollcall:Rollcall=null) {
+  public removeAnswers(rollcall:Rollcall=null) {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -266,13 +266,13 @@ export class DatabaseService extends SqlService {
 
   // ########## REPLY ##########
 
-  saveReply(rollcall:Rollcall, reply:Reply):Promise<any> {
+  public saveReply(rollcall:Rollcall, reply:Reply):Promise<any> {
     reply.organization_id = rollcall.organization_id;
     reply.rollcall_id = rollcall.id;
     return this.saveModel(reply);
   }
 
-  getReplies(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
+  public getReplies(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (rollcall) {
@@ -299,17 +299,17 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  getReply(id:number):Promise<Reply> {
+  public getReply(id:number):Promise<Reply> {
     let where = { id: id };
     return this.getModel<Reply>(new Reply(), where);
   }
 
-  removeReply(reply:Reply):Promise<any> {
+  public removeReply(reply:Reply):Promise<any> {
     let where = { id: reply.id };
     return this.removeModel<Reply>(new Reply(), where);
   }
 
-  removeReplies(rollcall:Rollcall=null) {
+  public removeReplies(rollcall:Rollcall=null) {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -319,13 +319,13 @@ export class DatabaseService extends SqlService {
 
   // ########## RECIPIENT ##########
 
-  saveRecipient(rollcall:Rollcall, recipient:Recipient):Promise<any> {
+  public saveRecipient(rollcall:Rollcall, recipient:Recipient):Promise<any> {
     recipient.rollcall_id = rollcall.id;
     recipient.organization_id = rollcall.organization_id;
     return this.saveModel(recipient);
   }
 
-  getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
+  public getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -337,17 +337,17 @@ export class DatabaseService extends SqlService {
     return this.getModels<Recipient>(new Recipient(), where, order, limit, offset);
   }
 
-  getRecipient(id:number):Promise<Recipient> {
+  public getRecipient(id:number):Promise<Recipient> {
     let where = { id: id };
     return this.getModel<Recipient>(new Recipient(), where);
   }
 
-  removeRecipient(recipient:Recipient):Promise<any> {
+  public removeRecipient(recipient:Recipient):Promise<any> {
     let where = { id: recipient.id };
     return this.removeModel<Recipient>(new Recipient(), where);
   }
 
-  removeRecipients(rollcall:Rollcall=null) {
+  public removeRecipients(rollcall:Rollcall=null) {
     let where = { };
     if (rollcall) {
       where['rollcall_id'] = rollcall.id;
@@ -357,28 +357,28 @@ export class DatabaseService extends SqlService {
 
   // ########## EMAIL ##########
 
-  saveEmail(organization:Organization, email:Email):Promise<any> {
+  public saveEmail(organization:Organization, email:Email):Promise<any> {
     email.organization_id = organization.id;
     return this.saveModel(email);
   }
 
-  getEmails(organization:Organization, limit:number=null, offset:number=null):Promise<Email[]> {
+  public getEmails(organization:Organization, limit:number=null, offset:number=null):Promise<Email[]> {
     let where = { organization_id: organization.id };
     let order = { };
     return this.getModels<Email>(new Email(), where, order, limit, offset);
   }
 
-  getEmail(id:number):Promise<Email> {
+  public getEmail(id:number):Promise<Email> {
     let where = { id: id };
     return this.getModel<Email>(new Email(), where);
   }
 
-  removeEmail(email:Email):Promise<any> {
+  public removeEmail(email:Email):Promise<any> {
     let where = { id: email.id };
     return this.removeModel<Email>(new Email(), where);
   }
 
-  removeEmails(organization:Organization=null) {
+  public removeEmails(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -388,28 +388,28 @@ export class DatabaseService extends SqlService {
 
   // ########## NOTIFICATION ##########
 
-  saveNotification(organization:Organization, notification:Notification):Promise<any> {
+  public saveNotification(organization:Organization, notification:Notification):Promise<any> {
     notification.organization_id = organization.id;
     return this.saveModel(notification, false);
   }
 
-  getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {
+  public getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "DESC" };
     return this.getModels<Notification>(new Notification(), where, order, limit, offset);
   }
 
-  getNotification(id:number):Promise<Notification> {
+  public getNotification(id:number):Promise<Notification> {
     let where = { id: id };
     return this.getModel<Notification>(new Notification(), where);
   }
 
-  removeNotification(notification:Notification):Promise<any> {
+  public removeNotification(notification:Notification):Promise<any> {
     let where = { id: notification.id };
     return this.removeModel<Notification>(new Notification(), where);
   }
 
-  removeNotifications(organization:Organization=null) {
+  public removeNotifications(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -419,12 +419,12 @@ export class DatabaseService extends SqlService {
 
   // ########## GROUP ##########
 
-  saveGroup(organization:Organization, group:Group):Promise<any> {
+  public saveGroup(organization:Organization, group:Group):Promise<any> {
     group.organization_id = organization.id;
     return this.saveModel(group);
   }
 
-  getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
+  public getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       let where = { organization_id: organization.id };
       let order = { name: "ASC" };
@@ -441,7 +441,7 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  getGroup(organization:Organization, id:number):Promise<Group> {
+  public getGroup(organization:Organization, id:number):Promise<Group> {
     return new Promise((resolve, reject) => {
       let where = {
         organization_id: organization.id,
@@ -458,12 +458,12 @@ export class DatabaseService extends SqlService {
     });
   }
 
-  removeGroup(group:Group):Promise<any> {
+  public removeGroup(group:Group):Promise<any> {
     let where = { id: group.id };
     return this.removeModel<Group>(new Group(), where);
   }
 
-  removeGroups(organization:Organization=null) {
+  public removeGroups(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -473,28 +473,28 @@ export class DatabaseService extends SqlService {
 
   // ########## SETTINGS ##########
 
-  saveSettings(organization:Organization, settings:Settings):Promise<any> {
+  public saveSettings(organization:Organization, settings:Settings):Promise<any> {
     settings.organization_id = organization.id;
     return this.saveModel(settings);
   }
 
-  getSettings(organization:Organization):Promise<Settings[]> {
+  public getSettings(organization:Organization):Promise<Settings[]> {
     let where = { organization_id: organization.id };
     let order = { key: "ASC" };
     return this.getModels<Settings>(new Settings(), where, order);
   }
 
-  getSetting(id:number):Promise<Settings> {
+  public getSetting(id:number):Promise<Settings> {
     let where = { id: id };
     return this.getModel<Settings>(new Settings(), where);
   }
 
-  removeSetting(settings:Settings):Promise<any> {
+  public removeSetting(settings:Settings):Promise<any> {
     let where = { id: settings.id };
     return this.removeModel<Settings>(new Settings(), where);
   }
 
-  removeSettings(organization:Organization=null) {
+  public removeSettings(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -504,28 +504,28 @@ export class DatabaseService extends SqlService {
 
   // ########## SUBSCRIPTIONS ##########
 
-  saveSubscription(organization:Organization, subscription:Subscription):Promise<any> {
+  public saveSubscription(organization:Organization, subscription:Subscription):Promise<any> {
     subscription.organization_id = organization.id;
     return this.saveModel(subscription);
   }
 
-  getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
+  public getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "ASC" };
     return this.getModels<Subscription>(new Subscription(), where, order, limit, offset);
   }
 
-  getSubscription(id:number):Promise<Subscription> {
+  public getSubscription(id:number):Promise<Subscription> {
     let where = { id: id };
     return this.getModel<Subscription>(new Subscription(), where);
   }
 
-  removeSubscription(subscription:Subscription):Promise<any> {
+  public removeSubscription(subscription:Subscription):Promise<any> {
     let where = { id: subscription.id };
     return this.removeModel<Subscription>(new Subscription(), where);
   }
 
-  removeSubscriptions(organization:Organization=null) {
+  public removeSubscriptions(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
@@ -535,28 +535,28 @@ export class DatabaseService extends SqlService {
 
   // ########## COUNTRIES ##########
 
-  saveCountry(organization:Organization, country:Country):Promise<any> {
+  public saveCountry(organization:Organization, country:Country):Promise<any> {
     country.organization_id = organization.id;
     return this.saveModel(country);
   }
 
-  getCountries(organization:Organization, limit:number=null, offset:number=null):Promise<Country[]> {
+  public getCountries(organization:Organization, limit:number=null, offset:number=null):Promise<Country[]> {
     let where = { organization_id: organization.id };
     let order = { created_at: "ASC" };
     return this.getModels<Country>(new Country(), where, order, limit, offset);
   }
 
-  getCountry(id:number):Promise<Country> {
+  public getCountry(id:number):Promise<Country> {
     let where = { id: id };
     return this.getModel<Country>(new Country(), where);
   }
 
-  removeCountry(region:Country):Promise<any> {
+  public removeCountry(region:Country):Promise<any> {
     let where = { id: region.id };
     return this.removeModel<Country>(new Country(), where);
   }
 
-  removeCountries(organization:Organization=null) {
+  public removeCountries(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
