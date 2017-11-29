@@ -108,10 +108,9 @@ export class RollcallListPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadRollCalls(cache); })
       .then(() => { return this.loadNotifications(cache); })
-      // .then(() => { return this.loadBadgeNumber(); })
+      .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
-        this.loadBadgeNumber();
         if (event) {
           event.complete();
         }
@@ -128,44 +127,45 @@ export class RollcallListPage extends BasePage {
 
   private loadBadgeNumber():Promise<number> {
     return new Promise((resolve, reject) => {
-      try {
-        let badgeNumber = 0;
-        if (this.organization && this.organization.rollcalls) {
-          for (let rollcall of this.organization.rollcalls) {
-            if (rollcall.canRespond(this.person)) {
-              badgeNumber = badgeNumber + 1;
-            }
-          }
-        }
-        this.logger.info(this, "loadBadgeNumber", badgeNumber);
-        this.badge.hasPermission().then((permission:any) => {
-          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
-          if (badgeNumber > 0) {
-            this.badge.set(badgeNumber).then((result:any) => {
-              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
-              resolve(badgeNumber);
-            },
-            (error:any) => {
-              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-              resolve(0);
-            });
-          }
-          else {
-            this.badge.clear().then((cleared:boolean) => {
-              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
-              resolve(0);
-            },
-            (error:any) => {
-              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-              resolve(0);
-            });
-          }
-        });
-      }
-      catch(error) {
-        this.logger.error(this, "loadBadgeNumber", "Error", error);
-        resolve(0);
-      }
+      resolve(true);
+      // try {
+      //   let badgeNumber = 0;
+      //   if (this.organization && this.organization.rollcalls) {
+      //     for (let rollcall of this.organization.rollcalls) {
+      //       if (rollcall.canRespond(this.person)) {
+      //         badgeNumber = badgeNumber + 1;
+      //       }
+      //     }
+      //   }
+      //   this.logger.info(this, "loadBadgeNumber", badgeNumber);
+      //   this.badge.registerPermission().then((permission:any) => {
+      //     this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
+      //     if (badgeNumber > 0) {
+      //       this.badge.set(badgeNumber).then((result:any) => {
+      //         this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
+      //         resolve(badgeNumber);
+      //       },
+      //       (error:any) => {
+      //         this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+      //         resolve(0);
+      //       });
+      //     }
+      //     else {
+      //       this.badge.clear().then((cleared:boolean) => {
+      //         this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
+      //         resolve(0);
+      //       },
+      //       (error:any) => {
+      //         this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+      //         resolve(0);
+      //       });
+      //     }
+      //   });
+      // }
+      // catch(error) {
+      //   this.logger.error(this, "loadBadgeNumber", "Error", error);
+      //   resolve(0);
+      // }
     });
   }
 

@@ -32,7 +32,8 @@ export class ApiService extends HttpService {
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
 
   scope:string = "user";
-  api:string = "https://api.staging.rollcall.io";
+  api:string = "https://api.rollcall.io";
+  // api:string = "https://api.staging.rollcall.io";
 
   constructor(
     protected device:Device,

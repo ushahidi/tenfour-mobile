@@ -339,7 +339,7 @@ export class SqlService {
           }
           clause.push(`${column} IN (${inClause.join(', ')})`);
         }
-        else if (parameter.toString().indexOf("%") != -1){
+        else if (parameter && parameter.toString().indexOf("%") != -1){
           clause.push(`${column} LIKE ?`);
         }
         else {

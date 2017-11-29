@@ -23,7 +23,7 @@
     "@angular/platform-browser-dynamic": "4.4.6",
     "@ionic-native/app-availability": "4.3.3",
     "@ionic-native/app-version": "4.3.3",
-    "@ionic-native/badge": "4.3.3",
+    "@ionic-native/badge": "^4.3.3",
     "@ionic-native/camera": "4.3.3",
     "@ionic-native/contacts": "4.3.3",
     "@ionic-native/core": "4.3.3",
