@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title>RollCall</ion-title>
+    <ion-title>TenFour</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content no-bounce>
@@ -47,19 +47,19 @@
       </ion-card>
       <div padding-left padding-right class="completed" *ngIf="person.config_self_test_sent == true">
         <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
-        <p>You sent a test RollCall to yourself</p>
+        <p>You sent a test Checkin to yourself</p>
       </div>
-      <ion-card tappable [class.disabled]="person.config_people_invited == false || person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendRollCall($event)">
+      <ion-card tappable [class.disabled]="person.config_people_invited == false || person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendCheckin($event)">
         <ion-card-content>
           <div class="icon-border">
             <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
           </div>
-          <h2>Send a test RollCall to yourself</h2>
+          <h2>Send a test Checkin to yourself</h2>
           <p>Confirm that you'll get messages when it really matters by sending yourself a test message.</p>
         </ion-card-content>
       </ion-card>
       <div padding-left padding-right padding-bottom>
-        <button ion-button block color="primary" (click)="showRollcallList($event)"
+        <button ion-button block color="primary" (click)="showCheckinList($event)"
                 *ngIf="person.config_people_invited == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
       </div>
     </ion-slide>

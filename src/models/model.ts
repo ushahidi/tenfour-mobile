@@ -15,19 +15,19 @@ export class Model {
     this.copyInto(data);
   }
 
-  public newInstance<M extends Model>(data:any=null) : M {
+  public newInstance<M extends Model>(data:any=null):any {
     return null;
   }
 
-  public getTable() : string {
+  public getTable():string {
     return this.constructor[TABLE];
   }
 
-  public getColumns() : any[] {
+  public getColumns():any[] {
     return this.constructor[COLUMNS];
   }
 
-  public getValues() : any {
+  public getValues():any {
     let values = {};
     let columns = this.getColumns();
     for (let index in columns) {
@@ -38,7 +38,7 @@ export class Model {
     return values;
   }
 
-  public hasKeys() : boolean {
+  public hasKeys():boolean {
     let columns = this.getColumns();
     for (let index in columns) {
       let column = columns[index];
@@ -50,7 +50,7 @@ export class Model {
     return true;
   }
 
-  public copyInto(values:any) : Model {
+  public copyInto(values:any):Model {
     if (values != null) {
       for (let key in values) {
         if (values[key] != null) {

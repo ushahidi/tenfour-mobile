@@ -3,7 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Person } from '../models/person';
-import { Rollcall } from '../models/rollcall';
+import { Checkin } from '../models/checkin';
 import { Settings } from '../models/settings';
 import { Group } from '../models/group';
 import { Region } from '../models/region';
@@ -168,7 +168,7 @@ export class Organization extends Model {
 
   public people:Person[] = [];
 
-  public rollcalls:Rollcall[] = [];
+  public checkins:Checkin[] = [];
 
   public groups:Group[] = [];
 

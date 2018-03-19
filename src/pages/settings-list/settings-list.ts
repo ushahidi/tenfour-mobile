@@ -11,7 +11,7 @@ import { SettingsTypesPage } from '../../pages/settings-types/settings-types';
 import { SettingsSizesPage } from '../../pages/settings-sizes/settings-sizes';
 import { SettingsRegionsPage } from '../../pages/settings-regions/settings-regions';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
-import { SettingsRollcallsPage } from '../../pages/settings-rollcalls/settings-rollcalls';
+import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-checkins';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -21,7 +21,7 @@ import { Person } from '../../models/person';
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
   providers: [ ApiService ],
-  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsRollcallsPage ]
+  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
 })
 export class SettingsListPage extends BasePage {
 
@@ -101,9 +101,9 @@ export class SettingsListPage extends BasePage {
         person: this.person });
   }
 
-  private settingsRollcalls(event:any) {
-    this.logger.info(this, "settingsRollcalls");
-    this.showModal(SettingsRollcallsPage,
+  private settingsCheckins(event:any) {
+    this.logger.info(this, "settingsCheckins");
+    this.showModal(SettingsCheckinsPage,
       { organization: this.organization,
         person: this.person });
   }

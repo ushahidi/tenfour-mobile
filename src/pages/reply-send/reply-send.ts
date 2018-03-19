@@ -10,7 +10,7 @@ import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
-import { Rollcall } from '../../models/rollcall';
+import { Checkin } from '../../models/checkin';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Person } from '../../models/person';
@@ -31,8 +31,8 @@ export class ReplySendPage extends BasePage {
   loading:boolean = false;
 
   organization:Organization = null;
-  rollcalls:Rollcall[] = [];
-  rollcall:Rollcall = null;
+  checkins:Checkin[] = [];
+  checkin:Checkin = null;
 
   constructor(
     protected zone:NgZone,
@@ -55,35 +55,35 @@ export class ReplySendPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.rollcalls = this.getParameter<Rollcall[]>("rollcalls");
-    this.rollcall = this.getParameter<Rollcall>("rollcall");
-    if (this.rollcalls && this.rollcall) {
-      this.index = this.rollcalls.indexOf(this.rollcall);
+    this.checkins = this.getParameter<Checkin[]>("checkins");
+    this.checkin = this.getParameter<Checkin>("checkin");
+    if (this.checkins && this.checkin) {
+      this.index = this.checkins.indexOf(this.checkin);
     }
-    else if (this.rollcalls) {
+    else if (this.checkins) {
       this.index = 0;
-      this.rollcall = this.rollcalls[0];
+      this.checkin = this.checkins[0];
     }
     else {
       this.index = 0;
-      this.rollcalls = [this.rollcall];
-      this.rollcall.reply = this.getParameter<Reply>("reply");
+      this.checkins = [this.checkin];
+      this.checkin.reply = this.getParameter<Reply>("reply");
     }
-    for (let rollcall of this.rollcalls) {
-      if (rollcall.reply == null) {
-        rollcall.reply = new Reply();
-        rollcall.reply.organization_id = this.organization.id;
-        rollcall.reply.rollcall_id = this.rollcall.id;
+    for (let checkin of this.checkins) {
+      if (checkin.reply == null) {
+        checkin.reply = new Reply();
+        checkin.reply.organization_id = this.organization.id;
+        checkin.reply.checkin_id = this.checkin.id;
       }
     }
     this.loadLocation().then((location:Location) => {
       this.logger.info(this, "Location", location);
       if (location) {
-        for (let rollcall of this.rollcalls) {
-          if (rollcall.reply.location_text == null) {
-            rollcall.reply.latitude = location.latitude;
-            rollcall.reply.longitude = location.longitude;
-            rollcall.reply.location_text = location.address;
+        for (let checkin of this.checkins) {
+          if (checkin.reply.location_text == null) {
+            checkin.reply.latitude = location.latitude;
+            checkin.reply.longitude = location.longitude;
+            checkin.reply.location_text = location.address;
           }
         }
       }
@@ -158,28 +158,28 @@ export class ReplySendPage extends BasePage {
 
   private slideChanged(event:any) {
     let index = this.slides.getActiveIndex();
-    if (index >= 0 && index < this.rollcalls.length) {
+    if (index >= 0 && index < this.checkins.length) {
       this.logger.info(this, "slideChanged", event, index);
       this.index = index;
-      this.rollcall = this.rollcalls[this.index];
+      this.checkin = this.checkins[this.index];
     }
     else {
       this.logger.error(this, "slideChanged", event, index);
     }
   }
 
-  private selectAnswer(rollcall:Rollcall, reply:Reply, answer:Answer) {
+  private selectAnswer(checkin:Checkin, reply:Reply, answer:Answer) {
     this.logger.info(this, "selectAnswer", answer);
     reply.answer = answer.answer;
   }
 
   private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
-    if (this.rollcall && this.rollcall.reply && this.rollcall.reply.id) {
-      this.database.getReply(this.rollcall.reply.id).then((reply:Reply) => {
-        this.rollcall.reply.answer = reply.answer;
-        this.rollcall.reply.message = reply.message;
-        this.rollcall.reply.location_text = reply.location_text;
+    if (this.checkin && this.checkin.reply && this.checkin.reply.id) {
+      this.database.getReply(this.checkin.reply.id).then((reply:Reply) => {
+        this.checkin.reply.answer = reply.answer;
+        this.checkin.reply.message = reply.message;
+        this.checkin.reply.location_text = reply.location_text;
         this.hideModal({
           canceled: true
         });
@@ -192,14 +192,14 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  private sendReply(rollcall:Rollcall, reply:Reply) {
+  private sendReply(checkin:Checkin, reply:Reply) {
     this.logger.info(this, "sendReply", reply);
     if (reply.answer == null || reply.answer.length == 0) {
       this.showToast("Answer is required, please select your response");
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.postReply(this.organization, rollcall, reply).then(
+      this.api.postReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "sendReply", "Reply", replied);
           this.database.getPerson(replied.user_id).then((person:Person) => {
@@ -208,9 +208,9 @@ export class ReplySendPage extends BasePage {
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(rollcall, replied).then(saved => {
+            this.database.saveReply(checkin, replied).then(saved => {
               loading.dismiss();
-              this.hideRollcall(rollcall, replied);
+              this.hideCheckin(checkin, replied);
             });
           });
         },
@@ -221,14 +221,14 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  private saveReply(rollcall:Rollcall, reply:Reply) {
+  private saveReply(checkin:Checkin, reply:Reply) {
     this.logger.info(this, "saveReply", reply);
     if (reply.answer == null || reply.answer.length == 0) {
       this.showToast("Answer is required, please select your response");
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.putReply(this.organization, rollcall, reply).then(
+      this.api.putReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "saveReply", "Reply", replied);
           this.database.getPerson(replied.user_id).then((person:Person) => {
@@ -237,9 +237,9 @@ export class ReplySendPage extends BasePage {
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(rollcall, replied).then(saved => {
+            this.database.saveReply(checkin, replied).then(saved => {
               loading.dismiss();
-              this.hideRollcall(rollcall, replied);
+              this.hideCheckin(checkin, replied);
             });
           });
         },
@@ -250,21 +250,21 @@ export class ReplySendPage extends BasePage {
     }
   }
 
-  private hideRollcall(rollcall:Rollcall, reply:Reply) {
-    if (this.rollcalls.length > 1) {
+  private hideCheckin(checkin:Checkin, reply:Reply) {
+    if (this.checkins.length > 1) {
       let index = this.slides.getActiveIndex();
-      this.logger.info(this, "hideRollcall", index);
+      this.logger.info(this, "hideCheckin", index);
       if (index == 0) {
-        this.rollcalls.shift();
+        this.checkins.shift();
         this.slides.slideTo(0, 0, true);
       }
       else {
-        this.rollcalls.splice(index, 1);
+        this.checkins.splice(index, 1);
         this.slides.slideTo(index-1, 0, true);
       }
     }
     else {
-      this.showToast("Rollcall Reply Sent");
+      this.showToast("Checkin Reply Sent");
       this.hideModal({reply: reply});
     }
   }

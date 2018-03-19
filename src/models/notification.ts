@@ -13,11 +13,11 @@ export class Notification extends Model {
       if (data.data.reply_from) {
         this.reply_from = data.data.reply_from;
       }
-      if (data.data.rollcall_id) {
-        this.rollcall_id = data.data.rollcall_id;
+      if (data.data.checkin_id) {
+        this.checkin_id = data.data.checkin_id;
       }
-      if (data.data.rollcall_message) {
-        this.rollcall_message = data.data.rollcall_message;
+      if (data.data.checkin_message) {
+        this.checkin_message = data.data.checkin_message;
       }
       if (data.data.person_id) {
         this.person_id = data.data.person_id;
@@ -47,8 +47,8 @@ export class Notification extends Model {
   @Column("notifiable_id", INTEGER)
   public notifiable_id:number = null;
 
-  @Column("rollcall_id", INTEGER)
-  public rollcall_id:number = null;
+  @Column("checkin_id", INTEGER)
+  public checkin_id:number = null;
 
   @Column("person_id", INTEGER)
   public person_id:number = null;
@@ -62,8 +62,8 @@ export class Notification extends Model {
   @Column("reply_from", TEXT)
   public reply_from:string = null;
 
-  @Column("rollcall_message", TEXT)
-  public rollcall_message:string = null;
+  @Column("checkin_message", TEXT)
+  public checkin_message:string = null;
 
   @Column("person_name", TEXT)
   public person_name:string = null;

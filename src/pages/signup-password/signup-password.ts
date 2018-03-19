@@ -29,8 +29,8 @@ export class SignupPasswordPage extends BasePage {
   organization:Organization;
 
   accepted:boolean = false;
-  termsOfService:string = "https://www.rollcall.io/terms-of-service";
-  privacyPolicy:string = "https://www.rollcall.io/privacy-policy";
+  termsOfService:string = "https://www.tenfour.org/terms-of-service";
+  privacyPolicy:string = "https://www.tenfour.org/privacy-policy";
 
   constructor(
       protected zone:NgZone,

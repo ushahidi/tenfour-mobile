@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons end>
+      <button ion-button color="primary" [disabled]="checkin.message == null || checkin.message.length == 0" (click)="showNext($event)" *ngIf="checkin">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="checkin">
+    <ion-item text-center no-lines color="white" class="avatar">
+      <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
+    </ion-item>
+    <ion-item text-wrap text-center no-lines color="white" class="textarea">
+      <ion-textarea text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message" [(ngModel)]="checkin.message"></ion-textarea>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="checkin && checkin.answers">
+    <ion-list-header>Answers</ion-list-header>
+    <ion-item color="white" tappable (click)="addAnswer()" *ngIf="checkin.answers.length > 0">
+      <h2 ion-text color="primary">Add answer</h2>
+    </ion-item>
+    <ion-item color="white" *ngFor="let answer of checkin.answers">
+      <button ion-button icon-only item-start clear tappable (click)="changeColor(answer, $event)">
+        <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
+      </button>
+      <ion-input type="text" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
+      <button ion-button icon-only item-end clear color="black" tappable (click)="removeAnswer(answer)">
+        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+      </button>
+    </ion-item>
+  </ion-list>
+  <div padding-left padding-right text-center>
+    <button ion-button text-only clear color="primary" (click)="addDefaults()" *ngIf="checkin && checkin.answers && checkin.answers.length == 0">
+      Ask for a response
+    </button>
+    <button ion-button text-only clear color="primary" (click)="removeAnswers()" *ngIf="checkin && checkin.answers && checkin.answers.length > 0">
+      Don't ask for a response
+    </button>
+  </div>
+</ion-content>

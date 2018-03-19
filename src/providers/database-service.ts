@@ -8,7 +8,7 @@ import { LoggerService } from '../providers/logger-service';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
-import { Rollcall } from '../models/rollcall';
+import { Checkin } from '../models/checkin';
 import { Organization } from '../models/organization';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
@@ -166,81 +166,81 @@ export class DatabaseService extends SqlService {
 
   // ########## ROLLCALL ##########
 
-  public saveRollcall(organization:Organization, rollcall:Rollcall):Promise<any> {
-    rollcall.organization_id = organization.id;
-    return this.saveModel(rollcall);
+  public saveCheckin(organization:Organization, checkin:Checkin):Promise<any> {
+    checkin.organization_id = organization.id;
+    return this.saveModel(checkin);
   }
 
-  getRollcalls(organization:Organization, limit:number=null, offset:number=null):Promise<Rollcall[]> {
+  getCheckins(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       let where = { organization_id: organization.id };
       let order = { created_at: "DESC" };
-      this.getModels<Rollcall>(new Rollcall(), where, order, limit, offset).then((rollcalls:Rollcall[]) => {
-        let rollcall_ids = rollcalls.map((rollcall:Rollcall) => rollcall.id);
-        this.logger.info(this, "getRollcalls", "IDs", rollcall_ids);
+      this.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
+        let checkin_ids = checkins.map((checkin:Checkin) => checkin.id);
+        this.logger.info(this, "getCheckins", "IDs", checkin_ids);
         Promise.all([
-          this.getAnswers(null, rollcall_ids),
-          this.getReplies(null, rollcall_ids),
-          this.getRecipients(null, rollcall_ids)]).then((results:any[]) => {
+          this.getAnswers(null, checkin_ids),
+          this.getReplies(null, checkin_ids),
+          this.getRecipients(null, checkin_ids)]).then((results:any[]) => {
             let answers = <Answer[]>results[0];
             let replies = <Reply[]>results[1];
             let recipients = <Recipient[]>results[2];
-            for (let rollcall of rollcalls) {
-              rollcall.answers = answers.filter(answer => answer.rollcall_id == rollcall.id);
-              rollcall.replies = replies.filter(reply => reply.rollcall_id == rollcall.id);
-              rollcall.recipients = recipients.filter(recipient => recipient.rollcall_id == rollcall.id);
+            for (let checkin of checkins) {
+              checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
+              checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
+              checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
             }
-            resolve(rollcalls);
+            resolve(checkins);
         });
       });
     });
   }
 
-  public getRollcall(id:number):Promise<Rollcall> {
+  public getCheckin(id:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       let where = { id: id };
-      this.getModel<Rollcall>(new Rollcall(), where).then((rollcall:Rollcall) => {
+      this.getModel<Checkin>(new Checkin(), where).then((checkin:Checkin) => {
         Promise.all([
-          this.getAnswers(rollcall),
-          this.getReplies(rollcall),
-          this.getRecipients(rollcall)]).then((results:any[]) => {
-            rollcall.answers = <Answer[]>results[0];
-            rollcall.replies = <Reply[]>results[1];
-            rollcall.recipients = <Recipient[]>results[2];
-            resolve(rollcall);
+          this.getAnswers(checkin),
+          this.getReplies(checkin),
+          this.getRecipients(checkin)]).then((results:any[]) => {
+            checkin.answers = <Answer[]>results[0];
+            checkin.replies = <Reply[]>results[1];
+            checkin.recipients = <Recipient[]>results[2];
+            resolve(checkin);
         });
       });
     });
   }
 
-  public removeRollcall(rollcall:Rollcall):Promise<any> {
-    let where = { id: rollcall.id };
-    return this.removeModel<Rollcall>(new Rollcall(), where);
+  public removeCheckin(checkin:Checkin):Promise<any> {
+    let where = { id: checkin.id };
+    return this.removeModel<Checkin>(new Checkin(), where);
   }
 
-  public removeRollcalls(organization:Organization=null) {
+  public removeCheckins(organization:Organization=null) {
     let where = { };
     if (organization) {
       where['organization_id'] = organization.id;
     }
-    return this.removeModel<Rollcall>(new Rollcall(), where);
+    return this.removeModel<Checkin>(new Checkin(), where);
   }
 
   // ########## ANSWER ##########
 
-  public saveAnswer(rollcall:Rollcall, answer:Answer):Promise<any> {
-    answer.organization_id = rollcall.organization_id;
-    answer.rollcall_id = rollcall.id;
+  public saveAnswer(checkin:Checkin, answer:Answer):Promise<any> {
+    answer.organization_id = checkin.organization_id;
+    answer.checkin_id = checkin.id;
     return this.saveModel(answer);
   }
 
-  public getAnswers(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
+  public getAnswers(checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
     let where = { };
-    if (rollcall) {
-      where['rollcall_id'] = rollcall.id;
+    if (checkin) {
+      where['checkin_id'] = checkin.id;
     }
-    if (rollcall_ids) {
-      where['rollcall_id'] = rollcall_ids;
+    if (checkin_ids) {
+      where['checkin_id'] = checkin_ids;
     }
     let order = { };
     return this.getModels<Answer>(new Answer(), where, order, limit, offset);
@@ -256,30 +256,30 @@ export class DatabaseService extends SqlService {
     return this.removeModel<Answer>(new Answer(), where);
   }
 
-  public removeAnswers(rollcall:Rollcall=null) {
+  public removeAnswers(checkin:Checkin=null) {
     let where = { };
-    if (rollcall) {
-      where['rollcall_id'] = rollcall.id;
+    if (checkin) {
+      where['checkin_id'] = checkin.id;
     }
     return this.removeModel<Answer>(new Answer(), where);
   }
 
   // ########## REPLY ##########
 
-  public saveReply(rollcall:Rollcall, reply:Reply):Promise<any> {
-    reply.organization_id = rollcall.organization_id;
-    reply.rollcall_id = rollcall.id;
+  public saveReply(checkin:Checkin, reply:Reply):Promise<any> {
+    reply.organization_id = checkin.organization_id;
+    reply.checkin_id = checkin.id;
     return this.saveModel(reply);
   }
 
-  public getReplies(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
+  public getReplies(checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
     return new Promise((resolve, reject) => {
       let where = { };
-      if (rollcall) {
-        where['rollcall_id'] = rollcall.id;
+      if (checkin) {
+        where['checkin_id'] = checkin.id;
       }
-      if (rollcall_ids) {
-        where['rollcall_id'] = rollcall_ids;
+      if (checkin_ids) {
+        where['checkin_id'] = checkin_ids;
       }
       let order = {  created_at: "DESC" };
       this.getModels<Reply>(new Reply(), where, order, limit, offset).then((replies:Reply[]) => {
@@ -309,29 +309,29 @@ export class DatabaseService extends SqlService {
     return this.removeModel<Reply>(new Reply(), where);
   }
 
-  public removeReplies(rollcall:Rollcall=null) {
+  public removeReplies(checkin:Checkin=null) {
     let where = { };
-    if (rollcall) {
-      where['rollcall_id'] = rollcall.id;
+    if (checkin) {
+      where['checkin_id'] = checkin.id;
     }
     return this.removeModel<Reply>(new Reply(), where);
   }
 
   // ########## RECIPIENT ##########
 
-  public saveRecipient(rollcall:Rollcall, recipient:Recipient):Promise<any> {
-    recipient.rollcall_id = rollcall.id;
-    recipient.organization_id = rollcall.organization_id;
+  public saveRecipient(checkin:Checkin, recipient:Recipient):Promise<any> {
+    recipient.checkin_id = checkin.id;
+    recipient.organization_id = checkin.organization_id;
     return this.saveModel(recipient);
   }
 
-  public getRecipients(rollcall:Rollcall, rollcall_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
+  public getRecipients(checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
     let where = { };
-    if (rollcall) {
-      where['rollcall_id'] = rollcall.id;
+    if (checkin) {
+      where['checkin_id'] = checkin.id;
     }
-    if (rollcall_ids) {
-      where['rollcall_id'] = rollcall_ids;
+    if (checkin_ids) {
+      where['checkin_id'] = checkin_ids;
     }
     let order = { };
     return this.getModels<Recipient>(new Recipient(), where, order, limit, offset);
@@ -347,10 +347,10 @@ export class DatabaseService extends SqlService {
     return this.removeModel<Recipient>(new Recipient(), where);
   }
 
-  public removeRecipients(rollcall:Rollcall=null) {
+  public removeRecipients(checkin:Checkin=null) {
     let where = { };
-    if (rollcall) {
-      where['rollcall_id'] = rollcall.id;
+    if (checkin) {
+      where['checkin_id'] = checkin.id;
     }
     return this.removeModel<Recipient>(new Recipient(), where);
   }

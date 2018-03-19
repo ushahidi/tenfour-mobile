@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons start>
+      <button ion-button color="primary" (click)="cancelCheckin($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title></ion-title>
+    <ion-buttons end *ngIf="checkin">
+      <button ion-button color="primary"  (click)="sendCheckin($event)">Send</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="checkin">
+    <ion-item text-wrap text-center color="white">
+      <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
+      <h1 padding-top>{{checkin.message}}</h1>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="checkin">
+    <ion-list-header>Send To</ion-list-header>
+    <ion-item color="white" *ngFor="let recipient of checkin.recipients">
+      <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
+      <h2>{{recipient.name}}</h2>
+    </ion-item>
+  </ion-list>
+</ion-content>

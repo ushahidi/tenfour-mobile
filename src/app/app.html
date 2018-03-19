@@ -9,7 +9,7 @@
     </ion-header>
     <ion-content>
       <ion-list *ngIf="organization">
-        <ion-item color="white" detail-push tappable (click)="showRollcallList($event)">RollCalls</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Checkins</ion-item>
         <ion-item color="white" detail-push tappable (click)="showPersonList($event)">People</ion-item>
         <ion-item color="white" detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
         <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>

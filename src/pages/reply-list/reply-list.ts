@@ -8,7 +8,7 @@ import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
-import { Rollcall } from '../../models/rollcall';
+import { Checkin } from '../../models/checkin';
 import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
 
@@ -29,7 +29,7 @@ export class ReplyListPage extends BasePage {
 
   organization:Organization = null;
 
-  rollcall:Rollcall = null;
+  checkin:Checkin = null;
 
   person:Person = null;
 
@@ -55,7 +55,7 @@ export class ReplyListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.rollcall = this.getParameter<Rollcall>("rollcall");
+    this.checkin = this.getParameter<Checkin>("checkin");
     this.person = this.getParameter<Person>("person");
     this.loadUpdates(null, true);
   }
@@ -64,7 +64,7 @@ export class ReplyListPage extends BasePage {
     super.ionViewDidEnter();
     this.trackPage({
       organization: this.organization.name,
-      rollcall: this.rollcall.message
+      checkin: this.checkin.message
     });
   }
 
@@ -89,30 +89,30 @@ export class ReplyListPage extends BasePage {
   private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getReplies(this.rollcall).then((replies:Reply[]) => {
-          this.rollcall.replies = replies;
+        return this.database.getReplies(this.checkin).then((replies:Reply[]) => {
+          this.checkin.replies = replies;
           resolve(replies);
         });
       }
       else {
-        return this.api.getRollcall(this.organization, this.rollcall.id).then((rollcall:Rollcall) => {
+        return this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
           let saves = [];
-          for (let answer of rollcall.answers) {
-            saves.push(this.database.saveAnswer(rollcall, answer));
+          for (let answer of checkin.answers) {
+            saves.push(this.database.saveAnswer(checkin, answer));
           }
-          for (let recipient of rollcall.recipients) {
-            saves.push(this.database.saveRecipient(rollcall, recipient));
+          for (let recipient of checkin.recipients) {
+            saves.push(this.database.saveRecipient(checkin, recipient));
           }
-          for (let reply of rollcall.replies) {
-            saves.push(this.database.saveReply(rollcall, reply));
+          for (let reply of checkin.replies) {
+            saves.push(this.database.saveReply(checkin, reply));
             if (this.person && this.person.id == reply.user_id) {
-              rollcall.replied = true;
+              checkin.replied = true;
             }
           }
-          saves.push(this.database.saveRollcall(this.organization, rollcall));
+          saves.push(this.database.saveCheckin(this.organization, checkin));
           Promise.all(saves).then(saved => {
-            this.rollcall = rollcall;
-            resolve(rollcall.replies);
+            this.checkin = checkin;
+            resolve(checkin.replies);
           });
         },
         (error:any) => {
@@ -126,7 +126,7 @@ export class ReplyListPage extends BasePage {
     this.logger.info(this, "sendReply");
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
-      rollcall: this.rollcall });
+      checkin: this.checkin });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
       if (data) {
@@ -148,7 +148,7 @@ export class ReplyListPage extends BasePage {
     if (reply.user_id == this.person.id) {
       let modal = this.showModal(ReplySendPage, {
         organization: this.organization,
-        rollcall: this.rollcall,
+        checkin: this.checkin,
         reply: reply });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);

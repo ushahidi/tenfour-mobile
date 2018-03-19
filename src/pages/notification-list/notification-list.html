@@ -14,12 +14,12 @@
     <ion-card [class.viewed]="notification.viewed_at" *ngFor="let notification of notifications">
       <ion-item color="white" text-wrap *ngIf="notification.type == 'ReplyReceived'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
-        <h3><strong>{{notification.reply_from}}</strong> responded to a RollCall.</h3>
+        <h3><strong>{{notification.reply_from}}</strong> responded to a Checkin.</h3>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'RollCallReceived'">
+      <ion-item color="white" text-wrap *ngIf="notification.type == 'CheckinReceived'">
         <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
-        <h3>You received a Rollcall: <strong>{{notification.rollcall_message}}</strong></h3>
+        <h3>You received a Checkin: <strong>{{notification.checkin_message}}</strong></h3>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-item>
       <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonJoinedOrganization'">

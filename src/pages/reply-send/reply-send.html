@@ -3,44 +3,44 @@
     <ion-buttons start>
       <button ion-button color="primary" (click)="cancelReply($event)">Cancel</button>
     </ion-buttons>
-    <ion-title *ngIf="rollcalls && rollcalls.length == 0"></ion-title>
-    <ion-title *ngIf="rollcalls && rollcalls.length > 1">{{index + 1}} / {{rollcalls.length}}</ion-title>
+    <ion-title *ngIf="checkins && checkins.length == 0"></ion-title>
+    <ion-title *ngIf="checkins && checkins.length > 1">{{index + 1}} / {{checkins.length}}</ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" *ngIf="rollcall && rollcall.reply && rollcall.reply.id == null" (click)="sendReply(rollcall, rollcall.reply)">Send</button>
-      <button ion-button color="primary" *ngIf="rollcall && rollcall.reply && rollcall.reply.id != null" (click)="saveReply(rollcall, rollcall.reply)">Save</button>
+      <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id == null" (click)="sendReply(checkin, checkin.reply)">Send</button>
+      <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id != null" (click)="saveReply(checkin, checkin.reply)">Save</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged($event)">
-    <ion-slide *ngFor="let rollcall of rollcalls">
+    <ion-slide *ngFor="let checkin of checkins">
       <ion-list no-margin>
         <ion-item text-wrap color="white">
-          <person-avatar [initials]="rollcall.user_initials" [image]="rollcall.user_picture" [large]="true"></person-avatar>
-          <h1 text-center>{{rollcall.message}}</h1>
-          <p text-center>{{rollcall.created_at | dateTime}}. <strong>From {{rollcall.user_name}}.</strong></p>
+          <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
+          <h1 text-center>{{checkin.message}}</h1>
+          <p text-center>{{checkin.created_at | dateTime}}. <strong>From {{checkin.user_name}}.</strong></p>
         </ion-item>
       </ion-list>
-      <div class="buttons" margin-top margin-bottom *ngIf="rollcall.reply">
-        <div padding-left padding-right *ngFor="let answer of rollcall.answers">
-          <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
-          <button ion-button block outline color="grey" *ngIf="answer.answer != rollcall.reply.answer" (click)="selectAnswer(rollcall, rollcall.reply, answer)">{{answer.answer}}</button>
+      <div class="buttons" margin-top margin-bottom *ngIf="checkin.reply">
+        <div padding-left padding-right *ngFor="let answer of checkin.answers">
+          <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
+          <button ion-button block outline color="grey" *ngIf="answer.answer != checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
         </div>
       </div>
-      <ion-list *ngIf="rollcall.reply">
+      <ion-list *ngIf="checkin.reply">
         <ion-item color="dark">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add message" [(ngModel)]="rollcall.reply.message"></ion-input>
-          <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(rollcall.reply)"
-                  *ngIf="rollcall.reply.message && rollcall.reply.message.length > 0">
+          <ion-input type="text" placeholder="Add message" [(ngModel)]="checkin.reply.message"></ion-input>
+          <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(checkin.reply)"
+                  *ngIf="checkin.reply.message && checkin.reply.message.length > 0">
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
           </button>
         </ion-item>
         <ion-item color="dark">
           <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add location" [(ngModel)]="rollcall.reply.location_text"></ion-input>
-          <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(rollcall.reply)"
-                  *ngIf="rollcall.reply.location_text && rollcall.reply.location_text.length > 0">
+          <ion-input type="text" placeholder="Add location" [(ngModel)]="checkin.reply.location_text"></ion-input>
+          <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(checkin.reply)"
+                  *ngIf="checkin.reply.location_text && checkin.reply.location_text.length > 0">
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
           </button>
         </ion-item>

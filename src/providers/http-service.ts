@@ -1,16 +1,8 @@
 import { Injectable } from '@angular/core';
-import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
-import { Observable } from 'rxjs/Observable';
+
+import { HTTP } from '@ionic-native/http';
 import { File, Entry, Metadata } from '@ionic-native/file';
 import { FileTransfer, FileTransferObject, FileUploadOptions, FileUploadResult, FileTransferError } from '@ionic-native/file-transfer';
-
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/retry';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/observable/throw';
 
 import { LoggerService } from '../providers/logger-service';
 
@@ -18,28 +10,28 @@ import { LoggerService } from '../providers/logger-service';
 export class HttpService {
 
   constructor(
-    protected http:Http,
+    protected http:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerService) {
   }
 
-  httpHeaders(accessToken:string=null, otherHeaders:any=null): Headers {
-    let headers = new Headers();
-    headers.set('Accept', 'application/json');
-    headers.set('Content-Type', 'application/json');
+  private httpHeaders(accessToken:string=null, otherHeaders:any=null):{} {
+    let headers = {};
+    headers['Accept'] = 'application/json';
+    headers['Content-Type'] = 'application/json';
     if (accessToken != null) {
-      headers.set("Authorization", `Bearer ${accessToken}`);
+      headers["Authorization"] = `Bearer ${accessToken}`;
     }
     if (otherHeaders) {
       for (let key of otherHeaders) {
-        headers.set(key, otherHeaders[key]);
+        headers[key] = otherHeaders[key];
       }
     }
     return headers;
   }
 
-  httpGet(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpGet(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let search = new URLSearchParams();
       if (params) {
@@ -51,198 +43,90 @@ export class HttpService {
         params = "";
       }
       let headers = this.httpHeaders(token, otherHeaders);
-      let options = new RequestOptions({
-        headers: headers,
-        search: search });
-      this.logger.info(this, "GET", url, params);
-      this.http.get(url, options)
-        .timeout(12000)
-        .map(res => res.json())
-        .catch((error:any) => {
+      this.logger.info(this, "GET", url, params, headers);
+      this.http.get(url, params, headers).then(
+        (response:any) => {
+          this.logger.info(this, "GET", url, response.data);
+          resolve(response.data);
+        },
+        (error:any) => {
           this.logger.error(this, "GET", url, error);
-          if (error instanceof Response) {
-            return Observable.throw(this.errorMessage(error) || 'Request Error');
-          }
-          else if (error.name === "TimeoutError") {
-            return Observable.throw("Request Timeout");
-          }
-          return Observable.throw(error || 'Request Error');
-        })
-        .subscribe(
-          (items:any) => {
-            this.logger.info(this, "GET", url, items);
-            resolve(items);
-          },
-          (error:any) => {
-            this.logger.error(this, "GET", url, error);
-            reject(this.errorMessage(error));
-          });
+          reject(this.errorMessage(error));
+        });
     });
   }
 
-  httpPost(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPost(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let body = (params != null) ? JSON.stringify(params) : "";
       let headers = this.httpHeaders(token, otherHeaders);
-      let options = new RequestOptions({
-        headers: headers });
-      this.logger.info(this, "POST", url, body);
-      this.http.post(url, body, options)
-        .timeout(12000)
-        .map(res => {
-          if (res.status == 204) {
-            return {}
-          }
-          else {
-            return res.json();
-          }
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "POST", url, error);
-          if (error instanceof Response) {
-            return Observable.throw(this.errorMessage(error) || 'Request Error');
-          }
-          else if (error.name === "TimeoutError") {
-            return Observable.throw("Request Timeout");
-          }
-          return Observable.throw(error || 'Request Error');
-        })
-        .subscribe(
-          (json:any) => {
-            this.logger.info(this, "POST", url, json);
-            resolve(json);
-          },
-          (error:any) => {
-            this.logger.error(this, "POST", url, params, error);
-            reject(this.errorMessage(error));
-          }
-        );
+      this.logger.info(this, "POST", url, body, headers);
+      this.http.post(url, body, headers).then(
+        (response:any) => {
+          this.logger.info(this, "POST", url, response.data);
+          resolve(response.data);
+        },
+        (error:any) => {
+          this.logger.error(this, "POST", url, params, error);
+          reject(this.errorMessage(error));
+        }
+      );
     });
   }
 
-  httpPut(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPut(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let body = JSON.stringify(params);
       let headers = this.httpHeaders(token, otherHeaders);
-      let options = new RequestOptions({
-        headers: headers });
-      this.logger.info(this, "PUT", url, body);
-      this.http.put(url, body, options)
-        .timeout(12000)
-        .map(res => {
-          if (res.status == 204) {
-            return {}
-          }
-          else {
-            return res.json();
-          }
-        })
-        .catch((error:any) => {
+      this.logger.info(this, "PUT", url, body, headers);
+      this.http.put(url, body, headers).then(
+        (response:any) => {
+          this.logger.info(this, "PUT", url, response.data);
+          resolve(response.data);
+        },
+        (error:any) => {
           this.logger.error(this, "PUT", url, error);
-          if (error instanceof Response) {
-            return Observable.throw(this.errorMessage(error) || 'Request Error');
-          }
-          else if (error.name === "TimeoutError") {
-            return Observable.throw("Request Timeout");
-          }
-          return Observable.throw(error || 'Request Error');
-        })
-        .subscribe(
-          (json:any) => {
-            this.logger.info(this, "PUT", url, json);
-            resolve(json);
-          },
-          (error:any) => {
-            this.logger.error(this, "PUT", url, error);
-            reject(this.errorMessage(error));
-          }
-        );
+          reject(this.errorMessage(error));
+        }
+      );
     });
   }
 
-  httpPatch(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPatch(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let body = JSON.stringify(params);
       let headers = this.httpHeaders(token, otherHeaders);
-      let options = new RequestOptions({
-        headers: headers });
-      this.logger.info(this, "PATCH", url, body);
-      this.http.patch(url, body, options)
-        .timeout(12000)
-        .map(res => {
-          if (res.status == 204) {
-            return {}
-          }
-          else {
-            return res.json();
-          }
-        })
-        .catch((error:any) => {
+      this.logger.info(this, "PATCH", url, body, headers);
+      this.http.patch(url, body, headers).then(
+        (response:any) => {
+          this.logger.info(this, "PATCH", url, response.data);
+          resolve(response.data);
+        },
+        (error:any) => {
           this.logger.error(this, "PATCH", url, error);
-          if (error instanceof Response) {
-            return Observable.throw(this.errorMessage(error) || 'Request Error');
-          }
-          else if (error.name === "TimeoutError") {
-            return Observable.throw("Request Timeout");
-          }
-          return Observable.throw(error || 'Request Error');
-        })
-        .subscribe(
-          (json:any) => {
-            this.logger.info(this, "PATCH", url, json);
-            resolve(json);
-          },
-          (error:any) => {
-            this.logger.error(this, "PATCH", url, error);
-            reject(this.errorMessage(error));
-          }
-        );
+          reject(this.errorMessage(error));
+        }
+      );
     });
   }
 
-  httpDelete(url:string, token:string=null, otherHeaders:any=null) {
+  protected httpDelete(url:string, token:string=null, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token, otherHeaders);
-      let options = new RequestOptions({
-        headers: headers });
-      this.logger.info(this, "DELETE", url);
-      this.http.delete(url, options)
-        .timeout(12000)
-        .map(res => {
-          this.logger.info(this, "DELETE", url, res);
-          if (res.status == 201) {
-            return res.headers.toJSON();
-          }
-          else if (res.status == 204) {
-            return res.headers.toJSON();
-          }
-          else {
-            return res.json();
-          }
-        })
-        .catch((error:any) => {
+      this.logger.info(this, "DELETE", url, headers);
+      this.http.delete(url, {}, headers).then(
+        (response:any) => {
+          this.logger.info(this, "DELETE", url, response.data);
+          resolve(response.data);
+        },
+        (error:any) => {
           this.logger.error(this, "DELETE", url, error);
-          if (error instanceof Response) {
-            return Observable.throw(this.errorMessage(error) || 'Request Error');
-          }
-          else if (error.name === "TimeoutError") {
-            return Observable.throw("Request Timeout");
-          }
-          return Observable.throw(error || 'Request Error');
-        })
-        .subscribe(
-          (items:any) => {
-            this.logger.info(this, "DELETE", url, items);
-            resolve(items);
-          },
-          (error:any) => {
-            this.logger.error(this, "DELETE", url, error);
-            reject(this.errorMessage(error));
-          });
+          reject(this.errorMessage(error));
+        });
     });
   }
 
-  fileUpload(url:string, token:string, file:string, caption:string,
+  protected fileUpload(url:string, token:string, file:string, caption:string,
              httpMethod:string="POST",
              mimeType:string='application/binary',
              acceptType:string="application/json",
@@ -293,7 +177,7 @@ export class HttpService {
     });
   }
 
-  mimeType(file:string):string {
+  private mimeType(file:string):string {
     let extension = file.toLowerCase().substr(file.lastIndexOf('.')+1);
     if (extension == "mov") {
       return "video/quicktime";
@@ -316,7 +200,7 @@ export class HttpService {
     return "application/binary"
   }
 
-  fileSize(filePath:any):Promise<number> {
+  private fileSize(filePath:any):Promise<number> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "fileSize", filePath);
       this.file.resolveLocalFilesystemUrl(filePath).then(
@@ -339,7 +223,7 @@ export class HttpService {
     });
   }
 
-  errorMessage(error:any):string {
+  private errorMessage(error:any):string {
     try {
       this.logger.error(this, "errorMessage", error);
       if (typeof error === 'string') {

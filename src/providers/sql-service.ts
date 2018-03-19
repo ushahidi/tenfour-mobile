@@ -10,7 +10,7 @@ import { LoggerService } from '../providers/logger-service';
 export class SqlService {
 
   protected database:SQLiteObject = null;
-  protected name:string = 'rollcall.db';
+  protected name:string = 'checkin.db';
   protected location:string = 'default';
 
   constructor(
@@ -197,7 +197,7 @@ export class SqlService {
     });
   }
 
-  private executeTest(table:string, columns:any):Promise<any[]> {
+  private executeTest(table:string, columns:any):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.openDatabase().then((database:SQLiteObject) => {
         let statement = this.testStatement(table, columns);

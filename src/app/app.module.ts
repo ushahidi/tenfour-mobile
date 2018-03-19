@@ -7,6 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { SegmentModule } from 'ngx-segment-analytics';
 
+import { HTTP } from '@ionic-native/http';
 import { AppVersion } from '@ionic-native/app-version';
 import { IsDebug } from '@ionic-native/is-debug';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -31,7 +32,7 @@ import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
 
-import { RollcallApp } from './app.component';
+import { TenFourApp } from './app.component';
 
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
@@ -55,10 +56,10 @@ import { PersonInviteModule } from '../pages/person-invite/person-invite.module'
 import { PersonImportModule } from '../pages/person-import/person-import.module';
 import { PersonSelectModule } from '../pages/person-select/person-select.module';
 
-import { RollcallListModule } from '../pages/rollcall-list/rollcall-list.module';
-import { RollcallEditModule } from '../pages/rollcall-edit/rollcall-edit.module';
-import { RollcallSendModule } from '../pages/rollcall-send/rollcall-send.module';
-import { RollcallTestModule } from '../pages/rollcall-test/rollcall-test.module';
+import { CheckinListModule } from '../pages/checkin-list/checkin-list.module';
+import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
+import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
+import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 
 import { ReplyListModule } from '../pages/reply-list/reply-list.module';
 import { ReplySendModule } from '../pages/reply-send/reply-send.module';
@@ -78,7 +79,7 @@ import { SettingsSizesModule } from '../pages/settings-sizes/settings-sizes.modu
 import { SettingsRegionsModule } from '../pages/settings-regions/settings-regions.module';
 import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
-import { SettingsRollcallsModule } from '../pages/settings-rollcalls/settings-rollcalls.module';
+import { SettingsCheckinsModule } from '../pages/settings-checkins/settings-checkins.module';
 
 import { DateTimeModule } from '../pipes/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago.module';
@@ -98,7 +99,7 @@ import { CountryService } from '../providers/country-service';
 
 @NgModule({
   declarations: [
-    RollcallApp
+    TenFourApp
   ],
   imports: [
     HttpModule,
@@ -125,10 +126,10 @@ import { CountryService } from '../providers/country-service';
     SignupPaymentModule,
     SignupPasswordModule,
     OnboardListModule,
-    RollcallListModule,
-    RollcallEditModule,
-    RollcallSendModule,
-    RollcallTestModule,
+    CheckinListModule,
+    CheckinEditModule,
+    CheckinSendModule,
+    CheckinTestModule,
     ReplyListModule,
     ReplySendModule,
     NotificationListModule,
@@ -144,7 +145,7 @@ import { CountryService } from '../providers/country-service';
     SettingsTypesModule,
     SettingsRolesModule,
     SettingsPaymentsModule,
-    SettingsRollcallsModule,
+    SettingsCheckinsModule,
     SettingsSizesModule,
     SettingsRegionsModule,
     DateTimeModule,
@@ -156,11 +157,11 @@ import { CountryService } from '../providers/country-service';
     HtmlParserModule,
     BrowserAnimationsModule,
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
-    IonicModule.forRoot(RollcallApp)
+    IonicModule.forRoot(TenFourApp)
   ],
   bootstrap: [IonicApp],
   entryComponents: [
-    RollcallApp
+    TenFourApp
   ],
   providers: [
     { provide: File, useClass: File },
@@ -186,6 +187,7 @@ import { CountryService } from '../providers/country-service';
     { provide: Contacts, useClass: Contacts },
     { provide: Badge, useClass: Badge },
     { provide: Sim, useClass: Sim },
+    { provide: HTTP, useClass: HTTP },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: CountryService, useClass: CountryService },

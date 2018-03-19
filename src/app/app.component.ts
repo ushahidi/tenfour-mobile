@@ -16,7 +16,7 @@ import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
-import { RollcallListPage } from '../pages/rollcall-list/rollcall-list';
+import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
@@ -32,7 +32,7 @@ import { Organization } from '../models/organization';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
-import { Rollcall } from '../models/rollcall';
+import { Checkin } from '../models/checkin';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
 import { Recipient } from '../models/recipient';
@@ -45,7 +45,7 @@ import { Subscription } from '../models/subscription';
 @Component({
   templateUrl: 'app.html'
 })
-export class RollcallApp {
+export class TenFourApp {
 
   zone:NgZone = null;
   rootPage:any;
@@ -100,7 +100,7 @@ export class RollcallApp {
         new Group(),
         new Person(),
         new Contact(),
-        new Rollcall(),
+        new Checkin(),
         new Answer(),
         new Reply(),
         new Recipient(),
@@ -173,7 +173,7 @@ export class RollcallApp {
                 this.logger.info(this, "loadApplication", "Person", person);
                 if (person && person.config_profile_reviewed && person.config_self_test_sent) {
                   this.person = person;
-                  this.showRollcallList();
+                  this.showCheckinList();
                 }
                 else {
                   this.showOnboardList(person);
@@ -300,9 +300,9 @@ export class RollcallApp {
     this.splashScreen.hide();
   }
 
-  private showRollcallList() {
-    this.logger.info(this, "showRollcallList");
-    this.nav.setRoot(RollcallListPage,
+  private showCheckinList() {
+    this.logger.info(this, "showCheckinList");
+    this.nav.setRoot(CheckinListPage,
       { organization: this.organization,
         person: this.person });
     this.menuController.close();
@@ -350,7 +350,7 @@ export class RollcallApp {
       this.database.removeOrganizations(),
       this.database.removeSubscriptions(),
       this.database.removeNotifications(),
-      this.database.removeRollcalls(),
+      this.database.removeCheckins(),
       this.database.removeAnswers(),
       this.database.removeReplies(),
       this.database.removeRecipients(),

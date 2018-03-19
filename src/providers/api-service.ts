@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
-import { Http } from '@angular/http';
 
-import { FileTransfer } from '@ionic-native/file-transfer';
+import { HTTP } from '@ionic-native/http';
 import { File } from '@ionic-native/file';
-import { NativeStorage } from '@ionic-native/native-storage';
 import { Device } from '@ionic-native/device';
+import { FileTransfer } from '@ionic-native/file-transfer';
+import { NativeStorage } from '@ionic-native/native-storage';
 
 import { HttpService } from '../providers/http-service';
 import { LoggerService } from '../providers/logger-service';
@@ -16,7 +16,7 @@ import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
 import { Organization } from '../models/organization';
-import { Rollcall } from '../models/rollcall';
+import { Checkin } from '../models/checkin';
 import { Reply } from '../models/reply';
 import { Answer } from '../models/answer';
 import { Group } from '../models/group';
@@ -32,13 +32,13 @@ export class ApiService extends HttpService {
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
 
   scope:string = "user";
-  api:string = "https://api.rollcall.io";
-  // api:string = "https://api.staging.rollcall.io";
+  // api:string = "https://api.tenfour.org";
+  api:string = "https://api.staging.tenfour.org";
 
   constructor(
     protected device:Device,
     protected platform:Platform,
-    protected http:Http,
+    protected http:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerService,
@@ -47,7 +47,7 @@ export class ApiService extends HttpService {
     super(http, file, transfer, logger);
   }
 
-  saveToken(organization:Organization, token:Token) {
+  public saveToken(organization:Organization, token:Token) {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveToken", token);
       let json = JSON.stringify(token);
@@ -61,7 +61,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getToken(organization:Organization):Promise<Token> {
+  public getToken(organization:Organization):Promise<Token> {
     return new Promise((resolve, reject) => {
       this.storage.getItem(organization.subdomain).then(
         (data:any) => {
@@ -96,7 +96,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  removeToken(organization:Organization):Promise<boolean> {
+  public removeToken(organization:Organization):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.storage.remove(organization.subdomain).then(
         (removed:any) => {
@@ -108,7 +108,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  clientLogin(organization:Organization):Promise<Token> {
+  public clientLogin(organization:Organization):Promise<Token> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/oauth/access_token";
       let params = {
@@ -134,7 +134,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  userLogin(organization:Organization, username:string, password:string):Promise<Token> {
+  public userLogin(organization:Organization, username:string, password:string):Promise<Token> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/oauth/access_token";
       let params = {
@@ -166,7 +166,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  refreshLogin(organization:Organization, refreshToken:string):Promise<Token> {
+  public refreshLogin(organization:Organization, refreshToken:string):Promise<Token> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/oauth/access_token";
       let params = {
@@ -193,7 +193,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  checkEmail(email:string):Promise<Email> {
+  public checkEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/verification/email";
       let params = {
@@ -209,7 +209,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  registerEmail(email:string):Promise<Email> {
+  public registerEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/verification/email";
       let params = {
@@ -225,7 +225,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
+  public getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
     return new Promise((resolve, reject) => {
       let params = { };
       if (name) {
@@ -255,7 +255,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getOrganization(organization:Organization):Promise<Organization> {
+  public getOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let params = { };
@@ -277,7 +277,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  createOrganization(organization:Organization):Promise<Organization> {
+  public createOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = this.api + "/api/v1/organizations";
       let params = {
@@ -310,7 +310,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  updateOrganization(organization:Organization):Promise<Organization> {
+  public updateOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = this.api + `/api/v1/organizations/${organization.id}`;
       let settings = {
@@ -369,7 +369,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
+  public getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
@@ -395,7 +395,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getPerson(organization:Organization, id:any="me"):Promise<Person> {
+  public getPerson(organization:Organization, id:any="me"):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/people/${id}`;
@@ -420,7 +420,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  createPerson(organization:Organization, person:Person):Promise<Person> {
+  public createPerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
@@ -451,7 +451,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  updatePerson(organization:Organization, person:Person):Promise<Person> {
+  public updatePerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
@@ -486,7 +486,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  deletePerson(organization:Organization, person:Person):Promise<any> {
+  public deletePerson(organization:Organization, person:Person):Promise<any> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
@@ -504,7 +504,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  invitePerson(organization:Organization, person:Person):Promise<Person> {
+  public invitePerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/invite`;
@@ -531,7 +531,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  createContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
+  public createContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
@@ -559,7 +559,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
+  public updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
@@ -587,20 +587,20 @@ export class ApiService extends HttpService {
     });
   }
 
-  getRollcalls(organization:Organization, limit:number=10, offset:number=0):Promise<Rollcall[]> {
+  public getCheckins(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
+        let url = this.api + `/api/v1/checkins/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
         this.httpGet(url, token.access_token).then(
           (data:any) => {
-            let rollcalls = [];
-            if (data && data.rollcalls) {
-              for (let _rollcall of data.rollcalls) {
-                let rollcall = new Rollcall(_rollcall);
-                rollcalls.push(rollcall);
+            let checkins = [];
+            if (data && data.checkins) {
+              for (let _checkin of data.checkins) {
+                let checkin = new Checkin(_checkin);
+                checkins.push(checkin);
               }
             }
-            resolve(rollcalls);
+            resolve(checkins);
           },
           (error:any) => {
             reject(error);
@@ -612,18 +612,18 @@ export class ApiService extends HttpService {
     });
   }
 
-  getRollcall(organization:Organization, id:number):Promise<Rollcall> {
+  public getCheckin(organization:Organization, id:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls/${id}`;
+        let url = this.api + `/api/v1/checkins/${id}`;
         this.httpGet(url, token.access_token).then(
           (data:any) => {
-            if (data && data.rollcall) {
-              let rollcall = new Rollcall(data.rollcall);
-              resolve(rollcall);
+            if (data && data.checkin) {
+              let checkin = new Checkin(data.checkin);
+              resolve(checkin);
             }
             else {
-              reject("Rollcall Not Found");
+              reject("Checkin Not Found");
             }
           },
           (error:any) => {
@@ -636,30 +636,30 @@ export class ApiService extends HttpService {
     });
   }
 
-  postRollcall(organization:Organization, rollcall:Rollcall):Promise<Rollcall> {
+  public postCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls`;
+        let url = this.api + `/api/v1/checkins`;
         let params = {
           creditsRequired: 0,
           organization_id: organization.id,
-          message: rollcall.message,
-          answers: rollcall.answers,
-          groups: rollcall.groupIds(),
-          recipients: rollcall.recipientIds(),
-          send_via: [rollcall.send_via]
+          message: checkin.message,
+          answers: checkin.answers,
+          groups: checkin.groupIds(),
+          recipients: checkin.recipientIds(),
+          send_via: [checkin.send_via]
         };
-        if (rollcall.self_test_roll_call) {
+        if (checkin.self_test_roll_call) {
           params['self_test_roll_call'] = 1;
         }
         this.httpPost(url, token.access_token, params).then(
           (data:any) => {
-            if (data && data.rollcall) {
-              let rollcall = new Rollcall(data.rollcall);
-              resolve(rollcall);
+            if (data && data.checkin) {
+              let checkin = new Checkin(data.checkin);
+              resolve(checkin);
             }
             else {
-              reject("Rollcall Not Created");
+              reject("Checkin Not Created");
             }
           },
           (error:any) => {
@@ -672,10 +672,10 @@ export class ApiService extends HttpService {
     });
   }
 
-  postReply(organization:Organization, rollcall:Rollcall, reply:Reply):Promise<Reply> {
+  public postReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies`;
+        let url = this.api + `/api/v1/checkins/${checkin.id}/replies`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -716,10 +716,10 @@ export class ApiService extends HttpService {
     });
   }
 
-  putReply(organization:Organization, rollcall:Rollcall, reply:Reply):Promise<Reply> {
+  public putReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls/${rollcall.id}/replies/${reply.id}`;
+        let url = this.api + `/api/v1/checkins/${checkin.id}/replies/${reply.id}`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -769,7 +769,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getNotifications(organization:Organization):Promise<Notification[]> {
+  public getNotifications(organization:Organization):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
@@ -797,17 +797,17 @@ export class ApiService extends HttpService {
     });
   }
 
-  getAnswers(organization:Organization, id:number):Promise<Answer[]> {
+  public getAnswers(organization:Organization, id:number):Promise<Answer[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/rollcalls/${id}`;
+        let url = this.api + `/api/v1/checkins/${id}`;
         this.httpGet(url, token.access_token).then(
           (data:any) => {
-            if (data && data.rollcall && data.rollcall.answers) {
+            if (data && data.checkin && data.checkin.answers) {
               let answers = [];
-              for (let _answer of data.rollcall.answers) {
+              for (let _answer of data.checkin.answers) {
                 let answer = new Answer(_answer);
-                answer.replies = data.rollcall.replies.filter(reply => reply.answer == answer.answer).length;
+                answer.replies = data.checkin.replies.filter(reply => reply.answer == answer.answer).length;
                 answers.push(answer);
               }
               resolve(answers);
@@ -826,7 +826,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
+  public getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
@@ -854,7 +854,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getGroup(organization:Organization, id:number):Promise<Group> {
+  public getGroup(organization:Organization, id:number):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/groups/${id}`;
@@ -878,7 +878,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  createGroup(organization:Organization, group:Group):Promise<Group> {
+  public createGroup(organization:Organization, group:Group):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/groups`;
@@ -906,7 +906,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  updateGroup(organization:Organization, group:Group):Promise<Group> {
+  public updateGroup(organization:Organization, group:Group):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/groups/${group.id}`;
@@ -935,7 +935,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getSubscriptions(organization:Organization):Promise<Subscription[]> {
+  public getSubscriptions(organization:Organization):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/subscriptions`;
@@ -963,7 +963,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  getRegions(organization:Organization):Promise<Region[]> {
+  public getRegions(organization:Organization):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = this.api + `/api/v1/organizations/${organization.id}/regions`;

@@ -4,8 +4,8 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonAddPage } from '../../pages/person-add/person-add';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
-import { RollcallTestPage } from '../../pages/rollcall-test/rollcall-test';
-import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
+import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -18,7 +18,7 @@ import { Person } from '../../models/person';
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ PersonAddPage, PersonEditPage, RollcallTestPage, RollcallListPage ]
+  entryComponents:[ PersonAddPage, PersonEditPage, CheckinTestPage, CheckinListPage ]
 })
 export class OnboardListPage extends BasePage {
 
@@ -138,7 +138,7 @@ export class OnboardListPage extends BasePage {
   private taskSendRollCall(event:any) {
     this.logger.info(this, "taskSendRollCall");
     if (this.person.config_people_invited && this.person.config_people_invited) {
-      let modal = this.showModal(RollcallTestPage, {
+      let modal = this.showModal(CheckinTestPage, {
         organization: this.organization,
         person: this.person });
       modal.onDidDismiss(data => {
@@ -153,8 +153,8 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  private showRollcallList(event:any) {
-    this.logger.info(this, "showRollcallList");
+  private showCheckinList(event:any) {
+    this.logger.info(this, "showCheckinList");
     let loading = this.showLoading("Loading...");
     this.api.updatePerson(this.organization, this.person).then((person:Person) => {
       person.config_people_invited = true;
@@ -162,12 +162,12 @@ export class OnboardListPage extends BasePage {
       person.config_self_test_sent = true;
       this.database.savePerson(this.organization, this.person).then(saved => {
         loading.dismiss();
-        this.showRootPage(RollcallListPage,
+        this.showRootPage(CheckinListPage,
           { organization: this.organization });
       });
     },
     (error:any) => {
-      this.logger.error(this, "showRollcallList", error);
+      this.logger.error(this, "showCheckinList", error);
       loading.dismiss();
       this.showAlert("Problem Updating User", error);
     });

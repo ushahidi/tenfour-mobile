@@ -1,5 +1,49 @@
-# Rollcall
+# TenFour
 ## Mobile App
+
+---
+
+## Quick Setup
+
+Remove Platforms
+```
+cordova clean
+ionic cordova platform rm ios
+ionic cordova platform rm android
+```
+Add Platforms
+```
+ionic cordova platform add ios --buildConfig=build.json
+ionic cordova platform add android@6.4.0 --buildConfig=build.json
+```
+```
+cordova plugin rm cordova-plugin-nativestorage
+cordova plugin add cordova-plugin-nativestorage@2.2.2
+```
+Debug Apps
+```
+ionic cordova run ios --livereload --consolelogs --serverlogs --debug --target "iPhone-SE"
+ionic cordova run ios --livereload --consolelogs --serverlogs --target "iPhone-8-Plus"
+ionic cordova run ios --livereload --consolelogs --serverlogs --debug --target "iPad-Pro"
+```
+```
+cordova run --list
+ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_22
+ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_23
+ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_24
+ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_25
+ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_26
+```
+Release Apps
+```
+ionic cordova prepare ios --buildConfig=build.json
+ionic cordova build ios --debug --buildConfig=build.json
+ionic cordova build ios --prod --release --buildConfig=build.json
+```
+```
+ionic cordova prepare android --buildConfig=build.json
+ionic cordova build android --device --prod --release --buildConfig=build.json
+```
 
 ---
 

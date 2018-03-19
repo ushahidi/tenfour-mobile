@@ -21,8 +21,8 @@ export class Answer extends Model {
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
 
-  @Column("rollcall_id", INTEGER)
-  public rollcall_id:number = null;
+  @Column("checkin_id", INTEGER)
+  public checkin_id:number = null;
 
   @Column("type", TEXT)
   public type:string = null;

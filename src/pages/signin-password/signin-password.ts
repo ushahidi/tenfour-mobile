@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { RollcallListPage } from '../../pages/rollcall-list/rollcall-list';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { ApiService } from '../../providers/api-service';
@@ -17,7 +17,7 @@ import { Person } from '../../models/person';
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ RollcallListPage, OnboardListPage ]
+  entryComponents:[ CheckinListPage, OnboardListPage ]
 })
 export class SigninPasswordPage extends BasePage {
 
@@ -73,7 +73,7 @@ export class SigninPasswordPage extends BasePage {
                 loading.dismiss();
                 this.showToast(`Welcome to ${organization.name}`);
                 if (person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRootPage(RollcallListPage,
+                  this.showRootPage(CheckinListPage,
                     { organization: organization });
                 }
                 else {

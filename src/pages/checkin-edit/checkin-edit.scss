@@ -1,0 +1,21 @@
+page-checkin-edit {
+  .person-avatar {
+    margin-bottom: 0 !important;
+  }
+  ion-badge {
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 2px !important;
+  }
+  ion-textarea {
+    font-size: 1.4em;
+  }
+  ion-list {
+    margin-bottom: 0;
+  }
+  ion-item {
+    .input-cover {
+      display: none;
+    }
+  }
+}

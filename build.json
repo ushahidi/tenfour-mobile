@@ -1,0 +1,30 @@
+{
+  "ios": {
+    "debug": {
+      "packageType": "development",
+      "developmentTeam": "K4L62494Y2",
+      "codeSignIdentity": "iPhone Developer",
+      "provisioningProfile": "38ac1b59-b07f-447c-918b-76b54734d5e1"
+    },
+    "release": {
+      "packageType": "app-store",
+      "developmentTeam": "K4L62494Y2",
+      "codeSignIdentity": "iPhone Distribution",
+      "provisioningProfile": "d8f255c1-f2b2-4dc3-89ae-f893ae637238"
+    }
+  },
+  "android": {
+    "debug": {
+      "alias": "ushahidi",
+      "keystore": "rollcall.keystore",
+      "password" : "westgate",
+      "storePassword": "westgate"
+    },
+    "release": {
+      "alias": "ushahidi",
+      "keystore": "rollcall.keystore",
+      "password" : "westgate",
+      "storePassword": "westgate"
+    }
+  }
+}
