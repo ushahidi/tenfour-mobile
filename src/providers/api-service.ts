@@ -28,7 +28,7 @@ import { Notification } from '../models/notification';
 @Injectable()
 export class ApiService extends HttpService {
 
-  clientId:string = "webapp";
+  clientId:string = "1";
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
 
   scope:string = "user";
@@ -136,13 +136,12 @@ export class ApiService extends HttpService {
 
   public userLogin(organization:Organization, username:string, password:string):Promise<Token> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/oauth/access_token";
+      let url = this.api + "/oauth/token";
       let params = {
         grant_type: "password",
         scope: this.scope,
-        username: username,
+        username: `${organization.subdomain}:${username}`,
         password: password,
-        subdomain: organization.subdomain,
         client_id: this.clientId,
         client_secret: this.clientSecret };
       this.httpPost(url, null, params).then(
@@ -168,7 +167,7 @@ export class ApiService extends HttpService {
 
   public refreshLogin(organization:Organization, refreshToken:string):Promise<Token> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/oauth/access_token";
+      let url = this.api + "/oauth/token";
       let params = {
         grant_type: "refresh_token",
         scope: this.scope,
@@ -227,7 +226,7 @@ export class ApiService extends HttpService {
 
   public getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
     return new Promise((resolve, reject) => {
-      let params = { };
+      let params = {};
       if (name) {
         params['name'] = name;
       }
@@ -237,6 +236,7 @@ export class ApiService extends HttpService {
       let url = this.api + "/api/v1/organizations";
       this.httpGet(url, null, params).then(
         (data:any) => {
+          this.logger.info(this, "getOrganizations", data);
           if (data.organizations && data.organizations.length > 0) {
             let organizations = [];
             for (let attributes of data.organizations) {

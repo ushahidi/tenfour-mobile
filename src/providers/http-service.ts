@@ -18,8 +18,6 @@ export class HttpService {
 
   private httpHeaders(accessToken:string=null, otherHeaders:any=null):{} {
     let headers = {};
-    headers['Accept'] = 'application/json';
-    headers['Content-Type'] = 'application/json';
     if (accessToken != null) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
@@ -31,93 +29,106 @@ export class HttpService {
     return headers;
   }
 
-  protected httpGet(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpGet(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
-      let search = new URLSearchParams();
-      if (params) {
-        for (let key in params) {
-          search.set(key, params[key])
-        }
-      }
-      else {
-        params = "";
-      }
       let headers = this.httpHeaders(token, otherHeaders);
       this.logger.info(this, "GET", url, params, headers);
+      this.http.setRequestTimeout(30);
+      this.http.setDataSerializer("json");
+      this.http.setHeader("Accept", "application/json");
+      this.http.setHeader("Content-Type", "application/json");
       this.http.get(url, params, headers).then(
         (response:any) => {
-          this.logger.info(this, "GET", url, response.data);
-          resolve(response.data);
+          let data = JSON.parse(response.data);
+          this.logger.info(this, "GET", url, data);
+          resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "GET", url, error);
-          reject(this.errorMessage(error));
+          this.logger.error(this, "GET", url, error.error);
+          reject(this.errorMessage( error.error));
         });
     });
   }
 
-  protected httpPost(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPost(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
-      let body = (params != null) ? JSON.stringify(params) : "";
       let headers = this.httpHeaders(token, otherHeaders);
-      this.logger.info(this, "POST", url, body, headers);
-      this.http.post(url, body, headers).then(
+      this.logger.info(this, "POST", url, params, headers);
+      this.http.setRequestTimeout(30);
+      this.http.setDataSerializer("json");
+      this.http.setHeader("Accept", "application/json");
+      this.http.setHeader("Content-Type", "application/json");
+      this.http.post(url, params, headers).then(
         (response:any) => {
-          this.logger.info(this, "POST", url, response.data);
-          resolve(response.data);
+          let data = JSON.parse(response.data);
+          this.logger.info(this, "POST", url, data);
+          resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "POST", url, params, error);
-          reject(this.errorMessage(error));
+          this.logger.error(this, "POST", url, params, error.error);
+          reject(this.errorMessage(error.error));
         }
       );
     });
   }
 
-  protected httpPut(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPut(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
-      let body = JSON.stringify(params);
       let headers = this.httpHeaders(token, otherHeaders);
-      this.logger.info(this, "PUT", url, body, headers);
-      this.http.put(url, body, headers).then(
+      this.logger.info(this, "PUT", url, params, headers);
+      this.http.setRequestTimeout(30);
+      this.http.setDataSerializer("json");
+      this.http.setHeader("Accept", "application/json");
+      this.http.setHeader("Content-Type", "application/json");
+      this.http.put(url, params, headers).then(
         (response:any) => {
-          this.logger.info(this, "PUT", url, response.data);
-          resolve(response.data);
+          let data = JSON.parse(response.data);
+          this.logger.info(this, "PUT", url, data);
+          resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "PUT", url, error);
-          reject(this.errorMessage(error));
+          this.logger.error(this, "PUT", url, error.error);
+          reject(this.errorMessage(error.error));
         }
       );
     });
   }
 
-  protected httpPatch(url:string, token:string=null, params:any=null, otherHeaders:any=null) {
+  protected httpPatch(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
-      let body = JSON.stringify(params);
       let headers = this.httpHeaders(token, otherHeaders);
-      this.logger.info(this, "PATCH", url, body, headers);
-      this.http.patch(url, body, headers).then(
+      this.logger.info(this, "PATCH", url, params, headers);
+      this.http.setRequestTimeout(30);
+      this.http.setDataSerializer("json");
+      this.http.setHeader("Accept", "application/json");
+      this.http.setHeader("Content-Type", "application/json");
+      this.http.patch(url, params, headers).then(
         (response:any) => {
-          this.logger.info(this, "PATCH", url, response.data);
-          resolve(response.data);
+          let data = JSON.parse(response.data);
+          this.logger.info(this, "PATCH", url, data);
+          resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "PATCH", url, error);
-          reject(this.errorMessage(error));
+          this.logger.error(this, "PATCH", url, error.error);
+          reject(this.errorMessage(error.error));
         }
       );
     });
   }
 
-  protected httpDelete(url:string, token:string=null, otherHeaders:any=null) {
+  protected httpDelete(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token, otherHeaders);
-      this.logger.info(this, "DELETE", url, headers);
-      this.http.delete(url, {}, headers).then(
+      this.logger.info(this, "DELETE", url, params, headers);
+      this.http.setRequestTimeout(30);
+      this.http.setDataSerializer("json");
+      this.http.setHeader("Accept", "application/json");
+      this.http.setHeader("Content-Type", "application/json");
+      this.http.delete(url, params, headers).then(
         (response:any) => {
-          this.logger.info(this, "DELETE", url, response.data);
-          resolve(response.data);
+          let data = JSON.parse(response.data);
+          this.logger.info(this, "DELETE", url, data);
+          resolve(data);
         },
         (error:any) => {
           this.logger.error(this, "DELETE", url, error);

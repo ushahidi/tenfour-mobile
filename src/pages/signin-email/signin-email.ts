@@ -48,7 +48,7 @@ export class SigninEmailPage extends BasePage {
   }
 
   private showNext(event:any) {
-    this.logger.info(this, "showNext");
+    this.logger.info(this, "showNext", this.email.value);
     if (this.email.value && this.email.value.length > 0) {
       let email = this.email.value;
       this.showPage(SigninPasswordPage,
