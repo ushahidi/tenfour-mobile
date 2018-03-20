@@ -16,22 +16,17 @@ export class HttpService {
     protected logger:LoggerService) {
   }
 
-  private httpHeaders(accessToken:string=null, otherHeaders:any=null):{} {
+  private httpHeaders(accessToken:string=null):{} {
     let headers = {};
     if (accessToken != null) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
-    if (otherHeaders) {
-      for (let key of otherHeaders) {
-        headers[key] = otherHeaders[key];
-      }
-    }
     return headers;
   }
 
-  protected httpGet(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
+  protected httpGet(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, otherHeaders);
+      let headers = this.httpHeaders(token);
       this.logger.info(this, "GET", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -39,20 +34,27 @@ export class HttpService {
       this.http.setHeader("Content-Type", "application/json");
       this.http.get(url, params, headers).then(
         (response:any) => {
-          let data = JSON.parse(response.data);
-          this.logger.info(this, "GET", url, data);
-          resolve(data);
+          if (response && response.data) {
+            let data = JSON.parse(response.data);
+            this.logger.info(this, "GET", url, data);
+            resolve(data);
+          }
+          else {
+            this.logger.error(this, "GET", url, "No Response Data");
+            reject("No Response Data");
+          }
         },
         (error:any) => {
-          this.logger.error(this, "GET", url, error.error);
-          reject(this.errorMessage( error.error));
+          let data = JSON.parse(error.error);
+          this.logger.error(this, "GET", url, data);
+          reject(this.errorMessage(data));
         });
     });
   }
 
-  protected httpPost(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
+  protected httpPost(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, otherHeaders);
+      let headers = this.httpHeaders(token);
       this.logger.info(this, "POST", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -65,16 +67,17 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "POST", url, params, error.error);
-          reject(this.errorMessage(error.error));
+          let data = JSON.parse(error.error);
+          this.logger.error(this, "POST", url, data);
+          reject(this.errorMessage(data));
         }
       );
     });
   }
 
-  protected httpPut(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
+  protected httpPut(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, otherHeaders);
+      let headers = this.httpHeaders(token);
       this.logger.info(this, "PUT", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -87,16 +90,17 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "PUT", url, error.error);
-          reject(this.errorMessage(error.error));
+          let data = JSON.parse(error.error);
+          this.logger.error(this, "PUT", url, data);
+          reject(this.errorMessage(data));
         }
       );
     });
   }
 
-  protected httpPatch(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
+  protected httpPatch(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, otherHeaders);
+      let headers = this.httpHeaders(token);
       this.logger.info(this, "PATCH", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -109,16 +113,17 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "PATCH", url, error.error);
-          reject(this.errorMessage(error.error));
+          let data = JSON.parse(error.error);
+          this.logger.error(this, "PATCH", url, data);
+          reject(this.errorMessage(data));
         }
       );
     });
   }
 
-  protected httpDelete(url:string, token:string=null, params:any={}, otherHeaders:any=null) {
+  protected httpDelete(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, otherHeaders);
+      let headers = this.httpHeaders(token);
       this.logger.info(this, "DELETE", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -131,8 +136,9 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          this.logger.error(this, "DELETE", url, error);
-          reject(this.errorMessage(error));
+          let data = JSON.parse(error.error);
+          this.logger.error(this, "DELETE", url, data);
+          reject(this.errorMessage(data));
         });
     });
   }
@@ -188,7 +194,7 @@ export class HttpService {
     });
   }
 
-  private mimeType(file:string):string {
+  protected mimeType(file:string):string {
     let extension = file.toLowerCase().substr(file.lastIndexOf('.')+1);
     if (extension == "mov") {
       return "video/quicktime";
@@ -211,7 +217,7 @@ export class HttpService {
     return "application/binary"
   }
 
-  private fileSize(filePath:any):Promise<number> {
+  protected fileSize(filePath:any):Promise<number> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "fileSize", filePath);
       this.file.resolveLocalFilesystemUrl(filePath).then(
@@ -236,36 +242,25 @@ export class HttpService {
 
   private errorMessage(error:any):string {
     try {
-      this.logger.error(this, "errorMessage", error);
       if (typeof error === 'string') {
         return error;
       }
-      else if (error instanceof Response) {
-        let response = <Response>error;
-        if (response.statusText) {
-          return response.statusText;
-        }
-        else {
-          let json = response.json();
-          this.logger.error(this, "errorMessage", "JSON", json);
-          if (json['errors']) {
-            let errors = json['errors'];
-            let messages = [];
-            for (let key of Object.keys(errors)) {
-              let error = errors[key];
-              if (error) {
-                messages.push(error);
-              }
-            }
-            return messages.join(", ");
-          }
-          else if (json['error']) {
-            return json['error'];
-          }
-          else if (json['message']) {
-            return json['message'];
+      else if (error['errors']) {
+        let errors = error['errors'];
+        let messages = [];
+        for (let key of Object.keys(errors)) {
+          let error = errors[key];
+          if (error) {
+            messages.push(error);
           }
         }
+        return messages.join(", ");
+      }
+      else if (error['error']) {
+        return error['error'];
+      }
+      else if (error['message']) {
+        return error['message'];
       }
     }
     catch (err) {

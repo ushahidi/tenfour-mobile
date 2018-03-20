@@ -157,7 +157,7 @@ export class BasePage {
     return loading;
   }
 
-  protected showToast(message:string, duration:number=1500):Toast {
+  protected showToast(message:string, duration:number=3000):Toast {
     let toast = this.toastController.create({
       message: message,
       duration: duration

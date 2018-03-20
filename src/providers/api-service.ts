@@ -110,13 +110,14 @@ export class ApiService extends HttpService {
 
   public clientLogin(organization:Organization):Promise<Token> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/oauth/access_token";
+      let url = `${this.api}/oauth/token`;
       let params = {
         grant_type: "client_credentials",
         scope: this.scope,
         client_id: this.clientId,
-        client_secret: this.clientSecret };
-      this.httpPost(url, null, params).then(
+        client_secret: this.clientSecret
+      };
+      this.httpPost(url, params).then(
         (data:any) => {
           let token:Token = <Token>data;
           token.issued_at = new Date();
@@ -124,6 +125,7 @@ export class ApiService extends HttpService {
             token.expires_at = new Date();
             token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
           }
+          this.logger.info(this, "clientLogin", token);
           this.saveToken(organization, token).then(saved => {
             resolve(token);
           });
@@ -136,15 +138,16 @@ export class ApiService extends HttpService {
 
   public userLogin(organization:Organization, username:string, password:string):Promise<Token> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/oauth/token";
+      let url = `${this.api}/oauth/token`;
       let params = {
         grant_type: "password",
         scope: this.scope,
         username: `${organization.subdomain}:${username}`,
         password: password,
         client_id: this.clientId,
-        client_secret: this.clientSecret };
-      this.httpPost(url, null, params).then(
+        client_secret: this.clientSecret
+      };
+      this.httpPost(url, params).then(
         (data:any) => {
           let token:Token = <Token>data;
           token.username = username;
@@ -155,6 +158,7 @@ export class ApiService extends HttpService {
             token.expires_at = new Date();
             token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
           }
+          this.logger.info(this, "userLogin", token);
           this.saveToken(organization, token).then(saved => {
             resolve(token);
           });
@@ -167,14 +171,15 @@ export class ApiService extends HttpService {
 
   public refreshLogin(organization:Organization, refreshToken:string):Promise<Token> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/oauth/token";
+      let url = `${this.api}/oauth/token`;
       let params = {
         grant_type: "refresh_token",
         scope: this.scope,
         refresh_token: refreshToken,
         client_id: this.clientId,
-        client_secret: this.clientSecret };
-      this.httpPost(url, null, params).then(
+        client_secret: this.clientSecret
+      };
+      this.httpPost(url, params).then(
         (data:any) => {
           let token:Token = <Token>data;
           token.issued_at = new Date();
@@ -182,6 +187,7 @@ export class ApiService extends HttpService {
             token.expires_at = new Date();
             token.expires_at.setMinutes(token.expires_at.getMinutes() + data.expires_in/60);
           }
+          this.logger.info(this, "refreshLogin", token);
           this.saveToken(organization, token).then(saved => {
             resolve(token);
           });
@@ -194,10 +200,11 @@ export class ApiService extends HttpService {
 
   public checkEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/verification/email";
+      let url = `${this.api}/verification/email`;
       let params = {
-        address: email };
-      this.httpGet(url, null, params).then(
+        address: email
+      };
+      this.httpGet(url, params).then(
         (data:any) => {
           let email = new Email(data);
           resolve(email);
@@ -210,10 +217,11 @@ export class ApiService extends HttpService {
 
   public registerEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/verification/email";
+      let url = `${this.api}/verification/email`;
       let params = {
-        address: email };
-      this.httpPost(url, null, params).then(
+        address: email
+      };
+      this.httpPost(url, params).then(
         (data:any) => {
           let email = new Email(data);
           resolve(email);
@@ -233,10 +241,9 @@ export class ApiService extends HttpService {
       if (subdomain) {
         params['subdomain'] = subdomain;
       }
-      let url = this.api + "/api/v1/organizations";
-      this.httpGet(url, null, params).then(
+      let url = `${this.api}/api/v1/organizations`;
+      this.httpGet(url, params).then(
         (data:any) => {
-          this.logger.info(this, "getOrganizations", data);
           if (data.organizations && data.organizations.length > 0) {
             let organizations = [];
             for (let attributes of data.organizations) {
@@ -258,9 +265,9 @@ export class ApiService extends HttpService {
   public getOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}`;
         let params = { };
-        let url = this.api + `/api/v1/organizations/${organization.id}`;
-        this.httpGet(url, token.access_token, params).then(
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.organization) {
               let organization = new Organization(data.organization);
@@ -279,15 +286,16 @@ export class ApiService extends HttpService {
 
   public createOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      let url = this.api + "/api/v1/organizations";
+      let url = `${this.api}/api/v1/organizations`;
       let params = {
         name: organization.name,
         email: organization.email,
         owner: organization.user_name,
         password: organization.password,
-        subdomain: organization.subdomain };
+        subdomain: organization.subdomain
+      };
       this.clientLogin(organization).then((token:Token) => {
-        this.httpPost(url, token.access_token, params).then(
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.organization) {
               let _organization:Organization = new Organization(data.organization);
@@ -312,7 +320,7 @@ export class ApiService extends HttpService {
 
   public updateOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      let url = this.api + `/api/v1/organizations/${organization.id}`;
+      let url = `${this.api}/api/v1/organizations/${organization.id}`;
       let settings = {
         channels: {
           app: { enabled: organization.app_enabled == true },
@@ -347,7 +355,7 @@ export class ApiService extends HttpService {
         subdomain: organization.subdomain,
         settings: settings };
       this.getToken(organization).then((token:Token) => {
-        this.httpPut(url, token.access_token, params).then(
+        this.httpPut(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.organization) {
               let _organization:Organization = new Organization(data.organization);
@@ -372,8 +380,9 @@ export class ApiService extends HttpService {
   public getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             let people = [];
             if (data && data.people) {
@@ -398,8 +407,9 @@ export class ApiService extends HttpService {
   public getPerson(organization:Organization, id:any="me"):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/people/${id}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.person) {
               let person = new Person(data.person);
@@ -423,7 +433,7 @@ export class ApiService extends HttpService {
   public createPerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people`;
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people`;
         let params = {
           name: person.name,
           description: person.description || "",
@@ -432,7 +442,7 @@ export class ApiService extends HttpService {
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
         }
-        this.httpPost(url, token.access_token, params).then(
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.person) {
               resolve(new Person(data.person));
@@ -454,7 +464,7 @@ export class ApiService extends HttpService {
   public updatePerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}`;
         let params = {
           name: person.name,
           description: person.description || ""};
@@ -467,7 +477,7 @@ export class ApiService extends HttpService {
         if (person.config_profile_reviewed) {
           params['config_profile_reviewed'] = true;
         }
-        this.httpPut(url, token.access_token, params).then(
+        this.httpPut(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.person) {
               resolve(new Person(data.person));
@@ -489,8 +499,9 @@ export class ApiService extends HttpService {
   public deletePerson(organization:Organization, person:Person):Promise<any> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}`;
-        this.httpDelete(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then(
           (data:any) => {
             resolve(data);
           },
@@ -507,11 +518,12 @@ export class ApiService extends HttpService {
   public invitePerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/invite`;
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}/invite`;
         let params = {
           orgId: person.organization_id,
-          personId: person.id };
-        this.httpPost(url, token.access_token, params).then(
+          personId: person.id
+        };
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.person) {
               let person = new Person(data.person);
@@ -534,13 +546,14 @@ export class ApiService extends HttpService {
   public createContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts`;
         let params = {
           type: contact.type,
           contact: contact.contact || "",
           preferred: contact.preferred || 0,
-          organization_id: person.organization_id };
-        this.httpPost(url, token.access_token, params).then(
+          organization_id: person.organization_id
+        };
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.contact) {
               resolve(new Contact(data.contact));
@@ -562,13 +575,14 @@ export class ApiService extends HttpService {
   public updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
+        let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}/contacts/${contact.id}`;
         let params = {
           type: contact.type,
           contact: contact.contact,
           preferred: contact.preferred || 0,
-          organization_id: person.organization_id };
-        this.httpPut(url, token.access_token, params).then(
+          organization_id: person.organization_id
+        };
+        this.httpPut(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.contact) {
               resolve(new Contact(data.contact));
@@ -590,8 +604,9 @@ export class ApiService extends HttpService {
   public getCheckins(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins/?organization=${organization.id}&limit=${limit}&offset=${offset}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}&offset=${offset}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             let checkins = [];
             if (data && data.checkins) {
@@ -615,8 +630,9 @@ export class ApiService extends HttpService {
   public getCheckin(organization:Organization, id:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins/${id}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/checkins/${id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.checkin) {
               let checkin = new Checkin(data.checkin);
@@ -639,7 +655,7 @@ export class ApiService extends HttpService {
   public postCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins`;
+        let url = `${this.api}/api/v1/checkins`;
         let params = {
           creditsRequired: 0,
           organization_id: organization.id,
@@ -652,7 +668,7 @@ export class ApiService extends HttpService {
         if (checkin.self_test_roll_call) {
           params['self_test_roll_call'] = 1;
         }
-        this.httpPost(url, token.access_token, params).then(
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.checkin) {
               let checkin = new Checkin(data.checkin);
@@ -675,7 +691,7 @@ export class ApiService extends HttpService {
   public postReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins/${checkin.id}/replies`;
+        let url = `${this.api}/api/v1/checkins/${checkin.id}/replies`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -696,7 +712,7 @@ export class ApiService extends HttpService {
             };
           }
         }
-        this.httpPost(url, token.access_token, params).then(
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.reply) {
               let reply = new Reply(data.reply);
@@ -719,7 +735,7 @@ export class ApiService extends HttpService {
   public putReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins/${checkin.id}/replies/${reply.id}`;
+        let url = `${this.api}/api/v1/checkins/${checkin.id}/replies/${reply.id}`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -749,7 +765,7 @@ export class ApiService extends HttpService {
             params["location_geo"] = "";
           }
         }
-        this.httpPut(url, token.access_token, params).then(
+        this.httpPut(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.reply) {
               let reply = new Reply(data.reply);
@@ -772,8 +788,9 @@ export class ApiService extends HttpService {
   public getNotifications(organization:Organization):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/people/me`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/me`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.person && data.person.notifications) {
               let notifications = [];
@@ -800,8 +817,9 @@ export class ApiService extends HttpService {
   public getAnswers(organization:Organization, id:number):Promise<Answer[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/checkins/${id}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/checkins/${id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.checkin && data.checkin.answers) {
               let answers = [];
@@ -829,8 +847,9 @@ export class ApiService extends HttpService {
   public getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.groups) {
               let groups = [];
@@ -857,8 +876,9 @@ export class ApiService extends HttpService {
   public getGroup(organization:Organization, id:number):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/groups/${id}`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/${id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.group) {
               let group = new Group(data.group);
@@ -881,14 +901,13 @@ export class ApiService extends HttpService {
   public createGroup(organization:Organization, group:Group):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/groups`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups`;
         let params = {
           name: group.name,
           description: group.description || "",
           members: group.memberIds() };
-        this.httpPost(url, token.access_token, params).then(
+        this.httpPost(url, params, token.access_token).then(
           (data:any) => {
-            this.logger.info(this, "createGroup", data);
             if (data && data.group) {
               resolve(new Group(data.group));
             }
@@ -909,15 +928,14 @@ export class ApiService extends HttpService {
   public updateGroup(organization:Organization, group:Group):Promise<Group> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/groups/${group.id}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/${group.id}`;
         let params = {
           name: group.name,
           description: group.description || "",
           members: group.memberIds()
         };
-        this.httpPut(url, token.access_token, params).then(
+        this.httpPut(url, params, token.access_token).then(
           (data:any) => {
-            this.logger.info(this, "updateGroup", data);
             if (data && data.group) {
               resolve(new Group(data.group));
             }
@@ -938,8 +956,9 @@ export class ApiService extends HttpService {
   public getSubscriptions(organization:Organization):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/subscriptions`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.subscriptions) {
               let subscriptions = [];
@@ -966,8 +985,9 @@ export class ApiService extends HttpService {
   public getRegions(organization:Organization):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = this.api + `/api/v1/organizations/${organization.id}/regions`;
-        this.httpGet(url, token.access_token).then(
+        let url = `${this.api}/api/v1/organizations/${organization.id}/regions`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then(
           (data:any) => {
             if (data && data.regions) {
               let regions = [];
