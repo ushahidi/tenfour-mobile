@@ -15,13 +15,13 @@
   },
   "android": {
     "debug": {
-      "alias": "ushahidi",
+      "alias": "rollcall",
       "keystore": "rollcall.keystore",
       "password" : "westgate",
       "storePassword": "westgate"
     },
     "release": {
-      "alias": "ushahidi",
+      "alias": "rollcall",
       "keystore": "rollcall.keystore",
       "password" : "westgate",
       "storePassword": "westgate"

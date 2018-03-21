@@ -17,8 +17,10 @@ export class HttpService {
   }
 
   private httpHeaders(accessToken:string=null):{} {
-    let headers = {};
-    if (accessToken != null) {
+    let headers = {
+      Accept: "application/json"
+    };
+    if (accessToken && accessToken.length > 0) {
       headers["Authorization"] = `Bearer ${accessToken}`;
     }
     return headers;
@@ -30,8 +32,6 @@ export class HttpService {
       this.logger.info(this, "GET", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
-      this.http.setHeader("Accept", "application/json");
-      this.http.setHeader("Content-Type", "application/json");
       this.http.get(url, params, headers).then(
         (response:any) => {
           if (response && response.data) {
@@ -58,8 +58,6 @@ export class HttpService {
       this.logger.info(this, "POST", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
-      this.http.setHeader("Accept", "application/json");
-      this.http.setHeader("Content-Type", "application/json");
       this.http.post(url, params, headers).then(
         (response:any) => {
           let data = JSON.parse(response.data);
@@ -81,8 +79,6 @@ export class HttpService {
       this.logger.info(this, "PUT", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
-      this.http.setHeader("Accept", "application/json");
-      this.http.setHeader("Content-Type", "application/json");
       this.http.put(url, params, headers).then(
         (response:any) => {
           let data = JSON.parse(response.data);
@@ -104,8 +100,6 @@ export class HttpService {
       this.logger.info(this, "PATCH", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
-      this.http.setHeader("Accept", "application/json");
-      this.http.setHeader("Content-Type", "application/json");
       this.http.patch(url, params, headers).then(
         (response:any) => {
           let data = JSON.parse(response.data);
@@ -127,8 +121,6 @@ export class HttpService {
       this.logger.info(this, "DELETE", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
-      this.http.setHeader("Accept", "application/json");
-      this.http.setHeader("Content-Type", "application/json");
       this.http.delete(url, params, headers).then(
         (response:any) => {
           let data = JSON.parse(response.data);

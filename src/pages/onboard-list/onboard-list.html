@@ -47,14 +47,14 @@
       </ion-card>
       <div padding-left padding-right class="completed" *ngIf="person.config_self_test_sent == true">
         <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
-        <p>You sent a test Checkin to yourself</p>
+        <p>You sent a test Check-In to yourself</p>
       </div>
       <ion-card tappable [class.disabled]="person.config_people_invited == false || person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendCheckin($event)">
         <ion-card-content>
           <div class="icon-border">
             <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
           </div>
-          <h2>Send a test Checkin to yourself</h2>
+          <h2>Send a test Check-In to yourself</h2>
           <p>Confirm that you'll get messages when it really matters by sending yourself a test message.</p>
         </ion-card-content>
       </ion-card>

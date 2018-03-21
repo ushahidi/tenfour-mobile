@@ -13,8 +13,8 @@ $font-path: "../assets/fonts";
 // http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
 
 
-$background-color: #efefeb;
-$toolbar-text-color: #5bab60;
+$background-color: #EFEFEB;
+$toolbar-text-color: #5BAB60;
 
 // Named Color Variables
 // --------------------------------------------------
@@ -25,18 +25,18 @@ $toolbar-text-color: #5bab60;
 // The "primary" color is the only required color in the map.
 
 $colors: (
-  primary:    #5bab60,
-  secondary:  #eecc50,
-  danger:     #a74b4b,
-  light:      #efefeb,
-  dark:       #e6e6dd,
+  primary:    #5BAB60,
+  secondary:  #EECC50,
+  danger:     #A74B4B,
+  light:      #EFEFEB,
+  dark:       #E6E6DD,
   info:       #888888,
-  waiting:    #cccccc,
-  navbar:     #f5f5f1,
-  background: #efefeb,
-  text:       #8f8f8f,
+  waiting:    #CCCCCC,
+  navbar:     #F5F5F1,
+  background: #EFEFEB,
+  text:       #8F8F8F,
   grey:       #888888,
-  white:      #ffffff,
+  white:      #FFFFFF,
   black:      #000000
 );
 
@@ -45,15 +45,15 @@ $colors: (
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
-$toolbar-ios-text-color: #5bab60;
-$toolbar-ios-button-color: #5bab60;
+$toolbar-ios-text-color: #5BAB60;
+$toolbar-ios-button-color: #5BAB60;
 
 // App Material Design Variables
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
-$toolbar-md-text-color: #5bab60;
-$toolbar-md-button-color: #5bab60;
+$toolbar-md-text-color: #5BAB60;
+$toolbar-md-button-color: #5BAB60;
 
 
 // App Windows Variables

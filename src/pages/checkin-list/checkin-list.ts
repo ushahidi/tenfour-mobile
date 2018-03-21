@@ -137,7 +137,7 @@ export class CheckinListPage extends BasePage {
           }
         }
         this.logger.info(this, "loadBadgeNumber", badgeNumber);
-        this.badge.registerPermission().then((permission:any) => {
+        this.badge.requestPermission().then((permission:any) => {
           this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
           if (badgeNumber > 0) {
             this.badge.set(badgeNumber).then((result:any) => {
@@ -280,7 +280,7 @@ export class CheckinListPage extends BasePage {
         });
       }
       else {
-        this.api.getCheckins(this.organization).then((checkins:Checkin[]) => {
+        this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
             let saves = [];
             for (let checkin of checkins) {

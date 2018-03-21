@@ -29,8 +29,8 @@
     <preference name="SplashShowOnlyFirstTime" value="false" />
     <preference name="FadeSplashScreenDuration" value="500" />
     <preference name="StatusBarStyle" value="lightcontent" />
-    <preference name="StatusBarOverlaysWebView" value="true" />
-    <preference name="StatusBarBackgroundColor" value="#F8F7F3" />
+    <preference name="StatusBarOverlaysWebView" value="false" />
+    <preference name="StatusBarBackgroundColor" value="#F5F5F1" />
     <preference name="ShowSplashScreenSpinner" value="true" />
     <preference name="android-build-tool" value="gradle" />
     <preference name="android-targetSdkVersion" value="26" />
@@ -162,6 +162,6 @@
     </plugin>
     <plugin name="cordova-plugin-screen-orientation" spec="^2.0.2" />
     <plugin name="cordova-plugin-badge" spec="^0.8.7" />
+    <plugin name="cordova-plugin-advanced-http" spec="^1.11.1" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
-    <plugin name="cordova-plugin-advanced-http" spec="^1.11.0" />
 </widget>

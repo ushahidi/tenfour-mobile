@@ -87,14 +87,13 @@ export class TenFourApp {
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
     InjectorService.injector = injector;
-    this.platform.ready().then(() => {
-      this.logger.info(this, "Platform", "Ready");
-      this.loadStatusBar();
-      this.loadOrientation();
-      this.loadSplitPane();
-      this.loadDeepLinks();
-      this.loadAnalytics();
-      this.loadApplication([
+    this.platform.ready()
+      .then(() => this.loadStatusBar())
+      .then(() => this.loadOrientation())
+      .then(() => this.loadSplitPane())
+      .then(() => this.loadDeepLinks())
+      .then(() => this.loadAnalytics())
+      .then(() => this.loadApplication([
         new Organization(),
         new Email(),
         new Group(),
@@ -107,60 +106,82 @@ export class TenFourApp {
         new Settings(),
         new Country(),
         new Notification(),
-        new Subscription()
-      ]);
+        new Subscription()]));
+  }
+
+  private loadSplitPane():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.platform.is('tablet')) {
+        this.logger.info(this, "loadSplitPane", "YES");
+        this.tablet = true;
+      }
+      else {
+        this.logger.info(this, "loadSplitPane", "NO");
+        this.tablet = false;
+      }
+      resolve(true);
     });
   }
 
-  private loadSplitPane() {
-    if (this.platform.is('tablet')) {
-      this.logger.info(this, "loadSplitPane", "YES");
-      this.tablet = true;
-    }
-    else {
-      this.logger.info(this, "loadSplitPane", "NO");
-      this.tablet = false;
-    }
-  }
-
-  private loadOrientation() {
-    this.logger.info(this, "loadOrientation", this.screenOrientation.type);
-    this.screenOrientation.unlock();
-    this.screenOrientation.onChange().subscribe(() => {
-      this.logger.info(this, "Orientation", this.screenOrientation.type);
-   });
-  }
-
-  private loadStatusBar() {
-    this.logger.info(this, "loadStatusBar");
-    this.statusBar.styleDefault();
-  }
-
-  private loadAnalytics() {
-    this.logger.info(this, "loadAnalytics");
-    this.segment.ready().then((ready:SegmentService) => {
-      this.logger.info(this, "loadAnalytics", "Ready");
-      this.segment.debug(this.device.isVirtual);
-    });
-  }
-
-  private loadDeepLinks() {
-    this.logger.info(this, "loadDeepLinks");
-    this.deeplinks.routeWithNavController(this.navController, {
-      '/organization': SigninUrlPage,
-      '/login/email': SigninEmailPage,
-      '/organization/email/confirmation/': SignupConfirmPage }).subscribe(
-      (match:any) => {
-        this.logger.info(this, "Deeplinks Match", match);
-      },
-      (nomatch:any) => {
-        this.logger.info(this, "DeepLinks No Match", nomatch);
+  private loadOrientation():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadOrientation", this.screenOrientation.type);
+      this.screenOrientation.unlock();
+      this.screenOrientation.onChange().subscribe(() => {
+        this.logger.info(this, "Orientation", this.screenOrientation.type);
       });
+      resolve(true);
+    });
   }
 
-  private loadApplication(models:Model[]) {
+  private loadStatusBar():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadStatusBar");
+      if (this.platform.is("android")) {
+        this.statusBar.styleLightContent();
+        this.statusBar.overlaysWebView(false);
+        this.statusBar.backgroundColorByHexString("#000000");
+      }
+      else {
+        this.statusBar.styleDefault();
+        this.statusBar.overlaysWebView(false);
+        this.statusBar.backgroundColorByHexString("#f5f5f1");
+      }
+      resolve(true);
+    });
+  }
+
+  private loadAnalytics():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadAnalytics");
+      this.segment.ready().then((ready:SegmentService) => {
+        this.logger.info(this, "loadAnalytics", "Ready");
+        this.segment.debug(this.device.isVirtual);
+        resolve(true);
+      });
+    });
+  }
+
+  private loadDeepLinks():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadDeepLinks");
+      this.deeplinks.routeWithNavController(this.navController, {
+        '/organization': SigninUrlPage,
+        '/login/email': SigninEmailPage,
+        '/organization/email/confirmation/': SignupConfirmPage }).subscribe(
+        (match:any) => {
+          this.logger.info(this, "Deeplinks Match", match);
+        },
+        (nomatch:any) => {
+          this.logger.info(this, "DeepLinks No Match", nomatch);
+        });
+      resolve(true);
+    });
+  }
+
+  private loadApplication(models:Model[]):Promise<any> {
     this.logger.info(this, "loadApplication");
-    this.loadDatabase(models).then(
+    return this.loadDatabase(models).then(
       (loaded:any) => {
         this.logger.info(this, "loadApplication", "Database", loaded);
         this.database.getOrganizations().then((organizations:Organization[]) => {
