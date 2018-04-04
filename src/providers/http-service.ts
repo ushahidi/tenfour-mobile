@@ -47,7 +47,7 @@ export class HttpService {
         (error:any) => {
           let data = JSON.parse(error.error);
           this.logger.error(this, "GET", url, data);
-          reject(this.errorMessage(data));
+          reject(this.httpError(data));
         });
     });
   }
@@ -67,7 +67,7 @@ export class HttpService {
         (error:any) => {
           let data = JSON.parse(error.error);
           this.logger.error(this, "POST", url, data);
-          reject(this.errorMessage(data));
+          reject(this.httpError(data));
         }
       );
     });
@@ -88,7 +88,7 @@ export class HttpService {
         (error:any) => {
           let data = JSON.parse(error.error);
           this.logger.error(this, "PUT", url, data);
-          reject(this.errorMessage(data));
+          reject(this.httpError(data));
         }
       );
     });
@@ -109,7 +109,7 @@ export class HttpService {
         (error:any) => {
           let data = JSON.parse(error.error);
           this.logger.error(this, "PATCH", url, data);
-          reject(this.errorMessage(data));
+          reject(this.httpError(data));
         }
       );
     });
@@ -130,7 +130,7 @@ export class HttpService {
         (error:any) => {
           let data = JSON.parse(error.error);
           this.logger.error(this, "DELETE", url, data);
-          reject(this.errorMessage(data));
+          reject(this.httpError(data));
         });
     });
   }
@@ -232,7 +232,7 @@ export class HttpService {
     });
   }
 
-  private errorMessage(error:any):string {
+  private httpError(error:any):string {
     try {
       if (typeof error === 'string') {
         return error;
@@ -256,7 +256,7 @@ export class HttpService {
       }
     }
     catch (err) {
-      this.logger.error(this, "errorMessage", "Error", err);
+      this.logger.error(this, "httpError", "Error", err);
     }
     return JSON.stringify(error);
   }

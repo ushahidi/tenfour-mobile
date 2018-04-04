@@ -24,12 +24,20 @@ ion-menu {
   ion-select {
     padding-top: 0 !important;
     padding-bottom: 0 !important;
+    &.select-disabled {
+      opacity: 1.0 !important;
+      .select-icon {
+        display: none;
+      }
+    }
     .select-ios {
       padding-left: 0;
     }
     .select-text {
       font-size: 1.2em;
       font-weight: 500;
+      margin-left: 0 !important;
+      padding-left: 0 !important;
     }
   }
 }
