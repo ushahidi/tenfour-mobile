@@ -15,12 +15,12 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content (swipe)="swipeEvent($event)">
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <div padding-top padding-left padding-right>
-    <ion-segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
+    <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
       <ion-segment-button value="all">All Check-Ins</ion-segment-button>
       <ion-segment-button value="waiting">Waiting Response</ion-segment-button>
     </ion-segment>

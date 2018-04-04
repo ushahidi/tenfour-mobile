@@ -1,5 +1,5 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { Badge } from '@ionic-native/badge';
 
@@ -433,6 +433,17 @@ export class CheckinListPage extends BasePage {
     }
     this.logger.info(this, "filterCheckins", this.filter, "Checkins", checkins.length, "Filtered", filtered.length);
     return filtered;
+  }
+
+  private swipeEvent(event:any) {
+    if(event.direction == '2'){
+      this.logger.info(this, "swipeEvent", event, "Left");
+      this.filter = "all";
+    }
+    else if(event.direction == '4'){
+      this.logger.info(this, "swipeEvent", event, "Right");
+      this.filter = "waiting";
+    }
   }
 
 }
