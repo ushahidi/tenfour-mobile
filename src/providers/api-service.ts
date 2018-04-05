@@ -468,6 +468,7 @@ export class ApiService extends HttpService {
         let url = `${this.api}/api/v1/organizations/${person.organization_id}/people/${person.id}`;
         let params = {
           name: person.name,
+          role: person.role,
           description: person.description || ""};
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
