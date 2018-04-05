@@ -33,7 +33,7 @@
     </ion-item>
     <ion-item class="phone" color="white" *ngFor="let contact of person.getPhones()">
       <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
-      <ion-select item-right [interface]="selectType" [disabled]="countryCodes == null || countryCodes.length <= 1" [selectOptions]="selectOptions" [(ngModel)]="contact.country_code" *ngIf="countryCodes">
+      <ion-select item-right interface="action-sheet" [disabled]="countryCodes == null || countryCodes.length <= 1" [selectOptions]="countryOptions" [(ngModel)]="contact.country_code" *ngIf="countryCodes">
         <ion-option [value]="countryCode" *ngFor="let countryCode of countryCodes">
           +{{countryCode}}
         </ion-option>
@@ -47,8 +47,23 @@
       <ion-label color="primary">Add email</ion-label>
     </ion-item>
     <ion-item class="email" color="white" *ngFor="let contact of person.getEmails()">
-      <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
-      <ion-input type="email" autocorrect="off" autocapitalize="none" placeholder="email address" [(ngModel)]="contact.contact"></ion-input>
+      <ion-label no-padding no-margin icon-only text-left>
+        <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
+      </ion-label>
+      <ion-input item-right type="email" autocorrect="off" autocapitalize="none" placeholder="email address" [(ngModel)]="contact.contact"></ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="person && user && user.role == 'admin'">
+    <ion-item class="role" color="white">
+      <ion-label no-padding no-margin icon-only text-left>
+        <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      </ion-label>
+      <ion-select item-right interface="action-sheet" multiple="false" [selectOptions]="roleOptions" [(ngModel)]="person.role">
+        <ion-option value="admin">Administrator</ion-option>
+        <ion-option value="author">Author</ion-option>
+        <ion-option value="viewer">Viewer</ion-option>
+        <ion-option value="responder">Reply Only</ion-option>
+      </ion-select>
     </ion-item>
   </ion-list>
   <div padding-left padding-right padding-bottom *ngIf="person && person.id">

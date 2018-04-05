@@ -6,7 +6,25 @@ page-person-edit {
   }
   .email {
     ion-input {
-
+      border-bottom: 1px solid #e5e5e5;
+    }
+    ion-label {
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      ion-icon {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+  }
+  .role {
+    ion-label {
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      ion-icon {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
     }
   }
   ion-item {

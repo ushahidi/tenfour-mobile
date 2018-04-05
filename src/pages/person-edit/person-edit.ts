@@ -27,12 +27,19 @@ import { Region } from '../../models/region';
 export class PersonEditPage extends BasePage {
 
   organization:Organization = null;
+  user:Person = null;
   person:Person = null;
   editing:boolean = true;
-  cameraPresent: boolean = true;
-  selectOptions:any = {};
+  cameraPresent:boolean = true;
   countryCodes:any = [];
-  selectType:string = "action-sheet";
+  countryOptions:any = {
+    multiple: false,
+    title: 'Country Code'
+  };
+  roleOptions:any = {
+    multiple: false,
+    title: 'Roles'
+  };
 
   constructor(
       protected zone:NgZone,
@@ -58,16 +65,13 @@ export class PersonEditPage extends BasePage {
   ionViewDidLoad() {
     super.ionViewDidLoad();
     this.loadCamera();
-    this.selectOptions = {
-      multiple: false,
-      title: 'Country Code'
-    }
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
+    this.user = this.getParameter<Person>("user");
     if (this.person) {
       this.editing = true;
     }
@@ -366,6 +370,10 @@ export class PersonEditPage extends BasePage {
       this.logger.error(this, "showCameraRoll", error);
       this.showAlert("Problem Selecting Photo", error);
     });
+  }
+
+  private addRole(event:any) {
+    this.logger.info(this, "addRole");
   }
 
   private deletePerson(event:any) {
