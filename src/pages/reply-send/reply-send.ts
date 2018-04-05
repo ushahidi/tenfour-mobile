@@ -176,7 +176,7 @@ export class ReplySendPage extends BasePage {
   private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
     if (this.checkin && this.checkin.reply && this.checkin.reply.id) {
-      this.database.getReply(this.checkin.reply.id).then((reply:Reply) => {
+      this.database.getReply(this.organization, this.checkin.reply.id).then((reply:Reply) => {
         this.checkin.reply.answer = reply.answer;
         this.checkin.reply.message = reply.message;
         this.checkin.reply.location_text = reply.location_text;
@@ -202,13 +202,13 @@ export class ReplySendPage extends BasePage {
       this.api.postReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "sendReply", "Reply", replied);
-          this.database.getPerson(replied.user_id).then((person:Person) => {
+          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "sendReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(checkin, replied).then(saved => {
+            this.database.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });
@@ -231,13 +231,13 @@ export class ReplySendPage extends BasePage {
       this.api.putReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "saveReply", "Reply", replied);
-          this.database.getPerson(replied.user_id).then((person:Person) => {
+          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "saveReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(checkin, replied).then(saved => {
+            this.database.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });

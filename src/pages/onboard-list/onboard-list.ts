@@ -24,6 +24,7 @@ export class OnboardListPage extends BasePage {
 
   organization:Organization = null;
   person:Person = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -43,6 +44,7 @@ export class OnboardListPage extends BasePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+    this.loading = true;
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
@@ -50,9 +52,17 @@ export class OnboardListPage extends BasePage {
       .then(() => { return this.loadPerson(); })
       .then(() => { return this.loadPeople(); })
       .then(() => {
+        this.logger.info(this, "ionViewDidLoad", "Loaded");
+        this.zone.run(() => {
+          this.loading = false;
+        });
         loading.dismiss();
       })
       .catch((error) => {
+        this.logger.info(this, "ionViewDidLoad", "Failed");
+        this.zone.run(() => {
+          this.loading = false;
+        });
         loading.dismiss();
         this.showToast(error);
       });
@@ -135,14 +145,14 @@ export class OnboardListPage extends BasePage {
     }
   }
 
-  private taskSendRollCall(event:any) {
-    this.logger.info(this, "taskSendRollCall");
+  private taskSendCheckin(event:any) {
+    this.logger.info(this, "taskSendCheckin");
     if (this.person.config_people_invited && this.person.config_people_invited) {
       let modal = this.showModal(CheckinTestPage, {
         organization: this.organization,
         person: this.person });
       modal.onDidDismiss(data => {
-        this.logger.info(this, "taskSendRollCall", "Modal", data);
+        this.logger.info(this, "taskSendCheckin", "Modal", data);
         if (data) {
           this.person.config_self_test_sent = true;
         }

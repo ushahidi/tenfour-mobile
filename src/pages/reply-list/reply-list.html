@@ -7,7 +7,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadUpdates($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="checkin">
@@ -18,14 +18,14 @@
       <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
       <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
     </ion-item>
-    <ion-item text-wrap color="white" tappable *ngIf="checkin.replied == null || checkin.replied == false" (click)="sendReply($event)">
+    <ion-item text-wrap color="white" tappable *ngIf="checkin.canRespond(person)" (click)="sendReply($event)">
       <div ion-text color="primary">Respond</div>
     </ion-item>
   </ion-list>
   <div *ngIf="checkin">
     <ion-list *ngFor="let answer of checkin.answers">
       <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
-      <ion-item color="white" [attr.detail-push]="reply.user_id == person.id ? 'true' : ''" tappable (click)="editReply($event, reply)" *ngFor="let reply of checkin.answerReplies(answer)">
+      <ion-item color="white" [attr.detail-push]="reply.user_id == person.id ? 'true' : null" [attr.tappable]="reply.user_id == person.id ? 'true' : null" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)">
         <person-avatar item-left [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
         <ion-grid no-padding>
           <ion-row no-padding>
@@ -38,7 +38,8 @@
           </ion-row>
           <ion-row no-padding>
             <ion-col text-left no-padding>
-              <p text-wrap>{{reply.message}}</p>
+              <p text-wrap>{{reply.message}}
+              </p>
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -60,15 +61,6 @@
             </ion-col>
           </ion-row>
         </ion-grid>
-        <!-- <ion-row no-padding>
-          <ion-col text-left no-padding>
-            <h2>{{recipient.name}}</h2>
-          </ion-col>
-          <ion-col text-right no-padding>
-            <small>{{recipient.created_at | dateTime}}</small>
-          </ion-col>
-        </ion-row>
-        <p text-wrap>{{recipient.response_status}}</p> -->
       </ion-item>
     </ion-list>
   </div>

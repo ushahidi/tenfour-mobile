@@ -32,8 +32,8 @@ export class ApiService extends HttpService {
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
 
   scope:string = "user";
-  // api:string = "https://api.tenfour.org";
-  api:string = "https://api.staging.tenfour.org";
+  api:string = "https://api.tenfour.org";
+  // api:string = "https://api.staging.tenfour.org";
 
   constructor(
     protected device:Device,
@@ -56,6 +56,7 @@ export class ApiService extends HttpService {
           resolve(data);
         },
         (error:any) => {
+          this.logger.error(this, "saveToken", token, "Error", error);
           reject(error);
         });
     });
@@ -630,7 +631,7 @@ export class ApiService extends HttpService {
   public getCheckin(organization:Organization, id:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/checkins/${id}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${id}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then(
           (data:any) => {
@@ -655,7 +656,7 @@ export class ApiService extends HttpService {
   public postCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/checkins`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
         let params = {
           creditsRequired: 0,
           organization_id: organization.id,
@@ -691,7 +692,7 @@ export class ApiService extends HttpService {
   public postReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/checkins/${checkin.id}/replies`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}/replies`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -735,7 +736,7 @@ export class ApiService extends HttpService {
   public putReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/checkins/${checkin.id}/replies/${reply.id}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}/replies/${reply.id}`;
         let params = { };
         if (reply) {
           if (reply.answer) {
@@ -817,7 +818,7 @@ export class ApiService extends HttpService {
   public getAnswers(organization:Organization, id:number):Promise<Answer[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/checkins/${id}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${id}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then(
           (data:any) => {

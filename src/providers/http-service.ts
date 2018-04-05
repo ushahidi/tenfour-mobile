@@ -16,12 +16,15 @@ export class HttpService {
     protected logger:LoggerService) {
   }
 
-  private httpHeaders(accessToken:string=null):{} {
+  private httpHeaders(accessToken:string=null, contentType:string=null):{} {
     let headers = {
       Accept: "application/json"
     };
     if (accessToken && accessToken.length > 0) {
       headers["Authorization"] = `Bearer ${accessToken}`;
+    }
+    if (contentType && contentType.length > 0) {
+      headers["Content-Type"] = contentType;
     }
     return headers;
   }
@@ -45,16 +48,15 @@ export class HttpService {
           }
         },
         (error:any) => {
-          let data = JSON.parse(error.error);
-          this.logger.error(this, "GET", url, data);
-          reject(this.httpError(data));
+          this.logger.error(this, "GET", url, error);
+          reject(this.httpError(error));
         });
     });
   }
 
   protected httpPost(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token);
+      let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "POST", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -65,9 +67,8 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          let data = JSON.parse(error.error);
-          this.logger.error(this, "POST", url, data);
-          reject(this.httpError(data));
+          this.logger.error(this, "POST", url, error);
+          reject(this.httpError(error));
         }
       );
     });
@@ -75,7 +76,7 @@ export class HttpService {
 
   protected httpPut(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token);
+      let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "PUT", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -86,9 +87,8 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          let data = JSON.parse(error.error);
-          this.logger.error(this, "PUT", url, data);
-          reject(this.httpError(data));
+          this.logger.error(this, "PUT", url, error);
+          reject(this.httpError(error));
         }
       );
     });
@@ -96,7 +96,7 @@ export class HttpService {
 
   protected httpPatch(url:string, params:any={}, token:string=null) {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token);
+      let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "PATCH", url, params, headers);
       this.http.setRequestTimeout(30);
       this.http.setDataSerializer("json");
@@ -107,9 +107,8 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          let data = JSON.parse(error.error);
-          this.logger.error(this, "PATCH", url, data);
-          reject(this.httpError(data));
+          this.logger.error(this, "PATCH", url, error);
+          reject(this.httpError(error));
         }
       );
     });
@@ -128,9 +127,8 @@ export class HttpService {
           resolve(data);
         },
         (error:any) => {
-          let data = JSON.parse(error.error);
-          this.logger.error(this, "DELETE", url, data);
-          reject(this.httpError(data));
+          this.logger.error(this, "DELETE", url, error);
+          reject(this.httpError(error));
         });
     });
   }
@@ -233,26 +231,30 @@ export class HttpService {
   }
 
   private httpError(error:any):string {
+    this.logger.error(this, "httpError", "Error", error);
     try {
       if (typeof error === 'string') {
         return error;
       }
-      else if (error['errors']) {
-        let errors = error['errors'];
-        let messages = [];
-        for (let key of Object.keys(errors)) {
-          let error = errors[key];
-          if (error) {
-            messages.push(error);
+      else if (error && error['error']){
+        let json = JSON.parse(error.error);
+        if (json['errors']) {
+          let errors = json['errors'];
+          let messages = [];
+          for (let key of Object.keys(errors)) {
+            let error = errors[key];
+            if (error) {
+              messages.push(error);
+            }
           }
+          return messages.join(", ");
         }
-        return messages.join(", ");
-      }
-      else if (error['error']) {
-        return error['error'];
-      }
-      else if (error['message']) {
-        return error['message'];
+        else if (json['error']) {
+          return json['error'];
+        }
+        else if (json['message']) {
+          return json['message'];
+        }
       }
     }
     catch (err) {

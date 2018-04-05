@@ -84,7 +84,7 @@ export class PersonDetailsPage extends BasePage {
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getContacts(this.person).then((contacts:Contact[]) => {
+        return this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
           if (contacts && contacts.length > 0) {
             this.person.contacts = contacts;
             resolve(this.person);
@@ -102,7 +102,7 @@ export class PersonDetailsPage extends BasePage {
             this.person = person;
             let saves = [];
             for (let contact of person.contacts) {
-              saves.push(this.database.saveContact(person, contact));
+              saves.push(this.database.saveContact(this.organization, person, contact));
             }
             saves.push(this.database.savePerson(this.organization, person))
             Promise.all(saves).then(saved => {

@@ -180,11 +180,11 @@ export class PersonEditPage extends BasePage {
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     let loading = this.showLoading("Canceling...");
-    this.database.getPerson(this.person.id).then((person:Person) => {
+    this.database.getPerson(this.organization, this.person.id).then((person:Person) => {
       this.person.name = person.name;
       this.person.description = person.description;
       this.person.profile_picture = person.profile_picture;
-      this.database.getContacts(person).then((contacts:Contact[]) => {
+      this.database.getContacts(this.organization, person).then((contacts:Contact[]) => {
         for (let contact of this.person.contacts) {
           let _contact = contacts.filter(_contact => _contact.id == contact.id);
           if (_contact && _contact.length > 0) {
@@ -263,7 +263,7 @@ export class PersonEditPage extends BasePage {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
         this.api.updateContact(organization, person, contact).then((updated:Contact) => {
-          this.database.saveContact(person, updated).then((saved:any) => {
+          this.database.saveContact(this.organization, person, updated).then((saved:any) => {
             resolve(updated);
           });
         },
@@ -277,7 +277,7 @@ export class PersonEditPage extends BasePage {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
         this.api.createContact(organization, person, contact).then((created:Contact) => {
-          this.database.saveContact(person, created).then((saved:any) => {
+          this.database.saveContact(this.organization, person, created).then((saved:any) => {
             resolve(created);
           });
         },
@@ -372,9 +372,9 @@ export class PersonEditPage extends BasePage {
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
       let removes = [];
-      removes.push(this.database.removePerson(this.person));
+      removes.push(this.database.removePerson(this.organization, this.person));
       for (let contact of this.person.contacts) {
-        removes.push(this.database.removeContact(contact));
+        removes.push(this.database.removeContact(this.organization, contact));
       }
       Promise.all(removes).then(removed => {
         loading.dismiss();

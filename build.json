@@ -4,13 +4,13 @@
       "packageType": "development",
       "developmentTeam": "K4L62494Y2",
       "codeSignIdentity": "iPhone Developer",
-      "provisioningProfile": "38ac1b59-b07f-447c-918b-76b54734d5e1"
+      "provisioningProfile": "edc38d8c-6ab5-4be1-a551-e41b9de5d928"
     },
     "release": {
       "packageType": "app-store",
       "developmentTeam": "K4L62494Y2",
       "codeSignIdentity": "iPhone Distribution",
-      "provisioningProfile": "d8f255c1-f2b2-4dc3-89ae-f893ae637238"
+      "provisioningProfile": "6c6b640c-1348-4c8d-a1f8-df6a10b347e0"
     }
   },
   "android": {

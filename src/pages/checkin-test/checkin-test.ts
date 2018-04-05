@@ -61,7 +61,7 @@ export class CheckinTestPage extends BasePage {
       user_id: this.person.id,
       user_initials: this.person.initials,
       user_picture: this.person.profile_picture,
-      message: "Did you receive this test RollCall?",
+      message: "Did you receive this test Check-in?",
       self_test_roll_call: true,
       send_via: 'apponly'
     });
@@ -89,18 +89,18 @@ export class CheckinTestPage extends BasePage {
     this.api.postCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       let saves = [];
       for (let answer of checkin.answers) {
-        saves.push(this.database.saveAnswer(checkin, answer));
+        saves.push(this.database.saveAnswer(this.organization, checkin, answer));
       }
       for (let recipient of checkin.recipients) {
-        saves.push(this.database.saveRecipient(checkin, recipient));
+        saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
       }
       for (let reply of checkin.replies) {
-        saves.push(this.database.saveReply(checkin, reply));
+        saves.push(this.database.saveReply(this.organization, checkin, reply));
       }
       saves.push(this.database.saveCheckin(this.organization, checkin));
       Promise.all(saves).then(saved => {
         loading.dismiss();
-        this.showToast("RollCall test sent");
+        this.showToast("Test Check-In sent");
         this.hideModal({ checkin: Checkin });
       });
     },

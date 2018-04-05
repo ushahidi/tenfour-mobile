@@ -189,7 +189,7 @@ export class TenFourApp {
             this.organizations = organizations;
             this.organization = organizations[0];
             this.logger.info(this, "loadApplication", "Organization", this.organization);
-            this.database.getPerson(null, true).then(
+            this.database.getPerson(this.organization, null, true).then(
               (person:Person) => {
                 this.logger.info(this, "loadApplication", "Person", person);
                 if (person && person.config_profile_reviewed && person.config_self_test_sent) {
@@ -290,7 +290,7 @@ export class TenFourApp {
   }
 
   private loadPerson():Promise<any> {
-    return this.database.getPerson(null, true).then(
+    return this.database.getPerson(this.organization, null, true).then(
       (person:Person) => {
         this.zone.run(() => {
           this.logger.info(this, "loadPerson", person);

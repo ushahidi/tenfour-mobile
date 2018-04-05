@@ -73,7 +73,7 @@ export class CheckinListPage extends BasePage {
             checkins: checkins });
           modal.onDidDismiss(data => {
             if (data) {
-              this.loadRollCalls(false).then(loaded => {
+              this.loadCheckins(false).then(loaded => {
                 this.loadBadgeNumber();
               })
             }
@@ -106,7 +106,7 @@ export class CheckinListPage extends BasePage {
     return Promise.resolve()
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadRollCalls(cache); })
+      .then(() => { return this.loadCheckins(cache); })
       .then(() => { return this.loadNotifications(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
@@ -200,7 +200,7 @@ export class CheckinListPage extends BasePage {
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        this.database.getPerson(null, true).then((person:Person) => {
+        this.database.getPerson(this.organization, null, true).then((person:Person) => {
           if (person) {
             this.person = person;
             resolve(person);
@@ -256,7 +256,7 @@ export class CheckinListPage extends BasePage {
     });
   }
 
-  private loadRollCalls(cache:boolean=true):Promise<Checkin[]> {
+  private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
@@ -266,7 +266,7 @@ export class CheckinListPage extends BasePage {
             resolve(this.checkins);
           }
           else {
-            this.loadRollCalls(false).then((checkins:Checkin[]) => {
+            this.loadCheckins(false).then((checkins:Checkin[]) => {
               this.organization.checkins = checkins;
               this.checkins = this.filterCheckins(checkins);
               resolve(this.checkins);
@@ -285,13 +285,13 @@ export class CheckinListPage extends BasePage {
             let saves = [];
             for (let checkin of checkins) {
               for (let answer of checkin.answers) {
-                saves.push(this.database.saveAnswer(checkin, answer));
+                saves.push(this.database.saveAnswer(this.organization, checkin, answer));
               }
               for (let recipient of checkin.recipients) {
-                saves.push(this.database.saveRecipient(checkin, recipient));
+                saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
               }
               for (let reply of checkin.replies) {
-                saves.push(this.database.saveReply(checkin, reply));
+                saves.push(this.database.saveReply(this.organization, checkin, reply));
                 if (this.person && this.person.id == reply.user_id) {
                   checkin.replied = true;
                 }
@@ -381,7 +381,7 @@ export class CheckinListPage extends BasePage {
           this.logger.info(this, "sendReply", "Modal", "Canceled");
         }
         else {
-          this.loadRollCalls(false);
+          this.loadCheckins(false);
         }
       }
    });
@@ -398,7 +398,7 @@ export class CheckinListPage extends BasePage {
           this.logger.info(this, "createCheckin", "Modal", "Canceled");
         }
         else {
-          this.loadRollCalls(false);
+          this.loadCheckins(false);
         }
       }
     });
@@ -414,7 +414,7 @@ export class CheckinListPage extends BasePage {
   private filterChanged(event:any) {
     this.logger.info(this, "filterChanged", this.filter);
     let loading = this.showLoading("Filtering...");
-    this.loadRollCalls(true).then((filtered:any) => {
+    this.loadCheckins(true).then((filtered:any) => {
       loading.dismiss();
     })
   }

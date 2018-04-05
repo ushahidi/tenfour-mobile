@@ -22,17 +22,17 @@ cordova plugin add cordova-plugin-nativestorage@2.2.2
 ```
 Debug Apps
 ```
-ionic cordova run ios --livereload --consolelogs --serverlogs --debug --target "iPhone-SE"
-ionic cordova run ios --livereload --consolelogs --serverlogs --target "iPhone-8-Plus"
-ionic cordova run ios --livereload --consolelogs --serverlogs --debug --target "iPad-Pro"
+ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE"
+ionic cordova emulate ios --livereload --consolelogs --emulator --target "iPhone-8-Plus"
+ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro"
 ```
 ```
 cordova run --list
-ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_22
-ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_23
-ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_24
-ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_25
-ionic cordova run android --livereload --consolelogs --serverlogs --target Nexus_S_API_26
+ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_22
+ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_23
+ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_24
+ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_25
+ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
 Release Apps
 ```
@@ -317,10 +317,10 @@ ionic cordova build ios
 Run the app in the iOS Simulator or attached iOS device
 
 ```
-ionic cordova run ios --livereload --consolelogs --serverlogs
+ionic cordova run ios --livereload --consolelogs
 ```
 ```
-ionic cordova run ios --livereload --consolelogs --serverlogs --target "iPhone-SE"
+ionic cordova run ios --livereload --consolelogs --target "iPhone-SE"
 ```
 
 Build the app in release and production mode for archiving
@@ -355,7 +355,7 @@ ionic cordova build android
 Run the app in the Android Emulator or attached Android device
 
 ```
-ionic cordova run android --livereload --consolelogs --serverlogs
+ionic cordova run android --livereload --consolelogs
 ```
 
 Build the app in release and production mode for archiving

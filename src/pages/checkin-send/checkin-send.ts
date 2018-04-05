@@ -118,25 +118,25 @@ export class CheckinSendPage extends BasePage {
 
   private sendCheckin(event:any) {
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
-      this.showToast("Please select how the RollCall will be sent");
+      this.showToast("Please select how the Check-In will be sent");
     }
     else {
       let loading = this.showLoading("Sending...");
       this.api.postCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
         let saves = [];
         for (let answer of checkin.answers) {
-          saves.push(this.database.saveAnswer(checkin, answer));
+          saves.push(this.database.saveAnswer(this.organization, checkin, answer));
         }
         for (let recipient of checkin.recipients) {
-          saves.push(this.database.saveRecipient(checkin, recipient));
+          saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
         }
         for (let reply of checkin.replies) {
-          saves.push(this.database.saveReply(checkin, reply));
+          saves.push(this.database.saveReply(this.organization, checkin, reply));
         }
         saves.push(this.database.saveCheckin(this.organization, checkin));
         Promise.all(saves).then(saved => {
           loading.dismiss();
-          this.showToast("RollCall sent");
+          this.showToast("Check-In sent");
           let firstViewController = this.navController.first();
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+
 import { Platform } from 'ionic-angular';
 import { IsDebug } from '@ionic-native/is-debug';
 
@@ -9,7 +10,7 @@ export class LoggerService {
 
   constructor(
     private isDebug:IsDebug,
-    protected platform: Platform) {
+    private platform:Platform) {
     this.platform.ready().then(() => {
       this.isDebug.getIsDebug().then(
         (isDebug:boolean) => {
@@ -21,37 +22,37 @@ export class LoggerService {
     });
   }
 
-  log(instance:any, method:string, ...objects:any[]) {
+  public log(instance:any, method:string, ...objects:any[]) {
     if (this.enabled) {
       console.log(this.message(instance, method, objects));
     }
   }
 
-  info(instance:any, method:string, ...objects:any[]) {
+  public info(instance:any, method:string, ...objects:any[]) {
     if (this.enabled) {
       console.info(this.message(instance, method, objects));
     }
   }
 
-  debug(instance:any, method:string, ...objects:any[]) {
+  public debug(instance:any, method:string, ...objects:any[]) {
     if (this.enabled) {
       console.debug(this.message(instance, method, objects));
     }
   }
 
-  warn(instance:any, method:string, ...objects:any[]) {
+  public warn(instance:any, method:string, ...objects:any[]) {
     if (this.enabled) {
       console.warn(this.message(instance, method, objects));
     }
   }
 
-  error(instance:any, method:string, ...objects:any[]) {
+  public error(instance:any, method:string, ...objects:any[]) {
     if (this.enabled) {
       console.error(this.message(instance, method, objects));
     }
   }
 
-  message(instance:any, method:string, objects:any[]) {
+  private message(instance:any, method:string, objects:any[]) {
     let messages = [];
     if (instance != null) {
       messages.push(instance.constructor.name);

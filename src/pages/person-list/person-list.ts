@@ -174,9 +174,9 @@ export class PersonListPage extends BasePage {
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, person).then((deleted:any) => {
       let removes = [];
-      removes.push(this.database.removePerson(person));
+      removes.push(this.database.removePerson(this.organization, person));
       for (let contact of person.contacts) {
-        removes.push(this.database.removeContact(contact));
+        removes.push(this.database.removeContact(this.organization, contact));
       }
       Promise.all(removes).then(removed => {
         let index = this.organization.people.indexOf(person);

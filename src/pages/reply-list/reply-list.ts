@@ -57,7 +57,7 @@ export class ReplyListPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.checkin = this.getParameter<Checkin>("checkin");
     this.person = this.getParameter<Person>("person");
-    this.loadUpdates(null, true);
+    this.loadUpdates(true);
   }
 
   ionViewDidEnter() {
@@ -68,7 +68,7 @@ export class ReplyListPage extends BasePage {
     });
   }
 
-  private loadUpdates(event:any, cache:boolean=true) {
+  private loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     Promise.all([this.loadReplies(cache)]).then(
       (loaded:any) =>{
@@ -89,7 +89,7 @@ export class ReplyListPage extends BasePage {
   private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getReplies(this.checkin).then((replies:Reply[]) => {
+        return this.database.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
           this.checkin.replies = replies;
           resolve(replies);
         });
@@ -98,13 +98,13 @@ export class ReplyListPage extends BasePage {
         return this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
           let saves = [];
           for (let answer of checkin.answers) {
-            saves.push(this.database.saveAnswer(checkin, answer));
+            saves.push(this.database.saveAnswer(this.organization, checkin, answer));
           }
           for (let recipient of checkin.recipients) {
-            saves.push(this.database.saveRecipient(checkin, recipient));
+            saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
           }
           for (let reply of checkin.replies) {
-            saves.push(this.database.saveReply(checkin, reply));
+            saves.push(this.database.saveReply(this.organization, checkin, reply));
             if (this.person && this.person.id == reply.user_id) {
               checkin.replied = true;
             }
@@ -143,7 +143,7 @@ export class ReplyListPage extends BasePage {
    });
   }
 
-  private editReply(event:any, reply:Reply) {
+  private editReply(reply:Reply, event:any) {
     this.logger.info(this, "editReply");
     if (reply.user_id == this.person.id) {
       let modal = this.showModal(ReplySendPage, {

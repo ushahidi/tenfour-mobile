@@ -54,7 +54,7 @@ export class CheckinEditPage extends BasePage {
         this.initCheckin();
       }
       else {
-        this.database.getPerson(null, true).then((person:Person) => {
+        this.database.getPerson(this.organization, null, true).then((person:Person) => {
           this.person = person;
           this.initCheckin();
         });

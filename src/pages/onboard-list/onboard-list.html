@@ -5,62 +5,61 @@
 </ion-header>
 <ion-content no-bounce>
   <ion-slides bounce>
-    <!-- <ion-slide *ngIf="organization">
-      <h2>{{organization.name}} is in good hands.</h2>
-      <p>You've taken the first step toward ensuring your organization's safety.</p>
-    </ion-slide> -->
     <ion-slide *ngIf="organization && person">
       <div *ngIf="(person.config_people_invited == false || person.isMember()) || person.config_profile_reviewed == false || person.config_self_test_sent == false">
         <h2>Let's make sure {{organization.name}} is ready.</h2>
-        <p>There's a few things we can do to ensure everything's in order:</p>
+        <p *ngIf="loading == true">Loading your organization...</p>
+        <p *ngIf="loading == false">There's a few things we can do to ensure everything's in order:</p>
       </div>
       <div *ngIf="(person.config_people_invited == true || person.isMember()) && person.config_profile_reviewed == true && person.config_self_test_sent == true">
-        <h2>You're all set!</h2>
+        <h2>Good news, you're all set!</h2>
       </div>
-      <div *ngIf="person && person.isOwnerOrAdmin()">
-        <div padding-left padding-right class="completed" *ngIf="person.config_people_invited == true">
-          <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
-          <p>You added people to {{organization.name}}</p>
+      <div *ngIf="loading == false">
+        <div *ngIf="person && person.isOwnerOrAdmin()">
+          <div padding-left padding-right class="completed" *ngIf="person.config_people_invited == true">
+            <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+            <p>You added people to {{organization.name}}</p>
+          </div>
+          <ion-card tappable *ngIf="person.config_people_invited == false" (click)="taskAddPeople($event)">
+            <ion-card-content>
+              <div class="icon-border">
+                <ion-icon ios="ios-person-add" md="md-person-add"></ion-icon>
+              </div>
+              <h2>Add people to your organization</h2>
+              <p>Make sure everyone you need to reach is included.</p>
+            </ion-card-content>
+          </ion-card>
         </div>
-        <ion-card tappable *ngIf="person.config_people_invited == false" (click)="taskAddPeople($event)">
+        <div padding-left padding-right class="completed" *ngIf="person.config_profile_reviewed == true">
+          <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+          <p>You reviewed your contact information</p>
+        </div>
+        <ion-card tappable [class.disabled]="person.config_people_invited == false" *ngIf="person.config_profile_reviewed == false" (click)="taskReviewContact($event)">
           <ion-card-content>
             <div class="icon-border">
-              <ion-icon ios="ios-person-add" md="md-person-add"></ion-icon>
+              <ion-icon ios="ios-person" md="md-person"></ion-icon>
             </div>
-            <h2>Add people to your organization</h2>
-            <p>Make sure everyone you need to reach is included.</p>
+            <h2>Review your contact information</h2>
+            <p>Make sure your information is complete and accurate, and that you have at least one number number or emailed added for when it matters most.</p>
           </ion-card-content>
         </ion-card>
-      </div>
-      <div padding-left padding-right class="completed" *ngIf="person.config_profile_reviewed == true">
-        <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
-        <p>You reviewed your contact information</p>
-      </div>
-      <ion-card tappable [class.disabled]="person.config_people_invited == false" *ngIf="person.config_profile_reviewed == false" (click)="taskReviewContact($event)">
-        <ion-card-content>
-          <div class="icon-border">
-            <ion-icon ios="ios-person" md="md-person"></ion-icon>
-          </div>
-          <h2>Review your contact information</h2>
-          <p>Make sure your information is complete and accurate, and that you have at least one number number or emailed added for when it matters most.</p>
-        </ion-card-content>
-      </ion-card>
-      <div padding-left padding-right class="completed" *ngIf="person.config_self_test_sent == true">
-        <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
-        <p>You sent a test Check-In to yourself</p>
-      </div>
-      <ion-card tappable [class.disabled]="person.config_people_invited == false || person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendCheckin($event)">
-        <ion-card-content>
-          <div class="icon-border">
-            <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
-          </div>
-          <h2>Send a test Check-In to yourself</h2>
-          <p>Confirm that you'll get messages when it really matters by sending yourself a test message.</p>
-        </ion-card-content>
-      </ion-card>
-      <div padding-left padding-right padding-bottom>
-        <button ion-button block color="primary" (click)="showCheckinList($event)"
-                *ngIf="person.config_people_invited == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
+        <div padding-left padding-right class="completed" *ngIf="person.config_self_test_sent == true">
+          <ion-icon color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
+          <p>You sent a test Check-In to yourself</p>
+        </div>
+        <ion-card tappable [class.disabled]="person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendCheckin($event)">
+          <ion-card-content>
+            <div class="icon-border">
+              <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
+            </div>
+            <h2>Send a test Check-In to yourself</h2>
+            <p>Confirm that you'll get messages when it really matters by sending yourself a test message.</p>
+          </ion-card-content>
+        </ion-card>
+        <div padding-left padding-right padding-bottom>
+          <button ion-button block color="primary" (click)="showCheckinList($event)"
+                  *ngIf="person.config_people_invited == true && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
+        </div>
       </div>
     </ion-slide>
   </ion-slides>
