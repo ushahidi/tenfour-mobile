@@ -159,7 +159,10 @@ import { CountryService } from '../providers/country-service';
     HumanizeModule,
     BrowserAnimationsModule,
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
-    IonicModule.forRoot(TenFourApp)
+    IonicModule.forRoot(TenFourApp, {
+      scrollAssist: true,
+      autoFocusAssist: true
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

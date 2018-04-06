@@ -56,7 +56,6 @@ export class CheckinSendPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.checkin = this.getParameter<Checkin>("checkin");
     this.person = this.getParameter<Person>("person");
-    this.statusBar.overlaysWebView(false);
   }
 
   ionViewDidEnter() {
@@ -65,11 +64,6 @@ export class CheckinSendPage extends BasePage {
       organization: this.organization.name,
       checkin: this.checkin.message
     });
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
-    this.statusBar.overlaysWebView(true);
   }
 
   private addPerson() {
