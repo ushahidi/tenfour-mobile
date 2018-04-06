@@ -152,6 +152,35 @@ export class GroupEditPage extends BasePage {
 
   private deleteGroup(event:any) {
     this.logger.info(this, "createGroup");
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Removing...");
+          this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
+            let removes = [];
+            removes.push(this.database.removeGroup(this.organization, this.group));
+            Promise.all(removes).then(removed => {
+              loading.dismiss();
+              this.showToast("Group removed from organization");
+              this.hideModal({deleted: true});
+            });
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Removing Group", error);
+          });
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteGroup", "Cancelled");
+        }
+      }
+    ];
+    this.showConfirm("Delete Group", "Are you sure you want to delete this group?", buttons);
   }
 
   private removePerson(person:Person) {

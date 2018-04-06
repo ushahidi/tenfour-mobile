@@ -378,23 +378,38 @@ export class PersonEditPage extends BasePage {
   }
 
   private deletePerson(event:any) {
-    let loading = this.showLoading("Removing...");
-    this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
-      let removes = [];
-      removes.push(this.database.removePerson(this.organization, this.person));
-      for (let contact of this.person.contacts) {
-        removes.push(this.database.removeContact(this.organization, contact));
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Removing...");
+          this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
+            let removes = [];
+            removes.push(this.database.removePerson(this.organization, this.person));
+            for (let contact of this.person.contacts) {
+              removes.push(this.database.removeContact(this.organization, contact));
+            }
+            Promise.all(removes).then(removed => {
+              loading.dismiss();
+              this.showToast("Person removed from organization");
+              this.hideModal({deleted: true});
+            });
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Removing Person", error);
+          });
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deletePerson", "Cancelled");
+        }
       }
-      Promise.all(removes).then(removed => {
-        loading.dismiss();
-        this.showToast("Person removed from organization");
-        this.hideModal({deleted: true});
-      });
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Removing Person", error);
-    });
+    ];
+    this.showConfirm("Delete Person", "Are you sure you want to delete this person?", buttons);
   }
 
 }
