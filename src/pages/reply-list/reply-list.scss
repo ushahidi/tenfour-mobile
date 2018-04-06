@@ -18,6 +18,7 @@ page-reply-list {
         text-overflow: ellipsis;
       }
       p {
+        padding-top: 4px;
         color: #888888 !important;
         white-space: nowrap;
         overflow: hidden;
@@ -30,11 +31,6 @@ page-reply-list {
         margin-top: 6px;
         margin-right: 8px;
         border-radius: 2px !important;
-      }
-      ion-row {
-        ion-col {
-
-        }
       }
     }
   }

@@ -36,9 +36,16 @@
               <small>{{reply.created_at | dateTime}}</small>
             </ion-col>
           </ion-row>
-          <ion-row no-padding>
+          <ion-row no-padding *ngIf="reply.message">
             <ion-col text-left no-padding>
-              <p text-wrap>{{reply.message}}
+              <p text-wrap>{{reply.message}}</p>
+            </ion-col>
+          </ion-row>
+          <ion-row no-padding *ngIf="reply.location_text">
+            <ion-col text-left no-padding>
+              <p text-wrap>
+                <ion-icon ios="ios-pin-outline" md="md-pin"></ion-icon>
+                {{reply.location_text}}
               </p>
             </ion-col>
           </ion-row>
