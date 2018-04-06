@@ -33,4 +33,7 @@
       <ion-toggle [(ngModel)]="organization.app_enabled" (ionChange)="onAppOnly($event)"></ion-toggle>
     </ion-item>
   </ion-list>
+  <p text-center>
+    <button ion-button clear color="primary"(click)="visitWebsite($event)">Login to TenFour on the web to configure Slack</button>
+  </p>
 </ion-content>

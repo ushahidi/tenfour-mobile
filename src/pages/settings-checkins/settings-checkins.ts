@@ -17,6 +17,7 @@ import { Organization } from '../../models/organization';
 })
 export class SettingsCheckinsPage extends BasePage {
 
+  website:string = "https://app.tenfour.org";
   organization:Organization = null;
 
   constructor(
@@ -94,6 +95,12 @@ export class SettingsCheckinsPage extends BasePage {
     if (this.organization.slack_enabled) {
       this.organization.app_enabled = false;
     }
+  }
+
+  private visitWebsite(event:any) {
+
+    this.logger.info(this, "visitWebsite", this.website);
+    this.showUrl(this.website, "_b`lank");
   }
 
 }
