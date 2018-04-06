@@ -81,6 +81,7 @@ export class PersonEditPage extends BasePage {
       this.person = new Person({
         name: null,
         description: null,
+        role: "author",
         organization_id: this.organization.id
       });
     }

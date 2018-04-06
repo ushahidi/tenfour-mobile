@@ -439,7 +439,7 @@ export class ApiService extends HttpService {
           name: person.name,
           description: person.description || "",
           person_type: "user",
-          role: "member" };
+          role: person.role || "responder" };
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
         }

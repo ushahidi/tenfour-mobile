@@ -10,6 +10,7 @@ import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
 
 import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
 
 @IonicPage()
 @Component({
@@ -21,6 +22,7 @@ import { Organization } from '../../models/organization';
 export class PersonAddPage extends BasePage {
 
   organization:Organization = null;
+  user:Person = null;
 
   constructor(
       protected zone:NgZone,
@@ -38,9 +40,10 @@ export class PersonAddPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
     this.organization = this.getParameter<Organization>("organization");
+    this.user = this.getParameter<Person>("user");
   }
 
   ionViewDidEnter() {
@@ -59,7 +62,8 @@ export class PersonAddPage extends BasePage {
   private addPerson(event:any) {
     this.logger.info(this, "addPerson");
     this.showPage(PersonEditPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        user: this.user });
   }
 
   private invitePerson(event:any) {

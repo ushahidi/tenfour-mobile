@@ -158,7 +158,9 @@ export class PersonListPage extends BasePage {
   private addPeople(event:any) {
     this.logger.info(this, "addPeople");
     this.showModal(PersonAddPage,
-      { organization: this.organization });
+      { organization: this.organization,
+        person: this.person,
+        user: this.person });
   }
 
   private showPerson(event:any, person:Person) {
