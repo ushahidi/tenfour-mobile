@@ -2,8 +2,8 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { PersonDetailsPage } from './person-details';
 
-import { DateTimeModule } from '../../pipes/date-time.module';
-import { TitleizeModule } from '../../pipes/titleize.module';
+import { DateTimeModule } from '../../pipes/date-time/date-time.module';
+import { TitleizeModule } from '../../pipes/titleize/titleize.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 
 @NgModule({

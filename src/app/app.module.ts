@@ -81,12 +81,13 @@ import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.modu
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsCheckinsModule } from '../pages/settings-checkins/settings-checkins.module';
 
-import { DateTimeModule } from '../pipes/date-time.module';
-import { TimeAgoModule } from '../pipes/time-ago.module';
-import { TitleizeModule } from '../pipes/titleize.module';
-import { CapitalizeModule } from '../pipes/capitalize.module';
-import { TruncateModule } from '../pipes/truncate.module';
-import { HtmlParserModule } from '../pipes/html-parser.module';
+import { DateTimeModule } from '../pipes/date-time/date-time.module';
+import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
+import { TitleizeModule } from '../pipes/titleize/titleize.module';
+import { CapitalizeModule } from '../pipes/capitalize/capitalize.module';
+import { TruncateModule } from '../pipes/truncate/truncate.module';
+import { HtmlParserModule } from '../pipes/html-parser/html-parser.module';
+import { HumanizeModule } from '../pipes/humanize/humanize.module';
 
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
@@ -155,6 +156,7 @@ import { CountryService } from '../providers/country-service';
     CapitalizeModule,
     TruncateModule,
     HtmlParserModule,
+    HumanizeModule,
     BrowserAnimationsModule,
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
     IonicModule.forRoot(TenFourApp)

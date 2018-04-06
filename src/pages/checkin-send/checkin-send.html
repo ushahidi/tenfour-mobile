@@ -16,7 +16,7 @@
   <ion-list *ngIf="checkin">
     <ion-item color="white" detail-push tappable (click)="showPopover($event)">
       <ion-label>Send via</ion-label>
-      <ion-note item-end>{{checkin.send_via}}</ion-note>
+      <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
