@@ -89,13 +89,6 @@ export class SettingsCheckinsPage extends BasePage {
     }
   }
 
-  private onTwitterEnabled(event:any) {
-    this.logger.info(this, "onTwitterEnabled", this.organization.twitter_enabled);
-    if (this.organization.twitter_enabled) {
-      this.organization.app_enabled = false;
-    }
-  }
-
   private onSlackEnabled(event:any) {
     this.logger.info(this, "onSlackEnabled", this.organization.slack_enabled);
     if (this.organization.slack_enabled) {

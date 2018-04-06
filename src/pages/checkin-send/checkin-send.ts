@@ -163,7 +163,6 @@ export class CheckinSendPage extends BasePage {
         app_enabled: this.organization.app_enabled,
         email_enabled: this.organization.email_enabled,
         sms_enabled: this.organization.sms_enabled && this.organization.credits > 0,
-        twitter_enabled: this.organization.twitter_enabled,
         slack_enabled: this.organization.slack_enabled,
         on_changed:(send_via:any) => {
             this.logger.info(this, "sendViaChanged", send_via);

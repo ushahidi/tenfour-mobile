@@ -23,11 +23,6 @@
       <ion-toggle [(ngModel)]="organization.sms_enabled" (ionChange)="onSmsEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
-      <ion-icon ios="logo-twitter" md="logo-twitter" item-left></ion-icon>
-      <ion-label>Twitter</ion-label>
-      <ion-toggle [(ngModel)]="organization.twitter_enabled" (ionChange)="onTwitterEnabled($event)"></ion-toggle>
-    </ion-item>
-    <ion-item color="white">
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
       <ion-label>Slack</ion-label>
       <ion-toggle [(ngModel)]="organization.slack_enabled" (ionChange)="onSlackEnabled($event)"></ion-toggle>

@@ -15,9 +15,6 @@ export class SendViaComponent {
   sms_enabled:boolean=false;
   sms_selected:boolean=false;
 
-  twitter_enabled:boolean=false;
-  twitter_selected:boolean=false;
-
   slack_enabled:boolean=false;
   slack_selected:boolean=false;
 
@@ -33,14 +30,12 @@ export class SendViaComponent {
     this.send_via = this.params.get('send_via');
     this.email_enabled = this.params.get('email_enabled');
     this.sms_enabled = this.params.get('sms_enabled');
-    this.twitter_enabled = this.params.get('twitter_enabled');
     this.slack_enabled = this.params.get('slack_enabled');
     this.app_enabled = this.params.get('app_enabled');
     if (this.send_via && this.send_via.length > 0) {
       let values = this.send_via.split(",");
       this.email_selected = values.indexOf('email') != -1;
       this.sms_selected = values.indexOf('sms') != -1;
-      this.twitter_selected = values.indexOf('twitter') != -1;
       this.slack_selected = values.indexOf('slack') != -1;
       this.app_selected = values.indexOf('apponly') != -1;
     }
@@ -50,7 +45,6 @@ export class SendViaComponent {
     if (this.app_selected) {
       this.email_enabled = false;
       this.sms_enabled = false;
-      this.twitter_enabled = false;
       this.slack_enabled = false;
     }
     this.onChanged();
@@ -70,13 +64,6 @@ export class SendViaComponent {
     this.onChanged();
   }
 
-  onTwitterChanged(event:any) {
-    if (this.twitter_selected) {
-      this.app_selected = false;
-    }
-    this.onChanged();
-  }
-
   onSlackChanged(event:any) {
     if (this.slack_selected) {
       this.app_selected = false;
@@ -91,9 +78,6 @@ export class SendViaComponent {
     }
     if (this.sms_enabled && this.sms_selected) {
       send_via.push('sms');
-    }
-    if (this.twitter_enabled && this.twitter_selected) {
-      send_via.push('twitter');
     }
     if (this.slack_enabled && this.slack_selected) {
       send_via.push('slack');

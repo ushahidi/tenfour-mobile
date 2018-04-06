@@ -10,11 +10,6 @@
     <ion-label>SMS</ion-label>
     <ion-checkbox [(ngModel)]="sms_selected" item-right (ionChange)="onSmsChanged($event)"></ion-checkbox>
   </ion-item>
-  <ion-item color="white" *ngIf="twitter_enabled">
-    <ion-icon ios="logo-twitter" md="logo-twitter" item-left></ion-icon>
-    <ion-label>Twitter</ion-label>
-    <ion-checkbox [(ngModel)]="twitter_selected" item-right (ionChange)="onTwitterChanged($event)"></ion-checkbox>
-  </ion-item>
   <ion-item color="white" *ngIf="slack_enabled">
     <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
     <ion-label>Slack</ion-label>
