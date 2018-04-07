@@ -667,8 +667,8 @@ export class ApiService extends HttpService {
           recipients: checkin.recipientIds(),
           send_via: [checkin.send_via]
         };
-        if (checkin.self_test_roll_call) {
-          params['self_test_roll_call'] = 1;
+        if (checkin.self_test_check_in) {
+          params['self_test_check_in'] = 1;
         }
         this.httpPost(url, params, token.access_token).then(
           (data:any) => {

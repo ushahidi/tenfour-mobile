@@ -62,7 +62,7 @@ export class CheckinTestPage extends BasePage {
       user_initials: this.person.initials,
       user_picture: this.person.profile_picture,
       message: "Did you receive this test Check-in?",
-      self_test_roll_call: true,
+      self_test_check_in: true,
       send_via: 'apponly'
     });
     this.checkin.answers = [];
