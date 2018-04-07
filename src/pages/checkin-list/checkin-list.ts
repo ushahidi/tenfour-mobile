@@ -33,7 +33,7 @@ export class CheckinListPage extends BasePage {
   person:Person = null;
   loading:boolean = false;
   notify:boolean = false;
-  limit:number = 10;
+  limit:number = 5;
   offset:number = 0;
 
   constructor(

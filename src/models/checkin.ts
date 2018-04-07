@@ -164,6 +164,9 @@ export class Checkin extends Model {
   }
 
   canRespond(person:Person):boolean {
+    if (this.answers && this.answers.length == 0) {
+      return false;
+    }
     if (person && this.recipients.filter(recipient => recipient.user_id == person.id).length > 0) {
       return this.replied == null || this.replied == false;
     }
