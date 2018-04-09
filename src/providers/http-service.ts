@@ -242,34 +242,37 @@ export class HttpService {
       }
       else if (typeof error === 'object') {
         this.logger.error(this, "httpError", "Object", error);
-        if (typeof error['error'] === 'string') {
-          if (error['error'].indexOf("The host could not be resolved") != -1) {
-            return "The internet connection appears to be offline";
-          }
-          if (error['error'].indexOf("The Internet connection appears to be offline") != -1) {
-            return "The internet connection appears to be offline";
-          }
-          return error['error'];
+        if (error['message']) {
+          return error['message'];
         }
         else if (error['error']) {
-          let json = JSON.parse(error['error']);
-          if (json['errors']) {
-            let errors = json['errors'];
-            let messages = [];
-            for (let key of Object.keys(errors)) {
-              let error = errors[key];
-              if (error) {
-                messages.push(error);
+          if (error['error'].toString().indexOf("The host could not be resolved") != -1) {
+            return "The internet connection appears to be offline";
+          }
+          else if (error['error'].toString().indexOf("The Internet connection appears to be offline") != -1) {
+            return "The internet connection appears to be offline";
+          }
+          else {
+            let json = JSON.parse(error['error']);
+            if (json['errors']) {
+              let errors = json['errors'];
+              let messages = [];
+              for (let key of Object.keys(errors)) {
+                let error = errors[key];
+                if (error) {
+                  messages.push(error);
+                }
               }
+              return messages.join(", ");
             }
-            return messages.join(", ");
+            else if (json['error']) {
+              return json['error'];
+            }
+            else if (json['message']) {
+              return json['message'];
+            }
           }
-          else if (json['error']) {
-            return json['error'];
-          }
-          else if (json['message']) {
-            return json['message'];
-          }
+          return JSON.stringify(error['error']);
         }
       }
     }
