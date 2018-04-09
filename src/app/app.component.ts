@@ -12,6 +12,7 @@ import { Deeplinks } from '@ionic-native/deeplinks';
 
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
+import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
