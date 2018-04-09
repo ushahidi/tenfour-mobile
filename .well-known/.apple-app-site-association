@@ -8,12 +8,12 @@
       {
         "appID": "K4L62494Y2.com.ushahidi.tenfour",
         "paths": [
+          "/checkins/",
           "/login/invite/",
           "/login/email/",
-          "/login/password",
+          "/login/password/",
           "/organization/",
-          "/organization/email/confirmation/",
-          "/checkins/"
+          "/organization/email/confirmation/"
         ]
       }
     ]
