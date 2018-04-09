@@ -16,6 +16,7 @@ import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
+import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';

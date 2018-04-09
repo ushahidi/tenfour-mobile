@@ -293,7 +293,8 @@ export class ApiService extends HttpService {
         email: organization.email,
         owner: organization.user_name,
         password: organization.password,
-        subdomain: organization.subdomain
+        subdomain: organization.subdomain,
+        terms_of_service: true,
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then(
