@@ -14,6 +14,7 @@ import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 
 import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
+import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
@@ -168,6 +169,8 @@ export class TenFourApp {
       this.deeplinks.routeWithNavController(this.navController, {
         '/organization': SigninUrlPage,
         '/login/email': SigninEmailPage,
+        '/login/password': SigninPasswordPage,
+        '/login/invite/': SignupPasswordPage,
         '/organization/email/confirmation/': SignupConfirmPage }).subscribe(
         (match:any) => {
           this.logger.info(this, "Deeplinks Match", match);

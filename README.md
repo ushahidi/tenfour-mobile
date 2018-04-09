@@ -25,6 +25,7 @@ Debug Apps
 ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE"
 ionic cordova emulate ios --livereload --consolelogs --emulator --target "iPhone-8-Plus"
 ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro"
+ionic cordova run ios --livereload --consolelogs --device --debug
 ```
 ```
 cordova run --list

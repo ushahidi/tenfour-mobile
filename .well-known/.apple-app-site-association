@@ -1,0 +1,22 @@
+{
+  "webcredentials": {
+    "apps": ["K4L62494Y2.com.ushahidi.tenfour"]
+  },
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "K4L62494Y2.com.ushahidi.tenfour",
+        "paths": [
+          "/login/invite/",
+          "/login/email",
+          "/login/password",
+          "/organization/",
+          "/organization/email/confirmation/",
+          "/checkins",
+          "/r/"
+        ]
+      }
+    ]
+  }
+}

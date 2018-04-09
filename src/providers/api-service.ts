@@ -201,9 +201,9 @@ export class ApiService extends HttpService {
 
   public checkEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email`;
+      let url = `${this.api}/organization/email/confirmation/`;
       let params = {
-        address: email
+        email: email
       };
       this.httpGet(url, params).then(
         (data:any) => {

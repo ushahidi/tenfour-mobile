@@ -3,7 +3,7 @@
     <name>TenFour</name>
     <description>TenFour App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
-    <content original-src="index.html" src="http://192.168.0.21:8100" />
+    <content src="index.html" />
     <access origin="*" />
     <access launch-external="yes" origin="tel:*" />
     <allow-navigation href="*" />
@@ -151,7 +151,7 @@
     <plugin name="ionic-plugin-deeplinks" spec="^1.0.15">
         <variable name="URL_SCHEME" value="tenfour" />
         <variable name="DEEPLINK_SCHEME" value="https" />
-        <variable name="DEEPLINK_HOST" value="app.tenfour.org" />
+        <variable name="DEEPLINK_HOST" value="*.tenfour.org" />
         <variable name="ANDROID_PATH_PREFIX" value="/" />
     </plugin>
     <plugin name="ionic-plugin-keyboard" spec="^2.2.1" />
