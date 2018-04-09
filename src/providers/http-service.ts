@@ -231,34 +231,50 @@ export class HttpService {
   }
 
   private httpError(error:any):string {
-    this.logger.error(this, "httpError", "Error", error);
     try {
-      if (typeof error === 'string') {
-        return error;
+      if (error == null) {
+        this.logger.error(this, "httpError", "Unknown", error);
+        return "Unknown error";
       }
-      else if (error && error['error']){
-        let json = JSON.parse(error.error);
-        if (json['errors']) {
-          let errors = json['errors'];
-          let messages = [];
-          for (let key of Object.keys(errors)) {
-            let error = errors[key];
-            if (error) {
-              messages.push(error);
-            }
+      else if (typeof error === 'string') {
+        this.logger.error(this, "httpError", "String", error);
+        return error['error'];
+      }
+      else if (typeof error === 'object') {
+        this.logger.error(this, "httpError", "Object", error);
+        if (typeof error['error'] === 'string') {
+          if (error['error'].indexOf("The host could not be resolved") != -1) {
+            return "The internet connection appears to be offline";
           }
-          return messages.join(", ");
+          if (error['error'].indexOf("The Internet connection appears to be offline") != -1) {
+            return "The internet connection appears to be offline";
+          }
+          return error['error'];
         }
-        else if (json['error']) {
-          return json['error'];
-        }
-        else if (json['message']) {
-          return json['message'];
+        else if (error['error']) {
+          let json = JSON.parse(error['error']);
+          if (json['errors']) {
+            let errors = json['errors'];
+            let messages = [];
+            for (let key of Object.keys(errors)) {
+              let error = errors[key];
+              if (error) {
+                messages.push(error);
+              }
+            }
+            return messages.join(", ");
+          }
+          else if (json['error']) {
+            return json['error'];
+          }
+          else if (json['message']) {
+            return json['message'];
+          }
         }
       }
     }
     catch (err) {
-      this.logger.error(this, "httpError", "Error", err);
+      this.logger.error(this, "httpError", error, "Error", err);
     }
     return JSON.stringify(error);
   }
