@@ -9,11 +9,11 @@
         "appID": "K4L62494Y2.com.ushahidi.tenfour",
         "paths": [
           "/login/invite/",
-          "/login/email",
+          "/login/email/",
           "/login/password",
           "/organization/",
           "/organization/email/confirmation/",
-          "/checkins",
+          "/checkins/",
           "/r/"
         ]
       }
