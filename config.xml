@@ -122,6 +122,8 @@
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <allow-navigation href="http://192.168.0.16:8100" />
     <allow-navigation href="http://192.168.0.21:8100" />
+    <engine name="ios" spec="~4.5.4" />
+    <engine name="android" spec="~6.4.0" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
@@ -163,6 +165,4 @@
     <plugin name="cordova-plugin-badge" spec="^0.8.7" />
     <plugin name="cordova-plugin-advanced-http" spec="^1.11.1" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
-    <engine name="ios" spec="~4.5.4" />
-    <engine name="android" spec="~6.4.0" />
 </widget>
