@@ -5,7 +5,7 @@
     </button>
     <ion-title>People</ion-title>
     <ion-buttons end>
-      <button ion-button icon-only color="primary" (click)="addPeople($event)">
+      <button ion-button icon-only color="primary" *ngIf="person && person.isOwnerOrAdmin()" (click)="addPeople($event)">
         <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>

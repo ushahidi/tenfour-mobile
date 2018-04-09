@@ -3,16 +3,16 @@
   "app_id": "",
   "proxies": [
     {
+      "path": "/api.tenfour.org",
+      "proxyUrl": "https://api.tenfour.org"
+    },
+    {
       "path": "/api.dev.tenfour.org",
       "proxyUrl": "https://api.dev.tenfour.org"
     },
     {
       "path": "/api.staging.tenfour.org",
       "proxyUrl": "https://api.staging.tenfour.org"
-    },
-    {
-      "path": "/api.app.tenfour.org",
-      "proxyUrl": "https://api.app.tenfour.org"
     }
   ],
   "integrations": {
