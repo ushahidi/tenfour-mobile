@@ -121,8 +121,16 @@ export class Person extends Model {
     return this.role === 'admin';
   }
 
-  isMember():boolean {
-    return this.role === 'member';
+  isAuthor():boolean {
+    return this.role === 'author';
+  }
+
+  isViewer():boolean {
+    return this.role === 'viewer';
+  }
+
+  isResponder():boolean {
+    return this.role === 'responder';
   }
 
   getEmails():Contact[] {
@@ -157,7 +165,7 @@ export class Person extends Model {
   }
 
   needsInvite():boolean {
-    if (this.role == 'member' && this.has_logged_in == false) {
+    if (this.has_logged_in == false) {
       return this.hasEmails();
     }
     return false;
