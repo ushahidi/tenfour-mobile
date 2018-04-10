@@ -1,0 +1,10 @@
+- type: serial
+  tag: master
+  steps:
+  - name: "deploy .wellknown to production"
+    service: awscli
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-production-client/.well-known/
+
+  - name: "deploy .wellknown to staging"
+    service: awscli
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client/.well-known/
