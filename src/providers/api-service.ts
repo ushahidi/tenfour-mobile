@@ -199,13 +199,13 @@ export class ApiService extends HttpService {
     });
   }
 
-  public checkEmail(email:string):Promise<Email> {
+  public registerEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/organization/email/confirmation/`;
+      let url = `${this.api}/verification/email`;
       let params = {
-        email: email
+        address: email
       };
-      this.httpGet(url, params).then(
+      this.httpPost(url, params).then(
         (data:any) => {
           let email = new Email(data);
           resolve(email);
@@ -216,13 +216,13 @@ export class ApiService extends HttpService {
     });
   }
 
-  public registerEmail(email:string):Promise<Email> {
+  public verifyEmail(email:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email`;
+      let url = `${this.api}/organization/email/confirmation/`;
       let params = {
-        address: email
+        email: email
       };
-      this.httpPost(url, params).then(
+      this.httpGet(url, params).then(
         (data:any) => {
           let email = new Email(data);
           resolve(email);
@@ -287,7 +287,7 @@ export class ApiService extends HttpService {
 
   public createOrganization(organization:Organization):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/api/v1/organizations`;
+      let url = `${this.api}/create_organization`;
       let params = {
         name: organization.name,
         email: organization.email,

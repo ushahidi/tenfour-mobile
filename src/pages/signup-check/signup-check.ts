@@ -9,6 +9,7 @@ import { SignupConfirmPage } from '../../pages/signup-confirm/signup-confirm';
 import { ApiService } from '../../providers/api-service';
 
 import { Organization } from '../../models/organization';
+import { Email } from '../../models/email';
 
 @IonicPage()
 @Component({
@@ -79,6 +80,18 @@ export class SignupCheckPage extends BasePage {
   private showNext(event:any) {
     this.showPage(SignupConfirmPage,
       { organization: this.organization });
+  }
+
+  private sendEmail(event:any) {
+    let loading = this.showLoading("Resending...");
+    this.api.registerEmail(this.organization.email).then(
+      (email:Email) => {
+        loading.dismiss();
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Email Verification", error);
+      });
   }
 
 }

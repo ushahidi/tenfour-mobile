@@ -11,10 +11,12 @@
     </ion-item>
     <ion-item no-lines class="action">
       <button ion-button block color="primary" *ngIf="mailer" (click)="openMail($event)">Open Mail app</button>
-      <button ion-button block color="secondary" (click)="showNext($event)">Already verified? Skip ahead</button>
+      <button ion-button block color="secondary" (click)="sendEmail($event)">Resend Confirmation Email</button>
+      <!-- <button ion-button block color="secondary" (click)="showNext($event)">Already verified? Skip ahead</button> -->
     </ion-item>
     <ion-item text-wrap no-lines class="info" *ngIf="organization">
-      <p>We sent an email to  you at <strong>{{organization.email}}</strong>, with instructions for getting started.</p>
+      <p>We sent an email to  you at <strong>{{organization.email}}</strong>, with instructions to verify your email address.</p>
+      <p>Open the email on your device, then click the <strong>Verify Email</strong> button.</p>
     </ion-item>
   </ion-list>
 </ion-content>

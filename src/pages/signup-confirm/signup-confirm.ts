@@ -50,9 +50,13 @@ export class SignupConfirmPage extends BasePage {
     this.trackPage();
   }
 
+  private resendEmail() {
+    
+  }
+
   private confirmEmail(name:string) {
     let loading = this.showLoading("Confirming...");
-    this.api.checkEmail(this.organization.email).then(
+    this.api.verifyEmail(this.organization.email).then(
       (data:any) => {
         loading.dismiss();
         this.showPage(SignupOwnerPage,
