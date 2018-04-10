@@ -4,7 +4,6 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { AppAvailability } from '@ionic-native/app-availability';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupConfirmPage } from '../../pages/signup-confirm/signup-confirm';
 
 import { ApiService } from '../../providers/api-service';
 
@@ -16,7 +15,7 @@ import { Email } from '../../models/email';
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',
   providers: [ ApiService ],
-  entryComponents:[ SignupConfirmPage ]
+  entryComponents:[  ]
 })
 export class SignupCheckPage extends BasePage {
 
@@ -75,11 +74,6 @@ export class SignupCheckPage extends BasePage {
     else if (this.platform.is('android')) {
       this.showUrl(this.mailerAndroid, '_system');
     }
-  }
-
-  private showNext(event:any) {
-    this.showPage(SignupConfirmPage,
-      { organization: this.organization });
   }
 
   private sendEmail(event:any) {

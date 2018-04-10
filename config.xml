@@ -42,6 +42,7 @@
     <preference name="MediaPlaybackRequiresUserAction" value="true" />
     <preference name="iosPersistentFileLocation" value="Compatibility" />
     <preference name="AndroidPersistentFileLocation" value="Compatibility" />
+    <preference name="AndroidLaunchMode" value="singleInstance" />
     <preference name="iosExtraFilesystems" value="library,library-nosync,documents,documents-nosync,cache,bundle,root" />
     <preference name="AndroidExtraFilesystems" value="files,files-external,documents,sdcard,cache,cache-external,assets,root" />
     <platform name="android">
@@ -122,6 +123,15 @@
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <allow-navigation href="http://192.168.0.16:8100" />
     <allow-navigation href="http://192.168.0.21:8100" />
+    <universal-links>
+        <host name="*.tenfour.org" scheme="https">
+            <path url="/login/email" />
+            <path url="/login/invite/" />
+            <path url="/login/password" />
+            <path url="/organization" />
+            <path url="/organization/email/confirmation/" />
+        </host>
+    </universal-links>
     <engine name="ios" spec="~4.5.4" />
     <engine name="android" spec="~6.4.0" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
@@ -165,4 +175,5 @@
     <plugin name="cordova-plugin-badge" spec="^0.8.7" />
     <plugin name="cordova-plugin-advanced-http" spec="^1.11.1" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
+    <plugin name="cordova-universal-links-plugin" spec="^1.2.1" />
 </widget>

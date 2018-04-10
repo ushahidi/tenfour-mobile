@@ -14,9 +14,9 @@ import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
-import { SignupConfirmPage } from '../pages/signup-confirm/signup-confirm';
+import { SignupCheckPage } from '../pages/signup-check/signup-check';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
-import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
+import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
@@ -173,7 +173,7 @@ export class TenFourApp {
         '/login/email': SigninEmailPage,
         '/login/password': SigninPasswordPage,
         '/login/invite/': SignupPasswordPage,
-        '/organization/email/confirmation/': SignupConfirmPage }).subscribe(
+        '/organization/email/confirmation/': SignupOwnerPage }).subscribe(
         (match:any) => {
           this.logger.info(this, "Deeplinks Match", match);
         },

@@ -43,7 +43,6 @@ import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
 import { SignupNameModule } from '../pages/signup-name/signup-name.module';
 import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
-import { SignupConfirmModule } from '../pages/signup-confirm/signup-confirm.module';
 import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
 import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.module';
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
@@ -122,7 +121,6 @@ import { CountryService } from '../providers/country-service';
     SignupNameModule,
     SignupOwnerModule,
     SignupCheckModule,
-    SignupConfirmModule,
     SignupPlanModule,
     SignupPaymentModule,
     SignupPasswordModule,

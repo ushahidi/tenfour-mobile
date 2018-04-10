@@ -69,8 +69,8 @@ export class SigninUrlPage extends BasePage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    // this.showUrl("https://app.tenfour.org/organization/email", "_system");
-    this.showPage(SignupEmailPage, {});
+    this.showUrl("https://app.tenfour.org/organization/email", "_system");
+    // this.showPage(SignupEmailPage, {});
   }
 
   private showNextOnReturn(event:any) {
