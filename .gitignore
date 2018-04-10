@@ -54,3 +54,8 @@ xcuserdata/
 *.ipa
 *.dSYM.zip
 *.dSYM
+
+
+codeship.aes
+deployment.env
+

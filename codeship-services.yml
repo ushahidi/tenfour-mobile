@@ -1,0 +1,6 @@
+awscli:
+  image: ushahidi/engineering-deployer:latest
+  volumes:
+    - .:/vols/src
+  encrypted_env_file: deployment.env.encrypted
+  cached: true
