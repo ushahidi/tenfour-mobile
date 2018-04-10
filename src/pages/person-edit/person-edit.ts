@@ -258,11 +258,7 @@ export class PersonEditPage extends BasePage {
 
   private updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
-      if (contact.contact == null || contact.contact.length == 0) {
-        this.logger.info(this, "updateContact", "Ignore", contact);
-        resolve(contact);
-      }
-      else if (contact.id) {
+      if (contact.id) {
         this.logger.info(this, "updateContact", "Update", contact);
         if (contact.type == 'phone') {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
