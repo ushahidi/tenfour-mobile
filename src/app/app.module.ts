@@ -48,7 +48,6 @@ import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.modu
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
 
 import { PersonListModule } from '../pages/person-list/person-list.module';
-import { PersonAddModule } from '../pages/person-add/person-add.module';
 import { PersonEditModule } from '../pages/person-edit/person-edit.module';
 import { PersonDetailsModule } from '../pages/person-details/person-details.module';
 import { PersonInviteModule } from '../pages/person-invite/person-invite.module';
@@ -133,7 +132,6 @@ import { CountryService } from '../providers/country-service';
     ReplySendModule,
     NotificationListModule,
     PersonListModule,
-    PersonAddModule,
     PersonEditModule,
     PersonDetailsModule,
     PersonInviteModule,

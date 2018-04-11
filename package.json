@@ -35,6 +35,7 @@
     "@ionic-native/file": "^4.4.0",
     "@ionic-native/file-transfer": "^4.4.0",
     "@ionic-native/geolocation": "^4.4.0",
+    "@ionic-native/google-analytics": "^4.7.0",
     "@ionic-native/http": "^4.6.0",
     "@ionic-native/in-app-browser": "^4.4.0",
     "@ionic-native/is-debug": "^4.4.0",
@@ -153,8 +154,7 @@
       "cordova-plugin-screen-orientation": {},
       "cordova-plugin-badge": {},
       "cordova-plugin-advanced-http": {},
-      "cordova-plugin-nativestorage": {},
-      "cordova-universal-links-plugin": {}
+      "cordova-plugin-nativestorage": {}
     },
     "platforms": [
       "ios",

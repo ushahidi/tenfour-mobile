@@ -46,7 +46,6 @@ export class PersonInvitePage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.loadPeople(null, true);
-    this.statusBar.overlaysWebView(false);
   }
 
   ionViewDidEnter() {
@@ -54,11 +53,6 @@ export class PersonInvitePage extends BasePage {
     this.trackPage({
       organization: this.organization.name
     });
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
-    this.statusBar.overlaysWebView(true);
   }
 
   private cancelInvite(event:any) {
@@ -77,10 +71,7 @@ export class PersonInvitePage extends BasePage {
       Promise.all(invites).then(invited => {
         loading.dismiss();
         this.showToast("Invites sent");
-        let firstViewController = this.navController.first();
-        this.navController.popToRoot({ animate: false }).then(() => {
-          firstViewController.dismiss({ });
-        });
+        this.hideModal({people: invites});
       });
     }
     else {

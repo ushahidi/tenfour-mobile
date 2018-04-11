@@ -56,7 +56,6 @@ export class PersonImportPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
-    this.statusBar.overlaysWebView(false);
     let loading = this.showLoading("Loading...");
     Promise.resolve()
       .then(() => { return this.loadCountry(); })
@@ -75,11 +74,6 @@ export class PersonImportPage extends BasePage {
     this.trackPage({
       organization: this.organization.name
     });
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
-    this.statusBar.overlaysWebView(true);
   }
 
   private cancelImport(event:any) {
@@ -161,40 +155,55 @@ export class PersonImportPage extends BasePage {
     let imports = [];
     for (let contact of this.imports) {
       if (contact.checked == true) {
+        this.logger.info(this, "importContacts", "Contact", contact);
         let person = new Person();
         person.organization_id = this.organization.id;
         person.name = contact.name.formatted;
         if (contact.organizations && contact.organizations.length > 0) {
+          this.logger.info(this, "importContacts", "Organizations", contact.organizations);
           let organization = contact.organizations[0];
-          person.description = `${organization.title}, ${organization.name}`
+          let description = [];
+          if (organization.title) {
+            description.push(organization.title);
+          }
+          if (organization.name) {
+            description.push(organization.name);
+          }
+          person.description = description.join(", ");
         }
         else {
           person.description = "";
         }
-        for (let phone of contact.phoneNumbers) {
-          if (phone.value) {
-            let phoneNumber = phone.value.replace(/\D/g,'');
-            if (phoneNumber) {
-              let contact = new Contact();
-              contact.organization_id = this.organization.id;
-              contact.type = "phone";
-              if (phoneNumber.indexOf("+") == -1) {
-                contact.contact = this.countryCode + phoneNumber;
+        if (contact.phoneNumbers && contact.phoneNumbers.length > 0) {
+          for (let phone of contact.phoneNumbers) {
+            this.logger.info(this, "importContacts", "Phone", phone.value);
+            if (phone.value) {
+              let phoneNumber = phone.value.replace(/\D/g,'');
+              if (phoneNumber) {
+                let contact = new Contact();
+                contact.organization_id = this.organization.id;
+                contact.type = "phone";
+                if (phoneNumber.indexOf("+") == -1) {
+                  contact.contact = this.countryCode + phoneNumber;
+                }
+                else {
+                  contact.contact = phoneNumber;
+                }
+                person.contacts.push(contact);
               }
-              else {
-                contact.contact = phoneNumber;
-              }
-              person.contacts.push(contact);
             }
           }
         }
-        for (let email of contact.emails) {
-          if (email.value && email.value.indexOf("@") != -1) {
-            let contact = new Contact();
-            contact.organization_id = this.organization.id;
-            contact.type = "email";
-            contact.contact = email.value;
-            person.contacts.push(contact);
+        if (contact.emails && contact.emails.length > 0) {
+          for (let email of contact.emails) {
+            this.logger.info(this, "importContacts", "Email", email.value);
+            if (email.value && email.value.indexOf("@") != -1) {
+              let contact = new Contact();
+              contact.organization_id = this.organization.id;
+              contact.type = "email";
+              contact.contact = email.value;
+              person.contacts.push(contact);
+            }
           }
         }
         imports.push(person);
@@ -206,7 +215,7 @@ export class PersonImportPage extends BasePage {
     }
     return Promise.all(creates).then(created => {
       loading.dismiss();
-      this.hideModal();
+      this.hideModal({ people: imports });
       this.showToast(`${imports.length} contacts imported`);
     },
     (error:any) => {

@@ -169,11 +169,12 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadDeepLinks");
       this.deeplinks.routeWithNavController(this.navController, {
-        '/organization': SigninUrlPage,
-        '/login/email': SigninEmailPage,
-        '/login/password': SigninPasswordPage,
-        '/login/invite/': SignupPasswordPage,
-        '/organization/email/confirmation/': SignupOwnerPage }).subscribe(
+        // '/organization': SigninUrlPage,
+        // '/login/email': SigninEmailPage,
+        // '/login/password': SigninPasswordPage,
+        // '/login/invite/': SignupPasswordPage,
+        // '/organization/email/confirmation/': SignupOwnerPage
+      }).subscribe(
         (match:any) => {
           this.logger.info(this, "Deeplinks Match", match);
         },

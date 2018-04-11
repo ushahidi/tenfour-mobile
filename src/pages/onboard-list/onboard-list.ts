@@ -2,8 +2,9 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { PersonAddPage } from '../../pages/person-add/person-add';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
+import { PersonInvitePage } from '../../pages/person-invite/person-invite';
+import { PersonImportPage } from '../../pages/person-import/person-import';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
@@ -18,7 +19,7 @@ import { Person } from '../../models/person';
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ PersonAddPage, PersonEditPage, CheckinTestPage, CheckinListPage ]
+  entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
 export class OnboardListPage extends BasePage {
 
@@ -110,11 +111,39 @@ export class OnboardListPage extends BasePage {
 
   private taskAddPeople(event:any) {
     this.logger.info(this, "taskAddPeople");
-    let modal = this.showModal(PersonAddPage, {
-      organization: this.organization,
-      person: this.person });
+    let buttons = [
+      {
+        text: 'Add Person',
+        handler: () => {
+          this.addPerson();
+        }
+      },{
+        text: 'Invite People',
+        handler: () => {
+          this.invitePerson();
+        }
+      },{
+        text: 'Import People',
+        handler: () => {
+          this.importPerson();
+        }
+      },{
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+        }
+      }
+    ];
+    this.showActionSheet(null, buttons);
+  }
+
+  private addPerson() {
+    this.logger.info(this, "addPerson");
+    let modal = this.showModal(PersonEditPage,
+      { organization: this.organization,
+        user: this.person });
     modal.onDidDismiss(data => {
-      this.logger.info(this, "taskAddPeople", "Modal", data);
+      this.logger.info(this, "addPerson", "Modal", data);
       this.database.getPeople(this.organization).then((people:Person[]) => {
         if (people && people.length > 1) {
           this.person.config_people_invited = true;
@@ -123,7 +152,43 @@ export class OnboardListPage extends BasePage {
           this.person.config_people_invited = false;
         }
       });
-   });
+    });
+  }
+
+  private invitePerson() {
+    this.logger.info(this, "invitePerson");
+    let modal = this.showModal(PersonInvitePage,
+      { organization: this.organization,
+        user: this.person });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "invitePerson", "Modal", data);
+      this.database.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
+    });
+  }
+
+  private importPerson() {
+    this.logger.info(this, "importPerson");
+    let modal = this.showModal(PersonImportPage,
+      { organization: this.organization,
+        user: this.person });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "importPerson", "Modal", data);
+      this.database.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
+    });
   }
 
   private taskReviewContact(event:any) {

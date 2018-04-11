@@ -76,7 +76,6 @@ export class PersonEditPage extends BasePage {
       this.editing = true;
     }
     else {
-      this.statusBar.overlaysWebView(false);
       this.editing = false;
       this.person = new Person({
         name: null,
@@ -104,13 +103,6 @@ export class PersonEditPage extends BasePage {
       organization: this.organization.name,
       person: this.person.name
     });
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
-    if (this.editing == false) {
-      this.statusBar.overlaysWebView(true);
-    }
   }
 
   private loadCountryCodes(cache:boolean=true):Promise<number[]> {
@@ -260,31 +252,41 @@ export class PersonEditPage extends BasePage {
     return new Promise((resolve, reject) => {
       if (contact.id) {
         this.logger.info(this, "updateContact", "Update", contact);
-        if (contact.type == 'phone') {
+        if (contact.type == 'phone' && contact.national_number && contact.national_number.length > 0) {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
-        this.api.updateContact(organization, person, contact).then((updated:Contact) => {
-          this.database.saveContact(this.organization, person, updated).then((saved:any) => {
-            resolve(updated);
+        if (contact.contact && contact.contact.length > 0) {
+          this.api.updateContact(organization, person, contact).then((updated:Contact) => {
+            this.database.saveContact(this.organization, person, updated).then((saved:any) => {
+              resolve(updated);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
-        });
+        }
+        else {
+          resolve(null);
+        }
       }
       else {
         this.logger.info(this, "updateContact", "Create", contact);
-        if (contact.type == 'phone') {
+        if (contact.type == 'phone' && contact.national_number && contact.national_number.length > 0) {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
-        this.api.createContact(organization, person, contact).then((created:Contact) => {
-          this.database.saveContact(this.organization, person, created).then((saved:any) => {
-            resolve(created);
+        if (contact.contact && contact.contact.length > 0) {
+          this.api.createContact(organization, person, contact).then((created:Contact) => {
+            this.database.saveContact(this.organization, person, created).then((saved:any) => {
+              resolve(created);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
-        });
+        }
+        else {
+          resolve(null);
+        }
       }
     });
   }
