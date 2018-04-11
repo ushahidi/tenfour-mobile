@@ -56,6 +56,7 @@ export class PersonInvitePage extends BasePage {
   }
 
   private cancelInvite(event:any) {
+    this.logger.info(this, 'cancelInvite');
     this.hideModal();
   }
 

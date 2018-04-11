@@ -3,8 +3,6 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 
 import { Sim } from '@ionic-native/sim';
 import { Contacts } from '@ionic-native/contacts';
-import { IsDebug } from '@ionic-native/is-debug';
-import { StatusBar } from '@ionic-native/status-bar';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -47,8 +45,6 @@ export class PersonImportPage extends BasePage {
       protected database:DatabaseService,
       protected countries:CountryService,
       protected contacts:Contacts,
-      protected isDebug:IsDebug,
-      protected statusBar:StatusBar,
       protected sim:Sim) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -77,6 +73,7 @@ export class PersonImportPage extends BasePage {
   }
 
   private cancelImport(event:any) {
+    this.logger.info(this, 'cancelImport');
     this.hideModal();
   }
 
@@ -163,10 +160,10 @@ export class PersonImportPage extends BasePage {
           this.logger.info(this, "importContacts", "Organizations", contact.organizations);
           let organization = contact.organizations[0];
           let description = [];
-          if (organization.title) {
+          if (organization.title && organization.title.length > 0) {
             description.push(organization.title);
           }
-          if (organization.name) {
+          if (organization.name && organization.name.length > 0) {
             description.push(organization.name);
           }
           person.description = description.join(", ");
@@ -179,7 +176,7 @@ export class PersonImportPage extends BasePage {
             this.logger.info(this, "importContacts", "Phone", phone.value);
             if (phone.value) {
               let phoneNumber = phone.value.replace(/\D/g,'');
-              if (phoneNumber) {
+              if (phoneNumber && phoneNumber.length > 0) {
                 let contact = new Contact();
                 contact.organization_id = this.organization.id;
                 contact.type = "phone";
