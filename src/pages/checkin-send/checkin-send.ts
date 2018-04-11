@@ -31,7 +31,7 @@ export class CheckinSendPage extends BasePage {
   person:Person = null;
 
   @ViewChild('select')
-  select: Select;
+  select:Select;
 
   constructor(
       protected zone:NgZone,

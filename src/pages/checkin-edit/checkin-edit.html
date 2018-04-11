@@ -3,7 +3,7 @@
     <ion-buttons start>
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
-    <ion-title></ion-title>
+    <ion-title>Check-In</ion-title>
     <ion-buttons end>
       <button ion-button color="primary" [disabled]="checkin.message == null || checkin.message.length == 0" (click)="showNext($event)" *ngIf="checkin">Next</button>
     </ion-buttons>

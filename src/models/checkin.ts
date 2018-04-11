@@ -173,6 +173,13 @@ export class Checkin extends Model {
     return false;
   }
 
+  canSend():boolean {
+    if (this.send_via == null || this.send_via.length == 0) {
+      return false;
+    }
+    return (this.recipients && this.recipients.length > 0) || (this.groups && this.groups.length > 0);
+  }
+
   groupIds():number[] {
     let ids = [];
     if (this.groups && this.groups.length > 0) {
