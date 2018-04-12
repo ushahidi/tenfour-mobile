@@ -216,11 +216,12 @@ export class ApiService extends HttpService {
     });
   }
 
-  public verifyEmail(email:string):Promise<Email> {
+  public verifyEmail(email:string, token:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/organization/email/confirmation/`;
+      let url = `${this.api}/verification/email/`;
       let params = {
-        email: email
+        address: email,
+        token: token
       };
       this.httpGet(url, params).then(
         (data:any) => {

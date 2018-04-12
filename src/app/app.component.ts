@@ -168,21 +168,52 @@ export class TenFourApp {
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadDeepLinks");
-      this.deeplinks.routeWithNavController(this.navController, {
-        // '/organization': SigninUrlPage,
-        // '/login/email': SigninEmailPage,
-        // '/login/password': SigninPasswordPage,
-        // '/login/invite/': SignupPasswordPage,
-        // '/organization/email/confirmation/': SignupOwnerPage
-      }).subscribe(
+      this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
         (match:any) => {
-          this.logger.info(this, "Deeplinks Match", match);
+          let path = match['$link']['path'];
+          let query = match['$link']['queryString'];
+          let parameters = this.getParameters(query);
+          this.logger.info(this, "loadDeepLinks", "Match", path, query, parameters);
+          if (path === '/organization/email/confirmation/') {
+            this.verifyEmail(parameters['email'], parameters['token']);
+          }
+          else if (path === '/login/email') {
+             //SigninEmailPage
+          }
+          else if (path === '/login/password') {
+             //SigninPasswordPage
+          }
+          else if (path === '/login/invite') {
+             //SignupPasswordPage
+          }
         },
         (nomatch:any) => {
-          this.logger.info(this, "DeepLinks No Match", nomatch);
+          this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
         });
       resolve(true);
     });
+  }
+
+  private verifyEmail(email:string, token:string) {
+    if (email && email.length > 0 && token && token.length > 0) {
+      this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
+      let loading = this.showLoading("Confirming...");
+      this.api.verifyEmail(email, token).then((_email:Email) => {
+        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
+        loading.dismiss();
+        this.showToast(`Email address ${email} confirmed`);
+        let organization = new Organization({});
+        organization.email = email;
+        this.navController.push(SignupOwnerPage, {
+          organization: organization
+        });
+      },
+      (error:any) => {
+        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Failed");
+        loading.dismiss();
+        this.showToast(`Unable to verify email ${email}`);
+      });
+    }
   }
 
   private loadApplication(models:Model[]):Promise<any> {
@@ -413,7 +444,7 @@ export class TenFourApp {
     return alert;
   }
 
-  private showToast(message:string, duration:number=1500):Toast {
+  private showToast(message:string, duration:number=3000):Toast {
     let toast = this.toastController.create({
       message: message,
       duration: duration
@@ -426,6 +457,19 @@ export class TenFourApp {
     return this.segment.track(event, properties).then(() => {
       this.logger.info(this, "Segment", "trackEvent", event);
     });
+  }
+
+  private getParameters(query:string) {
+    let parameters = {};
+    if (query && query.length > 0) {
+      query.split("&").forEach((parts) => {
+        let items = parts.split("=");
+        if (items && items.length >= 2) {
+          parameters[items[0]] = decodeURIComponent(items[1]);
+        }
+      });
+    }
+    return parameters;
   }
 
 }

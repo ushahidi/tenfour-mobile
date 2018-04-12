@@ -67,43 +67,52 @@ export class SignupPasswordPage extends BasePage {
     else {
       let loading = this.showLoading("Creating...");
       this.organization.password = this.password.value;
-      this.api.createOrganization(this.organization).then(
-        (organization:Organization) => {
-          this.logger.info(this, "createOrganization", "Organization", organization);
-          this.api.userLogin(organization, organization.email, this.password.value).then((token:Token) => {
-            this.logger.info(this, "createOrganization", "Token", token);
-            this.api.getPerson(organization, "me").then((person:Person) => {
-              this.logger.info(this, "createOrganization", "Person", person);
-              this.api.getOrganization(this.organization).then((organization:Organization) => {
-                this.logger.info(this, "createOrganization", "Organization", organization);
-                organization.user_id = person.id;
-                organization.user_name = person.name;
-                organization.password = this.password.value;
-                let saves = [
-                  this.database.saveOrganization(organization),
-                  this.database.savePerson(organization, person)];
-                Promise.all(saves).then(saved => {
-                  this.trackLogin(organization, person);
-                  loading.dismiss();
-                  this.showToast(`Welcome to ${organization.name}`);
-                  this.showRootPage(OnboardListPage,
-                    { organization: organization,
-                      person: person });
-                });
+      this.api.createOrganization(this.organization).then((organization:Organization) => {
+        this.logger.info(this, "createOrganization", "Organization", organization);
+        this.api.userLogin(organization, organization.email, this.password.value).then((token:Token) => {
+          this.logger.info(this, "createOrganization", "Token", token);
+          this.api.getPerson(organization, "me").then((person:Person) => {
+            this.logger.info(this, "createOrganization", "Person", person);
+            this.api.getOrganization(organization).then((organization:Organization) => {
+              this.logger.info(this, "createOrganization", "Organization", organization);
+              organization.user_id = person.id;
+              organization.user_name = person.name;
+              organization.password = this.password.value;
+              let saves = [
+                this.database.saveOrganization(organization),
+                this.database.savePerson(organization, person)];
+              Promise.all(saves).then(saved => {
+                this.trackLogin(organization, person);
+                loading.dismiss();
+                this.showToast(`Welcome to ${organization.name}`);
+                this.showRootPage(OnboardListPage,
+                  { organization: organization,
+                    person: person });
               });
+            },
+            (error:any) => {
+              this.logger.error(this, "createOrganization", error);
+              loading.dismiss();
+              this.showAlert("Problem Creating Organization", error);
             });
           },
           (error:any) => {
             this.logger.error(this, "createOrganization", error);
             loading.dismiss();
-            this.showAlert("Problem Logging In", error);
+            this.showAlert("Problem Creating Account", error);
           });
         },
         (error:any) => {
           this.logger.error(this, "createOrganization", error);
           loading.dismiss();
-          this.showAlert("Problem Creating Organization", error);
+          this.showAlert("Problem Logging In", error);
         });
+      },
+      (error:any) => {
+        this.logger.error(this, "createOrganization", error);
+        loading.dismiss();
+        this.showAlert("Problem Creating Organization", error);
+      });
     }
   }
 

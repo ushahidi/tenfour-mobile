@@ -4,6 +4,7 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { AppAvailability } from '@ionic-native/app-availability';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { ApiService } from '../../providers/api-service';
 
@@ -15,7 +16,7 @@ import { Email } from '../../models/email';
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',
   providers: [ ApiService ],
-  entryComponents:[  ]
+  entryComponents:[ SignupOwnerPage ]
 })
 export class SignupCheckPage extends BasePage {
 
