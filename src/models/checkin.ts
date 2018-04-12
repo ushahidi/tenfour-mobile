@@ -197,6 +197,15 @@ export class Checkin extends Model {
         ids.push({id: recipient.user_id});
       }
     }
+    if (this.groups && this.groups.length > 0) {
+      for (let group of this.groups) {
+        if (group.member_ids && group.member_ids.length > 0) {
+          for (let user_id of group.member_ids.split(",")) {
+            ids.push({id: user_id});
+          }
+        }
+      }
+    }
     return ids;
   }
 

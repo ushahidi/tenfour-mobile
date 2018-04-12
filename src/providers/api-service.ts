@@ -664,7 +664,6 @@ export class ApiService extends HttpService {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          groups: checkin.groupIds(),
           recipients: checkin.recipientIds(),
           send_via: [checkin.send_via]
         };

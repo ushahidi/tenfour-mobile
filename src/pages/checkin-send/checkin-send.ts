@@ -130,7 +130,13 @@ export class CheckinSendPage extends BasePage {
         saves.push(this.database.saveCheckin(this.organization, checkin));
         Promise.all(saves).then(saved => {
           loading.dismiss();
-          this.showToast("Check-In sent");
+          let recipients = this.checkin.recipientIds().length;
+          if (recipients == 1) {
+            this.showToast(`Check-In sent to 1 person`);
+          }
+          else {
+            this.showToast(`Check-In sent to ${recipients} people`);
+          }
           let firstViewController = this.navController.first();
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
