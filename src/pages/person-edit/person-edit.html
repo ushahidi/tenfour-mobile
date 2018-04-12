@@ -51,7 +51,7 @@
       <ion-input item-right type="email" autocorrect="off" autocapitalize="none" placeholder="email address" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="person && user && user.role == 'admin'">
+  <ion-list *ngIf="person && user && user.isOwnerOrAdmin()">
     <ion-item class="role" color="white">
       <ion-label no-padding no-margin icon-only text-left>
         <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
