@@ -197,11 +197,11 @@ export class TenFourApp {
   private verifyEmail(email:string, token:string) {
     if (email && email.length > 0 && token && token.length > 0) {
       this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
-      let loading = this.showLoading("Confirming...");
+      let loading = this.showLoading("Verifying...");
       this.api.verifyEmail(email, token).then((_email:Email) => {
         this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
         loading.dismiss();
-        this.showToast(`Email address ${email} confirmed`);
+        this.showToast(`Email address ${email} verified`);
         let organization = new Organization({});
         organization.email = email;
         this.navController.push(SignupOwnerPage, {

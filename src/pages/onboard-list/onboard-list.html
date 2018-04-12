@@ -6,12 +6,12 @@
 <ion-content no-bounce>
   <ion-slides bounce>
     <ion-slide *ngIf="organization && person">
-      <div *ngIf="(person.config_people_invited == false || person.isMember()) || person.config_profile_reviewed == false || person.config_self_test_sent == false">
+      <div *ngIf="(person.config_people_invited == false) || person.config_profile_reviewed == false || person.config_self_test_sent == false">
         <h2>Let's make sure {{organization.name}} is ready.</h2>
         <p *ngIf="loading == true">Loading your organization...</p>
         <p *ngIf="loading == false">There's a few things we can do to ensure everything's in order:</p>
       </div>
-      <div *ngIf="(person.config_people_invited == true || person.isMember()) && person.config_profile_reviewed == true && person.config_self_test_sent == true">
+      <div *ngIf="(person.config_people_invited == true) && person.config_profile_reviewed == true && person.config_self_test_sent == true">
         <h2>Good news, you're all set!</h2>
       </div>
       <div *ngIf="loading == false">
