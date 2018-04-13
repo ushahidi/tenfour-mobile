@@ -363,14 +363,14 @@ export class CheckinListPage extends BasePage {
     });
   }
 
-  private showReplies(event:any, checkin:Checkin) {
+  private showReplies(checkin:Checkin, event:any=null) {
     this.showPage(ReplyListPage, {
       organization: this.organization,
       person: this.person,
       checkin: checkin })
   }
 
-  private sendReply(event:any, checkin:Checkin) {
+  private sendReply(checkin:Checkin, event:any=null) {
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
       checkin: checkin });
@@ -385,6 +385,18 @@ export class CheckinListPage extends BasePage {
         }
       }
    });
+  }
+
+  private resendCheckin(checkin:Checkin, event:any=null) {
+    let loading = this.showLoading("Resending...");
+    this.api.resendCheckin(this.organization, checkin).then((checkin:Checkin) => {
+      loading.dismiss();
+      this.showToast(`Check-In ${checkin.message} resent`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Resending Check-In", error);
+    });
   }
 
   private createCheckin(event:any) {

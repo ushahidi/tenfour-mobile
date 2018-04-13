@@ -18,8 +18,9 @@
       <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
       <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
     </ion-item>
-    <ion-item text-wrap color="white" tappable *ngIf="checkin.canRespond(person)" (click)="sendReply($event)">
-      <div ion-text color="primary">Respond</div>
+    <ion-item text-wrap color="white">
+      <button ion-button text-only item-left clear color="primary" tappable *ngIf="checkin.canRespond(person)" (click)="sendReply($event)">Respond</button>
+      <button ion-button text-only item-right clear color="primary" tappable *ngIf="checkin.canResend(person)" (click)="resendCheckin($event)">Resend</button>
     </ion-item>
   </ion-list>
   <div *ngIf="checkin">

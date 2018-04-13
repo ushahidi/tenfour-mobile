@@ -167,4 +167,17 @@ export class ReplyListPage extends BasePage {
     }
   }
 
+  private resendCheckin(event:any) {
+    this.logger.info(this, "resendCheckin");
+    let loading = this.showLoading("Resending...");
+    this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
+      loading.dismiss();
+      this.showToast(`Check-In ${this.checkin.message} resent`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Resending Check-In", error);
+    });
+  }
+
 }

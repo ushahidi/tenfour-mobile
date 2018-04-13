@@ -656,12 +656,11 @@ export class ApiService extends HttpService {
     });
   }
 
-  public postCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+  public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
         let params = {
-          creditsRequired: 0,
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
@@ -691,7 +690,41 @@ export class ApiService extends HttpService {
     });
   }
 
-  public postReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
+  public resendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = {
+          organization_id: organization.id,
+          message: checkin.message,
+          answers: checkin.answers,
+          recipients: checkin.recipientIds(),
+          send_via: [checkin.send_via]
+        };
+        if (checkin.self_test_check_in) {
+          params['self_test_check_in'] = 1;
+        }
+        this.httpPut(url, params, token.access_token).then(
+          (data:any) => {
+            if (data && data.checkin) {
+              let checkin = new Checkin(data.checkin);
+              resolve(checkin);
+            }
+            else {
+              reject("Checkin Not Created");
+            }
+          },
+          (error:any) => {
+            reject(error);
+          });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public sendReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}/replies`;
@@ -735,7 +768,7 @@ export class ApiService extends HttpService {
     });
   }
 
-  public putReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
+  public updateReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<Reply> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}/replies/${reply.id}`;

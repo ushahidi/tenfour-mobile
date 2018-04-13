@@ -1,6 +1,9 @@
 page-reply-list {
   ion-list {
     ion-item {
+      ion-button, button {
+        font-size: 16px !important;
+      }
       h1 {
 
       }

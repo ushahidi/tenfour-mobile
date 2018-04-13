@@ -116,7 +116,7 @@ export class CheckinSendPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.postCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
+      this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
         let saves = [];
         for (let answer of checkin.answers) {
           saves.push(this.database.saveAnswer(this.organization, checkin, answer));
@@ -145,7 +145,7 @@ export class CheckinSendPage extends BasePage {
       },
       (error:any) => {
         loading.dismiss();
-        this.showAlert("Problem Creating Checkin", error);
+        this.showAlert("Problem Creating Check-In", error);
       });
     }
   }

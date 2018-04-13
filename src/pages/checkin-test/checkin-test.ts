@@ -86,7 +86,7 @@ export class CheckinTestPage extends BasePage {
 
   private sendCheckin(event:any) {
     let loading = this.showLoading("Sending...");
-    this.api.postCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
+    this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       let saves = [];
       for (let answer of checkin.answers) {
         saves.push(this.database.saveAnswer(this.organization, checkin, answer));

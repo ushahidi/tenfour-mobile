@@ -180,6 +180,15 @@ export class Checkin extends Model {
     return (this.recipients && this.recipients.length > 0) || (this.groups && this.groups.length > 0);
   }
 
+  canResend(person:Person):boolean {
+    if (person.id == this.user_id || person.isOwnerOrAdmin()) {
+      if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   groupIds():number[] {
     let ids = [];
     if (this.groups && this.groups.length > 0) {

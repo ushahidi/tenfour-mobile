@@ -199,7 +199,7 @@ export class ReplySendPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.postReply(this.organization, checkin, reply).then(
+      this.api.sendReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "sendReply", "Reply", replied);
           this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
@@ -228,7 +228,7 @@ export class ReplySendPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.putReply(this.organization, checkin, reply).then(
+      this.api.updateReply(this.organization, checkin, reply).then(
         (replied:Reply) => {
           this.logger.info(this, "saveReply", "Reply", replied);
           this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
