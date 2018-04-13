@@ -193,39 +193,34 @@ export class OnboardListPage extends BasePage {
 
   private taskReviewContact(event:any) {
     this.logger.info(this, "taskReviewContact");
-    if (this.person.config_people_invited) {
-      this.person.config_profile_reviewed = true;
-      let modal = this.showModal(PersonEditPage, {
-        organization: this.organization,
-        person: this.person });
-      modal.onDidDismiss(data => {
-        this.logger.info(this, "taskReviewContact", "Modal", data);
-        if (data) {
-          this.person.config_profile_reviewed = true;
-        }
-        else {
-          this.person.config_profile_reviewed = false;
-        }
-     });
-    }
+    let modal = this.showModal(PersonEditPage, {
+      organization: this.organization,
+      person: this.person });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "taskReviewContact", "Modal", data);
+      if (data) {
+        this.person.config_profile_reviewed = true;
+      }
+      else {
+        this.person.config_profile_reviewed = false;
+      }
+   });
   }
 
   private taskSendCheckin(event:any) {
     this.logger.info(this, "taskSendCheckin");
-    if (this.person.config_people_invited && this.person.config_people_invited) {
-      let modal = this.showModal(CheckinTestPage, {
-        organization: this.organization,
-        person: this.person });
-      modal.onDidDismiss(data => {
-        this.logger.info(this, "taskSendCheckin", "Modal", data);
-        if (data) {
-          this.person.config_self_test_sent = true;
-        }
-        else {
-          this.person.config_self_test_sent = false;
-        }
-     });
-    }
+    let modal = this.showModal(CheckinTestPage, {
+      organization: this.organization,
+      person: this.person });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "taskSendCheckin", "Modal", data);
+      if (data) {
+        this.person.config_self_test_sent = true;
+      }
+      else {
+        this.person.config_self_test_sent = false;
+      }
+    });
   }
 
   private showCheckinList(event:any) {
