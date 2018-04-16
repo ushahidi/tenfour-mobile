@@ -6,8 +6,8 @@
     <ion-title *ngIf="editing == true">Edit Person</ion-title>
     <ion-title *ngIf="editing == false">Add Person</ion-title>
     <ion-buttons end>
-      <button ion-button color="primary" *ngIf="editing == true" (click)="savePersonAndContacts('Creating', $event)">Save</button>
-      <button ion-button color="primary" *ngIf="editing == false" (click)="savePersonAndContacts('Updating', $event)">Create</button>
+      <button ion-button color="primary" *ngIf="editing == true" (click)="savePersonAndContacts('Updating', $event)">Save</button>
+      <button ion-button color="primary" *ngIf="editing == false" (click)="savePersonAndContacts('Creating', $event)">Create</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
