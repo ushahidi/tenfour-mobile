@@ -162,18 +162,6 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  private loadCamera() {
-    return this.diagnostic.isCameraPresent().then(
-      (cameraPresent:boolean) => {
-        this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
-        this.cameraPresent = cameraPresent;
-      },
-      (error:any) => {
-        this.logger.error(this, "loadCamera", "isCameraPresent", error);
-        this.cameraPresent = false;
-      });
-  }
-
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     let loading = this.showLoading("Canceling...");
@@ -196,62 +184,67 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  private createPerson(event:any) {
-    let loading = this.showLoading("Creating...");
-    this.api.createPerson(this.organization, this.person).then((person:Person) => {
-      let updates = [];
-      for (let contact of this.person.contacts) {
-        updates.push(this.updateContact(this.organization, person, contact));
+  private savePersonAndContacts(activity:string, event:any) {
+    let loading = this.showLoading(`${activity}...`);
+    this.savePerson(this.organization, this.person).then((person:Person) => {
+      let contacts = [];
+      for (let contact of this.person.getPhones()) {
+        contacts.push(this.saveContact(this.organization, person, contact));
       }
-      Promise.all(updates).then((updated:any) => {
+      for (let contact of this.person.getEmails()) {
+        contacts.push(this.saveContact(this.organization, person, contact));
+      }
+      Promise.all(contacts).then((updated:any) => {
         this.database.savePerson(this.organization, person).then((saved:any) => {
           loading.dismiss();
-          this.hideModal({ person: person });
+          this.hideModal({
+            person: person
+          });
         });
       },
       (error:any) => {
         loading.dismiss();
-        this.showAlert("Problem Creating Contacts", error);
+        this.showAlert(`Problem ${activity} Contacts`, error);
       });
     },
     (error:any) => {
       loading.dismiss();
-      this.showAlert("Problem Creating Person", error);
+      this.showAlert(`Problem ${activity} Person`, error);
     });
   }
 
-  private updatePerson(event:any) {
-    let loading = this.showLoading("Updating...");
-    this.api.updatePerson(this.organization, this.person).then(
-      (person:Person) => {
-        let updates = [];
-        for (let contact of this.person.getPhones()) {
-          updates.push(this.updateContact(this.organization, person, contact));
-        }
-        for (let contact of this.person.getEmails()) {
-          updates.push(this.updateContact(this.organization, person, contact));
-        }
-        Promise.all(updates).then((updated:any) => {
+  private savePerson(organization:Organization, person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (person.id) {
+        this.logger.info(this, "savePerson", "Update", person);
+        this.api.updatePerson(this.organization, person).then((person:Person) => {
           this.database.savePerson(this.organization, person).then((saved:any) => {
-            loading.dismiss();
-            this.hideModal({ person: person });
+            resolve(person);
           });
         },
         (error:any) => {
-          loading.dismiss();
-          this.showAlert("Problem Updating Contacts", error);
+          reject(error);
         });
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Updating Person", error);
-      });
+      }
+      else {
+        this.logger.info(this, "savePerson", "Create", person);
+        this.api.createPerson(this.organization, person).then((person:Person) => {
+          this.person.id = person.id;
+          this.database.savePerson(this.organization, person).then((saved:any) => {
+            resolve(person);
+          });
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+    });
   }
 
-  private updateContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
+  private saveContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.id) {
-        this.logger.info(this, "updateContact", "Update", contact);
+        this.logger.info(this, "saveContact", "Update", contact);
         if (contact.type == 'phone' && contact.national_number && contact.national_number.length > 0) {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
@@ -270,12 +263,13 @@ export class PersonEditPage extends BasePage {
         }
       }
       else {
-        this.logger.info(this, "updateContact", "Create", contact);
+        this.logger.info(this, "saveContact", "Create", contact);
         if (contact.type == 'phone' && contact.national_number && contact.national_number.length > 0) {
           contact.contact = `+${contact.country_code}${contact.national_number}`;
         }
         if (contact.contact && contact.contact.length > 0) {
           this.api.createContact(organization, person, contact).then((created:Contact) => {
+            contact.id = created.id;
             this.database.saveContact(this.organization, person, created).then((saved:any) => {
               resolve(created);
             });
@@ -328,6 +322,18 @@ export class PersonEditPage extends BasePage {
       buttons: buttons
     });
     actionSheet.present();
+  }
+
+  private loadCamera() {
+    return this.diagnostic.isCameraPresent().then(
+      (cameraPresent:boolean) => {
+        this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
+        this.cameraPresent = cameraPresent;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCamera", "isCameraPresent", error);
+        this.cameraPresent = false;
+      });
   }
 
   private showCamera() {
