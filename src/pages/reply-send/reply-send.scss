@@ -15,7 +15,12 @@ page-reply-send {
     h1 {
     }
     p {
-
+      color: #888 !important;
+      margin-top: 5px !important;
+      strong {
+        color: #444 !important;
+        font-weight: 500 !important;
+      }
     }
   }
 }

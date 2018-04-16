@@ -342,6 +342,18 @@ export class SqlService {
         else if (parameter && parameter.toString().indexOf("%") != -1){
           clause.push(`${column} LIKE ?`);
         }
+        else if (parameter && parameter.toString().indexOf(">") != -1){
+          clause.push(`${column} > ?`);
+        }
+        else if (parameter && parameter.toString().indexOf(">=") != -1){
+          clause.push(`${column} >= ?`);
+        }
+        else if (parameter && parameter.toString().indexOf("<") != -1){
+          clause.push(`${column} < ?`);
+        }
+        else if (parameter && parameter.toString().indexOf("<=") != -1){
+          clause.push(`${column} <= ?`);
+        }
         else {
           clause.push(`${column} = ?`);
         }
@@ -373,6 +385,26 @@ export class SqlService {
           for (let param of parameter) {
             parameters.push(param);
           }
+        }
+        else if (parameter && parameter.toString().indexOf(">") != -1){
+          let components = parameter.split(">");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf(">=") != -1){
+          let components = parameter.split(">=");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf("<") != -1){
+          let components = parameter.split("<");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf("<=") != -1){
+          let components = parameter.split("<=");
+          let number = Number(components[1].trim());
+          parameters.push(number);
         }
         else {
           parameters.push(parameter);

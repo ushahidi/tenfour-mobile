@@ -10,12 +10,20 @@ page-checkin-list {
         color: #888 !important;
         strong {
           color: #444 !important;
+          font-weight: 500 !important;
         }
       }
       ion-badge {
         margin-top: 6px;
         margin-right: 8px;
         border-radius: 2px !important;
+      }
+    }
+    ion-row {
+      ion-col {
+        button {
+          font-weight: 500 !important;
+        }
       }
     }
   }

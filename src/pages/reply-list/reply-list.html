@@ -20,7 +20,7 @@
     </ion-item>
     <ion-item text-wrap color="white">
       <button ion-button text-only item-left clear color="primary" tappable *ngIf="checkin.canRespond(person)" (click)="sendReply($event)">Respond</button>
-      <button ion-button text-only item-right clear color="primary" tappable *ngIf="checkin.canResend(person)" (click)="resendCheckin($event)">Resend</button>
+      <button ion-button text-only item-right clear color="secondary" tappable *ngIf="checkin.canResend(person)" (click)="resendCheckin($event)">Resend</button>
     </ion-item>
   </ion-list>
   <div *ngIf="checkin">

@@ -60,26 +60,7 @@ export class CheckinListPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((finished:any) => {
       loading.dismiss();
-      if (this.organization.checkins) {
-        let checkins = [];
-        for (let checkin of this.organization.checkins) {
-          if (checkin.canRespond(this.person)) {
-            checkins.push(checkin);
-          }
-        }
-        if (checkins.length > 0) {
-          let modal = this.showModal(ReplySendPage, {
-            organization: this.organization,
-            checkins: checkins });
-          modal.onDidDismiss(data => {
-            if (data) {
-              this.loadCheckins(false).then(loaded => {
-                this.loadBadgeNumber();
-              })
-            }
-          });
-        }
-      }
+      this.loadWaitingResponse();
     },
     (error:any) => {
       loading.dismiss();
@@ -123,6 +104,30 @@ export class CheckinListPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadWaitingResponse() {
+    this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
+      this.logger.info(this, "loadWaitingResponse", waiting.length);
+      let checkins = [];
+      for (let checkin of waiting) {
+        if (checkin.canRespond(this.person)) {
+          checkins.push(checkin);
+        }
+      }
+      if (checkins.length > 0) {
+        let modal = this.showModal(ReplySendPage, {
+          organization: this.organization,
+          checkins: checkins });
+        modal.onDidDismiss(data => {
+          if (data) {
+            this.loadCheckins(false).then(loaded => {
+              this.loadBadgeNumber();
+            })
+          }
+        });
+      }
+    });
   }
 
   private loadBadgeNumber():Promise<number> {
@@ -426,6 +431,9 @@ export class CheckinListPage extends BasePage {
   private filterChanged(event:any) {
     this.logger.info(this, "filterChanged", this.filter);
     let loading = this.showLoading("Filtering...");
+    this.loading = true;
+    this.offset = 0;
+    this.checkins = [];
     this.loadCheckins(true).then((filtered:any) => {
       loading.dismiss();
     })

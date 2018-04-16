@@ -23,7 +23,7 @@ export class NotificationListPage extends BasePage {
   person:Person = null;
   notifications:Notification[] = [];
   loading:boolean = false;
-  limit:number = 10;
+  limit:number = 20;
   offset:number = 0;
 
   constructor(

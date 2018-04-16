@@ -214,6 +214,34 @@ export class DatabaseService extends SqlService {
     });
   }
 
+  getCheckinsWaiting(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      let where = {
+        organization_id: organization.id,
+        waiting_count: "> 0"
+      };
+      let order = { created_at: "DESC" };
+      this.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
+        let checkin_ids = checkins.map((checkin:Checkin) => checkin.id);
+        this.logger.info(this, "getCheckins", "IDs", checkin_ids);
+        Promise.all([
+          this.getAnswers(organization, null, checkin_ids),
+          this.getReplies(organization, null, checkin_ids),
+          this.getRecipients(organization, null, checkin_ids)]).then((results:any[]) => {
+            let answers = <Answer[]>results[0];
+            let replies = <Reply[]>results[1];
+            let recipients = <Recipient[]>results[2];
+            for (let checkin of checkins) {
+              checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
+              checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
+              checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
+            }
+            resolve(checkins);
+        });
+      });
+    });
+  }
+
   public getCheckin(organization:Organization, id:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       let where = { id: id };

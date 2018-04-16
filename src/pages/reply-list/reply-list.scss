@@ -3,6 +3,7 @@ page-reply-list {
     ion-item {
       ion-button, button {
         font-size: 16px !important;
+        font-weight: 500 !important;
       }
       h1 {
 
@@ -28,6 +29,7 @@ page-reply-list {
         text-overflow: ellipsis;
         strong {
           color: #444444 !important;
+          font-weight: 500 !important;
         }
       }
       ion-badge {
