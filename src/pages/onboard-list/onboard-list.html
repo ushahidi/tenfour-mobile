@@ -55,9 +55,11 @@
           <h5>Confirm that you'll get messages when it really matters by sending yourself a test message.</h5>
         </ion-card-content>
       </ion-card>
-      <div padding-left padding-right margin-top padding-bottom>
-        <button ion-button block color="primary" (click)="showCheckinList($event)"
+      <div padding-left padding-right padding-bottom>
+        <button ion-button block margin-top color="primary" tappable (click)="showCheckinList($event)"
                 *ngIf="(person.isOwnerOrAdmin() == false || person.config_people_invited == true) && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
+        <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
+                *ngIf="(person.isOwnerOrAdmin() && person.config_people_invited == false) || person.config_profile_reviewed == false || person.config_self_test_sent == false">Skip ahead, I'm ready to get started</button>
       </div>
     </div>
   </div>

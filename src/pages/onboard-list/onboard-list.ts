@@ -243,4 +243,10 @@ export class OnboardListPage extends BasePage {
     });
   }
 
+  private skipAhead(event:any) {
+    this.logger.info(this, "skipAhead");
+    this.showRootPage(CheckinListPage,
+      { organization: this.organization });
+  }
+
 }
