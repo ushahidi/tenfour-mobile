@@ -5,7 +5,7 @@ import { Badge } from '@ionic-native/badge';
 import { Device } from '@ionic-native/device';
 import { SegmentService } from 'ngx-segment-analytics';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
-
+import { Firebase } from '@ionic-native/firebase';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Deeplinks } from '@ionic-native/deeplinks';
@@ -87,6 +87,7 @@ export class TenFourApp {
     protected segment:SegmentService,
     protected device:Device,
     protected badge:Badge,
+    protected firebase:Firebase,
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
     InjectorService.injector = injector;
@@ -96,6 +97,7 @@ export class TenFourApp {
       .then(() => this.loadSplitPane())
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
+      .then(() => this.loadFirebase())
       .then(() => this.loadApplication([
         new Organization(),
         new Email(),
@@ -190,6 +192,20 @@ export class TenFourApp {
         (nomatch:any) => {
           this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
         });
+      resolve(true);
+    });
+  }
+
+  private loadFirebase():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadFirebase");
+      this.firebase.getToken()
+        .then(token => {
+          this.logger.info(this, "loadFirebase", token);
+        })
+        .catch(error => {
+          this.logger.error(this, "loadFirebase", error);
+        })
       resolve(true);
     });
   }

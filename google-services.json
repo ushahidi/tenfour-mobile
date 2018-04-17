@@ -1,0 +1,63 @@
+{
+  "project_info": {
+    "project_number": "804609537189",
+    "firebase_url": "https://tenfour-7322f.firebaseio.com",
+    "project_id": "tenfour-7322f",
+    "storage_bucket": "tenfour-7322f.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804609537189:android:1d20d361b89c57de",
+        "android_client_info": {
+          "package_name": "com.ushahidi.tenfour"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "804609537189-vu2itoj9d3c22hki89vhq2sju949svfc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ushahidi.tenfour",
+            "certificate_hash": "7ca9971a3596f5b34e29bd4386854bf08e59875c"
+          }
+        },
+        {
+          "client_id": "804609537189-2n5l5v4d9aapdblo53ff790djvggb7aj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRL9zQreGzzabMMBXVjzbQHxjEa_nZTaU"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "804609537189-2n5l5v4d9aapdblo53ff790djvggb7aj.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "804609537189-lfonm8i7p4fe9idblhcuoh24l9fa859f.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ushahidi.tenfour",
+                "app_store_id": "1346046659"
+              }
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

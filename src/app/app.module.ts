@@ -31,6 +31,7 @@ import { Sim } from '@ionic-native/sim';
 import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
+import { Firebase } from '@ionic-native/firebase';
 
 import { TenFourApp } from './app.component';
 
@@ -189,6 +190,7 @@ import { CountryService } from '../providers/country-service';
     { provide: Badge, useClass: Badge },
     { provide: Sim, useClass: Sim },
     { provide: HTTP, useClass: HTTP },
+    { provide: Firebase, useClass: Firebase },
     { provide: ApiService, useClass: ApiService },
     { provide: LoggerService, useClass: LoggerService },
     { provide: CountryService, useClass: CountryService },
