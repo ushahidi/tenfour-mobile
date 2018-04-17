@@ -97,7 +97,7 @@ export class TenFourApp {
       .then(() => this.loadSplitPane())
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
-      .then(() => this.loadFirebase())
+      .then(() => this.loadNotifications())
       .then(() => this.loadApplication([
         new Organization(),
         new Email(),
@@ -196,16 +196,27 @@ export class TenFourApp {
     });
   }
 
-  private loadFirebase():Promise<boolean> {
+  private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadFirebase");
-      this.firebase.getToken()
-        .then(token => {
-          this.logger.info(this, "loadFirebase", token);
-        })
-        .catch(error => {
-          this.logger.error(this, "loadFirebase", error);
-        })
+      this.logger.info(this, "loadNotifications");
+      this.firebase.getToken().then((token:string) => {
+        this.logger.info(this, "loadNotifications", "getToken", token);
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadNotifications", "getToken", error);
+      });
+      this.firebase.subscribe("test").then((data:any) => {
+        this.logger.info(this, "loadNotifications", "subscribe", data);
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadNotifications", "subscribe", error);
+      });
+      this.firebase.onNotificationOpen().subscribe((data:any) => {
+        this.logger.info(this, "loadNotifications", "onNotificationOpen", data);
+      },
+      (error:any) => {
+        this.logger.info(this, "loadNotifications", "onNotificationOpen", error);
+      })
       resolve(true);
     });
   }
