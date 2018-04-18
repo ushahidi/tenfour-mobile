@@ -38,7 +38,7 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 Release Apps
 ```
 rvm use system
-ionic cordova prepare ios --buildConfig=build.json
+ionic cordova prepare ios --prod --release --buildConfig=build.json
 ionic cordova build ios --debug --buildConfig=build.json
 ionic cordova build ios --prod --release --buildConfig=build.json
 ```
@@ -50,11 +50,11 @@ ionic cordova build android --device --prod --release --buildConfig=build.json
 ---
 
 ## GitHub
-#### Clone the [Ushahidi](https://github.com/ushahidi/rollcall-mobile) repo
+#### Clone the [Ushahidi](https://github.com/ushahidi/tenfour-mobile) repo
 
 ```
-git clone git@github.com:ushahidi/rollcall-mobile.git Rollcall_Mobile
-cd Rollcall_Mobile
+git clone git@github.com:ushahidi/tenfour-mobile.git TenFour_Mobile
+cd TenFour_Mobile
 ```
 
 ---

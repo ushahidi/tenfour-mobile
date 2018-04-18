@@ -97,7 +97,7 @@ export class TenFourApp {
       .then(() => this.loadSplitPane())
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
-      .then(() => this.loadNotifications())
+      // .then(() => this.loadNotifications())
       .then(() => this.loadApplication([
         new Organization(),
         new Email(),
