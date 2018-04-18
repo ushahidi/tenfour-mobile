@@ -68,16 +68,29 @@ export class GroupEditPage extends BasePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-    let loading = this.showLoading("Canceling...");
-    this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
-      this.group.name = group.name;
-      this.group.description = group.description;
-      this.group.member_count = group.member_count;
-      loading.dismiss();
+    if (this.editing) {
+      let loading = this.showLoading("Canceling...");
+      this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
+        this.group.name = group.name;
+        this.group.description = group.description;
+        this.group.member_count = group.member_count;
+        loading.dismiss();
+        this.hideModal({
+          canceled: true
+        });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.hideModal({
+          canceled: true
+        });
+      });
+    }
+    else {
       this.hideModal({
         canceled: true
       });
-    });
+    }
   }
 
   private addPerson(event:any) {

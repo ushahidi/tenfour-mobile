@@ -80,7 +80,7 @@ export class PersonEditPage extends BasePage {
       this.person = new Person({
         name: null,
         description: null,
-        role: "author",
+        role: "responder",
         organization_id: this.organization.id
       });
     }
@@ -164,24 +164,31 @@ export class PersonEditPage extends BasePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-    let loading = this.showLoading("Canceling...");
-    this.database.getPerson(this.organization, this.person.id).then((person:Person) => {
-      this.person.name = person.name;
-      this.person.description = person.description;
-      this.person.profile_picture = person.profile_picture;
-      this.database.getContacts(this.organization, person).then((contacts:Contact[]) => {
-        for (let contact of this.person.contacts) {
-          let _contact = contacts.filter(_contact => _contact.id == contact.id);
-          if (_contact && _contact.length > 0) {
-            contact.contact = _contact[0].contact;
+    if (this.editing) {
+      let loading = this.showLoading("Canceling...");
+      this.database.getPerson(this.organization, this.person.id).then((person:Person) => {
+        this.person.name = person.name;
+        this.person.description = person.description;
+        this.person.profile_picture = person.profile_picture;
+        this.database.getContacts(this.organization, person).then((contacts:Contact[]) => {
+          for (let contact of this.person.contacts) {
+            let _contact = contacts.filter(_contact => _contact.id == contact.id);
+            if (_contact && _contact.length > 0) {
+              contact.contact = _contact[0].contact;
+            }
           }
-        }
-        loading.dismiss();
-        this.hideModal({
-          canceled: true
+          loading.dismiss();
+          this.hideModal({
+            canceled: true
+          });
         });
       });
-    });
+    }
+    else {
+      this.hideModal({
+        canceled: true
+      });
+    }
   }
 
   private savePersonAndContacts(activity:string, event:any) {

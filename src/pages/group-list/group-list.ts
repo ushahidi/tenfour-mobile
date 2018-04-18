@@ -128,6 +128,10 @@ export class GroupListPage extends BasePage {
               reject(error);
             });
           }
+        },
+        (error:any) => {
+          this.logger.error(this, "loadGroups", error);
+          reject(error);
         });
       }
       else {
@@ -158,7 +162,8 @@ export class GroupListPage extends BasePage {
     let modal = this.showModal(GroupEditPage,
       { organization: this.organization,
         person: this.person });
-    modal.onDidDismiss(data => {
+    modal.onDidDismiss((data:any) => {
+      this.logger.info(this, "createGroup", data);
       if (data && data.group) {
         let loading = this.showLoading("Loading...");
         this.loadGroups(false).then(loaded => {
