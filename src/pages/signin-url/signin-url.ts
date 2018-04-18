@@ -71,6 +71,7 @@ export class SigninUrlPage extends BasePage {
     this.logger.info(this, "createOrganization");
     if (this.platform.is("ios")) {
       this.showUrl("https://app.tenfour.org/organization/email", "_system");
+      // this.showPage(SignupEmailPage, {});
     }
     else {
       this.showPage(SignupEmailPage, {});
