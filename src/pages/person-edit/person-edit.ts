@@ -22,7 +22,7 @@ import { Region } from '../../models/region';
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
   providers: [ ApiService, DatabaseService, CountryService ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class PersonEditPage extends BasePage {
 
@@ -30,6 +30,7 @@ export class PersonEditPage extends BasePage {
   user:Person = null;
   person:Person = null;
   editing:boolean = true;
+  profile:boolean = false;
   cameraPresent:boolean = true;
   countryCodes:any = [];
   countryOptions:any = {
@@ -388,7 +389,7 @@ export class PersonEditPage extends BasePage {
     this.logger.info(this, "addRole");
   }
 
-  private deletePerson(event:any) {
+  private removePerson(event:any) {
     let buttons = [
       {
         text: 'Remove',
@@ -403,7 +404,9 @@ export class PersonEditPage extends BasePage {
             Promise.all(removes).then(removed => {
               loading.dismiss();
               this.showToast("Person removed from organization");
-              this.hideModal({deleted: true});
+              this.hideModal({
+                removed: true
+              });
             });
           },
           (error:any) => {
@@ -416,7 +419,7 @@ export class PersonEditPage extends BasePage {
         text: 'Cancel',
         role: 'cancel',
         handler: () => {
-          this.logger.info(this, "deletePerson", "Cancelled");
+          this.logger.info(this, "removePerson", "Cancelled");
         }
       }
     ];
@@ -432,7 +435,9 @@ export class PersonEditPage extends BasePage {
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
             loading.dismiss();
             this.showToast("Your account has been deleted");
-            this.events.publish('account:deleted');
+            this.hideModal({
+              deleted: true
+            });
           },
           (error:any) => {
             loading.dismiss();

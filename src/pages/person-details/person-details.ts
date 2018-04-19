@@ -124,6 +124,10 @@ export class PersonDetailsPage extends BasePage {
       if (data) {
         if (data.deleted) {
           this.logger.info(this, "editPerson", "Modal", "Deleted");
+          this.events.publish('account:deleted');
+        }
+        else if (data.removed) {
+          this.logger.info(this, "editPerson", "Modal", "Removed");
           this.closePage();
         }
         else if (data.canceled) {

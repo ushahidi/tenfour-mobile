@@ -202,7 +202,7 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadEvents");
       this.events.subscribe('account:deleted', () => {
-        this.userLogout();
+        this.userLogout(false);
       });
       resolve(true);
     })
@@ -381,7 +381,7 @@ export class TenFourApp {
       });
   }
 
-  private showSigninUrl() {
+  private showSigninUrl(event:any=null) {
     this.logger.info(this, "showSigninUrl");
     this.nav.setRoot(SigninUrlPage, { });
     this.menuController.close();
@@ -399,9 +399,10 @@ export class TenFourApp {
 
   private showCheckinList() {
     this.logger.info(this, "showCheckinList");
-    this.nav.setRoot(CheckinListPage,
-      { organization: this.organization,
-        person: this.person });
+    this.nav.setRoot(CheckinListPage, {
+      organization: this.organization,
+      person: this.person
+    });
     this.menuController.close();
     this.splashScreen.hide();
   }
@@ -416,31 +417,35 @@ export class TenFourApp {
 
   private showPersonList() {
     this.logger.info(this, "showPersonList");
-    this.nav.setRoot(PersonListPage,
-      { organization: this.organization,
-        person: this.person });
+    this.nav.setRoot(PersonListPage, {
+      organization: this.organization,
+      person: this.person
+    });
     this.menuController.close();
   }
 
   private showSettingsList() {
     this.logger.info(this, "showSettingsList");
-    this.nav.setRoot(SettingsListPage,
-      { organization: this.organization,
-        person: this.person });
+    this.nav.setRoot(SettingsListPage, {
+      organization: this.organization,
+      person: this.person
+    });
     this.menuController.close();
   }
 
   private showPersonDetails() {
     this.logger.info(this, "showPersonDetails");
-    this.nav.setRoot(PersonDetailsPage,
-      { organization: this.organization,
-        person: this.person,
-        user: this.person,
-        title: "Profile" });
+    this.nav.setRoot(PersonDetailsPage, {
+      organization: this.organization,
+      person: this.person,
+      user: this.person,
+      profile: true,
+      title: "Profile"
+    });
     this.menuController.close();
   }
 
-  private userLogout() {
+  private userLogout(event:any=null) {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...");
     let removes = [
@@ -466,7 +471,7 @@ export class TenFourApp {
         this.logger.error(this, "badge", "Clear Failed", error);
       });
       loading.dismiss();
-      this.showSigninUrl();
+      this.showSigninUrl(event);
     });
   }
 

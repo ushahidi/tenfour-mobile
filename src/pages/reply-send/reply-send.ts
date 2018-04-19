@@ -264,7 +264,7 @@ export class ReplySendPage extends BasePage {
       }
     }
     else {
-      this.showToast("Checkin Reply Sent");
+      this.showToast("Your reply has been sent");
       this.hideModal({reply: reply});
     }
   }
