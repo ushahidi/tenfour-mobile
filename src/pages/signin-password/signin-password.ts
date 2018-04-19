@@ -71,7 +71,12 @@ export class SigninPasswordPage extends BasePage {
               Promise.all(saves).then(saved => {
                 this.trackLogin(organization, person);
                 loading.dismiss();
-                this.showToast(`Welcome to ${organization.name}`);
+                if (person.name && person.name.length > 0) {
+                  this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
+                }
+                else {
+                  this.showToast(`Welcome to ${organization.name}`);
+                }
                 if (person.config_profile_reviewed && person.config_self_test_sent) {
                   this.showRootPage(CheckinListPage,
                     { organization: organization });

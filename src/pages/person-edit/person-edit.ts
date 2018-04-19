@@ -391,7 +391,7 @@ export class PersonEditPage extends BasePage {
   private deletePerson(event:any) {
     let buttons = [
       {
-        text: 'Delete',
+        text: 'Remove',
         handler: () => {
           let loading = this.showLoading("Removing...");
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
@@ -420,7 +420,35 @@ export class PersonEditPage extends BasePage {
         }
       }
     ];
-    this.showConfirm("Delete Person", "Are you sure you want to delete this person?", buttons);
+    this.showConfirm("Remove Person", "Are you sure you want to remove this person?", buttons);
+  }
+
+  private deleteAccount(event:any) {
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...");
+          this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
+            loading.dismiss();
+            this.showToast("Your account has been deleted");
+            this.events.publish('account:deleted');
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Deleting Acount", error);
+          });
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteAccount", "Cancelled");
+        }
+      }
+    ];
+    this.showConfirm("Delete Account", "Are you sure you want to delete your account?", buttons);
   }
 
 }

@@ -9,12 +9,12 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list *ngIf="organization">
+      <ion-list *ngIf="organization && person">
         <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins</ion-item>
-        <ion-item color="white" detail-push tappable (click)="showPersonList($event)">People</ion-item>
-        <ion-item color="white" detail-push tappable (click)="showGroupList($event)">Groups</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person" (click)="showPersonDetails($event)">Profile</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="showPersonList($event)">People</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showPersonDetails($event)">Profile</ion-item>
       </ion-list>
       <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
       <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>

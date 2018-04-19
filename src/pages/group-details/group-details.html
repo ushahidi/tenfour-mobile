@@ -1,8 +1,8 @@
 <ion-header>
   <ion-navbar>
     <ion-title></ion-title>
-    <ion-buttons end>
-      <button ion-button icon-only color="primary" *ngIf="person && person.isOwnerOrAdmin()" (click)="editGroup($event)">Edit</button>
+    <ion-buttons end *ngIf="person">
+      <button ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin()" (click)="editGroup($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

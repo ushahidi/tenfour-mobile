@@ -1,5 +1,5 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
-import { Platform, Nav, SplitPane, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
+import { Platform, Events, Nav, SplitPane, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { Badge } from '@ionic-native/badge';
 import { Device } from '@ionic-native/device';
@@ -72,6 +72,7 @@ export class TenFourApp {
   constructor(
     protected _zone: NgZone,
     protected platform:Platform,
+    protected events:Events,
     protected injector:Injector,
     protected statusBar:StatusBar,
     protected splashScreen:SplashScreen,
@@ -97,6 +98,7 @@ export class TenFourApp {
       .then(() => this.loadSplitPane())
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
+      .then(() => this.loadEvents())
       // .then(() => this.loadNotifications())
       .then(() => this.loadApplication([
         new Organization(),
@@ -194,6 +196,16 @@ export class TenFourApp {
         });
       resolve(true);
     });
+  }
+
+  private loadEvents():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadEvents");
+      this.events.subscribe('account:deleted', () => {
+        this.userLogout();
+      });
+      resolve(true);
+    })
   }
 
   private loadNotifications():Promise<boolean> {
@@ -447,7 +459,12 @@ export class TenFourApp {
       this.organizations = null;
       this.organization = null;
       this.person = null;
-      this.badge.clear();
+      this.badge.clear().then((cleared:any) => {
+        this.logger.info(this, "badge", "Cleared", cleared);
+      },
+      (error:any) => {
+        this.logger.error(this, "badge", "Clear Failed", error);
+      });
       loading.dismiss();
       this.showSigninUrl();
     });

@@ -105,57 +105,57 @@ export class Person extends Model {
 
   public notifications:Notification[] = [];
 
-  isMe():boolean {
-    return this.me == true;
+  public isMe():boolean {
+    return this.me != null && this.me == true;
   }
 
-  isOwnerOrAdmin():boolean {
+  public isOwnerOrAdmin():boolean {
     return this.role === 'owner' || this.role === 'admin';
   }
 
-  isOwner():boolean {
+  public isOwner():boolean {
     return this.role === 'owner';
   }
 
-  isAdmin():boolean {
+  public isAdmin():boolean {
     return this.role === 'admin';
   }
 
-  isAuthor():boolean {
+  public isAuthor():boolean {
     return this.role === 'author';
   }
 
-  isViewer():boolean {
+  public isViewer():boolean {
     return this.role === 'viewer';
   }
 
-  isResponder():boolean {
+  public isResponder():boolean {
     return this.role === 'responder';
   }
 
-  getEmails():Contact[] {
+  public getEmails():Contact[] {
     return this.contacts.filter(function(contact) {
       return contact.type == 'email';
     });
   }
 
-  getPhones():Contact[] {
+  public getPhones():Contact[] {
     return this.contacts.filter(function(contact) {
       return contact.type == 'phone';
     });
   }
 
-  hasEmails():boolean {
+  public hasEmails():boolean {
     let emails = this.getEmails();
     return emails && emails.length > 0;
   }
 
-  hasPhones():boolean {
+  public hasPhones():boolean {
     let phones = this.getPhones();
     return phones && phones.length > 0;
   }
 
-  hasEmail(email:string):boolean {
+  public hasEmail(email:string):boolean {
     for (let contact of this.getEmails()) {
       if (contact.contact == email) {
         return true;
@@ -164,7 +164,7 @@ export class Person extends Model {
     return false;
   }
 
-  needsInvite():boolean {
+  public needsInvite():boolean {
     if (this.has_logged_in == false) {
       return this.hasEmails();
     }

@@ -4,12 +4,12 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Check-Ins</ion-title>
-    <ion-buttons end>
+    <ion-buttons end *ngIf="person">
       <button #notifications ion-button icon-only color="primary" (click)="showNotifications($event)">
         <ion-icon ios="ios-notifications" md="md-notifications" *ngIf="notify == true"></ion-icon>
         <ion-icon ios="ios-notifications-outline" md="md-notifications" *ngIf="notify == false"></ion-icon>
       </button>
-      <button #create ion-button icon-only color="primary" *ngIf="person && person.isOwnerOrAdmin()" (click)="createCheckin($event)">
+      <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor()" (click)="createCheckin($event)">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
       </button>
     </ion-buttons>

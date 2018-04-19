@@ -123,6 +123,7 @@
     <preference name="CordovaWebViewEngine" value="CDVWKWebViewEngine" />
     <allow-navigation href="http://192.168.0.16:8100" />
     <allow-navigation href="http://192.168.0.21:8100" />
+    <allow-navigation href="http://192.168.0.25:8100" />
     <engine name="ios" spec="~4.5.4" />
     <engine name="android" spec="~6.4.0" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
