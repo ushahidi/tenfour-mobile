@@ -32,7 +32,7 @@ export class CountryService {
               for (let _country of data) {
                 if (codes == null || codes.indexOf(_country.code) != -1) {
                   let country = new Country(_country);
-                  country.image = `https://ui-flag.firebaseapp.com/flags/1x1/${country.code.toLowerCase()}.svg`;
+                  country.image = `assets/flags/${country.code.toLowerCase()}.png`;
                   countries.push(country);
                 }
               }

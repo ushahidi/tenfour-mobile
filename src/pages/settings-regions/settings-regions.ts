@@ -131,18 +131,23 @@ export class SettingsRegionsPage extends BasePage {
     let loading = this.showLoading("Updating...");
     let saves = [];
     let regions = [];
+    let codes = [];
     for (let country of this.organization.countries) {
       if (country.selected) {
+        codes.push(country.country_code);
         regions.push(country.code);
       }
       saves.push(this.database.saveCountry(this.organization, country));
     }
-    this.organization.regions = regions.join(",");
+    this.organization.codes = Array.from(new Set(codes)).sort().join(",");
+    this.organization.regions = Array.from(new Set(regions)).sort().join(",");
     Promise.all(saves).then(saved => {
       this.api.updateOrganization(this.organization).then((organization:Organization) => {
         this.database.saveOrganization(organization).then(saved => {
           loading.dismiss();
-          this.hideModal({ organization: organization });
+          this.hideModal({
+            organization: organization
+          });
         });
       },
       (error:any) => {
@@ -151,37 +156,5 @@ export class SettingsRegionsPage extends BasePage {
       });
     });
   }
-
-  // compare(a,b) {
-  //   if (a.name.common < b.name.common)
-  //     return -1;
-  //   if (a.name.common > b.name.common)
-  //     return 1;
-  //   return 0;
-  // }
-  //
-  // loadCountries() {
-  //   let url = "https://raw.githubusercontent.com/mledoze/countries/master/countries.json";
-  //   this.http.get(url)
-  //     .map(res => res.json())
-  //     .subscribe(
-  //       (items:any) => {
-  //         let sorted = items.sort(this.compare);
-  //         let countries = [];
-  //         let index = 1;
-  //         for (let item of sorted) {
-  //           countries.push({
-  //             id: index,
-  //             code: item.cca2,
-  //             name: item.name.common,
-  //             country_code: Number(item.callingCode[0])});
-  //             index = index + 1;
-  //         }
-  //         this.logger.info(this, "loadCountries", countries);
-  //       },
-  //       (error:any) => {
-  //         this.logger.error(this, "loadCountries", url, error);
-  //       });
-  // }
 
 }
