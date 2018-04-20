@@ -288,6 +288,7 @@ export class ApiService extends HttpService {
         let params = { };
         this.httpGet(url, params, token.access_token).then(
           (data:any) => {
+            this.logger.info(this, "getOrganization", data);
             if (data && data.organization) {
               let organization = new Organization(data.organization);
               resolve(organization);

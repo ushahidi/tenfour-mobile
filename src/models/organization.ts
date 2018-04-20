@@ -54,10 +54,10 @@ export class Organization extends Model {
               if (_settings.values.sms) {
                 this.sms_enabled = _settings.values.sms.enabled;
                 if (_settings.values.sms.regions) {
-                  for (let region of _settings.values.sms.regions) {
-
-                  }
-                  this.regions = _settings.values.sms.regions.map(region => region.code).join(",");
+                  let codes = _settings.values.sms.regions.map(region => region.country_code);
+                  this.codes = Array.from(new Set(codes)).sort().join(",");
+                  let regions = _settings.values.sms.regions.map(region => region.code);
+                  this.regions = Array.from(new Set(regions)).sort().join(",");
                 }
               }
               else {
@@ -125,6 +125,9 @@ export class Organization extends Model {
   @Column("regions", TEXT)
   public regions:string = null;
 
+  @Column("codes", TEXT)
+  public codes:string = null;
+
   @Column("size", TEXT)
   public size:string = null;
 
@@ -173,5 +176,19 @@ export class Organization extends Model {
   public groups:Group[] = [];
 
   public countries:Country[] = [];
+
+  public countryRegions():string[] {
+    if (this.regions) {
+      return this.regions.split(",");
+    }
+    return [];
+  }
+
+  public countryCodes():string[] {
+    if (this.codes) {
+      return this.codes.split(",");
+    }
+    return [];
+  }
 
 }

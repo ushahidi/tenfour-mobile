@@ -9,7 +9,6 @@ import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
-import { CountryService } from '../../providers/country-service';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -21,7 +20,7 @@ import { Region } from '../../models/region';
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiService, DatabaseService, CountryService ],
+  providers: [ ApiService, DatabaseService ],
   entryComponents:[ ]
 })
 export class PersonEditPage extends BasePage {
@@ -32,7 +31,6 @@ export class PersonEditPage extends BasePage {
   editing:boolean = true;
   profile:boolean = false;
   cameraPresent:boolean = true;
-  countryCodes:any = [];
   countryOptions:any = {
     multiple: false,
     title: 'Country Code'
@@ -55,7 +53,6 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiService,
       protected database:DatabaseService,
-      protected countryService:CountryService,
       protected events:Events,
       protected camera:Camera,
       protected statusBar:StatusBar,
@@ -85,17 +82,6 @@ export class PersonEditPage extends BasePage {
         organization_id: this.organization.id
       });
     }
-    this.loadCountryCodes(true).then((countryCodes:number[]) => {
-      if (countryCodes && countryCodes.length > 0) {
-        this.countryCodes = countryCodes;
-      }
-      else {
-        this.countryCodes = [1];
-      }
-    },
-    (error:any) => {
-      this.countryCodes = [1];
-    });
   }
 
   ionViewDidEnter() {
@@ -103,63 +89,6 @@ export class PersonEditPage extends BasePage {
     this.trackPage({
       organization: this.organization.name,
       person: this.person.name
-    });
-  }
-
-  private loadCountryCodes(cache:boolean=true):Promise<number[]> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadCountryCodes", cache);
-      if (cache) {
-        this.database.getCountries(this.organization).then((countries:Country[]) => {
-          if (countries && countries.length > 0) {
-            let countryCodes = [];
-            for (let country of countries) {
-              if (country.selected && countryCodes.indexOf(country.country_code) == -1) {
-                countryCodes.push(country.country_code);
-              }
-            }
-            resolve(countryCodes);
-          }
-          else {
-            this.loadCountryCodes(false).then((countryCodes:number[]) => {
-              resolve(countryCodes);
-            },
-            (error:any) => {
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getRegions(this.organization).then((regions:Region[]) => {
-          let codes = regions.map(region => region.code);
-          this.countryService.getCountries(codes).then((countries:Country[]) => {
-            let saves = [];
-            for (let country of countries) {
-              if (this.organization.regions) {
-                let codes = this.organization.regions.split(",");
-                country.selected = codes.indexOf(country.code) != -1;
-              }
-              else {
-                country.selected = false;
-              }
-              saves.push(this.database.saveCountry(this.organization, country));
-            }
-            Promise.all(saves).then(saved => {
-              let countryCodes = [];
-              for (let country of countries) {
-                if (country.selected && countryCodes.indexOf(country.country_code) == -1) {
-                  countryCodes.push(country.country_code);
-                }
-              }
-              resolve(countryCodes);
-            });
-          });
-        },
-        (error:any) => {
-          reject(error);
-        });
-      }
     });
   }
 
@@ -294,10 +223,12 @@ export class PersonEditPage extends BasePage {
   }
 
   private addPhone(event:any) {
-    let countryCode = this.countryCodes && this.countryCodes.length > 0 ? this.countryCodes[0] : 1;
+    let countryCodes = this.organization.countryCodes();
+    let countryCode = countryCodes && countryCodes.length > 0 ? countryCodes[0] : 1;
     let contact = new Contact({
       type: 'phone',
-      country_code: countryCode});
+      country_code: countryCode
+    });
     this.person.contacts.push(contact)
   }
 

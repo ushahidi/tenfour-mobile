@@ -32,9 +32,9 @@
       <ion-label color="primary">Add phone</ion-label>
     </ion-item>
     <ion-item class="phone" color="white" *ngFor="let contact of person.getPhones()">
-      <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
-      <ion-select item-right interface="action-sheet" [disabled]="countryCodes == null || countryCodes.length <= 1" [selectOptions]="countryOptions" [(ngModel)]="contact.country_code" *ngIf="countryCodes">
-        <ion-option [value]="countryCode" *ngFor="let countryCode of countryCodes">+{{countryCode}}</ion-option>
+      <ion-icon item-left ios="ios-call-outline" md="md-call"></ion-icon>
+      <ion-select item-left interface="action-sheet" [disabled]="organization.countryCodes().length <= 1" [selectOptions]="countryOptions" [(ngModel)]="contact.country_code">
+        <ion-option [value]="countryCode" *ngFor="let countryCode of organization.countryCodes()">+{{countryCode}}</ion-option>
       </ion-select>
       <ion-input item-right type="tel" autocorrect="off" autocapitalize="none" placeholder="phone number" [(ngModel)]="contact.national_number"></ion-input>
       <ion-input type="tel" hidden [(ngModel)]="contact.contact"></ion-input>
