@@ -64,7 +64,7 @@
       </ion-select>
     </ion-item>
   </ion-list>
-  <div padding-left padding-right padding-bottom *ngIf="user && person && person.id">
+  <div padding-left padding-right padding-bottom *ngIf="user && person && this.editing">
     <button ion-button block color="danger" *ngIf="person.isMe()" (click)="deleteAccount($event)">Delete my account</button>
     <button ion-button block color="danger" *ngIf="person.isMe() == false && user.isOwnerOrAdmin()" (click)="removePerson($event)">Remove from organization</button>
   </div>

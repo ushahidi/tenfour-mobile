@@ -152,7 +152,12 @@ export class PersonDetailsPage extends BasePage {
         this.database.savePerson(this.organization, invited).then(saved => {
           this.person = invited;
           loading.dismiss();
-          this.showToast("Person invited to organization");
+          if (this.person.name) {
+            this.showToast(`${this.person.name} invited to organization`);
+          }
+          else {
+            this.showToast("Person invited to organization");
+          }
         });
       },
       (error:any) => {

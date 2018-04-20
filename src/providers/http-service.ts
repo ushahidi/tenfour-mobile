@@ -38,7 +38,7 @@ export class HttpService {
       this.http.get(url, params, headers).then(
         (response:any) => {
           if (response.data) {
-            if (response.headers['content-type'] == "application/json") {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "GET", url, response.status, data);
               resolve(data);
@@ -69,7 +69,8 @@ export class HttpService {
       this.http.post(url, params, headers).then(
         (response:any) => {
           if (response.data) {
-            if (response.headers['content-type'] == "application/json") {
+            this.logger.info(this, "POST", url, response.status, response.headers, response.data);
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "POST", url, response.status, data);
               resolve(data);
@@ -101,7 +102,7 @@ export class HttpService {
       this.http.put(url, params, headers).then(
         (response:any) => {
           if (response.data) {
-            if (response.headers['content-type'] == "application/json") {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "PUT", url, response.status, data);
               resolve(data);
@@ -133,7 +134,7 @@ export class HttpService {
       this.http.patch(url, params, headers).then(
         (response:any) => {
           if (response.data) {
-            if (response.headers['content-type'] == "application/json") {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "PATCH", url, response.status, data);
               resolve(data);
@@ -165,7 +166,7 @@ export class HttpService {
       this.http.delete(url, params, headers).then(
         (response:any) => {
           if (response.data) {
-            if (response.headers['content-type'] == "application/json") {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "DELETE", url, response.status, data);
               resolve(data);
