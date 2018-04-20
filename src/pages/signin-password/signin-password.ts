@@ -99,14 +99,18 @@ export class SigninPasswordPage extends BasePage {
   }
 
   private resetPassword(event:any) {
+    let title = "Check Your Inbox";
+    let message = `If your email address ${this.email} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
     let loading = this.showLoading("Resetting...");
     this.api.resetPassword(this.organization.subdomain, this.email).then((reset:any) => {
+      this.logger.info(this, "resetPassword", reset);
       loading.dismiss();
-      this.showAlert("Password Reset Sent", `Password reset information sent to ${this.email}, please follow the instructions in the email.`);
+      this.showAlert(title, message);
     },
     (error:any) => {
+      this.logger.error(this, "resetPassword", error);
       loading.dismiss();
-      this.showAlert("Problem Resetting Password", "Your password could not be reset, please double check the email you entered and try again.");
+      this.showAlert(title, message);
     });
   }
 
