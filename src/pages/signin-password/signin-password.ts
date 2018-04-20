@@ -98,6 +98,18 @@ export class SigninPasswordPage extends BasePage {
     }
   }
 
+  private resetPassword(event:any) {
+    let loading = this.showLoading("Resetting...");
+    this.api.resetPassword(this.organization.subdomain, this.email).then((reset:any) => {
+      loading.dismiss();
+      this.showAlert("Password Reset Sent", `Password reset information sent to ${this.email}, please follow the instructions in the email.`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Resetting Password", "Your password could not be reset, please double check the email you entered and try again.");
+    });
+  }
+
   private showNextOnReturn(event:any) {
     if (event.keyCode == 13) {
       this.hideKeyboard();

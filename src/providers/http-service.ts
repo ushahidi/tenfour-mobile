@@ -29,7 +29,7 @@ export class HttpService {
     return headers;
   }
 
-  protected httpGet(url:string, params:any={}, token:string=null) {
+  protected httpGet(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token);
       this.logger.info(this, "GET", url, params, headers);
@@ -37,24 +37,30 @@ export class HttpService {
       this.http.setDataSerializer("json");
       this.http.get(url, params, headers).then(
         (response:any) => {
-          if (response && response.data) {
-            let data = JSON.parse(response.data);
-            this.logger.info(this, "GET", url, data);
-            resolve(data);
+          if (response.data) {
+            if (response.headers['content-type'] == "application/json") {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "GET", url, response.status, data);
+              resolve(data);
+            }
+            else {
+              this.logger.info(this, "GET", url, response.status, response.data);
+              resolve(response.data);
+            }
           }
           else {
-            this.logger.error(this, "GET", url, "No Response Data");
+            this.logger.error(this, "GET", url, response.status, "No Data");
             reject("No Response Data");
           }
         },
         (error:any) => {
-          this.logger.error(this, "GET", url, error);
+          this.logger.error(this, "GET", url, error.status, error.error);
           reject(this.httpError(error));
         });
     });
   }
 
-  protected httpPost(url:string, params:any={}, token:string=null) {
+  protected httpPost(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "POST", url, params, headers);
@@ -62,19 +68,31 @@ export class HttpService {
       this.http.setDataSerializer("json");
       this.http.post(url, params, headers).then(
         (response:any) => {
-          let data = JSON.parse(response.data);
-          this.logger.info(this, "POST", url, data);
-          resolve(data);
+          if (response.data) {
+            if (response.headers['content-type'] == "application/json") {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "POST", url, response.status, data);
+              resolve(data);
+            }
+            else {
+              this.logger.info(this, "POST", url, response.status, response.data);
+              resolve(response.data);
+            }
+          }
+          else {
+            this.logger.error(this, "POST", url, response.status, "No Data");
+            reject("No Response Data");
+          }
         },
         (error:any) => {
-          this.logger.error(this, "POST", url, error);
+          this.logger.error(this, "POST", url, error.status, error.error);
           reject(this.httpError(error));
         }
       );
     });
   }
 
-  protected httpPut(url:string, params:any={}, token:string=null) {
+  protected httpPut(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "PUT", url, params, headers);
@@ -82,19 +100,31 @@ export class HttpService {
       this.http.setDataSerializer("json");
       this.http.put(url, params, headers).then(
         (response:any) => {
-          let data = JSON.parse(response.data);
-          this.logger.info(this, "PUT", url, data);
-          resolve(data);
+          if (response.data) {
+            if (response.headers['content-type'] == "application/json") {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "PUT", url, response.status, data);
+              resolve(data);
+            }
+            else {
+              this.logger.info(this, "PUT", url, response.status, response.data);
+              resolve(response.data);
+            }
+          }
+          else {
+            this.logger.error(this, "PUT", url, response.status, "No Data");
+            reject("No Response Data");
+          }
         },
         (error:any) => {
-          this.logger.error(this, "PUT", url, error);
+          this.logger.error(this, "PUT", url, error.status, error.error);
           reject(this.httpError(error));
         }
       );
     });
   }
 
-  protected httpPatch(url:string, params:any={}, token:string=null) {
+  protected httpPatch(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token, "application/json");
       this.logger.info(this, "PATCH", url, params, headers);
@@ -102,19 +132,31 @@ export class HttpService {
       this.http.setDataSerializer("json");
       this.http.patch(url, params, headers).then(
         (response:any) => {
-          let data = JSON.parse(response.data);
-          this.logger.info(this, "PATCH", url, data);
-          resolve(data);
+          if (response.data) {
+            if (response.headers['content-type'] == "application/json") {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "PATCH", url, response.status, data);
+              resolve(data);
+            }
+            else {
+              this.logger.info(this, "PATCH", url, response.status, response.data);
+              resolve(response.data);
+            }
+          }
+          else {
+            this.logger.error(this, "PATCH", url, response.status, "No Data");
+            reject("No Response Data");
+          }
         },
         (error:any) => {
-          this.logger.error(this, "PATCH", url, error);
+          this.logger.error(this, "PATCH", url, error.status, error.error);
           reject(this.httpError(error));
         }
       );
     });
   }
 
-  protected httpDelete(url:string, params:any={}, token:string=null) {
+  protected httpDelete(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       let headers = this.httpHeaders(token);
       this.logger.info(this, "DELETE", url, params, headers);
@@ -122,12 +164,24 @@ export class HttpService {
       this.http.setDataSerializer("json");
       this.http.delete(url, params, headers).then(
         (response:any) => {
-          let data = JSON.parse(response.data);
-          this.logger.info(this, "DELETE", url, data);
-          resolve(data);
+          if (response.data) {
+            if (response.headers['content-type'] == "application/json") {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "DELETE", url, response.status, data);
+              resolve(data);
+            }
+            else {
+              this.logger.info(this, "DELETE", url, response.status, response.data);
+              resolve(response.data);
+            }
+          }
+          else {
+            this.logger.error(this, "DELETE", url, response.status, "No Data");
+            reject("No Response Data");
+          }
         },
         (error:any) => {
-          this.logger.error(this, "DELETE", url, error);
+          this.logger.error(this, "DELETE", url, error.status, error.error);
           reject(this.httpError(error));
         });
     });
@@ -167,20 +221,19 @@ export class HttpService {
       };
       this.logger.info(this, "UPLOAD", url, file, options);
       let fileTransfer:FileTransferObject = this.transfer.create();
-      fileTransfer.upload(file, url, options, true).then(
-        (data:FileUploadResult) => {
-          this.logger.info(this, "UPLOAD", url, file, data);
-          resolve(data);
-        },
-        (error:FileTransferError) => {
-          this.logger.error(this, "UPLOAD", url, file,
-            "Code", error.code,
-            "Source", error.source,
-            "Target", error.target,
-            "Body", error.body,
-            "Exception", error.exception);
-          reject(error.body || error.exception);
-       });
+      fileTransfer.upload(file, url, options, true).then((data:FileUploadResult) => {
+        this.logger.info(this, "UPLOAD", url, file, data);
+        resolve(data);
+      },
+      (error:FileTransferError) => {
+        this.logger.error(this, "UPLOAD", url, file,
+          "Code", error.code,
+          "Source", error.source,
+          "Target", error.target,
+          "Body", error.body,
+          "Exception", error.exception);
+        reject(error.body || error.exception);
+     });
     });
   }
 
@@ -210,23 +263,21 @@ export class HttpService {
   protected fileSize(filePath:any):Promise<number> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "fileSize", filePath);
-      this.file.resolveLocalFilesystemUrl(filePath).then(
-        (entry:Entry) => {
-          this.logger.info(this, "fileSize", filePath, "Entry", entry.fullPath);
-          entry.getMetadata(
-            (metadata:Metadata) => {
-              this.logger.info(this, "fileSize", filePath, "Metadata", metadata);
-              resolve(metadata.size);
-            },
-            (error:any) => {
-              this.logger.error(this, "fileSize", filePath, "Metadata", error);
-              reject(error);
-            });
+      this.file.resolveLocalFilesystemUrl(filePath).then((entry:Entry) => {
+        this.logger.info(this, "fileSize", filePath, "Entry", entry.fullPath);
+        entry.getMetadata((metadata:Metadata) => {
+          this.logger.info(this, "fileSize", filePath, "Metadata", metadata);
+          resolve(metadata.size);
         },
-        (error) => {
-          this.logger.error(this, "fileSize", filePath, "Error", error);
+        (error:any) => {
+          this.logger.error(this, "fileSize", filePath, "Metadata", error);
           reject(error);
         });
+      },
+      (error) => {
+        this.logger.error(this, "fileSize", filePath, "Error", error);
+        reject(error);
+      });
     });
   }
 
@@ -252,7 +303,7 @@ export class HttpService {
           else if (error['error'].toString().indexOf("The Internet connection appears to be offline") != -1) {
             return "The internet connection appears to be offline";
           }
-          else {
+          else if (error.headers['content-type'] == "application/json") {
             let json = JSON.parse(error['error']);
             if (json['errors']) {
               let errors = json['errors'];

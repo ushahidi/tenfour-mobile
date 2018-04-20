@@ -234,6 +234,23 @@ export class ApiService extends HttpService {
     });
   }
 
+  public resetPassword(subdomain:string, email:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/password/email`;
+      let params = {
+        subdomain: subdomain,
+        username: email
+      };
+      this.httpPost(url, params).then(
+        (data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
   public getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
     return new Promise((resolve, reject) => {
       let params = {};
