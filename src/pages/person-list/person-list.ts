@@ -138,7 +138,7 @@ export class PersonListPage extends BasePage {
         });
       }
       else {
-        this.api.getPeople(this.organization).then((people:Person[]) => {
+        this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
           let saves = [];
           for (let person of people) {
             saves.push(this.database.savePerson(this.organization, person));

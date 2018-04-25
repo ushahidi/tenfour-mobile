@@ -29,4 +29,7 @@
       <ion-checkbox item-right [(ngModel)]="person.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
+  <ion-infinite-scroll (ionInfinite)="loadMore(true, $event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
