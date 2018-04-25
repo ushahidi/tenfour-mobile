@@ -387,4 +387,15 @@ export class PersonEditPage extends BasePage {
     this.showConfirm("Delete Account", "Are you sure you want to delete your account?", buttons);
   }
 
+  private onKeyPress(event:any) {
+    if (event.keyCode == 13) {
+      this.logger.info(this, "onKeyPress", "Enter");
+      this.hideKeyboard();
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
 }

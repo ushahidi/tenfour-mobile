@@ -88,4 +88,15 @@ export class SettingsEditPage extends BasePage {
     });
   }
 
+  private onKeyPress(event:any) {
+    if (event.keyCode == 13) {
+      this.logger.info(this, "onKeyPress", "Enter");
+      this.hideKeyboard();
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
 }

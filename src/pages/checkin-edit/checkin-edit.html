@@ -15,7 +15,8 @@
       <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     </ion-item>
     <ion-item text-wrap text-center no-lines color="white" class="textarea">
-      <ion-textarea text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message" [(ngModel)]="checkin.message"></ion-textarea>
+      <ion-textarea text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message"
+        (keypress)="onKeyPress($event)" [(ngModel)]="checkin.message"></ion-textarea>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin && checkin.answers">

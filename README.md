@@ -38,7 +38,10 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 Release Apps
 ```
 rvm use system
+ionic cordova prepare ios --debug --buildConfig=build.json
 ionic cordova prepare ios --prod --release --buildConfig=build.json
+```
+```
 ionic cordova build ios --debug --buildConfig=build.json
 ionic cordova build ios --prod --release --buildConfig=build.json
 ```

@@ -20,11 +20,11 @@
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Name</ion-label>
-      <ion-input type="text" [(ngModel)]="person.name"></ion-input>
+      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="person.name"></ion-input>
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Description</ion-label>
-      <ion-input type="text" [(ngModel)]="person.description"></ion-input>
+      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="person.description"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person">
@@ -36,7 +36,7 @@
       <ion-select item-left interface="action-sheet" [disabled]="organization.countryCodes().length <= 1" [selectOptions]="countryOptions" [(ngModel)]="contact.country_code">
         <ion-option [value]="countryCode" *ngFor="let countryCode of organization.countryCodes()">+{{countryCode}}</ion-option>
       </ion-select>
-      <ion-input item-right type="tel" autocorrect="off" autocapitalize="none" placeholder="phone number" [(ngModel)]="contact.national_number"></ion-input>
+      <ion-input item-right type="tel" autocorrect="off" autocapitalize="none" placeholder="phone number" (keypress)="onKeyPress($event)" [(ngModel)]="contact.national_number"></ion-input>
       <ion-input type="tel" hidden [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
@@ -48,7 +48,7 @@
       <ion-label no-padding no-margin icon-only text-left>
         <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
       </ion-label>
-      <ion-input item-right type="email" autocorrect="off" autocapitalize="none" placeholder="email address" [(ngModel)]="contact.contact"></ion-input>
+      <ion-input item-right type="email" autocorrect="off" autocapitalize="none" placeholder="email address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person && user && user.isOwnerOrAdmin()">

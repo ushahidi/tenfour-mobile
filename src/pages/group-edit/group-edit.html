@@ -20,11 +20,11 @@
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Name</ion-label>
-      <ion-input type="text" [(ngModel)]="group.name"></ion-input>
+      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="group.name"></ion-input>
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Description</ion-label>
-      <ion-input type="text" [(ngModel)]="group.description"></ion-input>
+      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="group.description"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="group">

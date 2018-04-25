@@ -281,4 +281,15 @@ export class ReplySendPage extends BasePage {
     reply.longitude = null;
   }
 
+  private onKeyPress(event:any) {
+    if (event.keyCode == 13) {
+      this.logger.info(this, "onKeyPress", "Enter");
+      this.keyboard.close();
+      return false;
+    }
+    else {
+      return true;
+    }
+  }
+
 }

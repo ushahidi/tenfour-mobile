@@ -30,7 +30,7 @@
       <ion-list *ngIf="checkin.reply">
         <ion-item color="dark">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add message" [(ngModel)]="checkin.reply.message"></ion-input>
+          <ion-input type="text" placeholder="Add message" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.message"></ion-input>
           <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(checkin.reply)"
                   *ngIf="checkin.reply.message && checkin.reply.message.length > 0">
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
@@ -38,7 +38,7 @@
         </ion-item>
         <ion-item color="dark">
           <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add location" [(ngModel)]="checkin.reply.location_text"></ion-input>
+          <ion-input type="text" placeholder="Add location" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.location_text"></ion-input>
           <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(checkin.reply)"
                   *ngIf="checkin.reply.location_text && checkin.reply.location_text.length > 0">
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
