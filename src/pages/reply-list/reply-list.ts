@@ -180,4 +180,29 @@ export class ReplyListPage extends BasePage {
     });
   }
 
+  private shareCheckin(event:any) {
+    let subject = this.checkin.message;
+    let message = [];
+    for (let answer of this.checkin.answers) {
+      if (answer.replies > 0) {
+        let replies = [];
+        for (let reply of this.checkin.answerReplies(answer)) {
+          replies.push(reply.user_name);
+        }
+        message.push(`${answer.answer} - ${replies.join(", ")}`);
+      }
+    }
+    if (this.checkin.replies.length < this.checkin.recipients.length) {
+      let pending = [];
+      for (let recipient of this.checkin.recipientsPending()) {
+        pending.push(recipient.name);
+      }
+      message.push(`No Response - ${pending.join(", ")}`);
+    }
+    let image = this.checkin.user_picture;
+    let website = `https://${this.organization.subdomain}.tenfour.org/checkins/${this.checkin.id}`;
+    this.logger.info(this, "shareCheckin", subject, message.join(" "), image, website);
+    this.showShare(subject, message.join(" "), image, website);
+  }
+
 }

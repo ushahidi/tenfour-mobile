@@ -4,6 +4,11 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title></ion-title>
+    <ion-buttons end *ngIf="person">
+      <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="shareCheckin($event)">
+        <ion-icon ios="ios-share-outline" md="md-share"></ion-icon>
+      </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
