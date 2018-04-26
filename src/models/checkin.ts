@@ -218,4 +218,11 @@ export class Checkin extends Model {
     return ids;
   }
 
+  sendVia() {
+    if (this.send_via) {
+      return this.send_via.split(",");
+    }
+    return [];
+  }
+
 }

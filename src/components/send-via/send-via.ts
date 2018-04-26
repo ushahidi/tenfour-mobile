@@ -43,9 +43,9 @@ export class SendViaComponent {
 
   onAppSelected(event:any) {
     if (this.app_selected) {
-      this.email_enabled = false;
-      this.sms_enabled = false;
-      this.slack_enabled = false;
+      this.email_selected = false;
+      this.sms_selected = false;
+      this.slack_selected = false;
     }
     this.onChanged();
   }

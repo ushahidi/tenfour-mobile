@@ -683,7 +683,7 @@ export class ApiService extends HttpService {
           message: checkin.message,
           answers: checkin.answers,
           recipients: checkin.recipientIds(),
-          send_via: [checkin.send_via]
+          send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
           params['self_test_check_in'] = 1;
@@ -717,7 +717,7 @@ export class ApiService extends HttpService {
           message: checkin.message,
           answers: checkin.answers,
           recipients: checkin.recipientIds(),
-          send_via: [checkin.send_via]
+          send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
           params['self_test_check_in'] = 1;
