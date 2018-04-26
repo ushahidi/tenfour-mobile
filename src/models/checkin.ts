@@ -168,6 +168,11 @@ export class Checkin extends Model {
       return false;
     }
     if (person && this.recipients.filter(recipient => recipient.user_id == person.id).length > 0) {
+      for (let reply of this.replies) {
+        if (person.id == reply.user_id) {
+          return false;
+        }
+      }
       return this.replied == null || this.replied == false;
     }
     return false;

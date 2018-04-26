@@ -118,7 +118,8 @@ export class CheckinListPage extends BasePage {
       if (checkins.length > 0) {
         let modal = this.showModal(ReplySendPage, {
           organization: this.organization,
-          checkins: checkins });
+          checkins: checkins
+        });
         modal.onDidDismiss(data => {
           if (data) {
             this.loadCheckins(false).then(loaded => {
@@ -263,6 +264,7 @@ export class CheckinListPage extends BasePage {
 
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
+      this.offset = 0;
       if (cache) {
         this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
@@ -435,6 +437,7 @@ export class CheckinListPage extends BasePage {
     this.offset = 0;
     this.checkins = [];
     this.loadCheckins(true).then((filtered:any) => {
+      this.loading = false;
       loading.dismiss();
     })
   }
