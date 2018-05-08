@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, Loading, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { Sim } from '@ionic-native/sim';
 import { Contacts } from '@ionic-native/contacts';
@@ -54,8 +54,8 @@ export class PersonImportPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     let loading = this.showLoading("Loading...");
     Promise.resolve()
-      .then(() => { return this.loadCountry(); })
-      .then(() => { return this.loadContacts(); })
+      .then(() => { return this.loadCountries(loading); })
+      .then(() => { return this.loadContacts(loading); })
       .then(() => {
         loading.dismiss();
       })
@@ -77,64 +77,85 @@ export class PersonImportPage extends BasePage {
     this.hideModal();
   }
 
-  private loadCountry():Promise<any> {
+  private loadCountries(loading:Loading):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.sim.getSimInfo().then(
-        (info:any) => {
-          this.logger.info(this, 'loadCountry', 'SIM', info);
-          this.countries.getCountry(info.countryCode).then(
-            (country:Country) => {
-              this.logger.info(this, 'loadCountry', 'Country', country);
-              if (country) {
-                this.countryCode = `+${country.country_code}`;
-              }
-              else {
-                this.countryCode = "+1";
-              }
-              resolve();
-            },
-            (error:any) => {
-              this.logger.error(this, 'loadCountry', 'Country', error);
-              this.countryCode = "+1";
-              resolve();
-            });
+      if (loading) {
+        loading.setContent("Countries...");
+      }
+      this.sim.getSimInfo().then((info:any) => {
+        this.logger.info(this, 'loadCountries', 'SIM', info);
+        this.countries.getCountry(info.countryCode).then((country:Country) => {
+          this.logger.info(this, 'loadCountries', 'Country', country);
+          if (country) {
+            this.countryCode = `+${country.country_code}`;
+          }
+          else {
+            this.countryCode = "+1";
+          }
+          resolve();
         },
         (error:any) => {
-          this.logger.error(this, 'loadCountry', 'SIM', error);
+          this.logger.error(this, 'loadCountries', 'Country', error);
           this.countryCode = "+1";
           resolve();
-        }
-      );
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, 'loadCountries', 'SIM', error);
+        this.countryCode = "+1";
+        resolve();
+      });
     });
   }
 
-  private loadContacts(event:any=null):Promise<any> {
+  private loadContacts(loading:Loading=null, event:any=null):Promise<any> {
     return new Promise((resolve, reject) => {
+      if (loading) {
+        loading.setContent("Contacts...");
+      }
       this.logger.info(this, "loadContacts");
       this.imports = [];
-      this.contacts.find(['*']).then((contacts:any[]) => {
-        let sorted = contacts.sort(function(a, b) {
-          var givenA = a.name.givenName;
-          var givenB = b.name.givenName;
-          var familyA = a.name.familyName;
-          var familyB = b.name.familyName;
-          if (familyA === familyB) {
-            return (givenA < givenB) ? -1 : (givenA > givenB) ? 1 : 0;
-          }
-          else {
-            return (familyA < familyB) ? -1 : (familyA > familyB) ? 1 : 0;
-          }
+      let options = {
+        filter : "",
+        multiple:true,
+        desiredFields: [
+          'name',
+          'displayName',
+          'name.givenName',
+          'name.familyName',
+          'name.formatted',
+          'phoneNumbers',
+          'emails',
+          'addresses',
+          'title']
+      };
+      this.contacts.find(['*'], options).then((contacts:any[]) => {
+        let sorted = contacts.sort((a, b) => {
+          let givenA = a.name.givenName;
+          let givenB = b.name.givenName;
+          let familyA = a.name.familyName;
+          let familyB = b.name.familyName;
+          let formattedA = a.name.formatted;
+          let formattedB = b.name.formatted;
+          if (familyA < familyB) return -1;
+          if (familyA > familyB) return 1;
+          if (givenA < givenB) return -1;
+          if (givenA > givenB) return 1;
+          if (formattedA < formattedB) return -1;
+          if (formattedA > formattedB) return -1;
+          return 0;
         });
-        for (let contact of sorted) {
-          this.logger.info(this, "loadContacts", "Contact", contact);
-          this.imports.push(contact);
-        }
         if (event) {
           event.complete();
         }
-        resolve();
+        this.imports = sorted;
+        resolve(this.imports);
       },
       (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.imports = [];
         reject(error);
       });
     });

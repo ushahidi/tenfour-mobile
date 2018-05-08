@@ -58,6 +58,7 @@ export class CheckinListPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
+    this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
       loading.dismiss();
       this.loadWaitingResponse();

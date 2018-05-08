@@ -38,6 +38,7 @@ export class BasePage {
   protected segment:SegmentService;
   protected device:Device;
   protected appVersion:AppVersion;
+  protected tablet:boolean = false;
 
   @ViewChild(Content)
   content: Content;
@@ -67,6 +68,12 @@ export class BasePage {
 
   ionViewDidLoad() {
     this.logger.info(this, "ionViewDidLoad");
+    if (this.platform.is('tablet')) {
+      this.tablet = true;
+    }
+    else {
+      this.tablet = false;
+    }
   }
 
   ionViewWillEnter() {
