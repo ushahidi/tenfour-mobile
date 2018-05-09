@@ -3,6 +3,7 @@ import { IonicPage, Events, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
+import { ReplyListPage } from '../../pages/reply-list/reply-list';
 
 import { ApiService } from '../../providers/api-service';
 import { DatabaseService } from '../../providers/database-service';
@@ -10,13 +11,14 @@ import { DatabaseService } from '../../providers/database-service';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
+import { Checkin } from '../../models/checkin';
 
 @IonicPage()
 @Component({
   selector: 'page-person-details',
   templateUrl: 'person-details.html',
   providers: [ ApiService, DatabaseService ],
-  entryComponents:[ PersonEditPage ]
+  entryComponents:[ PersonEditPage, ReplyListPage ]
 })
 export class PersonDetailsPage extends BasePage {
 
@@ -25,6 +27,9 @@ export class PersonDetailsPage extends BasePage {
   user:Person = null;
   title:string = null;
   loading:boolean = false;
+  checkins:Checkin[] = [];
+  limit:number = 3;
+  offset:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -65,7 +70,9 @@ export class PersonDetailsPage extends BasePage {
 
   private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
     this.loading = true;
-    return Promise.all([this.loadPerson(cache)]).then(
+    return Promise.all([
+      this.loadPerson(cache),
+      this.loadCheckins(cache)]).then(
       (loaded:any) =>{
         if (event) {
           event.complete();
@@ -110,6 +117,27 @@ export class PersonDetailsPage extends BasePage {
             });
           });
       }
+    });
+  }
+
+  private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      //TODO load checkins from API
+      this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.checkins = checkins;
+        resolve(this.checkins);
+      });
+    });
+  }
+
+  private loadMore(event:any) {
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+      this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.checkins = [...this.checkins, ...checkins];
+        resolve(this.checkins);
+      });
     });
   }
 
@@ -188,6 +216,14 @@ export class PersonDetailsPage extends BasePage {
         this.showToast("Email is not available...");
       });
     }
+  }
+
+  private showReplies(checkin:Checkin, event:any=null) {
+    this.showPage(ReplyListPage, {
+      organization: this.organization,
+      person: this.person,
+      checkin: checkin
+    });
   }
 
 }

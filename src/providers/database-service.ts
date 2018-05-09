@@ -214,6 +214,31 @@ export class DatabaseService extends SqlService {
     });
   }
 
+  getCheckinsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      let order = { created_at: "DESC" };
+      this.getModels<Reply>(new Reply(), { organization_id: organization.id, user_id: person.id }, order).then((replies:Reply[]) => {
+        let checkin_ids = replies.map((reply) => reply.checkin_id);
+        this.getModels<Checkin>(new Checkin(), { organization_id: organization.id, id: checkin_ids }, order, limit, offset).then((checkins:Checkin[]) => {
+          Promise.all([
+            this.getAnswers(organization, null, checkin_ids),
+            this.getReplies(organization, null, checkin_ids),
+            this.getRecipients(organization, null, checkin_ids)]).then((results:any[]) => {
+              let answers = <Answer[]>results[0];
+              let replies = <Reply[]>results[1];
+              let recipients = <Recipient[]>results[2];
+              for (let checkin of checkins) {
+                checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
+                checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
+                checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
+              }
+              resolve(checkins);
+          });
+        });
+      });
+    });
+  }
+
   getCheckinsWaiting(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       let where = {

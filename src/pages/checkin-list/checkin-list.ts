@@ -375,7 +375,8 @@ export class CheckinListPage extends BasePage {
     this.showPage(ReplyListPage, {
       organization: this.organization,
       person: this.person,
-      checkin: checkin })
+      checkin: checkin
+    });
   }
 
   private sendReply(checkin:Checkin, event:any=null) {

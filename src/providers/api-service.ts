@@ -431,6 +431,7 @@ export class ApiService extends HttpService {
         let params = { };
         this.httpGet(url, params, token.access_token).then(
           (data:any) => {
+            this.logger.info(this, "getPerson", data);
             if (data && data.person) {
               let person = new Person(data.person);
               person.me = person.hasEmail(token.username);

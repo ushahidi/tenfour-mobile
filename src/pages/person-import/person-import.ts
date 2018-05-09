@@ -121,13 +121,13 @@ export class PersonImportPage extends BasePage {
         desiredFields: [
           'name',
           'displayName',
-          'name.givenName',
-          'name.familyName',
-          'name.formatted',
+          // 'name.givenName',
+          // 'name.familyName',
+          // 'name.formatted',
           'phoneNumbers',
           'emails',
           'addresses',
-          'title']
+          'organizations']
       };
       this.contacts.find(['*'], options).then((contacts:any[]) => {
         let sorted = contacts.sort((a, b) => {

@@ -31,7 +31,12 @@
       <div ion-text color="primary">Select all</div>
     </ion-item>
     <ion-item color="white" *ngFor="let contact of imports">
-      <ion-label>{{contact.name.formatted}}</ion-label>
+      <ion-label *ngIf="contact.name.formatted && contact.name.formatted.length > 0">
+        {{contact.name.formatted}}
+      </ion-label>
+      <ion-label *ngIf="contact.name.formatted == null || contact.name.formatted.length == 0">
+        {{contact.name.givenName}} {{contact.name.familyName}}
+      </ion-label>
       <ion-checkbox [(ngModel)]="contact.checked"></ion-checkbox>
     </ion-item>
   </ion-list>
