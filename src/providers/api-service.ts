@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
+import { Http } from '@angular/http';
 
 import { HTTP } from '@ionic-native/http';
 import { File } from '@ionic-native/file';
@@ -33,18 +34,18 @@ export class ApiService extends HttpService {
 
   scope:string = "user";
   api:string = "https://api.tenfour.org";
-  // api:string = "https://api.staging.tenfour.org";
 
   constructor(
     protected device:Device,
     protected platform:Platform,
-    protected http:HTTP,
+    protected http:Http,
+    protected httpNative:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerService,
     protected storage:NativeStorage,
     protected database:DatabaseService) {
-    super(http, file, transfer, logger);
+    super(platform, http, httpNative, file, transfer, logger);
   }
 
   public saveToken(organization:Organization, token:Token) {

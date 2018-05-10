@@ -14,13 +14,13 @@ export class SqlService {
   protected location:string = 'default';
 
   constructor(
-    protected sqlite: SQLite,
+    protected sqlite:SQLite,
     protected platform:Platform,
     protected logger:LoggerService) {
   }
 
   public testDatabase():boolean {
-    return this.platform.platforms().indexOf('cordova') >= 0;
+    return this.platform.is('cordova');
   }
 
   public openDatabase():Promise<SQLiteObject> {

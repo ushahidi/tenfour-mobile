@@ -36,6 +36,10 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_25
 ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
+```
+ionic serve --livereload --consolelogs
+ionic serve --livereload --consolelogs --labs
+```
 Release Apps
 ```
 rvm use system

@@ -175,4 +175,5 @@
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
     <allow-navigation href="http://192.168.178.192:8100" />
+    <engine name="browser" spec="~5.0.3" />
 </widget>

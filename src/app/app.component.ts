@@ -99,7 +99,7 @@ export class TenFourApp {
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
       .then(() => this.loadEvents())
-      // .then(() => this.loadNotifications())
+      .then(() => this.loadNotifications())
       .then(() => this.loadApplication([
         new Organization(),
         new Email(),
@@ -119,12 +119,16 @@ export class TenFourApp {
   private loadSplitPane():Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (this.platform.is('tablet')) {
-        this.logger.info(this, "loadSplitPane", "YES");
+        this.logger.info(this, "loadSplitPane", "Tablet");
+        this.tablet = true;
+      }
+      else if (this.platform.is('mobile')) {
+        this.logger.info(this, "loadSplitPane", "Mobile");
         this.tablet = true;
       }
       else {
-        this.logger.info(this, "loadSplitPane", "NO");
-        this.tablet = false;
+        this.logger.info(this, "loadSplitPane", "Web");
+        this.tablet = true;
       }
       resolve(true);
     });
@@ -132,27 +136,36 @@ export class TenFourApp {
 
   private loadOrientation():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadOrientation", this.screenOrientation.type);
-      this.screenOrientation.unlock();
-      this.screenOrientation.onChange().subscribe(() => {
-        this.logger.info(this, "Orientation", this.screenOrientation.type);
-      });
+      if (this.platform.is('cordova')) {
+        this.logger.info(this, "loadOrientation", this.screenOrientation.type);
+        this.screenOrientation.unlock();
+        this.screenOrientation.onChange().subscribe(() => {
+          this.logger.info(this, "Orientation", this.screenOrientation.type);
+        });
+      }
+      else {
+        this.logger.info(this, "loadOrientation", "Ignored");
+      }
       resolve(true);
     });
   }
 
   private loadStatusBar():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadStatusBar");
       if (this.platform.is("android")) {
+        this.logger.info(this, "loadStatusBar", "Android");
         this.statusBar.styleLightContent();
         this.statusBar.overlaysWebView(false);
         this.statusBar.backgroundColorByHexString("#000000");
       }
-      else {
+      else if (this.platform.is("ios")) {
+        this.logger.info(this, "loadStatusBar", "iOS");
         this.statusBar.styleDefault();
         this.statusBar.overlaysWebView(false);
         this.statusBar.backgroundColorByHexString("#f5f5f1");
+      }
+      else {
+        this.logger.info(this, "loadStatusBar", "Web");
       }
       resolve(true);
     });
@@ -160,40 +173,51 @@ export class TenFourApp {
 
   private loadAnalytics():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadAnalytics");
-      this.segment.ready().then((ready:SegmentService) => {
-        this.logger.info(this, "loadAnalytics", "Ready");
-        this.segment.debug(this.device.isVirtual);
+      if (this.platform.is("cordova")) {
+        this.logger.info(this, "loadAnalytics", "Loaded");
+        this.segment.ready().then((ready:SegmentService) => {
+          this.logger.info(this, "loadAnalytics", "Ready");
+          this.segment.debug(this.device.isVirtual);
+          resolve(true);
+        });
+      }
+      else {
+        this.logger.info(this, "loadAnalytics", "Ignored");
         resolve(true);
-      });
+      }
     });
   }
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadDeepLinks");
-      this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
-        (match:any) => {
-          let path = match['$link']['path'];
-          let query = match['$link']['queryString'];
-          let parameters = this.getParameters(query);
-          this.logger.info(this, "loadDeepLinks", "Match", path, query, parameters);
-          if (path === '/organization/email/confirmation/') {
-            this.verifyEmail(parameters['email'], parameters['token']);
-          }
-          else if (path === '/login/email') {
-             //SigninEmailPage
-          }
-          else if (path === '/login/password') {
-             //SigninPasswordPage
-          }
-          else if (path === '/login/invite') {
-             //SignupPasswordPage
-          }
-        },
-        (nomatch:any) => {
-          this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
-        });
+      if (this.platform.is("cordova")) {
+        this.logger.info(this, "loadDeepLinks", "Loaded");
+        this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
+          (match:any) => {
+            let path = match['$link']['path'];
+            let query = match['$link']['queryString'];
+            let parameters = this.getParameters(query);
+            this.logger.info(this, "loadDeepLinks", "Match", path, query, parameters);
+            if (path === '/organization/email/confirmation/') {
+              this.verifyEmail(parameters['email'], parameters['token']);
+            }
+            else if (path === '/login/email') {
+               //SigninEmailPage
+            }
+            else if (path === '/login/password') {
+               //SigninPasswordPage
+            }
+            else if (path === '/login/invite') {
+               //SignupPasswordPage
+            }
+          },
+          (nomatch:any) => {
+            this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
+          });
+      }
+      else {
+        this.logger.info(this, "loadDeepLinks", "Ignored");
+      }
       resolve(true);
     });
   }
@@ -210,25 +234,30 @@ export class TenFourApp {
 
   private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadNotifications");
-      this.firebase.getToken().then((token:string) => {
-        this.logger.info(this, "loadNotifications", "getToken", token);
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadNotifications", "getToken", error);
-      });
-      this.firebase.subscribe("test").then((data:any) => {
-        this.logger.info(this, "loadNotifications", "subscribe", data);
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadNotifications", "subscribe", error);
-      });
-      this.firebase.onNotificationOpen().subscribe((data:any) => {
-        this.logger.info(this, "loadNotifications", "onNotificationOpen", data);
-      },
-      (error:any) => {
-        this.logger.info(this, "loadNotifications", "onNotificationOpen", error);
-      })
+      if (this.platform.is("cordova")) {
+        this.logger.info(this, "loadNotifications", "Loaded");
+        this.firebase.getToken().then((token:string) => {
+          this.logger.info(this, "loadNotifications", "getToken", token);
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadNotifications", "getToken", error);
+        });
+        this.firebase.subscribe("test").then((data:any) => {
+          this.logger.info(this, "loadNotifications", "subscribe", data);
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadNotifications", "subscribe", error);
+        });
+        this.firebase.onNotificationOpen().subscribe((data:any) => {
+          this.logger.info(this, "loadNotifications", "onNotificationOpen", data);
+        },
+        (error:any) => {
+          this.logger.info(this, "loadNotifications", "onNotificationOpen", error);
+        })
+      }
+      else {
+        this.logger.info(this, "loadNotifications", "Ignored");
+      }
       resolve(true);
     });
   }
@@ -256,71 +285,97 @@ export class TenFourApp {
   }
 
   private loadApplication(models:Model[]):Promise<any> {
-    this.logger.info(this, "loadApplication");
-    return this.loadDatabase(models).then(
-      (loaded:any) => {
-        this.logger.info(this, "loadApplication", "Database", loaded);
-        this.database.getOrganizations().then((organizations:Organization[]) => {
-          if (organizations && organizations.length > 0) {
-            this.organizations = organizations;
-            this.organization = organizations[0];
-            this.logger.info(this, "loadApplication", "Organization", this.organization);
-            this.database.getPerson(this.organization, null, true).then(
-              (person:Person) => {
-                this.logger.info(this, "loadApplication", "Person", person);
-                if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.person = person;
-                  this.showCheckinList();
-                }
-                else {
-                  this.showOnboardList(person);
-                }
-              },
-              (error:any) => {
-                this.logger.error(this, "loadApplication", "Person", error);
-                this.showOnboardList();
-              });
-          }
-          else {
+    return new Promise((resolve, reject) => {
+      if (this.platform.is("cordova")) {
+        this.logger.info(this, "loadApplication");
+        this.loadDatabase(models).then(
+          (loaded:any) => {
+            this.logger.info(this, "loadApplication", "Database", loaded);
+            this.database.getOrganizations().then((organizations:Organization[]) => {
+              if (organizations && organizations.length > 0) {
+                this.organizations = organizations;
+                this.organization = organizations[0];
+                this.logger.info(this, "loadApplication", "Organization", this.organization);
+                this.database.getPerson(this.organization, null, true).then(
+                  (person:Person) => {
+                    this.logger.info(this, "loadApplication", "Person", person);
+                    if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                      this.person = person;
+                      this.showCheckinList();
+                      resolve(true);
+                    }
+                    else {
+                      this.showOnboardList(person);
+                      resolve(true);
+                    }
+                  },
+                  (error:any) => {
+                    this.logger.error(this, "loadApplication", "Person", error);
+                    this.showOnboardList();
+                    resolve(true);
+                  });
+              }
+              else {
+                this.organizations = [];
+                this.logger.info(this, "loadApplication", "No Organizations");
+                this.showSigninUrl();
+                resolve(true);
+              }
+            });
+          },
+          (error:any) => {
+            this.logger.error(this, "loadApplication", "loadDatabase", error);
             this.organizations = [];
-            this.logger.info(this, "loadApplication", "No Organizations");
-            this.showSigninUrl();
-          }
-        });
-      },
-      (error:any) => {
-        this.logger.error(this, "loadApplication", "loadDatabase", error);
-        this.organizations = [];
-        this.splashScreen.hide();
-        this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
-          text: 'Reset Database',
-          handler: (clicked) => {
-            let loading = this.showLoading("Resetting...");
-            this.resetDatabase().then(
-              (reset:any) => {
-                this.loadDatabase(models).then(
-                  (created:any) => {
-                    loading.dismiss();
-                    this.showSigninUrl();
+            this.hideSplashScreen();
+            this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
+              text: 'Reset Database',
+              handler: (clicked) => {
+                let loading = this.showLoading("Resetting...");
+                this.resetDatabase().then(
+                  (reset:any) => {
+                    this.loadDatabase(models).then(
+                      (created:any) => {
+                        loading.dismiss();
+                        this.showSigninUrl();
+                      },
+                      (error:any) => {
+                        loading.dismiss();
+                        this.showAlert("Problem Creating Database", "There was a problem creating the database.");
+                      }
+                    );
                   },
                   (error:any) => {
                     loading.dismiss();
-                    this.showAlert("Problem Creating Database", "There was a problem creating the database.");
-                  }
-                );
-              },
-              (error:any) => {
-                loading.dismiss();
-                this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
-            });
-          }
-        }]);
-      });
+                    this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
+                });
+              }
+            }]);
+            resolve(false);
+          });
+      }
+      else {
+        //TODO handle web logic
+        this.showSigninUrl();
+      }
+    });
   }
 
   private loadDatabase(models:Model[]):Promise<any> {
-    this.logger.info(this, "loadDatabase");
-    return this.database.loadDatabase(models);
+    return new Promise((resolve, reject) => {
+      if (this.platform.is("cordova")) {
+        this.logger.info(this, "loadDatabase", "Cordova");
+        this.database.loadDatabase(models).then((loaded:any) => {
+          resolve(loaded);
+        },
+        (error:any) => {
+          reject(error);
+        })
+      }
+      else {
+        this.logger.info(this, "loadDatabase", "Web");
+        resolve([]);
+      }
+    });
   }
 
   private resetDatabase():Promise<any> {
@@ -385,7 +440,7 @@ export class TenFourApp {
     this.logger.info(this, "showSigninUrl");
     this.nav.setRoot(SigninUrlPage, { });
     this.menuController.close();
-    this.splashScreen.hide();
+    this.hideSplashScreen();
   }
 
   private showOnboardList(person:Person=null) {
@@ -394,7 +449,7 @@ export class TenFourApp {
       { organization: this.organization,
         person: person });
     this.menuController.close();
-    this.splashScreen.hide();
+    this.hideSplashScreen();
   }
 
   private showCheckinList() {
@@ -404,7 +459,7 @@ export class TenFourApp {
       person: this.person
     });
     this.menuController.close();
-    this.splashScreen.hide();
+    this.hideSplashScreen();
   }
 
   private showGroupList() {
@@ -519,6 +574,12 @@ export class TenFourApp {
       });
     }
     return parameters;
+  }
+
+  private hideSplashScreen() {
+    if (this.platform.is("cordova")) {
+      this.splashScreen.hide();
+    }
   }
 
 }

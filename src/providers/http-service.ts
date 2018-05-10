@@ -1,4 +1,14 @@
 import { Injectable } from '@angular/core';
+import { Platform } from 'ionic-angular';
+import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/retry';
+import 'rxjs/add/operator/delay';
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/timeout';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/observable/throw';
 
 import { HTTP } from '@ionic-native/http';
 import { File, Entry, Metadata } from '@ionic-native/file';
@@ -10,7 +20,9 @@ import { LoggerService } from '../providers/logger-service';
 export class HttpService {
 
   constructor(
-    protected http:HTTP,
+    protected platform:Platform,
+    protected http:Http,
+    protected httpNative:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerService) {
@@ -31,160 +43,330 @@ export class HttpService {
 
   protected httpGet(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token);
-      this.logger.info(this, "GET", url, params, headers);
-      this.http.setRequestTimeout(30);
-      this.http.setDataSerializer("json");
-      this.http.get(url, params, headers).then(
-        (response:any) => {
-          if (response.data) {
-            if (response.headers['content-type'].indexOf("application/json") != -1) {
-              let data = JSON.parse(response.data);
-              this.logger.info(this, "GET", url, response.status, data);
-              resolve(data);
+      if (this.platform.is("cordova")) {
+        let headers = this.httpHeaders(token);
+        this.logger.info(this, "GET", url, params, headers);
+        this.httpNative.setRequestTimeout(30);
+        this.httpNative.setDataSerializer("json");
+        this.httpNative.get(url, params, headers).then(
+          (response:any) => {
+            if (response.data) {
+              if (response.headers['content-type'].indexOf("application/json") != -1) {
+                let data = JSON.parse(response.data);
+                this.logger.info(this, "GET", url, response.status, data);
+                resolve(data);
+              }
+              else {
+                this.logger.info(this, "GET", url, response.status, response.data);
+                resolve(response.data);
+              }
             }
             else {
-              this.logger.info(this, "GET", url, response.status, response.data);
-              resolve(response.data);
+              this.logger.error(this, "GET", url, response.status, "No Data");
+              reject("No Response Data");
             }
+          },
+          (error:any) => {
+            this.logger.error(this, "GET", url, error.status, error.error);
+            reject(this.httpError(error));
+          });
+      }
+      else {
+        let search = new URLSearchParams();
+        if (params) {
+          for (let key in params) {
+            search.set(key, params[key])
           }
-          else {
-            this.logger.error(this, "GET", url, response.status, "No Data");
-            reject("No Response Data");
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "GET", url, error.status, error.error);
-          reject(this.httpError(error));
-        });
+        }
+        else {
+          params = "";
+        }
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers,
+          search: search });
+        this.logger.info(this, "GET", url, params);
+        this.http.get(url, options)
+          .timeout(12000)
+          .map(res => res.json())
+          .catch((error:any) => {
+            this.logger.error(this, "httpGet", error);
+            let message = this.httpError(error);
+            return Observable.throw(message || 'Request Error');
+          })
+          .subscribe(
+            (items) => {
+              this.logger.info(this, "GET", url, items);
+              resolve(items);
+            },
+            (error) => {
+              this.logger.error(this, "GET", url, error);
+              reject(this.httpError(error));
+            });
+      }
     });
   }
 
   protected httpPost(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, "application/json");
-      this.logger.info(this, "POST", url, params, headers);
-      this.http.setRequestTimeout(30);
-      this.http.setDataSerializer("json");
-      this.http.post(url, params, headers).then(
-        (response:any) => {
-          if (response.data) {
-            this.logger.info(this, "POST", url, response.status, response.headers, response.data);
-            if (response.headers['content-type'].indexOf("application/json") != -1) {
-              let data = JSON.parse(response.data);
-              this.logger.info(this, "POST", url, response.status, data);
-              resolve(data);
+      if (this.platform.is("cordova")) {
+        let headers = this.httpHeaders(token, "application/json");
+        this.logger.info(this, "POST", url, params, headers);
+        this.httpNative.setRequestTimeout(30);
+        this.httpNative.setDataSerializer("json");
+        this.httpNative.post(url, params, headers).then(
+          (response:any) => {
+            if (response.data) {
+              this.logger.info(this, "POST", url, response.status, response.headers, response.data);
+              if (response.headers['content-type'].indexOf("application/json") != -1) {
+                let data = JSON.parse(response.data);
+                this.logger.info(this, "POST", url, response.status, data);
+                resolve(data);
+              }
+              else {
+                this.logger.info(this, "POST", url, response.status, response.data);
+                resolve(response.data);
+              }
             }
             else {
-              this.logger.info(this, "POST", url, response.status, response.data);
-              resolve(response.data);
+              this.logger.error(this, "POST", url, response.status, "No Data");
+              reject("No Response Data");
             }
+          },
+          (error:any) => {
+            this.logger.error(this, "POST", url, error.status, error.error);
+            reject(this.httpError(error));
           }
-          else {
-            this.logger.error(this, "POST", url, response.status, "No Data");
-            reject("No Response Data");
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "POST", url, error.status, error.error);
-          reject(this.httpError(error));
-        }
-      );
+        );
+      }
+      else {
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
+        });
+        this.logger.info(this, "POST", url, params);
+        this.http.post(url, params, options)
+          .timeout(12000)
+          .map(res => {
+            if (res.status == 204) {
+              return {}
+            }
+            else {
+              return res.json();
+            }
+          })
+          .catch((error:any) => {
+            let message = this.httpError(error);
+            return Observable.throw(message || 'Request Error');
+          })
+          .subscribe(
+            (json) => {
+              this.logger.info(this, "POST", url, json);
+              resolve(json);
+            },
+            (error) => {
+              this.logger.error(this, "POST", url, error);
+              reject(this.httpError(error));
+            }
+          );
+      }
     });
   }
 
   protected httpPut(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, "application/json");
-      this.logger.info(this, "PUT", url, params, headers);
-      this.http.setRequestTimeout(30);
-      this.http.setDataSerializer("json");
-      this.http.put(url, params, headers).then(
-        (response:any) => {
-          if (response.data) {
-            if (response.headers['content-type'].indexOf("application/json") != -1) {
-              let data = JSON.parse(response.data);
-              this.logger.info(this, "PUT", url, response.status, data);
-              resolve(data);
+      if (this.platform.is("cordova")) {
+        let headers = this.httpHeaders(token, "application/json");
+        this.logger.info(this, "PUT", url, params, headers);
+        this.httpNative.setRequestTimeout(30);
+        this.httpNative.setDataSerializer("json");
+        this.httpNative.put(url, params, headers).then(
+          (response:any) => {
+            if (response.data) {
+              if (response.headers['content-type'].indexOf("application/json") != -1) {
+                let data = JSON.parse(response.data);
+                this.logger.info(this, "PUT", url, response.status, data);
+                resolve(data);
+              }
+              else {
+                this.logger.info(this, "PUT", url, response.status, response.data);
+                resolve(response.data);
+              }
             }
             else {
-              this.logger.info(this, "PUT", url, response.status, response.data);
-              resolve(response.data);
+              this.logger.error(this, "PUT", url, response.status, "No Data");
+              reject("No Response Data");
             }
+          },
+          (error:any) => {
+            this.logger.error(this, "PUT", url, error.status, error.error);
+            reject(this.httpError(error));
           }
-          else {
-            this.logger.error(this, "PUT", url, response.status, "No Data");
-            reject("No Response Data");
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "PUT", url, error.status, error.error);
-          reject(this.httpError(error));
-        }
-      );
+        );
+      }
+      else {
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
+        });
+        this.logger.info(this, "PUT", url, params);
+        this.http.put(url, params, options)
+          .timeout(12000)
+          .map(res => {
+            if (res.status == 204) {
+              return {}
+            }
+            else {
+              return res.json();
+            }
+          })
+          .catch((error:any) => {
+            let message = this.httpError(error);
+            return Observable.throw(message || 'Request Error');
+          })
+          .subscribe(
+            (json) => {
+              this.logger.info(this, "PUT", url, json);
+              resolve(json);
+            },
+            (error) => {
+              this.logger.error(this, "PUT", url, error);
+              reject(this.httpError(error));
+            }
+          );
+      }
     });
   }
 
   protected httpPatch(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token, "application/json");
-      this.logger.info(this, "PATCH", url, params, headers);
-      this.http.setRequestTimeout(30);
-      this.http.setDataSerializer("json");
-      this.http.patch(url, params, headers).then(
-        (response:any) => {
-          if (response.data) {
-            if (response.headers['content-type'].indexOf("application/json") != -1) {
-              let data = JSON.parse(response.data);
-              this.logger.info(this, "PATCH", url, response.status, data);
-              resolve(data);
+      if (this.platform.is("cordova")) {
+        let headers = this.httpHeaders(token, "application/json");
+        this.logger.info(this, "PATCH", url, params, headers);
+        this.httpNative.setRequestTimeout(30);
+        this.httpNative.setDataSerializer("json");
+        this.httpNative.patch(url, params, headers).then(
+          (response:any) => {
+            if (response.data) {
+              if (response.headers['content-type'].indexOf("application/json") != -1) {
+                let data = JSON.parse(response.data);
+                this.logger.info(this, "PATCH", url, response.status, data);
+                resolve(data);
+              }
+              else {
+                this.logger.info(this, "PATCH", url, response.status, response.data);
+                resolve(response.data);
+              }
             }
             else {
-              this.logger.info(this, "PATCH", url, response.status, response.data);
-              resolve(response.data);
+              this.logger.error(this, "PATCH", url, response.status, "No Data");
+              reject("No Response Data");
             }
+          },
+          (error:any) => {
+            this.logger.error(this, "PATCH", url, error.status, error.error);
+            reject(this.httpError(error));
           }
-          else {
-            this.logger.error(this, "PATCH", url, response.status, "No Data");
-            reject("No Response Data");
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "PATCH", url, error.status, error.error);
-          reject(this.httpError(error));
-        }
-      );
+        );
+      }
+      else {
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
+        });
+        this.logger.info(this, "PATCH", url, params);
+        this.http.patch(url, params, options)
+          .timeout(12000)
+          .map(res => {
+            if (res.status == 204) {
+              return {}
+            }
+            else {
+              return res.json();
+            }
+          })
+          .catch((error:any) => {
+            let message = this.httpError(error);
+            return Observable.throw(message || 'Request Error');
+          })
+          .subscribe(
+            (json) => {
+              this.logger.info(this, "PATCH", url, json);
+              resolve(json);
+            },
+            (error) => {
+              this.logger.error(this, "PATCH", url, error);
+              reject(this.httpError(error));
+            }
+          );
+      }
     });
   }
 
   protected httpDelete(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let headers = this.httpHeaders(token);
-      this.logger.info(this, "DELETE", url, params, headers);
-      this.http.setRequestTimeout(30);
-      this.http.setDataSerializer("json");
-      this.http.delete(url, params, headers).then(
-        (response:any) => {
-          if (response.data) {
-            if (response.headers['content-type'].indexOf("application/json") != -1) {
-              let data = JSON.parse(response.data);
-              this.logger.info(this, "DELETE", url, response.status, data);
-              resolve(data);
+      if (this.platform.is("cordova")) {
+        let headers = this.httpHeaders(token);
+        this.logger.info(this, "DELETE", url, params, headers);
+        this.httpNative.setRequestTimeout(30);
+        this.httpNative.setDataSerializer("json");
+        this.httpNative.delete(url, params, headers).then(
+          (response:any) => {
+            if (response.data) {
+              if (response.headers['content-type'].indexOf("application/json") != -1) {
+                let data = JSON.parse(response.data);
+                this.logger.info(this, "DELETE", url, response.status, data);
+                resolve(data);
+              }
+              else {
+                this.logger.info(this, "DELETE", url, response.status, response.data);
+                resolve(response.data);
+              }
             }
             else {
-              this.logger.info(this, "DELETE", url, response.status, response.data);
-              resolve(response.data);
+              this.logger.error(this, "DELETE", url, response.status, "No Data");
+              reject("No Response Data");
             }
-          }
-          else {
-            this.logger.error(this, "DELETE", url, response.status, "No Data");
-            reject("No Response Data");
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "DELETE", url, error.status, error.error);
-          reject(this.httpError(error));
+          },
+          (error:any) => {
+            this.logger.error(this, "DELETE", url, error.status, error.error);
+            reject(this.httpError(error));
+          });
+      }
+      else {
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
         });
+        this.logger.info(this, "DELETE", url);
+        this.http.delete(url, options)
+          .timeout(12000)
+          .map(res => {
+            this.logger.info(this, "DELETE", url, res);
+            if (res.status == 201) {
+              return res.headers.toJSON();
+            }
+            else if (res.status == 204) {
+              return res.headers.toJSON();
+            }
+            else {
+              return res.json();
+            }
+          })
+          .catch((error:any) => {
+            let message = this.httpError(error);
+            return Observable.throw(message || 'Request Error');
+          })
+          .subscribe(
+            (items) => {
+              this.logger.info(this, "DELETE", url, items);
+              resolve(items);
+            },
+            (error) => {
+              this.logger.error(this, "DELETE", url, error);
+              reject(this.httpError(error));
+            });
+      }
     });
   }
 

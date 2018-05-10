@@ -12,13 +12,18 @@ export class LoggerService {
     private isDebug:IsDebug,
     private platform:Platform) {
     this.platform.ready().then(() => {
-      this.isDebug.getIsDebug().then(
-        (isDebug:boolean) => {
-          this.enabled = isDebug;
-        },
-        (error:any) => {
-          this.enabled = false;
-        });
+      if (this.platform.is("cordova")) {
+        this.isDebug.getIsDebug().then(
+          (isDebug:boolean) => {
+            this.enabled = isDebug;
+          },
+          (error:any) => {
+            this.enabled = false;
+          });
+      }
+      else {
+        this.enabled = true;
+      }
     });
   }
 
