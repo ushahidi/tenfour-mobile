@@ -6,28 +6,28 @@ import { HTTP } from '@ionic-native/http';
 import { File } from '@ionic-native/file';
 import { Device } from '@ionic-native/device';
 import { FileTransfer } from '@ionic-native/file-transfer';
-import { NativeStorage } from '@ionic-native/native-storage';
 
-import { HttpService } from '../providers/http-service';
-import { LoggerService } from '../providers/logger-service';
-import { DatabaseService } from '../providers/database-service';
+import { HttpProvider } from '../../providers/http/http';
+import { LoggerProvider } from '../../providers/logger/logger';
+import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
-import { Token } from '../models/token';
-import { Email } from '../models/email';
-import { Person } from '../models/person';
-import { Contact } from '../models/contact';
-import { Organization } from '../models/organization';
-import { Checkin } from '../models/checkin';
-import { Reply } from '../models/reply';
-import { Answer } from '../models/answer';
-import { Group } from '../models/group';
-import { Settings } from '../models/settings';
-import { Region } from '../models/region';
-import { Subscription } from '../models/subscription';
-import { Notification } from '../models/notification';
+import { Token } from '../../models/token';
+import { Email } from '../../models/email';
+import { Person } from '../../models/person';
+import { Contact } from '../../models/contact';
+import { Organization } from '../../models/organization';
+import { Checkin } from '../../models/checkin';
+import { Reply } from '../../models/reply';
+import { Answer } from '../../models/answer';
+import { Group } from '../../models/group';
+import { Settings } from '../../models/settings';
+import { Region } from '../../models/region';
+import { Subscription } from '../../models/subscription';
+import { Notification } from '../../models/notification';
 
 @Injectable()
-export class ApiService extends HttpService {
+export class ApiProvider extends HttpProvider {
 
   clientId:string = "1";
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
@@ -42,9 +42,9 @@ export class ApiService extends HttpService {
     protected httpNative:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
-    protected logger:LoggerService,
-    protected storage:NativeStorage,
-    protected database:DatabaseService) {
+    protected logger:LoggerProvider,
+    protected database:DatabaseProvider,
+    protected storage:StorageProvider) {
     super(platform, http, httpNative, file, transfer, logger);
   }
 
@@ -52,7 +52,7 @@ export class ApiService extends HttpService {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveToken", token);
       let json = JSON.stringify(token);
-      this.storage.setItem(organization.subdomain, json).then(
+      this.storage.set(organization.subdomain, json).then(
         (data:any) => {
           resolve(data);
         },
@@ -65,7 +65,7 @@ export class ApiService extends HttpService {
 
   public getToken(organization:Organization):Promise<Token> {
     return new Promise((resolve, reject) => {
-      this.storage.getItem(organization.subdomain).then(
+      this.storage.get(organization.subdomain).then(
         (data:any) => {
           this.logger.info(this, "getToken", data);
           if (data) {

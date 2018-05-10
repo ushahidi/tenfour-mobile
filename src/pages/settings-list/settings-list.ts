@@ -1,8 +1,8 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
@@ -20,7 +20,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
 })
 export class SettingsListPage extends BasePage {
@@ -40,8 +40,8 @@ export class SettingsListPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

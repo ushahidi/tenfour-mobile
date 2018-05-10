@@ -5,6 +5,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { NgxLocalStorageModule } from 'ngx-localstorage';
 import { SegmentModule } from 'ngx-segment-analytics';
 
 import { HTTP } from '@ionic-native/http';
@@ -92,10 +93,11 @@ import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
 
-import { LoggerService } from '../providers/logger-service';
-import { ApiService } from '../providers/api-service';
-import { DatabaseService } from '../providers/database-service';
-import { CountryService } from '../providers/country-service';
+import { LoggerProvider } from '../providers/logger/logger';
+import { ApiProvider } from '../providers/api/api';
+import { DatabaseProvider } from '../providers/database/database';
+import { CountryProvider } from '../providers/country/country';
+import { StorageProvider } from '../providers/storage/storage';
 
 @NgModule({
   declarations: [
@@ -155,6 +157,7 @@ import { CountryService } from '../providers/country-service';
     HtmlParserModule,
     HumanizeModule,
     BrowserAnimationsModule,
+    NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
     IonicModule.forRoot(TenFourApp, {
       scrollAssist: true,
@@ -191,10 +194,11 @@ import { CountryService } from '../providers/country-service';
     { provide: Sim, useClass: Sim },
     { provide: HTTP, useClass: HTTP },
     { provide: Firebase, useClass: Firebase },
-    { provide: ApiService, useClass: ApiService },
-    { provide: LoggerService, useClass: LoggerService },
-    { provide: CountryService, useClass: CountryService },
-    { provide: DatabaseService, useClass: DatabaseService },
+    { provide: ApiProvider, useClass: ApiProvider },
+    { provide: LoggerProvider, useClass: LoggerProvider },
+    { provide: CountryProvider, useClass: CountryProvider },
+    { provide: DatabaseProvider, useClass: DatabaseProvider },
+    { provide: StorageProvider, useClass: StorageProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

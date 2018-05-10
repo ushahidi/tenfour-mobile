@@ -6,8 +6,8 @@ import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/nativ
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
@@ -20,7 +20,7 @@ import { Location } from '../../models/location';
 @Component({
   selector: 'page-reply-send',
   templateUrl: 'reply-send.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[  ]
 })
 export class ReplySendPage extends BasePage {
@@ -45,8 +45,8 @@ export class ReplySendPage extends BasePage {
     protected alertController:AlertController,
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController,
-    protected api:ApiService,
-    protected database:DatabaseService,
+    protected api:ApiProvider,
+    protected database:DatabaseProvider,
     protected geolocation:Geolocation,
     protected geocoder:NativeGeocoder) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);

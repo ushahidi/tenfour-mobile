@@ -4,7 +4,7 @@ import { Platform } from 'ionic-angular';
 import { IsDebug } from '@ionic-native/is-debug';
 
 @Injectable()
-export class LoggerService {
+export class LoggerProvider {
 
   private enabled:boolean = true;
 

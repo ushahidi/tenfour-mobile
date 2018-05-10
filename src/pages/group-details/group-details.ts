@@ -5,8 +5,8 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { GroupEditPage } from '../../pages/group-edit/group-edit';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -16,7 +16,7 @@ import { Group } from '../../models/group';
 @Component({
   selector: 'page-group-details',
   templateUrl: 'group-details.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ GroupEditPage, PersonDetailsPage ]
 })
 export class GroupDetailsPage extends BasePage {
@@ -37,8 +37,8 @@ export class GroupDetailsPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

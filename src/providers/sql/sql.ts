@@ -2,12 +2,12 @@ import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
 
-import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN } from '../models/model';
+import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN } from '../../models/model';
 
-import { LoggerService } from '../providers/logger-service';
+import { LoggerProvider } from '../../providers/logger/logger';
 
 @Injectable()
-export class SqlService {
+export class SqlProvider {
 
   protected database:SQLiteObject = null;
   protected name:string = 'checkin.db';
@@ -16,7 +16,7 @@ export class SqlService {
   constructor(
     protected sqlite:SQLite,
     protected platform:Platform,
-    protected logger:LoggerService) {
+    protected logger:LoggerProvider) {
   }
 
   public testDatabase():boolean {

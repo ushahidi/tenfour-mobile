@@ -4,8 +4,8 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePage } from '../../pages/base-page/base-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -15,7 +15,7 @@ import { Token } from '../../models/token';
 @Component({
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ OnboardListPage ]
 })
 export class SignupPasswordPage extends BasePage {
@@ -43,8 +43,8 @@ export class SignupPasswordPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

@@ -6,7 +6,7 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SignupPaymentPage } from '../../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 
@@ -14,7 +14,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signup-plan',
   templateUrl: 'signup-plan.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SignupPaymentPage, SignupPasswordPage ]
 })
 export class SignupPlanPage extends BasePage {

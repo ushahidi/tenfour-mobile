@@ -5,7 +5,7 @@ import { IonicPage, TextInput,
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupNamePage } from '../../pages/signup-name/signup-name';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 
@@ -13,7 +13,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signup-owner',
   templateUrl: 'signup-owner.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SignupNamePage ]
 })
 export class SignupOwnerPage extends BasePage {
@@ -34,7 +34,7 @@ export class SignupOwnerPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService) {
+      protected api:ApiProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

@@ -4,8 +4,8 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -15,7 +15,7 @@ import { Group } from '../../models/group';
 @Component({
   selector: 'page-group-edit',
   templateUrl: 'group-edit.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class GroupEditPage extends BasePage {
@@ -37,8 +37,8 @@ export class GroupEditPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

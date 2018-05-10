@@ -5,7 +5,7 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 
@@ -13,7 +13,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signin-url',
   templateUrl: 'signin-url.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SigninEmailPage, SignupEmailPage ]
 })
 export class SigninUrlPage extends BasePage {
@@ -32,7 +32,7 @@ export class SigninUrlPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService) {
+      protected api:ApiProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

@@ -5,8 +5,8 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { ReplyListPage } from '../../pages/reply-list/reply-list';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -17,7 +17,7 @@ import { Checkin } from '../../models/checkin';
 @Component({
   selector: 'page-person-details',
   templateUrl: 'person-details.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ PersonEditPage, ReplyListPage ]
 })
 export class PersonDetailsPage extends BasePage {
@@ -42,8 +42,8 @@ export class PersonDetailsPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

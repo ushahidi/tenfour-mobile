@@ -6,9 +6,9 @@ import { Contacts } from '@ionic-native/contacts';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
-import { CountryService } from '../../providers/country-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { CountryProvider } from '../../providers/country/country';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -19,7 +19,7 @@ import { Country } from '../../models/country';
 @Component({
   selector: 'page-person-import',
   templateUrl: 'person-import.html',
-  providers: [ ApiService, DatabaseService, CountryService ],
+  providers: [ ApiProvider, DatabaseProvider, CountryProvider ],
   entryComponents:[  ]
 })
 export class PersonImportPage extends BasePage {
@@ -41,9 +41,9 @@ export class PersonImportPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
-      protected countries:CountryService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
+      protected countries:CountryProvider,
       protected contacts:Contacts,
       protected sim:Sim) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);

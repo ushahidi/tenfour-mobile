@@ -5,8 +5,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 
@@ -14,7 +14,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[  ]
 })
 export class SettingsEditPage extends BasePage {
@@ -34,8 +34,8 @@ export class SettingsEditPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected camera:Camera) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

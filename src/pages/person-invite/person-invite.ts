@@ -5,8 +5,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -15,7 +15,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[  ]
 })
 export class PersonInvitePage extends BasePage {
@@ -36,8 +36,8 @@ export class PersonInvitePage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected statusBar:StatusBar) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

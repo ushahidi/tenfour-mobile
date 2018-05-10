@@ -9,8 +9,8 @@ import { ReplyListPage } from '../../pages/reply-list/reply-list';
 import { ReplySendPage } from '../../pages/reply-send/reply-send';
 import { NotificationListPage } from '../../pages/notification-list/notification-list';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -21,7 +21,7 @@ import { Notification } from '../../models/notification';
 @Component({
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ CheckinEditPage, ReplyListPage, ReplySendPage, NotificationListPage ]
 })
 export class CheckinListPage extends BasePage {
@@ -48,8 +48,8 @@ export class CheckinListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected badge:Badge,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

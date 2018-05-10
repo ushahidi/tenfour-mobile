@@ -6,7 +6,7 @@ import { AppAvailability } from '@ionic-native/app-availability';
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
@@ -15,7 +15,7 @@ import { Email } from '../../models/email';
 @Component({
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SignupOwnerPage ]
 })
 export class SignupCheckPage extends BasePage {
@@ -36,7 +36,7 @@ export class SignupCheckPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
+      protected api:ApiProvider,
       protected appAvailability:AppAvailability) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

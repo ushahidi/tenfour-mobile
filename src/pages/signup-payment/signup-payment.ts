@@ -5,7 +5,7 @@ import { IonicPage, TextInput,
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 
@@ -13,7 +13,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signup-payment',
   templateUrl: 'signup-payment.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SignupPasswordPage ]
 })
 export class SignupPaymentPage extends BasePage {

@@ -2,19 +2,19 @@ import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import 'rxjs/add/operator/map';
 
-import { Country } from '../models/country';
+import { Country } from '../../models/country';
 
-import { LoggerService } from '../providers/logger-service';
+import { LoggerProvider } from '../../providers/logger/logger';
 
 @Injectable()
-export class CountryService {
+export class CountryProvider {
 
   file:string = "assets/data/countries.json";
   countries:Country[] = null;
 
   constructor(
     private http:Http,
-    private logger:LoggerService) {
+    private logger:LoggerProvider) {
   }
 
   getCountries(codes:string[]=null):Promise<Country[]> {

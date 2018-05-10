@@ -168,7 +168,7 @@ npm install -g cordova@latest
 If you run into permission problems, try using `sudo`
 
 ```
-sudo npm install -g cordova@latest
+sudo npm install -g cordova@7.1.0
 ```
 
 Check the version of Cordova

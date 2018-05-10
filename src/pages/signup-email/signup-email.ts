@@ -3,7 +3,7 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
+import { ApiProvider } from '../../providers/api/api';
 
 import { SignupCheckPage } from '../../pages/signup-check/signup-check';
 
@@ -14,7 +14,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signup-email',
   templateUrl: 'signup-email.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SignupCheckPage ]
 })
 export class SignupEmailPage extends BasePage {
@@ -33,7 +33,7 @@ export class SignupEmailPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService) {
+      protected api:ApiProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

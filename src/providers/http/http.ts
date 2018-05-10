@@ -14,10 +14,10 @@ import { HTTP } from '@ionic-native/http';
 import { File, Entry, Metadata } from '@ionic-native/file';
 import { FileTransfer, FileTransferObject, FileUploadOptions, FileUploadResult, FileTransferError } from '@ionic-native/file-transfer';
 
-import { LoggerService } from '../providers/logger-service';
+import { LoggerProvider } from '../logger/logger';
 
 @Injectable()
-export class HttpService {
+export class HttpProvider {
 
   constructor(
     protected platform:Platform,
@@ -25,7 +25,7 @@ export class HttpService {
     protected httpNative:HTTP,
     protected file:File,
     protected transfer:FileTransfer,
-    protected logger:LoggerService) {
+    protected logger:LoggerProvider) {
   }
 
   private httpHeaders(accessToken:string=null, contentType:string=null):{} {

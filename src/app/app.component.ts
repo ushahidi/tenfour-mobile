@@ -25,10 +25,10 @@ import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 
-import { ApiService } from '../providers/api-service';
-import { LoggerService } from '../providers/logger-service';
-import { DatabaseService } from '../providers/database-service';
-import { InjectorService } from '../providers/injector-service';
+import { ApiProvider } from '../providers/api/api';
+import { LoggerProvider } from '../providers/logger/logger';
+import { DatabaseProvider } from '../providers/database/database';
+import { InjectorProvider } from '../providers/injector/injector';
 
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
@@ -76,9 +76,9 @@ export class TenFourApp {
     protected injector:Injector,
     protected statusBar:StatusBar,
     protected splashScreen:SplashScreen,
-    protected api:ApiService,
-    protected database:DatabaseService,
-    protected logger:LoggerService,
+    protected api:ApiProvider,
+    protected database:DatabaseProvider,
+    protected logger:LoggerProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
     protected loadingController:LoadingController,
@@ -91,7 +91,7 @@ export class TenFourApp {
     protected firebase:Firebase,
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
-    InjectorService.injector = injector;
+    InjectorProvider.injector = injector;
     this.platform.ready()
       .then(() => this.loadStatusBar())
       .then(() => this.loadOrientation())

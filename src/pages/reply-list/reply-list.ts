@@ -4,8 +4,8 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 import { BasePage } from '../../pages/base-page/base-page';
 import { ReplySendPage } from '../../pages/reply-send/reply-send';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
@@ -16,7 +16,7 @@ import { Reply } from '../../models/reply';
 @Component({
   selector: 'page-reply-list',
   templateUrl: 'reply-list.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ ReplySendPage ]
 })
 export class ReplyListPage extends BasePage {
@@ -46,8 +46,8 @@ export class ReplyListPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

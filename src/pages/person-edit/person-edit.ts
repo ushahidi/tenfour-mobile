@@ -7,8 +7,8 @@ import { Camera, CameraOptions } from '@ionic-native/camera';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -20,7 +20,7 @@ import { Region } from '../../models/region';
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ ]
 })
 export class PersonEditPage extends BasePage {
@@ -51,8 +51,8 @@ export class PersonEditPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected events:Events,
       protected camera:Camera,
       protected statusBar:StatusBar,

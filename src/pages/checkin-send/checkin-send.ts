@@ -6,8 +6,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { SendViaComponent } from '../../components/send-via/send-via';
 
@@ -21,7 +21,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-checkin-send',
   templateUrl: 'checkin-send.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class CheckinSendPage extends BasePage {
@@ -45,8 +45,8 @@ export class CheckinSendPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
-      protected api:ApiService,
-      protected database:DatabaseService,
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
       protected statusBar:StatusBar) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

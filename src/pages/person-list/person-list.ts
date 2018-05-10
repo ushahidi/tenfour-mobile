@@ -7,8 +7,8 @@ import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -17,7 +17,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-person-list',
   templateUrl: 'person-list.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ PersonDetailsPage, PersonEditPage, PersonInvitePage, PersonImportPage ]
 })
 export class PersonListPage extends BasePage {
@@ -39,8 +39,8 @@ export class PersonListPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

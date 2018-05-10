@@ -11,8 +11,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SocialSharing } from '@ionic-native/social-sharing';
 import { ThemeableBrowser, ThemeableBrowserOptions, ThemeableBrowserObject } from '@ionic-native/themeable-browser';
 
-import { LoggerService } from '../../providers/logger-service';
-import { InjectorService } from '../../providers/injector-service';
+import { LoggerProvider } from '../../providers/logger/logger';
+import { InjectorProvider } from '../../providers/injector/injector';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -20,7 +20,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'base-page',
   templateUrl: 'base-page.html',
-  providers: [ LoggerService ],
+  providers: [ LoggerProvider ],
 })
 export class BasePage {
 
@@ -29,7 +29,7 @@ export class BasePage {
   protected disconnection:any = null;
 
   protected zone:NgZone;
-  protected logger:LoggerService;
+  protected logger:LoggerProvider;
   protected network:Network;
   protected keyboard:Keyboard;
   protected statusBar:StatusBar;
@@ -55,15 +55,15 @@ export class BasePage {
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController) {
     this.zone = _zone;
-    this.logger = InjectorService.injector.get(LoggerService);
-    this.network = InjectorService.injector.get(Network);
-    this.keyboard = InjectorService.injector.get(Keyboard);
-    this.statusBar = InjectorService.injector.get(StatusBar);
-    this.themeableBrowser = InjectorService.injector.get(ThemeableBrowser);
-    this.socialSharing = InjectorService.injector.get(SocialSharing);
-    this.segment = InjectorService.injector.get(SegmentService);
-    this.device = InjectorService.injector.get(Device);
-    this.appVersion = InjectorService.injector.get(AppVersion)
+    this.logger = InjectorProvider.injector.get(LoggerProvider);
+    this.network = InjectorProvider.injector.get(Network);
+    this.keyboard = InjectorProvider.injector.get(Keyboard);
+    this.statusBar = InjectorProvider.injector.get(StatusBar);
+    this.themeableBrowser = InjectorProvider.injector.get(ThemeableBrowser);
+    this.socialSharing = InjectorProvider.injector.get(SocialSharing);
+    this.segment = InjectorProvider.injector.get(SegmentService);
+    this.device = InjectorProvider.injector.get(Device);
+    this.appVersion = InjectorProvider.injector.get(AppVersion)
   }
 
   ionViewDidLoad() {

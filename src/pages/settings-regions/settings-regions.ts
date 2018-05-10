@@ -1,9 +1,9 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
-import { CountryService } from '../../providers/country-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
+import { CountryProvider } from '../../providers/country/country';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
@@ -20,7 +20,7 @@ import { Country } from '../../models/country';
 @Component({
   selector: 'page-settings-regions',
   templateUrl: 'settings-regions.html',
-  providers: [ ApiService ],
+  providers: [ ApiProvider ],
   entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
 })
 export class SettingsRegionsPage extends BasePage {
@@ -39,9 +39,9 @@ export class SettingsRegionsPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService,
-      protected countries:CountryService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider,
+      protected countries:CountryProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

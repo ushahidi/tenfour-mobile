@@ -5,8 +5,8 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
-import { ApiService } from '../../providers/api-service';
-import { DatabaseService } from '../../providers/database-service';
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -16,7 +16,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
-  providers: [ ApiService, DatabaseService ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ CheckinListPage, OnboardListPage ]
 })
 export class SigninPasswordPage extends BasePage {
@@ -38,8 +38,8 @@ export class SigninPasswordPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiService,
-      protected database:DatabaseService) {
+      protected api:ApiProvider,
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

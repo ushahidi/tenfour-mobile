@@ -2,30 +2,30 @@ import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { SQLite } from '@ionic-native/sqlite';
 
-import { SqlService } from '../providers/sql-service';
-import { LoggerService } from '../providers/logger-service';
+import { SqlProvider } from '../../providers/sql/sql';
+import { LoggerProvider } from '../../providers/logger/logger';
 
-import { Email } from '../models/email';
-import { Person } from '../models/person';
-import { Contact } from '../models/contact';
-import { Checkin } from '../models/checkin';
-import { Organization } from '../models/organization';
-import { Answer } from '../models/answer';
-import { Reply } from '../models/reply';
-import { Recipient } from '../models/recipient';
-import { Group } from '../models/group';
-import { Settings } from '../models/settings';
-import { Country } from '../models/country';
-import { Subscription } from '../models/subscription';
-import { Notification } from '../models/notification';
+import { Email } from '../../models/email';
+import { Person } from '../../models/person';
+import { Contact } from '../../models/contact';
+import { Checkin } from '../../models/checkin';
+import { Organization } from '../../models/organization';
+import { Answer } from '../../models/answer';
+import { Reply } from '../../models/reply';
+import { Recipient } from '../../models/recipient';
+import { Group } from '../../models/group';
+import { Settings } from '../../models/settings';
+import { Country } from '../../models/country';
+import { Subscription } from '../../models/subscription';
+import { Notification } from '../../models/notification';
 
 @Injectable()
-export class DatabaseService extends SqlService {
+export class DatabaseProvider extends SqlProvider {
 
   constructor(
     protected sqlite:SQLite,
     protected platform:Platform,
-    protected logger:LoggerService) {
+    protected logger:LoggerProvider) {
     super(sqlite, platform, logger);
   }
 
