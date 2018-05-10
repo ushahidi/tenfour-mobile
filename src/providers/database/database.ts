@@ -290,7 +290,13 @@ export class DatabaseProvider extends SqlProvider {
               checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
             }
             resolve(checkins);
+        },
+        (error:any) => {
+          resolve(checkins);
         });
+      },
+      (error:any) => {
+        resolve([]);
       });
     });
   }

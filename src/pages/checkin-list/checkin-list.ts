@@ -73,7 +73,7 @@ export class CheckinListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     if (this.loading == false) {
-      // this.loadNotifications(true);
+      this.loadNotifications(true);
     }
   }
 
@@ -91,7 +91,7 @@ export class CheckinListPage extends BasePage {
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      // .then(() => { return this.loadNotifications(cache); })
+      .then(() => { return this.loadNotifications(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
@@ -134,6 +134,9 @@ export class CheckinListPage extends BasePage {
           }
         });
       }
+    },
+    (error:any) => {
+      this.logger.error(this, "loadWaitingResponse", error);
     });
   }
 
