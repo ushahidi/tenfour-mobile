@@ -338,22 +338,30 @@ export class BasePage {
   }
 
   protected appName():string {
-    return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
+    if (this.platform.is('cordova')) {
+      return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
+    }
+    return "TenFour";
   }
 
   protected deviceName():string {
     let name = [];
-    if (this.device.manufacturer) {
-      name.push(this.device.manufacturer);
+    if (this.platform.is('cordova')) {
+      if (this.device.manufacturer) {
+        name.push(this.device.manufacturer);
+      }
+      if (this.device.platform) {
+        name.push(this.device.platform);
+      }
+      if (this.device.version) {
+        name.push(this.device.version);
+      }
+      if (this.device.model) {
+        name.push(this.device.model);
+      }
     }
-    if (this.device.platform) {
-      name.push(this.device.platform);
-    }
-    if (this.device.version) {
-      name.push(this.device.version);
-    }
-    if (this.device.model) {
-      name.push(this.device.model);
+    else {
+      name.push("Web App");
     }
     return name.join(" ");
   }

@@ -56,9 +56,7 @@ ionic cordova build android --device --prod --release --buildConfig=build.json
 ```
 Deploy PWA
 ```
-npm run ionic:build --prod
-```
-```
+npm run ionic:build --prod --release
 firebase deploy
 ```
 ---

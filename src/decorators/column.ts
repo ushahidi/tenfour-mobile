@@ -1,8 +1,10 @@
 export let COLUMNS:string = "Columns";
 
+import { isDevMode } from '@angular/core';
+
 export function Column(name:string=null, type:string="TEXT", key:boolean=false): PropertyDecorator {
    return (target: Object, property: string | symbol) => {
-     console.log(`Class ${target.constructor.name} Column ${name} Type ${type} Key ${key} Property ${property}`);
+     //console.log(`Class ${target.constructor.name} Column ${name} Type ${type} Key ${key} Property ${property}`);
      let columns = <any[]>target.constructor[COLUMNS];
      if (columns == null) {
        columns = [];
