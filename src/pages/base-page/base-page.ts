@@ -295,11 +295,15 @@ export class BasePage {
   }
 
   protected showKeyboard() {
-    this.keyboard.show();
+    if (this.platform.is('cordova')) {
+      this.keyboard.show();
+    }
   }
 
   protected hideKeyboard() {
-    this.keyboard.close();
+    if (this.platform.is('cordova')) {
+      this.keyboard.close();
+    }
   }
 
   protected trackLogin(organization:Organization, person:Person) {

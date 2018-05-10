@@ -148,10 +148,17 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## CONTACT ##########
 
-  public saveContact(organization:Organization, person:Person, contact:Contact):Promise<any> {
-    contact.organization_id = organization.id;
-    contact.person_id = person.id;
-    return this.saveModel(contact);
+  public saveContact(organization:Organization, person:Person, contact:Contact):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      contact.organization_id = organization.id;
+      contact.person_id = person.id;
+      this.saveModel(contact).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getContacts(organization:Organization, person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
@@ -198,14 +205,14 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## CHECKIN ##########
 
-  public saveCheckin(organization:Organization, checkin:Checkin):Promise<any> {
+  public saveCheckin(organization:Organization, checkin:Checkin):Promise<boolean> {
     return new Promise((resolve, reject) => {
       checkin.organization_id = organization.id;
       this.saveModel(checkin).then((saved:any) => {
-        resolve(saved);
+        resolve(true);
       },
       (error:any) => {
-        reject(error);
+        reject(false);
       });
     });
   }
@@ -451,7 +458,7 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## RECIPIENT ##########
 
-  public saveRecipient(organization:Organization, checkin:Checkin, recipient:Recipient):Promise<any> {
+  public saveRecipient(organization:Organization, checkin:Checkin, recipient:Recipient):Promise<boolean> {
     return new Promise((resolve, reject) => {
       recipient.checkin_id = checkin.id;
       recipient.organization_id = organization.id;
@@ -508,9 +515,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## EMAIL ##########
 
-  public saveEmail(organization:Organization, email:Email):Promise<any> {
-    email.organization_id = organization.id;
-    return this.saveModel(email);
+  public saveEmail(organization:Organization, email:Email):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      email.organization_id = organization.id;
+      this.saveModel(email).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getEmails(organization:Organization, limit:number=null, offset:number=null):Promise<Email[]> {
@@ -545,7 +559,7 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## NOTIFICATION ##########
 
-  public saveNotification(organization:Organization, notification:Notification):Promise<any> {
+  public saveNotification(organization:Organization, notification:Notification):Promise<boolean> {
     return new Promise((resolve, reject) => {
       notification.organization_id = organization.id;
       this.saveModel(notification, false).then((saved:any) => {
@@ -589,9 +603,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## GROUP ##########
 
-  public saveGroup(organization:Organization, group:Group):Promise<any> {
-    group.organization_id = organization.id;
-    return this.saveModel(group);
+  public saveGroup(organization:Organization, group:Group):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      group.organization_id = organization.id;
+      this.saveModel(group).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
@@ -629,11 +650,13 @@ export class DatabaseProvider extends SqlProvider {
   }
 
   public removeGroup(organization:Organization, group:Group):Promise<any> {
-    let where = {
-      organization_id: organization.id,
-      id: group.id
-    };
-    return this.removeModel<Group>(new Group(), where);
+    return new Promise((resolve, reject) => {
+      let where = {
+        organization_id: organization.id,
+        id: group.id
+      };
+      this.removeModel<Group>(new Group(), where);
+    });
   }
 
   public removeGroups(organization:Organization=null) {
@@ -646,9 +669,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## SETTINGS ##########
 
-  public saveSettings(organization:Organization, settings:Settings):Promise<any> {
-    settings.organization_id = organization.id;
-    return this.saveModel(settings);
+  public saveSettings(organization:Organization, settings:Settings):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      settings.organization_id = organization.id;
+      this.saveModel(settings).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getSettings(organization:Organization):Promise<Settings[]> {
@@ -683,9 +713,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## SUBSCRIPTIONS ##########
 
-  public saveSubscription(organization:Organization, subscription:Subscription):Promise<any> {
-    subscription.organization_id = organization.id;
-    return this.saveModel(subscription);
+  public saveSubscription(organization:Organization, subscription:Subscription):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      subscription.organization_id = organization.id;
+      this.saveModel(subscription).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
@@ -720,9 +757,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## COUNTRIES ##########
 
-  public saveCountry(organization:Organization, country:Country):Promise<any> {
-    country.organization_id = organization.id;
-    return this.saveModel(country);
+  public saveCountry(organization:Organization, country:Country):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      country.organization_id = organization.id;
+      this.saveModel(country).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getCountries(organization:Organization, limit:number=null, offset:number=null):Promise<Country[]> {
