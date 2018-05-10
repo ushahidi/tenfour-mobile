@@ -86,6 +86,18 @@ export class SigninPasswordPage extends BasePage {
                     { organization: organization,
                       person: person });
                 }
+              },
+              (error:any) => {
+                this.logger.error(this, "showNext", error);
+                if (person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRootPage(CheckinListPage,
+                    { organization: organization });
+                }
+                else {
+                  this.showRootPage(OnboardListPage,
+                    { organization: organization,
+                      person: person });
+                }
               });
             });
           });

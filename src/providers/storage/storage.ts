@@ -27,8 +27,12 @@ export class StorageProvider {
           });
       }
       else {
-        this.webStorage.set(key, value);
-        resolve(true);
+        this.webStorage.asPromisable().set(key, value).then((saved:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
       }
     });
   }
@@ -45,8 +49,12 @@ export class StorageProvider {
           });
       }
       else {
-        let data = this.webStorage.get(key);
-        resolve(data);
+        this.webStorage.asPromisable().get(key).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          resolve(null);
+        });
       }
     });
   }
@@ -63,8 +71,12 @@ export class StorageProvider {
           });
       }
       else {
-        this.webStorage.remove(key);
-        resolve(true);
+        this.webStorage.asPromisable().remove(key).then((deleted:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
       }
     });
   }

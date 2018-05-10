@@ -60,10 +60,12 @@ export class CheckinListPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
       this.loadWaitingResponse();
     },
     (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
       loading.dismiss();
     });
   }
@@ -71,7 +73,7 @@ export class CheckinListPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     if (this.loading == false) {
-      this.loadNotifications(true);
+      // this.loadNotifications(true);
     }
   }
 
@@ -89,7 +91,7 @@ export class CheckinListPage extends BasePage {
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      .then(() => { return this.loadNotifications(cache); })
+      // .then(() => { return this.loadNotifications(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
@@ -125,7 +127,10 @@ export class CheckinListPage extends BasePage {
           if (data) {
             this.loadCheckins(false).then(loaded => {
               this.loadBadgeNumber();
-            })
+            },
+            (error:any) => {
+
+            });
           }
         });
       }
@@ -134,42 +139,47 @@ export class CheckinListPage extends BasePage {
 
   private loadBadgeNumber():Promise<number> {
     return new Promise((resolve, reject) => {
-      try {
-        let badgeNumber = 0;
-        if (this.organization && this.organization.checkins) {
-          for (let checkin of this.organization.checkins) {
-            if (checkin.canRespond(this.person)) {
-              badgeNumber = badgeNumber + 1;
+      if (this.platform.is('cordova')) {
+        try {
+          let badgeNumber = 0;
+          if (this.organization && this.organization.checkins) {
+            for (let checkin of this.organization.checkins) {
+              if (checkin.canRespond(this.person)) {
+                badgeNumber = badgeNumber + 1;
+              }
             }
           }
+          this.logger.info(this, "loadBadgeNumber", badgeNumber);
+          this.badge.requestPermission().then((permission:any) => {
+            this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
+            if (badgeNumber > 0) {
+              this.badge.set(badgeNumber).then((result:any) => {
+                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
+                resolve(badgeNumber);
+              },
+              (error:any) => {
+                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+                resolve(0);
+              });
+            }
+            else {
+              this.badge.clear().then((cleared:boolean) => {
+                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
+                resolve(0);
+              },
+              (error:any) => {
+                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
+                resolve(0);
+              });
+            }
+          });
         }
-        this.logger.info(this, "loadBadgeNumber", badgeNumber);
-        this.badge.requestPermission().then((permission:any) => {
-          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
-          if (badgeNumber > 0) {
-            this.badge.set(badgeNumber).then((result:any) => {
-              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
-              resolve(badgeNumber);
-            },
-            (error:any) => {
-              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-              resolve(0);
-            });
-          }
-          else {
-            this.badge.clear().then((cleared:boolean) => {
-              this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
-              resolve(0);
-            },
-            (error:any) => {
-              this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-              resolve(0);
-            });
-          }
-        });
+        catch(error) {
+          this.logger.error(this, "loadBadgeNumber", "Error", error);
+          resolve(0);
+        }
       }
-      catch(error) {
-        this.logger.error(this, "loadBadgeNumber", "Error", error);
+      else {
         resolve(0);
       }
     });
@@ -235,6 +245,10 @@ export class CheckinListPage extends BasePage {
           this.database.savePerson(this.organization, person).then(saved => {
             this.person = person;
             resolve(person);
+          },
+          (error:any) => {
+            this.person = person;
+            resolve(person);
           });
         },
         (error:any) => {
@@ -252,6 +266,10 @@ export class CheckinListPage extends BasePage {
       else {
         this.api.getOrganization(this.organization).then((organization:Organization) => {
           this.database.saveOrganization(this.organization).then(saved => {
+            this.organization = organization;
+            resolve(organization);
+          },
+          (error:any) => {
             this.organization = organization;
             resolve(organization);
           });
@@ -311,7 +329,15 @@ export class CheckinListPage extends BasePage {
                 this.organization.checkins = _checkins;
                 this.checkins = this.filterCheckins(_checkins);
                 resolve(_checkins);
+              },
+              (error:any) => {
+                this.checkins = checkins;
+                resolve(checkins);
               });
+            },
+            (error:any) => {
+              this.checkins = checkins;
+              resolve(checkins);
             });
           }
           else {
@@ -341,6 +367,9 @@ export class CheckinListPage extends BasePage {
             }
           }
           resolve(notifications);
+        },
+        (error:any) => {
+          resolve([]);
         });
       }
       else {
@@ -429,7 +458,8 @@ export class CheckinListPage extends BasePage {
     this.showPage(NotificationListPage, {
       organization: this.organization,
       person: this.person,
-      notifications: this.notifications });
+      notifications: this.notifications
+    });
   }
 
   private filterChanged(event:any) {

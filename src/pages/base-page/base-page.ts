@@ -77,7 +77,7 @@ export class BasePage {
   }
 
   ionViewWillEnter() {
-    this.logger.info(this, "ionViewWillEnter", "Network", this.network.type);
+    this.logger.info(this, "ionViewWillEnter");
     this.subscribeNetwork();
   }
 
@@ -99,55 +99,61 @@ export class BasePage {
   }
 
   protected subscribeNetwork() {
-    this.logger.info(this, "subscribeNetwork", "Network", this.network.type);
-    if (this.network.type == 'none') {
-      this.zone.run(() => {
-        this.offline = true;
-        this.resizeContent();
+    if (this.platform.is('cordova')) {
+      this.logger.info(this, "subscribeNetwork", "Network", this.network.type);
+      if (this.network.type == 'none') {
+        this.zone.run(() => {
+          this.offline = true;
+          this.resizeContent();
+        });
+      }
+      else {
+        this.zone.run(() => {
+          this.offline = false;
+        });
+      }
+      this.connection = this.network.onConnect().subscribe(() => {
+        this.logger.info(this, "subscribeNetwork", "Network Connected", this.network.type);
+        this.zone.run(() => {
+          this.offline = false;
+          this.resizeContent();
+        });
+      });
+      this.disconnection = this.network.onDisconnect().subscribe(() => {
+        this.logger.info(this, "subscribeNetwork", "Network Disconnected", this.network.type);
+        this.zone.run(() => {
+          this.offline = true;
+          this.resizeContent();
+        });
       });
     }
-    else {
-      this.zone.run(() => {
-        this.offline = false;
-      });
-    }
-    this.connection = this.network.onConnect().subscribe(() => {
-      this.logger.info(this, "subscribeNetwork", "Network Connected", this.network.type);
-      this.zone.run(() => {
-        this.offline = false;
-        this.resizeContent();
-      });
-    });
-    this.disconnection = this.network.onDisconnect().subscribe(() => {
-      this.logger.info(this, "subscribeNetwork", "Network Disconnected", this.network.type);
-      this.zone.run(() => {
-        this.offline = true;
-        this.resizeContent();
-      });
-    });
   }
 
   protected unsubscribeNetwork() {
-    this.logger.info(this, "unsubscribeNetwork", "Network", this.network.type);
-    if (this.connection) {
-      this.connection.unsubscribe();
-      this.connection = null;
-    }
-    if (this.disconnection) {
-      this.disconnection.unsubscribe();
-      this.disconnection = null;
-    }
+    if (this.platform.is('cordova')) {
+      this.logger.info(this, "unsubscribeNetwork", "Network", this.network.type);
+      if (this.connection) {
+        this.connection.unsubscribe();
+        this.connection = null;
+      }
+      if (this.disconnection) {
+        this.disconnection.unsubscribe();
+        this.disconnection = null;
+      }
+    };
   }
 
   protected loadStatusBar(lightContent:boolean=true) {
     this.platform.ready().then(() => {
-      if (lightContent) {
-        this.statusBar.styleLightContent();
-        this.statusBar.backgroundColorByHexString('#3f4751');
-      }
-      else {
-        this.statusBar.styleDefault();
-        this.statusBar.backgroundColorByHexString('#f9f9f8');
+      if (this.platform.is('cordova')) {
+        if (lightContent) {
+          this.statusBar.styleLightContent();
+          this.statusBar.backgroundColorByHexString('#3f4751');
+        }
+        else {
+          this.statusBar.styleDefault();
+          this.statusBar.backgroundColorByHexString('#f9f9f8');
+        }
       }
     });
   }

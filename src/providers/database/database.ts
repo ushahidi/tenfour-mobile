@@ -32,7 +32,14 @@ export class DatabaseProvider extends SqlProvider {
   // ########## ORGANIZATION ##########
 
   public saveOrganization(organization:Organization):Promise<boolean> {
-    return this.saveModel(organization);
+    return new Promise((resolve, reject) => {
+      this.saveModel(organization).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
@@ -56,9 +63,16 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## PERSON ##########
 
-  public savePerson(organization:Organization, person:Person):Promise<any> {
-    person.organization_id = organization.id;
-    return this.saveModel(person);
+  public savePerson(organization:Organization, person:Person):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      person.organization_id = organization.id;
+      this.saveModel(person).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
@@ -185,8 +199,15 @@ export class DatabaseProvider extends SqlProvider {
   // ########## CHECKIN ##########
 
   public saveCheckin(organization:Organization, checkin:Checkin):Promise<any> {
-    checkin.organization_id = organization.id;
-    return this.saveModel(checkin);
+    return new Promise((resolve, reject) => {
+      checkin.organization_id = organization.id;
+      this.saveModel(checkin).then((saved:any) => {
+        resolve(saved);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
   }
 
   getCheckins(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
@@ -302,10 +323,17 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## ANSWER ##########
 
-  public saveAnswer(organization:Organization, checkin:Checkin, answer:Answer):Promise<any> {
-    answer.organization_id = organization.id;
-    answer.checkin_id = checkin.id;
-    return this.saveModel(answer);
+  public saveAnswer(organization:Organization, checkin:Checkin, answer:Answer):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      answer.organization_id = organization.id;
+      answer.checkin_id = checkin.id;
+      this.saveModel(answer).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getAnswers(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
@@ -352,10 +380,17 @@ export class DatabaseProvider extends SqlProvider {
 
   // ########## REPLY ##########
 
-  public saveReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<any> {
-    reply.organization_id = organization.id;
-    reply.checkin_id = checkin.id;
-    return this.saveModel(reply);
+  public saveReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      reply.organization_id = organization.id;
+      reply.checkin_id = checkin.id;
+      this.saveModel(reply).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getReplies(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
@@ -417,9 +452,16 @@ export class DatabaseProvider extends SqlProvider {
   // ########## RECIPIENT ##########
 
   public saveRecipient(organization:Organization, checkin:Checkin, recipient:Recipient):Promise<any> {
-    recipient.checkin_id = checkin.id;
-    recipient.organization_id = organization.id;
-    return this.saveModel(recipient);
+    return new Promise((resolve, reject) => {
+      recipient.checkin_id = checkin.id;
+      recipient.organization_id = organization.id;
+      this.saveModel(recipient).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getRecipients(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
@@ -504,8 +546,15 @@ export class DatabaseProvider extends SqlProvider {
   // ########## NOTIFICATION ##########
 
   public saveNotification(organization:Organization, notification:Notification):Promise<any> {
-    notification.organization_id = organization.id;
-    return this.saveModel(notification, false);
+    return new Promise((resolve, reject) => {
+      notification.organization_id = organization.id;
+      this.saveModel(notification, false).then((saved:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
   }
 
   public getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {
