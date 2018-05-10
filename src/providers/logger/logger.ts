@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 
 import { Platform } from 'ionic-angular';
 import { IsDebug } from '@ionic-native/is-debug';
@@ -21,8 +21,11 @@ export class LoggerProvider {
             this.enabled = false;
           });
       }
-      else {
+      else if (isDevMode()) {
         this.enabled = true;
+      }
+      else {
+        this.enabled = false;
       }
     });
   }
