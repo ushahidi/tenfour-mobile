@@ -68,7 +68,7 @@ export class GroupEditPage extends BasePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-    if (this.editing) {
+    if (this.editing && this.mobile) {
       let loading = this.showLoading("Canceling...");
       this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
         this.group.name = group.name;
@@ -128,10 +128,16 @@ export class GroupEditPage extends BasePage {
           group.member_count = 0;
           group.member_ids = "";
         }
-        this.database.saveGroup(this.organization, group).then((saved:any) => {
+        if (this.mobile) {
+          this.database.saveGroup(this.organization, group).then((saved:any) => {
+            loading.dismiss();
+            this.hideModal({ group: group });
+          });
+        }
+        else {
           loading.dismiss();
           this.hideModal({ group: group });
-        });
+        }
       },
       (error:any) => {
         loading.dismiss();
@@ -152,10 +158,16 @@ export class GroupEditPage extends BasePage {
         group.member_count = 0;
         group.member_ids = "";
       }
-      this.database.saveGroup(this.organization, group).then((saved:any) => {
+      if (this.mobile) {
+        this.database.saveGroup(this.organization, group).then((saved:any) => {
+          loading.dismiss();
+          this.hideModal({ group: group });
+        });
+      }
+      else {
         loading.dismiss();
         this.hideModal({ group: group });
-      });
+      }
     },
     (error:any) => {
       loading.dismiss();
@@ -171,13 +183,20 @@ export class GroupEditPage extends BasePage {
         handler: () => {
           let loading = this.showLoading("Removing...");
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
-            let removes = [];
-            removes.push(this.database.removeGroup(this.organization, this.group));
-            Promise.all(removes).then(removed => {
+            if (this.mobile) {
+              let removes = [];
+              removes.push(this.database.removeGroup(this.organization, this.group));
+              Promise.all(removes).then(removed => {
+                loading.dismiss();
+                this.showToast("Group removed from organization");
+                this.hideModal({deleted: true});
+              });
+            }
+            else {
               loading.dismiss();
               this.showToast("Group removed from organization");
               this.hideModal({deleted: true});
-            });
+            }
           },
           (error:any) => {
             loading.dismiss();

@@ -94,7 +94,7 @@ export class PersonEditPage extends BasePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-    if (this.editing) {
+    if (this.editing && this.mobile) {
       let loading = this.showLoading("Canceling...");
       this.database.getPerson(this.organization, this.person.id).then((person:Person) => {
         this.person.name = person.name;
@@ -132,12 +132,20 @@ export class PersonEditPage extends BasePage {
         contacts.push(this.saveContact(this.organization, person, contact));
       }
       Promise.all(contacts).then((updated:any) => {
-        this.database.savePerson(this.organization, person).then((saved:any) => {
+        if (this.mobile) {
+          this.database.savePerson(this.organization, person).then((saved:any) => {
+            loading.dismiss();
+            this.hideModal({
+              person: person
+            });
+          });
+        }
+        else {
           loading.dismiss();
           this.hideModal({
             person: person
           });
-        });
+        }
       },
       (error:any) => {
         loading.dismiss();
@@ -155,9 +163,14 @@ export class PersonEditPage extends BasePage {
       if (person.id) {
         this.logger.info(this, "savePerson", "Update", person);
         this.api.updatePerson(this.organization, person).then((person:Person) => {
-          this.database.savePerson(this.organization, person).then((saved:any) => {
+          if (this.mobile) {
+            this.database.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          }
+          else {
             resolve(person);
-          });
+          }
         },
         (error:any) => {
           reject(error);
@@ -167,9 +180,14 @@ export class PersonEditPage extends BasePage {
         this.logger.info(this, "savePerson", "Create", person);
         this.api.createPerson(this.organization, person).then((person:Person) => {
           this.person.id = person.id;
-          this.database.savePerson(this.organization, person).then((saved:any) => {
+          if (this.mobile) {
+            this.database.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          }
+          else {
             resolve(person);
-          });
+          }
         },
         (error:any) => {
           reject(error);
@@ -187,9 +205,14 @@ export class PersonEditPage extends BasePage {
         }
         if (contact.contact && contact.contact.length > 0) {
           this.api.updateContact(organization, person, contact).then((updated:Contact) => {
-            this.database.saveContact(this.organization, person, updated).then((saved:any) => {
+            if (this.mobile) {
+              this.database.saveContact(this.organization, person, updated).then((saved:any) => {
+                resolve(updated);
+              });
+            }
+            else {
               resolve(updated);
-            });
+            }
           },
           (error:any) => {
             reject(error);
@@ -207,9 +230,14 @@ export class PersonEditPage extends BasePage {
         if (contact.contact && contact.contact.length > 0) {
           this.api.createContact(organization, person, contact).then((created:Contact) => {
             contact.id = created.id;
-            this.database.saveContact(this.organization, person, created).then((saved:any) => {
+            if (this.mobile) {
+              this.database.saveContact(this.organization, person, created).then((saved:any) => {
+                resolve(created);
+              });
+            }
+            else {
               resolve(created);
-            });
+            }
           },
           (error:any) => {
             reject(error);
@@ -264,15 +292,20 @@ export class PersonEditPage extends BasePage {
   }
 
   private loadCamera() {
-    return this.diagnostic.isCameraPresent().then(
-      (cameraPresent:boolean) => {
-        this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
-        this.cameraPresent = cameraPresent;
-      },
-      (error:any) => {
-        this.logger.error(this, "loadCamera", "isCameraPresent", error);
-        this.cameraPresent = false;
-      });
+    if (this.mobile) {
+      return this.diagnostic.isCameraPresent().then(
+        (cameraPresent:boolean) => {
+          this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
+          this.cameraPresent = cameraPresent;
+        },
+        (error:any) => {
+          this.logger.error(this, "loadCamera", "isCameraPresent", error);
+          this.cameraPresent = false;
+        });
+    }
+    else {
+      this.cameraPresent = false;
+    }
   }
 
   private showCamera() {
@@ -327,18 +360,27 @@ export class PersonEditPage extends BasePage {
         handler: () => {
           let loading = this.showLoading("Removing...");
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
-            let removes = [];
-            removes.push(this.database.removePerson(this.organization, this.person));
-            for (let contact of this.person.contacts) {
-              removes.push(this.database.removeContact(this.organization, contact));
+            if (this.mobile) {
+              let removes = [];
+              removes.push(this.database.removePerson(this.organization, this.person));
+              for (let contact of this.person.contacts) {
+                removes.push(this.database.removeContact(this.organization, contact));
+              }
+              Promise.all(removes).then(removed => {
+                loading.dismiss();
+                this.showToast("Person removed from organization");
+                this.hideModal({
+                  removed: true
+                });
+              });
             }
-            Promise.all(removes).then(removed => {
+            else {
               loading.dismiss();
               this.showToast("Person removed from organization");
               this.hideModal({
                 removed: true
               });
-            });
+            }
           },
           (error:any) => {
             loading.dismiss();

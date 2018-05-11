@@ -93,7 +93,7 @@ export class PersonListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-        if (this.cordova) {
+        if (this.mobile) {
           let saves = [];
           for (let person of people) {
             saves.push(this.database.savePerson(this.organization, person));
@@ -129,7 +129,7 @@ export class PersonListPage extends BasePage {
   private loadPeople(cache:boolean=true) {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.cordova) {
+      if (cache && this.mobile) {
         this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           if (people && people.length > 1) {
             this.organization.people = people;
@@ -158,7 +158,7 @@ export class PersonListPage extends BasePage {
       }
       else {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-          if (this.cordova) {
+          if (this.mobile) {
             let saves = [];
             for (let person of people) {
               saves.push(this.database.savePerson(this.organization, person));
@@ -194,27 +194,31 @@ export class PersonListPage extends BasePage {
 
   private addPeople(event:any) {
     this.logger.info(this, "addPeople");
-    let buttons = [
-      {
-        text: 'Add Person',
-        handler: () => {
-          this.addPerson();
-        }
-      },{
-        text: 'Invite People',
-        handler: () => {
-          this.invitePerson();
-        }
-      },{
+    let buttons = [];
+    buttons.push({
+      text: 'Add Person',
+      handler: () => {
+        this.addPerson();
+      }
+    });
+    buttons.push({
+      text: 'Invite Person',
+      handler: () => {
+        this.invitePerson();
+      }
+    });
+    if (this.mobile) {
+      buttons.push({
         text: 'Import People',
         handler: () => {
           this.importPerson();
         }
-      },{
-        text: 'Cancel',
-        role: 'cancel'
-      }
-    ];
+      });  
+    }
+    buttons.push({
+      text: 'Cancel',
+      role: 'cancel'
+    });
     this.showActionSheet(null, buttons);
   }
 
@@ -291,7 +295,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "removePerson", person);
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, person).then((deleted:any) => {
-      if (this.cordova) {
+      if (this.mobile) {
         let removes = [];
         removes.push(this.database.removePerson(this.organization, person));
         for (let contact of person.contacts) {

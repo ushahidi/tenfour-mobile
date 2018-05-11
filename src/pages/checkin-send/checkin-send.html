@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-title>Check-In</ion-title>
-    <ion-buttons end *ngIf="checkin">
+    <ion-buttons right *ngIf="checkin">
       <button ion-button color="primary" [disabled]="checkin.canSend() == false" (click)="sendCheckin($event)">Send</button>
     </ion-buttons>
   </ion-navbar>

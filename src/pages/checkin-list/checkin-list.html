@@ -4,7 +4,7 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Check-Ins</ion-title>
-    <ion-buttons end *ngIf="person">
+    <ion-buttons right *ngIf="person">
       <button #notifications ion-button icon-only color="primary" (click)="showNotifications($event)">
         <ion-icon ios="ios-notifications" md="md-notifications" *ngIf="notify == true"></ion-icon>
         <ion-icon ios="ios-notifications-outline" md="md-notifications" *ngIf="notify == false"></ion-icon>

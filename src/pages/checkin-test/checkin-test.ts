@@ -87,22 +87,29 @@ export class CheckinTestPage extends BasePage {
   private sendCheckin(event:any) {
     let loading = this.showLoading("Sending...");
     this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-      let saves = [];
-      for (let answer of checkin.answers) {
-        saves.push(this.database.saveAnswer(this.organization, checkin, answer));
+      if (this.mobile) {
+        let saves = [];
+        for (let answer of checkin.answers) {
+          saves.push(this.database.saveAnswer(this.organization, checkin, answer));
+        }
+        for (let recipient of checkin.recipients) {
+          saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
+        }
+        for (let reply of checkin.replies) {
+          saves.push(this.database.saveReply(this.organization, checkin, reply));
+        }
+        saves.push(this.database.saveCheckin(this.organization, checkin));
+        Promise.all(saves).then(saved => {
+          loading.dismiss();
+          this.showToast("Test Check-In sent");
+          this.hideModal({ checkin: Checkin });
+        });
       }
-      for (let recipient of checkin.recipients) {
-        saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
-      }
-      for (let reply of checkin.replies) {
-        saves.push(this.database.saveReply(this.organization, checkin, reply));
-      }
-      saves.push(this.database.saveCheckin(this.organization, checkin));
-      Promise.all(saves).then(saved => {
+      else {
         loading.dismiss();
         this.showToast("Test Check-In sent");
         this.hideModal({ checkin: Checkin });
-      });
+      }
     },
     (error:any) => {
       loading.dismiss();

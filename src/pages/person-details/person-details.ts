@@ -90,7 +90,7 @@ export class PersonDetailsPage extends BasePage {
 
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.mobile) {
         this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
           if (contacts && contacts.length > 0) {
             this.person.contacts = contacts;
@@ -109,8 +109,8 @@ export class PersonDetailsPage extends BasePage {
         });
       }
       else {
-        this.api.getPerson(this.organization, this.person.id).then(
-          (person:Person) => {
+        this.api.getPerson(this.organization, this.person.id).then((person:Person) => {
+          if (this.mobile) {
             this.person = person;
             let saves = [];
             for (let contact of person.contacts) {
@@ -123,44 +123,58 @@ export class PersonDetailsPage extends BasePage {
             (error:any) => {
               resolve(person);
             });
-          },
-          (error:any) => {
-            resolve(null);
-          });
+          }
+          else {
+            this.person = person;
+            resolve(person);
+          }
+        },
+        (error:any) => {
+          resolve(null);
+        });
       }
     });
   }
 
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      //TODO load checkins from API
-      this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-        this.checkins = checkins;
-        resolve(this.checkins);
-      },
-      (error:any) => {
+      if (this.mobile) {
+        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+          this.checkins = checkins;
+          resolve(this.checkins);
+        },
+        (error:any) => {
+          resolve([]);
+        });
+      }
+      else {
         resolve([]);
-      });
+      }
     });
   }
 
   private loadMore(event:any) {
     return new Promise((resolve, reject) => {
-      this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-        this.checkins = [...this.checkins, ...checkins];
-        if (event) {
-          event.complete();
-        }
-        resolve(this.checkins);
-      },
-      (error:any) => {
-        if (event) {
-          event.complete();
-        }
+      if (this.mobile) {
+        this.offset = this.offset + this.limit;
+        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+          this.checkins = [...this.checkins, ...checkins];
+          if (event) {
+            event.complete();
+          }
+          resolve(this.checkins);
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          resolve([]);
+        });
+      }
+      else {
         resolve([]);
-      });
+      }
     });
   }
 

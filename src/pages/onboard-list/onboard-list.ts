@@ -80,10 +80,16 @@ export class OnboardListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.api.getPerson(this.organization, "me").then((person:Person) => {
         this.logger.info(this, "loadPerson", person);
-        this.database.savePerson(this.organization, person).then(saved => {
+        if (this.mobile) {
+          this.database.savePerson(this.organization, person).then(saved => {
+            this.person = person;
+            resolve(person);
+          });
+        }
+        else {
           this.person = person;
           resolve(person);
-        });
+        }
       });
     });
   }
@@ -91,12 +97,23 @@ export class OnboardListPage extends BasePage {
   private loadPeople():Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPeople(this.organization).then((people:Person[]) => {
-        let saves = [];
-        for (let person of people) {
-          this.logger.info(this, "loadPeople", person);
-          saves.push(this.database.savePerson(this.organization, person));
+        if (this.mobile) {
+          let saves = [];
+          for (let person of people) {
+            this.logger.info(this, "loadPeople", person);
+            saves.push(this.database.savePerson(this.organization, person));
+          }
+          Promise.all(saves).then(saved => {
+            if (people && people.length > 1) {
+              this.person.config_people_invited = true;
+            }
+            else {
+              this.person.config_people_invited = false;
+            }
+            resolve();
+          });
         }
-        Promise.all(saves).then(saved => {
+        else {
           if (people && people.length > 1) {
             this.person.config_people_invited = true;
           }
@@ -104,7 +121,7 @@ export class OnboardListPage extends BasePage {
             this.person.config_people_invited = false;
           }
           resolve();
-        });
+        }
       });
     });
   }
@@ -144,14 +161,16 @@ export class OnboardListPage extends BasePage {
         user: this.person });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
-      this.database.getPeople(this.organization).then((people:Person[]) => {
-        if (people && people.length > 1) {
-          this.person.config_people_invited = true;
-        }
-        else {
-          this.person.config_people_invited = false;
-        }
-      });
+      if (this.mobile) {
+        this.database.getPeople(this.organization).then((people:Person[]) => {
+          if (people && people.length > 1) {
+            this.person.config_people_invited = true;
+          }
+          else {
+            this.person.config_people_invited = false;
+          }
+        });
+      }
     });
   }
 
@@ -162,14 +181,16 @@ export class OnboardListPage extends BasePage {
         user: this.person });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
-      this.database.getPeople(this.organization).then((people:Person[]) => {
-        if (people && people.length > 1) {
-          this.person.config_people_invited = true;
-        }
-        else {
-          this.person.config_people_invited = false;
-        }
-      });
+      if (this.mobile) {
+        this.database.getPeople(this.organization).then((people:Person[]) => {
+          if (people && people.length > 1) {
+            this.person.config_people_invited = true;
+          }
+          else {
+            this.person.config_people_invited = false;
+          }
+        });
+      }
     });
   }
 
@@ -180,14 +201,16 @@ export class OnboardListPage extends BasePage {
         user: this.person });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
-      this.database.getPeople(this.organization).then((people:Person[]) => {
-        if (people && people.length > 1) {
-          this.person.config_people_invited = true;
-        }
-        else {
-          this.person.config_people_invited = false;
-        }
-      });
+      if (this.mobile) {
+        this.database.getPeople(this.organization).then((people:Person[]) => {
+          if (people && people.length > 1) {
+            this.person.config_people_invited = true;
+          }
+          else {
+            this.person.config_people_invited = false;
+          }
+        });  
+      }
     });
   }
 

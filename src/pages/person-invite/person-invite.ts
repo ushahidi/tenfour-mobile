@@ -83,7 +83,7 @@ export class PersonInvitePage extends BasePage {
 
   private loadPeople(event:any, cache:boolean=true) {
     this.loading = true;
-    if (cache) {
+    if (cache && this.mobile) {
       return this.database.getPeople(this.organization).then((people:Person[]) => {
         this.logger.info(this, "loadPeople", people);
         if (people && people.length > 0) {

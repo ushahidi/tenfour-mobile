@@ -1,12 +1,12 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons start>
-      <button ion-button icon-only menuToggle color="primary" *ngIf="title">
+    <ion-buttons left *ngIf="title">
+      <button ion-button icon-only menuToggle color="primary">
         <ion-icon name="menu"></ion-icon>
       </button>
     </ion-buttons>
     <ion-title>{{title}}</ion-title>
-    <ion-buttons end  *ngIf="user && person">
+    <ion-buttons right *ngIf="user && person">
       <button tappable ion-button color="primary" *ngIf="person.isMe() || user.isOwner() || user.isAdmin()" (click)="editPerson($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>

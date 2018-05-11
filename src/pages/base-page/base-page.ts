@@ -27,7 +27,9 @@ export class BasePage {
   protected offline:boolean = false;
   protected tablet:boolean = false;
   protected mobile:boolean = false;
-  protected cordova:boolean = false;
+  protected android:boolean = false;
+  protected ios:boolean = false;
+  protected web:boolean = false;
 
   protected connection:any = null;
   protected disconnection:any = null;
@@ -72,9 +74,11 @@ export class BasePage {
   ionViewDidLoad() {
     this.logger.info(this, "ionViewDidLoad");
     this.platform.ready().then(() => {
+      this.ios = this.platform.is('ios');
+      this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
-      this.mobile = this.platform.is('mobile');
-      this.cordova = this.platform.is('cordova');
+      this.mobile = this.platform.is('cordova');
+      this.web = this.platform.is('core');
     })
   }
 
@@ -101,7 +105,7 @@ export class BasePage {
   }
 
   protected subscribeNetwork() {
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       this.logger.info(this, "subscribeNetwork", "Network", this.network.type);
       if (this.network.type == 'none') {
         this.zone.run(() => {
@@ -132,7 +136,7 @@ export class BasePage {
   }
 
   protected unsubscribeNetwork() {
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       this.logger.info(this, "unsubscribeNetwork", "Network", this.network.type);
       if (this.connection) {
         this.connection.unsubscribe();
@@ -147,7 +151,7 @@ export class BasePage {
 
   protected loadStatusBar(lightContent:boolean=true) {
     this.platform.ready().then(() => {
-      if (this.platform.is('cordova')) {
+      if (this.mobile) {
         if (lightContent) {
           this.statusBar.styleLightContent();
           this.statusBar.backgroundColorByHexString('#3f4751');
@@ -236,48 +240,54 @@ export class BasePage {
     return this.socialSharing.share(message, subject, file, url);
   }
 
-  protected showUrl(url:string, target:string="_blank", event:any=null):ThemeableBrowserObject {
+  protected showUrl(url:string, target:string="_blank", event:any=null):any {
     this.logger.info(this, "showUrl", url, target);
-    let options:ThemeableBrowserOptions = {
-      statusbar: {
-        color: "f5f5f1"
-      },
-        toolbar: {
-        height: 44,
-        color: "f5f5f1"
-      },
-        title: {
-        color: '#000000',
-        showPageTitle: true
-      },
-      backButton: {
-        wwwImage: 'assets/images/back.png',
-        wwwImageDensity: 2,
-        align: 'right',
-        event: 'backPressed'
-      },
-      forwardButton: {
-        wwwImage: 'assets/images/forward.png',
-        wwwImageDensity: 2,
-        align: 'right',
-        event: 'forwardPressed'
-      },
-      closeButton: {
-        wwwImage: 'assets/images/close.png',
-        wwwImageDensity: 2,
-        align: 'left',
-        event: 'closePressed'
-      },
-      backButtonCanClose: true
-    };
-    let browser = this.themeableBrowser.create(url, target, options);
-    if (this.platform.is("ios")) {
-      browser.show();
+    if (this.mobile) {
+      let options:ThemeableBrowserOptions = {
+        statusbar: {
+          color: "f5f5f1"
+        },
+          toolbar: {
+          height: 44,
+          color: "f5f5f1"
+        },
+          title: {
+          color: '#000000',
+          showPageTitle: true
+        },
+        backButton: {
+          wwwImage: 'assets/images/back.png',
+          wwwImageDensity: 2,
+          align: 'right',
+          event: 'backPressed'
+        },
+        forwardButton: {
+          wwwImage: 'assets/images/forward.png',
+          wwwImageDensity: 2,
+          align: 'right',
+          event: 'forwardPressed'
+        },
+        closeButton: {
+          wwwImage: 'assets/images/close.png',
+          wwwImageDensity: 2,
+          align: 'left',
+          event: 'closePressed'
+        },
+        backButtonCanClose: true
+      };
+      let browser = this.themeableBrowser.create(url, target, options);
+      if (this.platform.is("ios")) {
+        browser.show();
+      }
+      if (event) {
+        event.stopPropagation();
+      }
+      return browser;
     }
-    if (event) {
-      event.stopPropagation();
+    else {
+      window.open(url, target);
+      return null;
     }
-    return browser;
   }
 
   protected showOfflineAlert() {
@@ -297,13 +307,13 @@ export class BasePage {
   }
 
   protected showKeyboard() {
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       this.keyboard.show();
     }
   }
 
   protected hideKeyboard() {
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       this.keyboard.close();
     }
   }
@@ -340,7 +350,7 @@ export class BasePage {
   }
 
   protected appName():string {
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
     }
     return "TenFour";
@@ -348,7 +358,7 @@ export class BasePage {
 
   protected deviceName():string {
     let name = [];
-    if (this.platform.is('cordova')) {
+    if (this.mobile) {
       if (this.device.manufacturer) {
         name.push(this.device.manufacturer);
       }

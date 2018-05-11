@@ -57,7 +57,9 @@ export class TenFourApp {
   person:Person = null;
   tablet:boolean = false;
   mobile:boolean = false;
-  cordova:boolean = false;
+  android:boolean = false;
+  ios:boolean = false;
+  web:boolean = false;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -93,9 +95,9 @@ export class TenFourApp {
     this.zone = _zone;
     InjectorProvider.injector = injector;
     this.platform.ready()
+      .then(() => this.loadPlatforms())
       .then(() => this.loadStatusBar())
       .then(() => this.loadOrientation())
-      .then(() => this.loadSplitPane())
       .then(() => this.loadDeepLinks())
       .then(() => this.loadAnalytics())
       .then(() => this.loadEvents())
@@ -116,18 +118,20 @@ export class TenFourApp {
         new Subscription()]));
   }
 
-  private loadSplitPane():Promise<boolean> {
+  private loadPlatforms():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.ios = this.platform.is('ios');
+      this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
-      this.mobile = this.platform.is('mobile');
-      this.cordova = this.platform.is('cordova');
+      this.mobile = this.platform.is('cordova');
+      this.web = this.platform.is('core');
       resolve(true);
     });
   }
 
   private loadOrientation():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is('cordova')) {
+      if (this.mobile) {
         this.logger.info(this, "loadOrientation", this.screenOrientation.type);
         this.screenOrientation.unlock();
         this.screenOrientation.onChange().subscribe(() => {
@@ -143,13 +147,13 @@ export class TenFourApp {
 
   private loadStatusBar():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("android")) {
+      if (this.android) {
         this.logger.info(this, "loadStatusBar", "Android");
         this.statusBar.styleLightContent();
         this.statusBar.overlaysWebView(false);
         this.statusBar.backgroundColorByHexString("#000000");
       }
-      else if (this.platform.is("ios")) {
+      else if (this.ios) {
         this.logger.info(this, "loadStatusBar", "iOS");
         this.statusBar.styleDefault();
         this.statusBar.overlaysWebView(false);
@@ -164,7 +168,7 @@ export class TenFourApp {
 
   private loadAnalytics():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
+      if (this.mobile) {
         this.logger.info(this, "loadAnalytics", "Loaded");
         this.segment.ready().then((ready:SegmentService) => {
           this.logger.info(this, "loadAnalytics", "Ready");
@@ -181,7 +185,7 @@ export class TenFourApp {
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
+      if (this.mobile) {
         this.logger.info(this, "loadDeepLinks", "Loaded");
         this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
           (match:any) => {
@@ -225,7 +229,7 @@ export class TenFourApp {
 
   private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
+      if (this.mobile) {
         this.logger.info(this, "loadNotifications", "Loaded");
         this.firebase.getToken().then((token:string) => {
           this.logger.info(this, "loadNotifications", "getToken", token);
@@ -277,7 +281,7 @@ export class TenFourApp {
 
   private loadApplication(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
+      if (this.mobile) {
         this.logger.info(this, "loadApplication");
         this.loadDatabase(models).then(
           (loaded:any) => {
@@ -368,7 +372,7 @@ export class TenFourApp {
 
   private loadDatabase(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
+      if (this.mobile) {
         this.logger.info(this, "loadDatabase", "Cordova");
         this.database.loadDatabase(models).then((loaded:any) => {
           resolve(loaded);
@@ -430,19 +434,6 @@ export class TenFourApp {
         this.person = null;
       });
     });
-    // return this.database.getPerson(this.organization, null, true).then(
-    //   (person:Person) => {
-    //     this.zone.run(() => {
-    //       this.logger.info(this, "loadPerson", person);
-    //       this.person = person;
-    //     });
-    //   },
-    //   (error:any) => {
-    //     this.zone.run(() => {
-    //       this.logger.error(this, "loadPerson", error);
-    //       this.person = null;
-    //     });
-    //   });
   }
 
   private showSigninUrl(event:any=null) {

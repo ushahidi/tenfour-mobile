@@ -83,7 +83,7 @@ export class GroupListPage extends BasePage {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.cordova) {
+      if (cache && this.mobile) {
         this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
@@ -114,7 +114,7 @@ export class GroupListPage extends BasePage {
       }
       else {
         this.api.getGroups(this.organization).then((groups:Group[]) => {
-          if (this.cordova) {
+          if (this.mobile) {
             this.logger.info(this, "loadGroups", "API", groups);
             let saves = [];
             for (let group of groups) {
@@ -150,7 +150,7 @@ export class GroupListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-        if (this.cordova) {
+        if (this.mobile) {
           let saves = [];
           for (let group of groups) {
             saves.push(this.database.saveGroup(this.organization, group));

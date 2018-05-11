@@ -117,18 +117,34 @@ export class CheckinSendPage extends BasePage {
     else {
       let loading = this.showLoading("Sending...");
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-        let saves = [];
-        for (let answer of checkin.answers) {
-          saves.push(this.database.saveAnswer(this.organization, checkin, answer));
+        if (this.mobile) {
+          let saves = [];
+          for (let answer of checkin.answers) {
+            saves.push(this.database.saveAnswer(this.organization, checkin, answer));
+          }
+          for (let recipient of checkin.recipients) {
+            saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
+          }
+          for (let reply of checkin.replies) {
+            saves.push(this.database.saveReply(this.organization, checkin, reply));
+          }
+          saves.push(this.database.saveCheckin(this.organization, checkin));
+          Promise.all(saves).then(saved => {
+            loading.dismiss();
+            let recipients = this.checkin.recipientIds().length;
+            if (recipients == 1) {
+              this.showToast(`Check-In sent to 1 person`);
+            }
+            else {
+              this.showToast(`Check-In sent to ${recipients} people`);
+            }
+            let firstViewController = this.navController.first();
+            this.navController.popToRoot({ animate: false }).then(() => {
+              firstViewController.dismiss({ checkin: Checkin });
+            });
+          });
         }
-        for (let recipient of checkin.recipients) {
-          saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
-        }
-        for (let reply of checkin.replies) {
-          saves.push(this.database.saveReply(this.organization, checkin, reply));
-        }
-        saves.push(this.database.saveCheckin(this.organization, checkin));
-        Promise.all(saves).then(saved => {
+        else {
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {
@@ -141,7 +157,7 @@ export class CheckinSendPage extends BasePage {
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
           });
-        });
+        }
       },
       (error:any) => {
         loading.dismiss();

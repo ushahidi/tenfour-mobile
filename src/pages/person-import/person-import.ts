@@ -121,9 +121,6 @@ export class PersonImportPage extends BasePage {
         desiredFields: [
           'name',
           'displayName',
-          // 'name.givenName',
-          // 'name.familyName',
-          // 'name.formatted',
           'phoneNumbers',
           'emails',
           'addresses',

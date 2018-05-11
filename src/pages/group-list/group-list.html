@@ -4,7 +4,7 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Groups</ion-title>
-    <ion-buttons end *ngIf="person">
+    <ion-buttons right *ngIf="person">
       <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin()" (click)="createGroup($event)">
         <ion-icon ios="ios-add" md="md-add"></ion-icon>
       </button>

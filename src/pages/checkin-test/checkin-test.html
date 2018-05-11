@@ -1,10 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons start>
+    <ion-buttons left>
       <button ion-button color="primary" (click)="cancelCheckin($event)">Cancel</button>
     </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons end *ngIf="checkin">
+    <ion-buttons right *ngIf="checkin">
       <button ion-button color="primary"  (click)="sendCheckin($event)">Send</button>
     </ion-buttons>
   </ion-navbar>

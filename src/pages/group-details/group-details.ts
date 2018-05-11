@@ -63,7 +63,7 @@ export class GroupDetailsPage extends BasePage {
 
   private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.mobile) {
         this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
           this.group = group;
           if (event) {
@@ -80,13 +80,22 @@ export class GroupDetailsPage extends BasePage {
       }
       else {
         this.api.getGroup(this.organization, this.group.id).then((group:Group) => {
-          this.database.saveGroup(this.organization, group).then((saved:any) => {
+          if (this.mobile) {
+            this.database.saveGroup(this.organization, group).then((saved:any) => {
+              this.group = group;
+              if (event) {
+                event.complete();
+              }
+              resolve(group);
+            });
+          }
+          else {
             this.group = group;
             if (event) {
               event.complete();
             }
             resolve(group);
-          });
+          }
         },
         (error:any) => {
           if (event) {

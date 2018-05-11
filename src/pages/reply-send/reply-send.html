@@ -1,11 +1,11 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons start>
+    <ion-buttons left>
       <button ion-button color="primary" (click)="cancelReply($event)">Cancel</button>
     </ion-buttons>
     <ion-title *ngIf="checkins && checkins.length == 0"></ion-title>
     <ion-title *ngIf="checkins && checkins.length > 1">{{index + 1}} / {{checkins.length}}</ion-title>
-    <ion-buttons end>
+    <ion-buttons right>
       <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id == null" (click)="sendReply(checkin, checkin.reply)">Send</button>
       <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id != null" (click)="saveReply(checkin, checkin.reply)">Save</button>
     </ion-buttons>

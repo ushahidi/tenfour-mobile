@@ -110,7 +110,7 @@ export class CheckinListPage extends BasePage {
   }
 
   private loadWaitingResponse() {
-    if (this.cordova) {
+    if (this.mobile) {
       this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
         this.logger.info(this, "loadWaitingResponse", waiting.length);
         let checkins = [];
@@ -147,7 +147,7 @@ export class CheckinListPage extends BasePage {
 
   private loadBadgeNumber():Promise<number> {
     return new Promise((resolve, reject) => {
-      if (this.cordova) {
+      if (this.mobile) {
         try {
           let badgeNumber = 0;
           if (this.organization && this.organization.checkins) {
@@ -198,7 +198,7 @@ export class CheckinListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-        if (this.cordova) {
+        if (this.mobile) {
           let saves = [];
           for (let checkin of checkins) {
             saves.push(this.database.saveCheckin(this.organization, checkin));
@@ -235,7 +235,7 @@ export class CheckinListPage extends BasePage {
 
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
-      if (cache && this.cordova) {
+      if (cache && this.mobile) {
         this.database.getPerson(this.organization, null, true).then((person:Person) => {
           if (person) {
             this.person = person;
@@ -261,7 +261,7 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getPerson(this.organization, "me").then((person:Person) => {
-          if (this.cordova) {
+          if (this.mobile) {
             this.database.savePerson(this.organization, person).then(saved => {
               this.person = person;
               resolve(person);
@@ -290,7 +290,7 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getOrganization(this.organization).then((organization:Organization) => {
-          if (this.cordova) {
+          if (this.mobile) {
             this.database.saveOrganization(this.organization).then(saved => {
               this.organization = organization;
               resolve(organization);
@@ -315,7 +315,7 @@ export class CheckinListPage extends BasePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.cordova) {
+      if (cache && this.mobile) {
         this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
             this.organization.checkins = checkins;
@@ -338,7 +338,7 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-          if (this.cordova) {
+          if (this.mobile) {
             let saves = [];
             for (let checkin of checkins) {
               for (let answer of checkin.answers) {
@@ -389,7 +389,7 @@ export class CheckinListPage extends BasePage {
   private loadNotifications(cache:boolean=true):Promise<any> {
     this.notify = false;
     return new Promise((resolve, reject) => {
-      if (cache && this.cordova) {
+      if (cache && this.mobile) {
         this.database.getNotifications(this.organization, 10, 0).then((notifications:Notification[]) => {
           this.notifications = notifications;
           for (let notification of notifications) {
@@ -405,7 +405,7 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          if (this.cordova) {
+          if (this.mobile) {
             let saves = [];
             for (let notification of notifications) {
               saves.push(this.database.saveNotification(this.organization, notification));
