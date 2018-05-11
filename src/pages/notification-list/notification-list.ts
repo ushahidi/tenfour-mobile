@@ -89,22 +89,27 @@ export class NotificationListPage extends BasePage {
   private loadMore(event:any) {
     this.logger.info(this, "loadMore");
     return new Promise((resolve, reject) => {
-      this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", this.offset);
-      this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-        this.notifications = [...this.notifications, ...notifications];
-        if (event) {
-          event.complete();
-        }
-        resolve(this.notifications);
-      },
-      (error:any) => {
-        if (event) {
-          event.complete();
-        }
-        reject(error);
-        this.showToast(error);
-      });
+      if (this.mobile) {
+        this.offset = this.offset + this.limit;
+        this.logger.info(this, "loadMore", this.offset);
+        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
+          this.notifications = [...this.notifications, ...notifications];
+          if (event) {
+            event.complete();
+          }
+          resolve(this.notifications);
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          reject(error);
+          this.showToast(error);
+        });
+      }
+      else if (event) {
+        event.complete();
+      }
     });
   }
 
@@ -172,7 +177,7 @@ export class NotificationListPage extends BasePage {
       },
       (error:any) => {
         this.logger.error(this, "viewNotifications", "Failed", error);
-      });  
+      });
     }
     else {
 

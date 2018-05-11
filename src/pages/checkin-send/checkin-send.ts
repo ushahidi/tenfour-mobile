@@ -66,6 +66,13 @@ export class CheckinSendPage extends BasePage {
     });
   }
 
+  private cancelEdit(event:any) {
+    this.logger.info(this, "cancelEdit");
+    this.hideModal({
+      canceled: true
+    });
+  }
+
   private addPerson() {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {

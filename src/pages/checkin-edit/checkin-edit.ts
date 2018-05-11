@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { App, IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
@@ -28,6 +28,7 @@ export class CheckinEditPage extends BasePage {
   checkin:Checkin = null;
 
   constructor(
+      protected appController:App,
       protected zone:NgZone,
       protected platform:Platform,
       protected navParams:NavParams,
@@ -90,10 +91,20 @@ export class CheckinEditPage extends BasePage {
   }
 
   private showNext() {
-    this.showPage(CheckinSendPage, {
-      organization: this.organization,
-      person: this.person,
-      checkin: this.checkin });
+    if (this.tablet || this.web) {
+      this.showModal(CheckinSendPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: this.checkin
+      });
+    }
+    else {
+      this.showPage(CheckinSendPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: this.checkin
+      });
+    }
   }
 
   private addDefaults() {

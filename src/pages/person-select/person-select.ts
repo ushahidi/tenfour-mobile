@@ -85,7 +85,7 @@ export class PersonSelectPage extends BasePage {
   private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.mobile) {
         this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
           if (people && people.length > 1) {
@@ -107,14 +107,20 @@ export class PersonSelectPage extends BasePage {
       else {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
-          let saves = [];
-          for (let person of people) {
-            saves.push(this.database.savePerson(this.organization, person));
+          if (this.mobile) {
+            let saves = [];
+            for (let person of people) {
+              saves.push(this.database.savePerson(this.organization, person));
+            }
+            Promise.all(saves).then(saved => {
+              this.updatePeople(people);
+              resolve(people);
+            });
           }
-          Promise.all(saves).then(saved => {
+          else {
             this.updatePeople(people);
             resolve(people);
-          });
+          }
         },
         (error:any) => {
           this.updatePeople([]);
@@ -170,7 +176,7 @@ export class PersonSelectPage extends BasePage {
   private loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.mobile) {
         this.database.getGroups(this.organization).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
@@ -190,23 +196,27 @@ export class PersonSelectPage extends BasePage {
         });
       }
       else {
-        this.api.getGroups(this.organization).then(
-          (groups:Group[]) => {
-            this.logger.info(this, "loadGroups", "API", groups);
+        this.api.getGroups(this.organization).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "API", groups);
+          if (this.mobile) {
             let saves = [];
             for (let group of groups) {
               saves.push(this.database.saveGroup(this.organization, group));
             }
             Promise.all(saves).then(saved => {
               this.updateGroups(groups);
-              this.logger.info(this, "loadGroups", "API", "Done");
               resolve(groups);
             });
-          },
-          (error:any) => {
-            this.updateGroups([]);
-            reject(error);
-          });
+          }
+          else {
+            this.updateGroups(groups);
+            resolve(groups);
+          }
+        },
+        (error:any) => {
+          this.updateGroups([]);
+          reject(error);
+        });
       }
     });
   }

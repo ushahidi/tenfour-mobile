@@ -1,5 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left *ngIf="tablet == true || web == true">
+      <button ion-button icon-only color="primary" (click)="cancelEdit($event)">
+        <ion-icon ios="ios-arrow-back" md="ios-arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
     <ion-title>Check-In</ion-title>
     <ion-buttons right *ngIf="checkin">
       <button ion-button color="primary" [disabled]="checkin.canSend() == false" (click)="sendCheckin($event)">Send</button>

@@ -34,7 +34,7 @@
       </ion-item>
     </ion-card>
   </ion-list>
-  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll *ngIf="mobile == true" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>

@@ -4,7 +4,6 @@ $font-path: "../assets/fonts";
 
 @import "ionic.globals";
 
-
 // Shared Variables
 // --------------------------------------------------
 // To customize the look and feel of this app, you can override
@@ -41,12 +40,19 @@ $colors: (
 );
 
 
+// App Web Variables
+// --------------------------------------------------
+// Web only Sass variables can go here
+
+$modal-inset-height-small: 90%;
+
 // App iOS Variables
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
 $toolbar-ios-text-color: #5BAB60;
 $toolbar-ios-button-color: #5BAB60;
+
 
 // App Material Design Variables
 // --------------------------------------------------
@@ -59,8 +65,6 @@ $toolbar-md-button-color: #5BAB60;
 // App Windows Variables
 // --------------------------------------------------
 // Windows only Sass variables can go here
-
-
 
 
 // App Theme
