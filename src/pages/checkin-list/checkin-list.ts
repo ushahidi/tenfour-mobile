@@ -29,6 +29,7 @@ export class CheckinListPage extends BasePage {
   filter:string = "all";
   organization:Organization = null;
   checkins:Checkin[] = [];
+  selected:Checkin = null;
   notifications:Notification[] = [];
   person:Person = null;
   loading:boolean = false;
@@ -60,7 +61,7 @@ export class CheckinListPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
-      this.logger.error(this, "ionViewDidLoad", "loadUpdates", "Loaded");
+      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
       this.loadWaitingResponse();
     },
@@ -438,11 +439,14 @@ export class CheckinListPage extends BasePage {
   }
 
   private showReplies(checkin:Checkin, event:any=null) {
-    this.showPage(ReplyListPage, {
-      organization: this.organization,
-      person: this.person,
-      checkin: checkin
-    });
+    this.selected = checkin;
+    if (this.platform.width() < 992) {
+      this.showPage(ReplyListPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: checkin
+      });
+    }
   }
 
   private sendReply(checkin:Checkin, event:any=null) {

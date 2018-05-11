@@ -1,5 +1,8 @@
 page-checkin-list {
   ion-card {
+    &.selected {
+      background-color: #eee !important;
+    }
     ion-card-content {
       border-bottom: 1px solid #ccc;
       person-avatar {
@@ -24,6 +27,46 @@ page-checkin-list {
         button {
           font-weight: 500 !important;
         }
+      }
+    }
+  }
+  ion-list {
+    ion-item {
+      ion-button, button {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+      }
+      h1 {
+
+      }
+      h2 {
+        font-weight: 500 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      small {
+        display: block;
+        color: #888888 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      p {
+        padding-top: 4px;
+        color: #888888 !important;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        strong {
+          color: #444444 !important;
+          font-weight: 500 !important;
+        }
+      }
+      ion-badge {
+        margin-top: 6px;
+        margin-right: 8px;
+        border-radius: 2px !important;
       }
     }
   }
