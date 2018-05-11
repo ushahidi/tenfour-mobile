@@ -29,6 +29,7 @@ import { ApiProvider } from '../providers/api/api';
 import { LoggerProvider } from '../providers/logger/logger';
 import { DatabaseProvider } from '../providers/database/database';
 import { InjectorProvider } from '../providers/injector/injector';
+import { StorageProvider } from '../providers/storage/storage';
 
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
@@ -52,13 +53,9 @@ export class TenFourApp {
 
   zone:NgZone = null;
   rootPage:any;
-  organizations:Organization[] = [];
   organization:Organization = null;
   person:Person = null;
   tablet:boolean = false;
-  selectOptions:any = {
-    title: 'Organizations'
-  };
 
   @ViewChild(Nav)
   nav:Nav;
@@ -77,13 +74,14 @@ export class TenFourApp {
     protected statusBar:StatusBar,
     protected splashScreen:SplashScreen,
     protected api:ApiProvider,
+    protected storage:StorageProvider,
     protected database:DatabaseProvider,
     protected logger:LoggerProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
     protected loadingController:LoadingController,
-    protected alertController: AlertController,
-    protected menuController: MenuController,
+    protected alertController:AlertController,
+    protected menuController:MenuController,
     protected deeplinks:Deeplinks,
     protected segment:SegmentService,
     protected device:Device,
@@ -293,7 +291,6 @@ export class TenFourApp {
             this.logger.info(this, "loadApplication", "Database", loaded);
             this.database.getOrganizations().then((organizations:Organization[]) => {
               if (organizations && organizations.length > 0) {
-                this.organizations = organizations;
                 this.organization = organizations[0];
                 this.logger.info(this, "loadApplication", "Organization", this.organization);
                 this.database.getPerson(this.organization, null, true).then(
@@ -316,7 +313,6 @@ export class TenFourApp {
                   });
               }
               else {
-                this.organizations = [];
                 this.logger.info(this, "loadApplication", "No Organizations");
                 this.showSigninUrl();
                 resolve(true);
@@ -325,7 +321,6 @@ export class TenFourApp {
           },
           (error:any) => {
             this.logger.error(this, "loadApplication", "loadDatabase", error);
-            this.organizations = [];
             this.hideSplashScreen();
             this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
               text: 'Reset Database',
@@ -354,8 +349,26 @@ export class TenFourApp {
           });
       }
       else {
-        //TODO handle web logic
-        this.showSigninUrl();
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          this.storage.getPerson().then((person:Person) => {
+            if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+              this.person = person;
+              this.showCheckinList();
+              resolve(true);
+            }
+            else {
+              this.showOnboardList(person);
+              resolve(true);
+            }
+          },
+          (error:any) => {
+            this.showSigninUrl();
+          });
+        },
+        (error:any) => {
+            this.showSigninUrl();
+        });
       }
     });
   }
@@ -386,7 +399,7 @@ export class TenFourApp {
   private loadMenu() {
     this.logger.info(this, "loadMenu");
     Promise.all([
-      this.loadOrganizations(),
+      this.loadOrganization(),
       this.loadPerson()]).then(
       (loaded:any) => {
         this.logger.info(this, "loadMenu", "Loaded");
@@ -396,44 +409,47 @@ export class TenFourApp {
       });
   }
 
-  private loadOrganizations():Promise<any> {
-    if (this.organizations && this.organizations.length > 0) {
-      this.logger.info(this, "loadOrganizations", this.organizations);
-      return Promise.resolve();
-    }
-    else {
-      return this.database.getOrganizations().then(
-        (organizations:Organization[]) => {
-          this.zone.run(() => {
-            this.logger.info(this, "loadOrganizations", organizations);
-            this.organizations = organizations;
-            this.organization = organizations[0];
-          });
-        },
-        (error:any) => {
-          this.zone.run(() => {
-            this.logger.error(this, "loadOrganizations", error);
-            this.organizations = null;
-            this.organization = null;
-          });
+  private loadOrganization():Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.storage.getOrganization().then((organization:Organization) => {
+        this.logger.info(this, "loadOrganization", organization);
+        this.zone.run(() => {
+          this.organization = organization;
         });
-    }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadOrganization", error);
+        this.organization = null;
+      });
+    });
   }
 
   private loadPerson():Promise<any> {
-    return this.database.getPerson(this.organization, null, true).then(
-      (person:Person) => {
+    return new Promise((resolve, reject) => {
+      this.storage.getPerson().then((person:Person) => {
+        this.logger.info(this, "loadPerson", person);
         this.zone.run(() => {
-          this.logger.info(this, "loadPerson", person);
           this.person = person;
         });
       },
       (error:any) => {
-        this.zone.run(() => {
-          this.logger.error(this, "loadPerson", error);
-          this.person = null;
-        });
+        this.logger.error(this, "loadPerson", error);
+        this.person = null;
       });
+    });
+    // return this.database.getPerson(this.organization, null, true).then(
+    //   (person:Person) => {
+    //     this.zone.run(() => {
+    //       this.logger.info(this, "loadPerson", person);
+    //       this.person = person;
+    //     });
+    //   },
+    //   (error:any) => {
+    //     this.zone.run(() => {
+    //       this.logger.error(this, "loadPerson", error);
+    //       this.person = null;
+    //     });
+    //   });
   }
 
   private showSigninUrl(event:any=null) {
@@ -504,6 +520,8 @@ export class TenFourApp {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...");
     let removes = [
+      this.storage.removePerson(),
+      this.storage.removeOrganization(),
       this.database.removeOrganizations(),
       this.database.removeSubscriptions(),
       this.database.removeNotifications(),
@@ -516,7 +534,6 @@ export class TenFourApp {
       this.database.removePeople(),
       this.database.removeContacts()];
     Promise.all(removes).then((removed:any) => {
-      this.organizations = null;
       this.organization = null;
       this.person = null;
       this.badge.clear().then((cleared:any) => {

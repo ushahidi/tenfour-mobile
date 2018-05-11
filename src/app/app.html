@@ -2,10 +2,7 @@
   <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">
-        <ion-select interface="action-sheet" [selectOptions]="selectOptions" [(ngModel)]="organization"
-          [disabled]="organizations == null || organizations.length == 1" *ngIf="organizations && organizations.length > 0">
-          <ion-option value="{{organization}}" *ngFor="let organization of organizations">{{organization.name}}</ion-option>
-        </ion-select>
+        <ion-title *ngIf="organization">{{organization.name}}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>

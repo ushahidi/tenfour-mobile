@@ -7,6 +7,7 @@ import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -16,7 +17,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ CheckinListPage, OnboardListPage ]
 })
 export class SigninPasswordPage extends BasePage {
@@ -39,6 +40,7 @@ export class SigninPasswordPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -66,6 +68,8 @@ export class SigninPasswordPage extends BasePage {
               organization.email = this.email;
               organization.password = password;
               let saves = [
+                this.storage.setOrganization(organization),
+                this.storage.setPerson(person),
                 this.database.saveOrganization(organization),
                 this.database.savePerson(organization, person)];
               Promise.all(saves).then(saved => {
