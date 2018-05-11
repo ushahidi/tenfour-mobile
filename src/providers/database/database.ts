@@ -162,18 +162,25 @@ export class DatabaseProvider extends SqlProvider {
   }
 
   public getContacts(organization:Organization, person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
-    let where = { };
-    if (organization) {
-      where['organization_id'] = organization.id;
-    }
-    if (person) {
-      where['id'] = person.id;
-    }
-    if (people_ids) {
-      where['person_id'] = people_ids;
-    }
-    let order = { };
-    return this.getModels<Contact>(new Contact(), where, order, limit, offset);
+    return new Promise((resolve, reject) => {
+      let where = { };
+      if (organization) {
+        where['organization_id'] = organization.id;
+      }
+      if (person) {
+        where['id'] = person.id;
+      }
+      if (people_ids) {
+        where['person_id'] = people_ids;
+      }
+      let order = { };
+      this.getModels<Contact>(new Contact(), where, order, limit, offset).then((contacts:Contact[]) => {
+        resolve(contacts);
+      },
+      (error:any) => {
+        reject(error);
+      })
+    });
   }
 
   public getContact(organization:Organization, id:number):Promise<Contact> {
@@ -261,8 +268,17 @@ export class DatabaseProvider extends SqlProvider {
                 checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
               }
               resolve(checkins);
+          },
+          (error:any) => {
+            reject(error);
           });
+        },
+        (error:any) => {
+          reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -634,7 +650,10 @@ export class DatabaseProvider extends SqlProvider {
             group.loadMembers(people);
           }
           resolve(groups);
-      });
+        },
+        (error:any) => {
+          resolve([]);
+        });
     });
   }
 

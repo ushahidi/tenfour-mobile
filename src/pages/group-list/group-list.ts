@@ -79,6 +79,66 @@ export class GroupListPage extends BasePage {
       });
   }
 
+  private loadGroups(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadGroups", cache);
+    return new Promise((resolve, reject) => {
+      this.offset = 0;
+      if (cache) {
+        this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "Database", groups);
+          if (groups && groups.length > 0) {
+            this.organization.groups = groups;
+            resolve(groups);
+          }
+          else {
+            this.loadGroups(false).then((groups:Group[]) => {
+              this.organization.groups = groups;
+              resolve(groups);
+            },
+            (error:any) => {
+              this.organization.groups = [];
+              reject(error);
+            });
+          }
+        },
+        (error:any) => {
+          this.loadGroups(false).then((groups:Group[]) => {
+            this.organization.groups = groups;
+            resolve(groups);
+          },
+          (error:any) => {
+            this.organization.groups = [];
+            reject(error);
+          });
+        });
+      }
+      else {
+        this.api.getGroups(this.organization).then((groups:Group[]) => {
+          this.logger.info(this, "loadGroups", "API", groups);
+          let saves = [];
+          for (let group of groups) {
+            saves.push(this.database.saveGroup(this.organization, group));
+          }
+          Promise.all(saves).then(saved => {
+            this.logger.info(this, "loadGroups", "API", "Done");
+            this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+              this.organization.groups = groups;
+              resolve(groups);
+            },
+            (error:any) => {
+              this.organization.groups = groups;
+              resolve(groups);
+            });
+          });
+        },
+        (error:any) => {
+          this.organization.groups = [];
+          reject(error);
+        });
+      }
+    });
+  }
+
   private loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
@@ -104,56 +164,6 @@ export class GroupListPage extends BasePage {
         }
         resolve(this.organization.groups);
       });
-    });
-  }
-
-  private loadGroups(cache:boolean=true):Promise<any> {
-    this.logger.info(this, "loadGroups", cache);
-    return new Promise((resolve, reject) => {
-      this.offset = 0;
-      if (cache) {
-        this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", "Database", groups);
-          if (groups && groups.length > 0) {
-            this.organization.groups = groups;
-            resolve(groups);
-          }
-          else {
-            this.loadGroups(false).then((groups:Group[]) => {
-              this.organization.groups = groups;
-              resolve(groups);
-            },
-            (error:any) => {
-              this.organization.groups = [];
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "loadGroups", error);
-          reject(error);
-        });
-      }
-      else {
-        this.api.getGroups(this.organization).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", "API", groups);
-          let saves = [];
-          for (let group of groups) {
-            saves.push(this.database.saveGroup(this.organization, group));
-          }
-          Promise.all(saves).then(saved => {
-            this.logger.info(this, "loadGroups", "API", "Done");
-            this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-              this.organization.groups = groups;
-              resolve(groups);
-            });
-          });
-        },
-        (error:any) => {
-          this.organization.groups = [];
-          reject(error);
-        });
-      }
     });
   }
 

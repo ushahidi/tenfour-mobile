@@ -135,6 +135,15 @@ export class PersonListPage extends BasePage {
               reject(error);
             });
           }
+        },
+        (error:any) => {
+          this.loadPeople(false).then((people:Person[]) => {
+            resolve(people);
+          },
+          (error:any) => {
+            this.organization.people = [];
+            reject(error);
+          });
         });
       }
       else {
@@ -148,6 +157,11 @@ export class PersonListPage extends BasePage {
               this.organization.people = _people;
               this.loading = false;
               resolve(_people);
+            },
+            (error:any) => {
+              this.organization.people = people;
+              this.loading = false;
+              resolve(people);
             });
           });
         },

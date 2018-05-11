@@ -91,7 +91,7 @@ export class PersonDetailsPage extends BasePage {
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
+        this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
           if (contacts && contacts.length > 0) {
             this.person.contacts = contacts;
             resolve(this.person);
@@ -99,12 +99,17 @@ export class PersonDetailsPage extends BasePage {
           else {
             this.loadPerson(false).then((person:Person) => {
               resolve(person);
-            })
+            });
           }
+        },
+        (error:any) => {
+          this.loadPerson(false).then((person:Person) => {
+            resolve(person);
+          });
         });
       }
       else {
-        return this.api.getPerson(this.organization, this.person.id).then(
+        this.api.getPerson(this.organization, this.person.id).then(
           (person:Person) => {
             this.person = person;
             let saves = [];
@@ -114,7 +119,13 @@ export class PersonDetailsPage extends BasePage {
             saves.push(this.database.savePerson(this.organization, person))
             Promise.all(saves).then(saved => {
               resolve(person);
+            },
+            (error:any) => {
+              resolve(person);
             });
+          },
+          (error:any) => {
+            resolve(null);
           });
       }
     });
@@ -126,6 +137,9 @@ export class PersonDetailsPage extends BasePage {
       this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
         this.checkins = checkins;
         resolve(this.checkins);
+      },
+      (error:any) => {
+        resolve([]);
       });
     });
   }
@@ -136,7 +150,16 @@ export class PersonDetailsPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
         this.checkins = [...this.checkins, ...checkins];
+        if (event) {
+          event.complete();
+        }
         resolve(this.checkins);
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        resolve([]);
       });
     });
   }
