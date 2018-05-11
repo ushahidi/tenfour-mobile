@@ -43,7 +43,14 @@ export class DatabaseProvider extends SqlProvider {
   }
 
   public getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
-    return this.getModels<Organization>(new Organization(), where, order, limit, offset);
+    return new Promise((resolve, reject) => {
+      this.getModels<Organization>(new Organization(), where, order, limit, offset).then((organizations:Organization[]) => {
+        resolve(organizations);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
   }
 
   public getOrganization(id:number):Promise<Organization> {
@@ -244,6 +251,9 @@ export class DatabaseProvider extends SqlProvider {
               checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
             }
             resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
         });
       });
     });
@@ -446,7 +456,13 @@ export class DatabaseProvider extends SqlProvider {
             }
           }
           resolve(replies);
+        },
+        (error:any) => {
+          reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

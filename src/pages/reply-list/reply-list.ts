@@ -89,13 +89,22 @@ export class ReplyListPage extends BasePage {
   private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        return this.database.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
+        this.database.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
           this.checkin.replies = replies;
           resolve(replies);
+        },
+        (error:any) => {
+          this.loadReplies(false).then((replies:Reply[]) => {
+            this.checkin.replies = replies;
+            resolve(replies);
+          },
+          (error:any) => {
+            reject(error);
+          });
         });
       }
       else {
-        return this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
+        this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
           let saves = [];
           for (let answer of checkin.answers) {
             saves.push(this.database.saveAnswer(this.organization, checkin, answer));
@@ -111,6 +120,10 @@ export class ReplyListPage extends BasePage {
           }
           saves.push(this.database.saveCheckin(this.organization, checkin));
           Promise.all(saves).then(saved => {
+            this.checkin = checkin;
+            resolve(checkin.replies);
+          },
+          (error:any) => {
             this.checkin = checkin;
             resolve(checkin.replies);
           });
