@@ -25,6 +25,10 @@ import { Person } from '../../models/person';
 export class BasePage {
 
   protected offline:boolean = false;
+  protected tablet:boolean = false;
+  protected mobile:boolean = false;
+  protected cordova:boolean = false;
+
   protected connection:any = null;
   protected disconnection:any = null;
 
@@ -38,10 +42,9 @@ export class BasePage {
   protected segment:SegmentService;
   protected device:Device;
   protected appVersion:AppVersion;
-  protected tablet:boolean = false;
 
   @ViewChild(Content)
-  content: Content;
+  content:Content;
 
   constructor(
     protected _zone:NgZone,
@@ -68,12 +71,11 @@ export class BasePage {
 
   ionViewDidLoad() {
     this.logger.info(this, "ionViewDidLoad");
-    if (this.platform.is('tablet')) {
-      this.tablet = true;
-    }
-    else {
-      this.tablet = false;
-    }
+    this.platform.ready().then(() => {
+      this.tablet = this.platform.is('tablet');
+      this.mobile = this.platform.is('mobile');
+      this.cordova = this.platform.is('cordova');
+    })
   }
 
   ionViewWillEnter() {
@@ -361,7 +363,7 @@ export class BasePage {
       }
     }
     else {
-      name.push("Web App");
+      name.push(navigator.appVersion);
     }
     return name.join(" ");
   }

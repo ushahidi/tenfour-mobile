@@ -1,4 +1,4 @@
-<ion-split-pane #splitPane [enabled]="organization != null && person != null && tablet == true">
+<ion-split-pane #splitPane [enabled]="organization && person && (tablet == true || cordova == false)">
   <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">

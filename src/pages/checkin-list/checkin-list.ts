@@ -110,39 +110,44 @@ export class CheckinListPage extends BasePage {
   }
 
   private loadWaitingResponse() {
-    this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
-      this.logger.info(this, "loadWaitingResponse", waiting.length);
-      let checkins = [];
-      for (let checkin of waiting) {
-        if (checkin.canRespond(this.person)) {
-          checkins.push(checkin);
-        }
-      }
-      if (checkins.length > 0) {
-        let modal = this.showModal(ReplySendPage, {
-          organization: this.organization,
-          checkins: checkins
-        });
-        modal.onDidDismiss(data => {
-          if (data) {
-            this.loadCheckins(false).then(loaded => {
-              this.loadBadgeNumber();
-            },
-            (error:any) => {
-
-            });
+    if (this.cordova) {
+      this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
+        this.logger.info(this, "loadWaitingResponse", waiting.length);
+        let checkins = [];
+        for (let checkin of waiting) {
+          if (checkin.canRespond(this.person)) {
+            checkins.push(checkin);
           }
-        });
-      }
-    },
-    (error:any) => {
-      this.logger.error(this, "loadWaitingResponse", error);
-    });
+        }
+        if (checkins.length > 0) {
+          let modal = this.showModal(ReplySendPage, {
+            organization: this.organization,
+            checkins: checkins
+          });
+          modal.onDidDismiss(data => {
+            if (data) {
+              this.loadCheckins(false).then(loaded => {
+                this.loadBadgeNumber();
+              },
+              (error:any) => {
+
+              });
+            }
+          });
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadWaitingResponse", error);
+      });
+    }
+    else {
+
+    }
   }
 
   private loadBadgeNumber():Promise<number> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is('cordova')) {
+      if (this.cordova) {
         try {
           let badgeNumber = 0;
           if (this.organization && this.organization.checkins) {
@@ -193,11 +198,29 @@ export class CheckinListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-        let saves = [];
-        for (let checkin of checkins) {
-          saves.push(this.database.saveCheckin(this.organization, checkin));
+        if (this.cordova) {
+          let saves = [];
+          for (let checkin of checkins) {
+            saves.push(this.database.saveCheckin(this.organization, checkin));
+          }
+          Promise.all(saves).then(saved => {
+            this.organization.checkins = [...this.organization.checkins, ...checkins];
+            this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
+            if (event) {
+              event.complete();
+            }
+            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
+            resolve(this.checkins);
+          },
+          (error:any) => {
+            this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
+            if (event) {
+              event.complete();
+            }
+            resolve(this.checkins);
+          });
         }
-        Promise.all(saves).then(saved => {
+        else {
           this.organization.checkins = [...this.organization.checkins, ...checkins];
           this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
           if (event) {
@@ -205,21 +228,14 @@ export class CheckinListPage extends BasePage {
           }
           this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
           resolve(this.checkins);
-        },
-        (error:any) => {
-          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
-          if (event) {
-            event.complete();
-          }
-          resolve(this.checkins);
-        });
+        }
       });
     });
   }
 
   private loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.cordova) {
         this.database.getPerson(this.organization, null, true).then((person:Person) => {
           if (person) {
             this.person = person;
@@ -245,14 +261,20 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getPerson(this.organization, "me").then((person:Person) => {
-          this.database.savePerson(this.organization, person).then(saved => {
+          if (this.cordova) {
+            this.database.savePerson(this.organization, person).then(saved => {
+              this.person = person;
+              resolve(person);
+            },
+            (error:any) => {
+              this.person = person;
+              resolve(person);
+            });
+          }
+          else {
             this.person = person;
             resolve(person);
-          },
-          (error:any) => {
-            this.person = person;
-            resolve(person);
-          });
+          }
         },
         (error:any) => {
           reject(error);
@@ -268,14 +290,20 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getOrganization(this.organization).then((organization:Organization) => {
-          this.database.saveOrganization(this.organization).then(saved => {
+          if (this.cordova) {
+            this.database.saveOrganization(this.organization).then(saved => {
+              this.organization = organization;
+              resolve(organization);
+            },
+            (error:any) => {
+              this.organization = organization;
+              resolve(organization);
+            });
+          }
+          else {
             this.organization = organization;
             resolve(organization);
-          },
-          (error:any) => {
-            this.organization = organization;
-            resolve(organization);
-          });
+          }
         },
         (error:any) => {
           reject(error);
@@ -287,7 +315,7 @@ export class CheckinListPage extends BasePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache) {
+      if (cache && this.cordova) {
         this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
             this.organization.checkins = checkins;
@@ -310,7 +338,7 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-          if (checkins && checkins.length > 0) {
+          if (this.cordova) {
             let saves = [];
             for (let checkin of checkins) {
               for (let answer of checkin.answers) {
@@ -344,9 +372,9 @@ export class CheckinListPage extends BasePage {
             });
           }
           else {
-            this.organization.checkins = [];
-            this.checkins = [];
-            resolve([]);
+            this.organization.checkins = checkins;
+            this.checkins = this.filterCheckins(checkins);
+            resolve(checkins);
           }
         },
         (error:any) => {
@@ -361,7 +389,7 @@ export class CheckinListPage extends BasePage {
   private loadNotifications(cache:boolean=true):Promise<any> {
     this.notify = false;
     return new Promise((resolve, reject) => {
-      if (cache) {
+      if (cache && this.cordova) {
         this.database.getNotifications(this.organization, 10, 0).then((notifications:Notification[]) => {
           this.notifications = notifications;
           for (let notification of notifications) {
@@ -377,24 +405,30 @@ export class CheckinListPage extends BasePage {
       }
       else {
         this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          let saves = [];
-          for (let notification of notifications) {
-            saves.push(this.database.saveNotification(this.organization, notification));
-          }
-          Promise.all(saves).then(saved => {
-            this.database.getNotifications(this.organization, 10, 0).then((_notifications:Notification[]) => {
-              this.notifications = _notifications;
-              for (let notification of _notifications) {
-                if (notification.viewed_at == null) {
-                  this.notify = true;
+          if (this.cordova) {
+            let saves = [];
+            for (let notification of notifications) {
+              saves.push(this.database.saveNotification(this.organization, notification));
+            }
+            Promise.all(saves).then(saved => {
+              this.database.getNotifications(this.organization, 10, 0).then((_notifications:Notification[]) => {
+                this.notifications = _notifications;
+                for (let notification of _notifications) {
+                  if (notification.viewed_at == null) {
+                    this.notify = true;
+                  }
                 }
-              }
-              resolve(_notifications);
-            },
-            (error:any) => {
-              resolve(notifications);
+                resolve(_notifications);
+              },
+              (error:any) => {
+                resolve(notifications);
+              });
             });
-          });
+          }
+          else {
+            this.notifications = notifications;
+            resolve(notifications);
+          }
         },
         (error:any) => {
           reject(error);

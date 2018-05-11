@@ -56,6 +56,8 @@ export class TenFourApp {
   organization:Organization = null;
   person:Person = null;
   tablet:boolean = false;
+  mobile:boolean = false;
+  cordova:boolean = false;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -116,18 +118,9 @@ export class TenFourApp {
 
   private loadSplitPane():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is('tablet')) {
-        this.logger.info(this, "loadSplitPane", "Tablet");
-        this.tablet = true;
-      }
-      else if (this.platform.is('mobile')) {
-        this.logger.info(this, "loadSplitPane", "Mobile");
-        this.tablet = true;
-      }
-      else {
-        this.logger.info(this, "loadSplitPane", "Web");
-        this.tablet = true;
-      }
+      this.tablet = this.platform.is('tablet');
+      this.mobile = this.platform.is('mobile');
+      this.cordova = this.platform.is('cordova');
       resolve(true);
     });
   }

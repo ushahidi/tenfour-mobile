@@ -93,18 +93,28 @@ export class PersonListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-        let saves = [];
-        for (let person of people) {
-          saves.push(this.database.savePerson(this.organization, person));
+        if (this.cordova) {
+          let saves = [];
+          for (let person of people) {
+            saves.push(this.database.savePerson(this.organization, person));
+          }
+          Promise.all(saves).then(saved => {
+            this.organization.people = [...this.organization.people, ...people];
+            if (event) {
+              event.complete();
+            }
+            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.people.length);
+            resolve(this.organization.people);
+          });
         }
-        Promise.all(saves).then(saved => {
+        else {
           this.organization.people = [...this.organization.people, ...people];
           if (event) {
             event.complete();
           }
           this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.people.length);
           resolve(this.organization.people);
-        });
+        }
       },
       (error:any) => {
         this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
@@ -119,7 +129,7 @@ export class PersonListPage extends BasePage {
   private loadPeople(cache:boolean=true) {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache) {
+      if (cache && this.cordova) {
         this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           if (people && people.length > 1) {
             this.organization.people = people;
@@ -148,22 +158,29 @@ export class PersonListPage extends BasePage {
       }
       else {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-          let saves = [];
-          for (let person of people) {
-            saves.push(this.database.savePerson(this.organization, person));
-          }
-          Promise.all(saves).then(saved => {
-            this.database.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
-              this.organization.people = _people;
-              this.loading = false;
-              resolve(_people);
-            },
-            (error:any) => {
-              this.organization.people = people;
-              this.loading = false;
-              resolve(people);
+          if (this.cordova) {
+            let saves = [];
+            for (let person of people) {
+              saves.push(this.database.savePerson(this.organization, person));
+            }
+            Promise.all(saves).then(saved => {
+              this.database.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
+                this.organization.people = _people;
+                this.loading = false;
+                resolve(_people);
+              },
+              (error:any) => {
+                this.organization.people = people;
+                this.loading = false;
+                resolve(people);
+              });
             });
-          });
+          }
+          else {
+            this.organization.people = people;
+            this.loading = false;
+            resolve(people);
+          }
         },
         (error:any) => {
           this.organization.people = [];
@@ -274,18 +291,27 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "removePerson", person);
     let loading = this.showLoading("Removing...");
     this.api.deletePerson(this.organization, person).then((deleted:any) => {
-      let removes = [];
-      removes.push(this.database.removePerson(this.organization, person));
-      for (let contact of person.contacts) {
-        removes.push(this.database.removeContact(this.organization, contact));
+      if (this.cordova) {
+        let removes = [];
+        removes.push(this.database.removePerson(this.organization, person));
+        for (let contact of person.contacts) {
+          removes.push(this.database.removeContact(this.organization, contact));
+        }
+        Promise.all(removes).then(removed => {
+          let index = this.organization.people.indexOf(person);
+          if (index > -1) {
+            this.organization.people.splice(index, 1);
+          }
+          loading.dismiss();
+        });
       }
-      Promise.all(removes).then(removed => {
+      else {
         let index = this.organization.people.indexOf(person);
         if (index > -1) {
           this.organization.people.splice(index, 1);
         }
         loading.dismiss();
-      });
+      }
     },
     (error:any) => {
       loading.dismiss();
