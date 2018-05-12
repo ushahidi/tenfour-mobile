@@ -59,10 +59,20 @@ export class SettingsEditPage extends BasePage {
   private doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.database.saveOrganization(organization).then(saved => {
+      if (this.mobile) {
+        this.database.saveOrganization(organization).then(saved => {
+          loading.dismiss();
+          this.hideModal({
+            organization: organization
+          });
+        });
+      }
+      else {
         loading.dismiss();
-        this.hideModal({ organization: organization });
-      });
+        this.hideModal({
+          organization: organization
+        });
+      }
     },
     (error:any) => {
       loading.dismiss();

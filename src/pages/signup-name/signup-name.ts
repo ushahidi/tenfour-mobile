@@ -51,24 +51,24 @@ export class SignupNamePage extends BasePage {
   private showNext(event:any) {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Loading...");
-    this.api.getOrganizations(null, this.name.value).then(
-      (organizations:Organization[]) => {
-        this.logger.error(this, "showNext", organizations);
-        loading.dismiss();
-        if (organizations && organizations.length > 0) {
-          this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
-        }
-        else {
-          this.organization.name = this.name.value;
-          this.showPage(SignupUrlPage,
-            { organization: this.organization });
-        }
-      },
-      (error:any) => {
-        this.logger.info(this, "showNext", error);
-        loading.dismiss();
-        this.showAlert("Organization Name", error);
-      });
+    this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
+      this.logger.error(this, "showNext", organizations);
+      loading.dismiss();
+      if (organizations && organizations.length > 0) {
+        this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
+      }
+      else {
+        this.organization.name = this.name.value;
+        this.showPage(SignupUrlPage, {
+          organization: this.organization
+        });
+      }
+    },
+    (error:any) => {
+      this.logger.info(this, "showNext", error);
+      loading.dismiss();
+      this.showAlert("Organization Name", error);
+    });
   }
 
   private showNextOnReturn(event:any) {

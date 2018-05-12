@@ -111,16 +111,8 @@ export class PersonDetailsPage extends BasePage {
       else {
         this.api.getPerson(this.organization, this.person.id).then((person:Person) => {
           if (this.mobile) {
-            this.person = person;
-            let saves = [];
-            for (let contact of person.contacts) {
-              saves.push(this.database.saveContact(this.organization, person, contact));
-            }
-            saves.push(this.database.savePerson(this.organization, person))
-            Promise.all(saves).then(saved => {
-              resolve(person);
-            },
-            (error:any) => {
+            this.database.savePerson(this.organization, person).then((saved:boolean) => {
+              this.person = person;
               resolve(person);
             });
           }
@@ -180,10 +172,11 @@ export class PersonDetailsPage extends BasePage {
 
   private editPerson(event:any) {
     this.logger.info(this, "editPerson");
-    let modal = this.showModal(PersonEditPage,
-      { organization: this.organization,
-        person: this.person,
-        user: this.user });
+    let modal = this.showModal(PersonEditPage, {
+      organization: this.organization,
+      person: this.person,
+      user: this.user
+    });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);
       if (data) {

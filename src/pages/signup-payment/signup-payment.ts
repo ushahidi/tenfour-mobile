@@ -52,8 +52,9 @@ export class SignupPaymentPage extends BasePage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.showPage(SignupPasswordPage,
-      { organization: this.organization });
+    this.showPage(SignupPasswordPage, {
+      organization: this.organization
+    });
   }
 
   private showNextOnReturn(event:any) {

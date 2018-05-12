@@ -46,24 +46,24 @@ export class SigninUrlPage extends BasePage {
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
       let loading = this.showLoading("Searching...");
-      this.api.getOrganizations(subdomain).then(
-        (organizations:Organization[]) => {
-          this.logger.info(this, "showNext", organizations);
-          loading.dismiss();
-          if (organizations && organizations.length > 0) {
-            let organization:Organization = organizations[0];
-            this.showPage(SigninEmailPage,
-              { organization: organization });
-          }
-          else {
-            this.showPage(SignupEmailPage, {});
-          }
-        },
-        (error:any) => {
-          this.logger.error(this, "showNext", error);
-          loading.dismiss();
-          this.showAlert("Problem Finding Organization", error);
-        });
+      this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
+        this.logger.info(this, "showNext", organizations);
+        loading.dismiss();
+        if (organizations && organizations.length > 0) {
+          let organization:Organization = organizations[0];
+          this.showPage(SigninEmailPage, {
+            organization: organization
+          });
+        }
+        else {
+          this.showPage(SignupEmailPage, {});
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "showNext", error);
+        loading.dismiss();
+        this.showAlert("Problem Finding Organization", error);
+      });
     }
   }
 

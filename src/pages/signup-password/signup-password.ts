@@ -80,7 +80,8 @@ export class SignupPasswordPage extends BasePage {
               organization.password = this.password.value;
               let saves = [
                 this.database.saveOrganization(organization),
-                this.database.savePerson(organization, person)];
+                this.database.savePerson(organization, person)
+              ];
               Promise.all(saves).then(saved => {
                 this.trackLogin(organization, person);
                 loading.dismiss();
@@ -90,9 +91,10 @@ export class SignupPasswordPage extends BasePage {
                 else {
                   this.showToast(`Welcome to ${organization.name}`);
                 }
-                this.showRootPage(OnboardListPage,
-                  { organization: organization,
-                    person: person });
+                this.showRootPage(OnboardListPage, {
+                  organization: organization,
+                  person: person
+                });
               });
             },
             (error:any) => {

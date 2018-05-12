@@ -97,29 +97,18 @@ export class OnboardListPage extends BasePage {
   private loadPeople():Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
         if (this.mobile) {
-          let saves = [];
-          for (let person of people) {
-            this.logger.info(this, "loadPeople", person);
-            saves.push(this.database.savePerson(this.organization, person));
-          }
-          Promise.all(saves).then(saved => {
-            if (people && people.length > 1) {
-              this.person.config_people_invited = true;
-            }
-            else {
-              this.person.config_people_invited = false;
-            }
+          this.database.savePeople(this.organization, people).then((saved:boolean) => {
             resolve();
           });
         }
         else {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
           resolve();
         }
       });
@@ -156,9 +145,10 @@ export class OnboardListPage extends BasePage {
 
   private addPerson() {
     this.logger.info(this, "addPerson");
-    let modal = this.showModal(PersonEditPage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonEditPage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
       if (this.mobile) {
@@ -176,9 +166,10 @@ export class OnboardListPage extends BasePage {
 
   private invitePerson() {
     this.logger.info(this, "invitePerson");
-    let modal = this.showModal(PersonInvitePage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonInvitePage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
       if (this.mobile) {
@@ -196,9 +187,10 @@ export class OnboardListPage extends BasePage {
 
   private importPerson() {
     this.logger.info(this, "importPerson");
-    let modal = this.showModal(PersonImportPage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonImportPage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
       if (this.mobile) {
@@ -209,7 +201,7 @@ export class OnboardListPage extends BasePage {
           else {
             this.person.config_people_invited = false;
           }
-        });  
+        });
       }
     });
   }
@@ -255,8 +247,9 @@ export class OnboardListPage extends BasePage {
       person.config_self_test_sent = true;
       this.database.savePerson(this.organization, this.person).then(saved => {
         loading.dismiss();
-        this.showRootPage(CheckinListPage,
-          { organization: this.organization });
+        this.showRootPage(CheckinListPage,{
+          organization: this.organization
+        });
       });
     },
     (error:any) => {
@@ -268,8 +261,9 @@ export class OnboardListPage extends BasePage {
 
   private skipAhead(event:any) {
     this.logger.info(this, "skipAhead");
-    this.showRootPage(CheckinListPage,
-      { organization: this.organization });
+    this.showRootPage(CheckinListPage, {
+      organization: this.organization
+    });
   }
 
 }

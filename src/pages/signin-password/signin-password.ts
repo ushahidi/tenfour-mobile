@@ -56,61 +56,67 @@ export class SigninPasswordPage extends BasePage {
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
       let password = this.password.value;
-      this.api.userLogin(this.organization, this.email, password).then(
-        (token:Token) => {
-          this.logger.info(this, "showNext", "Token", token);
-          this.api.getPerson(this.organization, "me").then((person:Person) => {
-            this.logger.info(this, "showNext", "Person", person);
-            this.api.getOrganization(this.organization).then((organization:Organization) => {
-              this.logger.info(this, "showNext", "Organization", organization);
-              organization.user_id = person.id;
-              organization.user_name = person.name;
-              organization.email = this.email;
-              organization.password = password;
-              let saves = [
-                this.storage.setOrganization(organization),
-                this.storage.setPerson(person),
-                this.database.saveOrganization(organization),
-                this.database.savePerson(organization, person)];
-              Promise.all(saves).then(saved => {
-                this.trackLogin(organization, person);
-                loading.dismiss();
-                if (person.name && person.name.length > 0) {
-                  this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
-                }
-                else {
-                  this.showToast(`Welcome to ${organization.name}`);
-                }
-                if (person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRootPage(CheckinListPage,
-                    { organization: organization });
-                }
-                else {
-                  this.showRootPage(OnboardListPage,
-                    { organization: organization,
-                      person: person });
-                }
-              },
-              (error:any) => {
-                this.logger.error(this, "showNext", error);
-                if (person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRootPage(CheckinListPage,
-                    { organization: organization });
-                }
-                else {
-                  this.showRootPage(OnboardListPage,
-                    { organization: organization,
-                      person: person });
-                }
-              });
+      this.api.userLogin(this.organization, this.email, password).then((token:Token) => {
+        this.logger.info(this, "showNext", "Token", token);
+        this.api.getPerson(this.organization, "me").then((person:Person) => {
+          this.logger.info(this, "showNext", "Person", person);
+          this.api.getOrganization(this.organization).then((organization:Organization) => {
+            this.logger.info(this, "showNext", "Organization", organization);
+            organization.user_id = person.id;
+            organization.user_name = person.name;
+            organization.email = this.email;
+            organization.password = password;
+            let saves = [
+              this.storage.setOrganization(organization),
+              this.storage.setPerson(person)
+            ];
+            if (this.mobile) {
+              saves.push(this.database.saveOrganization(organization));
+              saves.push(this.database.savePerson(organization, person));
+            }
+            Promise.all(saves).then(saved => {
+              this.trackLogin(organization, person);
+              loading.dismiss();
+              if (person.name && person.name.length > 0) {
+                this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
+              }
+              else {
+                this.showToast(`Welcome to ${organization.name}`);
+              }
+              if (person.config_profile_reviewed && person.config_self_test_sent) {
+                this.showRootPage(CheckinListPage, {
+                  organization: organization
+                });
+              }
+              else {
+                this.showRootPage(OnboardListPage, {
+                  organization: organization,
+                  person: person
+                });
+              }
+            },
+            (error:any) => {
+              this.logger.error(this, "showNext", error);
+              if (person.config_profile_reviewed && person.config_self_test_sent) {
+                this.showRootPage(CheckinListPage, {
+                  organization: organization
+                });
+              }
+              else {
+                this.showRootPage(OnboardListPage, {
+                  organization: organization,
+                  person: person
+                });
+              }
             });
           });
-        },
-        (error:any) => {
-          this.logger.error(this, "showNext", error);
-          loading.dismiss();
-          this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
         });
+      },
+      (error:any) => {
+        this.logger.error(this, "showNext", error);
+        loading.dismiss();
+        this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
+      });
     }
   }
 

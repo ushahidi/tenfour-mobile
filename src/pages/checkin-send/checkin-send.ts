@@ -125,18 +125,7 @@ export class CheckinSendPage extends BasePage {
       let loading = this.showLoading("Sending...");
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
         if (this.mobile) {
-          let saves = [];
-          for (let answer of checkin.answers) {
-            saves.push(this.database.saveAnswer(this.organization, checkin, answer));
-          }
-          for (let recipient of checkin.recipients) {
-            saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
-          }
-          for (let reply of checkin.replies) {
-            saves.push(this.database.saveReply(this.organization, checkin, reply));
-          }
-          saves.push(this.database.saveCheckin(this.organization, checkin));
-          Promise.all(saves).then(saved => {
+          this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
             loading.dismiss();
             let recipients = this.checkin.recipientIds().length;
             if (recipients == 1) {

@@ -69,7 +69,7 @@ export class SettingsRegionsPage extends BasePage {
   private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadRegions");
-      if (cache) {
+      if (cache && this.mobile) {
         this.database.getCountries(this.organization).then((countries:Country[]) => {
           if (countries && countries.length > 0) {
             this.organization.countries = countries;
@@ -86,30 +86,43 @@ export class SettingsRegionsPage extends BasePage {
               resolve(regions);
             });
           }
+        },
+        (error:any) => {
+          this.loadRegions(false, event).then((regions:Region[]) => {
+            if (event) {
+              event.complete();
+            }
+            resolve(regions);
+          });
         });
       }
       else {
         this.api.getRegions(this.organization).then((regions:Region[]) => {
           let codes = regions.map(region => region.code);
           this.countries.getCountries(codes).then((countries:Country[]) => {
-            let saves = [];
-            for (let country of countries) {
-              if (this.organization.regions) {
-                let codes = this.organization.regions.split(",");
-                country.selected = codes.indexOf(country.code) != -1;
-              }
-              else {
-                country.selected = false;
-              }
-              saves.push(this.database.saveCountry(this.organization, country));
+            if (this.mobile) {
+              this.database.saveCountries(this.organization, countries).then((saved:boolean) => {
+                this.organization.countries = countries;
+                if (event) {
+                  event.complete();
+                }
+                resolve(regions);
+              },
+              (error:any) => {
+                this.organization.countries = countries;
+                if (event) {
+                  event.complete();
+                }
+                resolve(regions);
+              });
             }
-            Promise.all(saves).then(saved => {
+            else {
               this.organization.countries = countries;
               if (event) {
                 event.complete();
               }
               resolve(regions);
-            });
+            }
           });
         },
         (error:any) => {
@@ -143,12 +156,20 @@ export class SettingsRegionsPage extends BasePage {
     this.organization.regions = Array.from(new Set(regions)).sort().join(",");
     Promise.all(saves).then(saved => {
       this.api.updateOrganization(this.organization).then((organization:Organization) => {
-        this.database.saveOrganization(organization).then(saved => {
+        if (this.mobile) {
+          this.database.saveOrganization(organization).then(saved => {
+            loading.dismiss();
+            this.hideModal({
+              organization: organization
+            });
+          });
+        }
+        else {
           loading.dismiss();
           this.hideModal({
             organization: organization
           });
-        });
+        }
       },
       (error:any) => {
         loading.dismiss();

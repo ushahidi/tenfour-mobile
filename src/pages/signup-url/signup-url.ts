@@ -51,24 +51,24 @@ export class SignupUrlPage extends BasePage {
   private showNext(event:any) {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Checking...");
-    this.api.getOrganizations(this.subdomain.value).then(
-      (organizations:Organization[]) => {
-        this.logger.error(this, "showNext", organizations);
-        loading.dismiss();
-        if (organizations && organizations.length > 0) {
-          this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
-        }
-        else {
-          this.organization.subdomain = this.subdomain.value;
-          this.showPage(SignupPlanPage,
-            { organization: this.organization });
-        }
-      },
-      (error:any) => {
-        this.logger.info(this, "showNext", error);
-        loading.dismiss();
-        this.showAlert("Organization URL", error);
-      });
+    this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
+      this.logger.error(this, "showNext", organizations);
+      loading.dismiss();
+      if (organizations && organizations.length > 0) {
+        this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
+      }
+      else {
+        this.organization.subdomain = this.subdomain.value;
+        this.showPage(SignupPlanPage, {
+          organization: this.organization
+        });
+      }
+    },
+    (error:any) => {
+      this.logger.info(this, "showNext", error);
+      loading.dismiss();
+      this.showAlert("Organization URL", error);
+    });
   }
 
   private showNextOnReturn(event:any) {

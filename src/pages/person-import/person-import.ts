@@ -277,12 +277,17 @@ export class PersonImportPage extends BasePage {
   private createContact(person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.api.createContact(this.organization, person, contact).then((newContact:Contact) => {
-        this.database.saveContact(this.organization, person, newContact).then((saved:any) => {
+        if (this.mobile) {
+          this.database.saveContact(this.organization, person, newContact).then((saved:any) => {
+            resolve(newContact);
+          },
+          (error:any) => {
+            reject(error);
+          });
+        }
+        else {
           resolve(newContact);
-        },
-        (error:any) => {
-          reject(error);
-        });
+        }
       },
       (error:any) => {
         reject(error);

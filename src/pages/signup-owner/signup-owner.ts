@@ -51,8 +51,9 @@ export class SignupOwnerPage extends BasePage {
   private showNext(event:any) {
     this.logger.info(this, "showNext");
     this.organization.user_name = this.owner.value;
-    this.showPage(SignupNamePage,
-      { organization: this.organization });
+    this.showPage(SignupNamePage, {
+      organization: this.organization
+    });
   }
 
   private showNextOnReturn(event:any) {

@@ -115,13 +115,7 @@ export class GroupListPage extends BasePage {
       else {
         this.api.getGroups(this.organization).then((groups:Group[]) => {
           if (this.mobile) {
-            this.logger.info(this, "loadGroups", "API", groups);
-            let saves = [];
-            for (let group of groups) {
-              saves.push(this.database.saveGroup(this.organization, group));
-            }
-            Promise.all(saves).then(saved => {
-              this.logger.info(this, "loadGroups", "API", "Done");
+            this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
               this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
                 this.organization.groups = groups;
                 resolve(groups);
@@ -151,17 +145,23 @@ export class GroupListPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
         if (this.mobile) {
-          let saves = [];
-          for (let group of groups) {
-            saves.push(this.database.saveGroup(this.organization, group));
-          }
-          Promise.all(saves).then(saved => {
-            this.organization.groups = [...this.organization.groups, ...groups];
-            if (event) {
-              event.complete();
-            }
-            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
-            resolve(this.organization.groups);
+          this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
+            this.database.getGroups(this.organization, this.limit, this.offset).then((_groups:Group[]) => {
+              this.organization.groups = [...this.organization.groups, ..._groups];
+              if (event) {
+                event.complete();
+              }
+              this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
+              resolve(this.organization.groups);
+            },
+            (error:any) => {
+              this.organization.groups = [...this.organization.groups, ...groups];
+              if (event) {
+                event.complete();
+              }
+              this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
+              resolve(this.organization.groups);
+            });
           });
         }
         else {
@@ -185,9 +185,10 @@ export class GroupListPage extends BasePage {
 
   private createGroup(event:any) {
     this.logger.info(this, "createGroup");
-    let modal = this.showModal(GroupEditPage,
-      { organization: this.organization,
-        person: this.person });
+    let modal = this.showModal(GroupEditPage, {
+      organization: this.organization,
+      person: this.person
+    });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "createGroup", data);
       if (data && data.group) {
@@ -204,10 +205,11 @@ export class GroupListPage extends BasePage {
 
   private showGroup(group:Group) {
     this.logger.info(this, "showGroup", group);
-    this.showPage(GroupDetailsPage,
-      { organization: this.organization,
-        person: this.person,
-        group: group });
+    this.showPage(GroupDetailsPage, {
+      organization: this.organization,
+      person: this.person,
+      group: group
+    });
   }
 
 }

@@ -108,11 +108,7 @@ export class PersonSelectPage extends BasePage {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
           if (this.mobile) {
-            let saves = [];
-            for (let person of people) {
-              saves.push(this.database.savePerson(this.organization, person));
-            }
-            Promise.all(saves).then(saved => {
+            this.database.savePeople(this.organization, people).then((saved:boolean) => {
               this.updatePeople(people);
               resolve(people);
             });
@@ -199,11 +195,7 @@ export class PersonSelectPage extends BasePage {
         this.api.getGroups(this.organization).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "API", groups);
           if (this.mobile) {
-            let saves = [];
-            for (let group of groups) {
-              saves.push(this.database.saveGroup(this.organization, group));
-            }
-            Promise.all(saves).then(saved => {
+            this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
               this.updateGroups(groups);
               resolve(groups);
             });
@@ -265,7 +257,8 @@ export class PersonSelectPage extends BasePage {
     }
     this.hideModal({
       people: people,
-      groups: groups });
+      groups: groups
+    });
   }
 
 }

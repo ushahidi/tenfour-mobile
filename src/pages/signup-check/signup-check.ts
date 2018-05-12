@@ -58,13 +58,18 @@ export class SignupCheckPage extends BasePage {
   }
 
   private checkMail(app:string) {
-    this.appAvailability.check(app).then(
-      (yes:any) => {
-        this.mailer = true;
-      },
-      (no:any) => {
-        this.mailer = false;
-      });
+    if (this.mobile) {
+      this.appAvailability.check(app).then(
+        (yes:any) => {
+          this.mailer = true;
+        },
+        (no:any) => {
+          this.mailer = false;
+        });
+    }
+    else {
+      this.mailer = false;
+    }
   }
 
   private openMail(event:any) {
@@ -79,14 +84,13 @@ export class SignupCheckPage extends BasePage {
 
   private sendEmail(event:any) {
     let loading = this.showLoading("Resending...");
-    this.api.registerEmail(this.organization.email).then(
-      (email:Email) => {
-        loading.dismiss();
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Email Verification", error);
-      });
+    this.api.registerEmail(this.organization.email).then((email:Email) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Email Verification", error);
+    });
   }
 
 }

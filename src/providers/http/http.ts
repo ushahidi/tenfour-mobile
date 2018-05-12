@@ -48,28 +48,27 @@ export class HttpProvider {
         this.logger.info(this, "GET", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.get(url, params, headers).then(
-          (response:any) => {
-            if (response.data) {
-              if (response.headers['content-type'].indexOf("application/json") != -1) {
-                let data = JSON.parse(response.data);
-                this.logger.info(this, "GET", url, response.status, data);
-                resolve(data);
-              }
-              else {
-                this.logger.info(this, "GET", url, response.status, response.data);
-                resolve(response.data);
-              }
+        this.httpNative.get(url, params, headers).then((response:any) => {
+          if (response.data) {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "GET", url, response.status, data);
+              resolve(data);
             }
             else {
-              this.logger.error(this, "GET", url, response.status, "No Data");
-              reject("No Response Data");
+              this.logger.info(this, "GET", url, response.status, response.data);
+              resolve(response.data);
             }
-          },
-          (error:any) => {
-            this.logger.error(this, "GET", url, error.status, error.error);
-            reject(this.httpError(error));
-          });
+          }
+          else {
+            this.logger.error(this, "GET", url, response.status, "No Data");
+            reject("No Response Data");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "GET", url, error.status, error.error);
+          reject(this.httpError(error));
+        });
       }
       else {
         let search = new URLSearchParams();
@@ -114,30 +113,28 @@ export class HttpProvider {
         this.logger.info(this, "POST", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.post(url, params, headers).then(
-          (response:any) => {
-            if (response.data) {
-              this.logger.info(this, "POST", url, response.status, response.headers, response.data);
-              if (response.headers['content-type'].indexOf("application/json") != -1) {
-                let data = JSON.parse(response.data);
-                this.logger.info(this, "POST", url, response.status, data);
-                resolve(data);
-              }
-              else {
-                this.logger.info(this, "POST", url, response.status, response.data);
-                resolve(response.data);
-              }
+        this.httpNative.post(url, params, headers).then((response:any) => {
+          if (response.data) {
+            this.logger.info(this, "POST", url, response.status, response.headers, response.data);
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "POST", url, response.status, data);
+              resolve(data);
             }
             else {
-              this.logger.error(this, "POST", url, response.status, "No Data");
-              reject("No Response Data");
+              this.logger.info(this, "POST", url, response.status, response.data);
+              resolve(response.data);
             }
-          },
-          (error:any) => {
-            this.logger.error(this, "POST", url, error.status, error.error);
-            reject(this.httpError(error));
           }
-        );
+          else {
+            this.logger.error(this, "POST", url, response.status, "No Data");
+            reject("No Response Data");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "POST", url, error.status, error.error);
+          reject(this.httpError(error));
+        });
       }
       else {
         let headers = new Headers(this.httpHeaders(token));
@@ -180,29 +177,27 @@ export class HttpProvider {
         this.logger.info(this, "PUT", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.put(url, params, headers).then(
-          (response:any) => {
-            if (response.data) {
-              if (response.headers['content-type'].indexOf("application/json") != -1) {
-                let data = JSON.parse(response.data);
-                this.logger.info(this, "PUT", url, response.status, data);
-                resolve(data);
-              }
-              else {
-                this.logger.info(this, "PUT", url, response.status, response.data);
-                resolve(response.data);
-              }
+        this.httpNative.put(url, params, headers).then((response:any) => {
+          if (response.data) {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "PUT", url, response.status, data);
+              resolve(data);
             }
             else {
-              this.logger.error(this, "PUT", url, response.status, "No Data");
-              reject("No Response Data");
+              this.logger.info(this, "PUT", url, response.status, response.data);
+              resolve(response.data);
             }
-          },
-          (error:any) => {
-            this.logger.error(this, "PUT", url, error.status, error.error);
-            reject(this.httpError(error));
           }
-        );
+          else {
+            this.logger.error(this, "PUT", url, response.status, "No Data");
+            reject("No Response Data");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "PUT", url, error.status, error.error);
+          reject(this.httpError(error));
+        });
       }
       else {
         let headers = new Headers(this.httpHeaders(token));
@@ -245,29 +240,27 @@ export class HttpProvider {
         this.logger.info(this, "PATCH", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.patch(url, params, headers).then(
-          (response:any) => {
-            if (response.data) {
-              if (response.headers['content-type'].indexOf("application/json") != -1) {
-                let data = JSON.parse(response.data);
-                this.logger.info(this, "PATCH", url, response.status, data);
-                resolve(data);
-              }
-              else {
-                this.logger.info(this, "PATCH", url, response.status, response.data);
-                resolve(response.data);
-              }
+        this.httpNative.patch(url, params, headers).then((response:any) => {
+          if (response.data) {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "PATCH", url, response.status, data);
+              resolve(data);
             }
             else {
-              this.logger.error(this, "PATCH", url, response.status, "No Data");
-              reject("No Response Data");
+              this.logger.info(this, "PATCH", url, response.status, response.data);
+              resolve(response.data);
             }
-          },
-          (error:any) => {
-            this.logger.error(this, "PATCH", url, error.status, error.error);
-            reject(this.httpError(error));
           }
-        );
+          else {
+            this.logger.error(this, "PATCH", url, response.status, "No Data");
+            reject("No Response Data");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "PATCH", url, error.status, error.error);
+          reject(this.httpError(error));
+        });
       }
       else {
         let headers = new Headers(this.httpHeaders(token));
@@ -310,28 +303,27 @@ export class HttpProvider {
         this.logger.info(this, "DELETE", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.delete(url, params, headers).then(
-          (response:any) => {
-            if (response.data) {
-              if (response.headers['content-type'].indexOf("application/json") != -1) {
-                let data = JSON.parse(response.data);
-                this.logger.info(this, "DELETE", url, response.status, data);
-                resolve(data);
-              }
-              else {
-                this.logger.info(this, "DELETE", url, response.status, response.data);
-                resolve(response.data);
-              }
+        this.httpNative.delete(url, params, headers).then((response:any) => {
+          if (response.data) {
+            if (response.headers['content-type'].indexOf("application/json") != -1) {
+              let data = JSON.parse(response.data);
+              this.logger.info(this, "DELETE", url, response.status, data);
+              resolve(data);
             }
             else {
-              this.logger.error(this, "DELETE", url, response.status, "No Data");
-              reject("No Response Data");
+              this.logger.info(this, "DELETE", url, response.status, response.data);
+              resolve(response.data);
             }
-          },
-          (error:any) => {
-            this.logger.error(this, "DELETE", url, error.status, error.error);
-            reject(this.httpError(error));
-          });
+          }
+          else {
+            this.logger.error(this, "DELETE", url, response.status, "No Data");
+            reject("No Response Data");
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "DELETE", url, error.status, error.error);
+          reject(this.httpError(error));
+        });
       }
       else {
         let headers = new Headers(this.httpHeaders(token));

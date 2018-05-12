@@ -184,9 +184,7 @@ export class GroupEditPage extends BasePage {
           let loading = this.showLoading("Removing...");
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
             if (this.mobile) {
-              let removes = [];
-              removes.push(this.database.removeGroup(this.organization, this.group));
-              Promise.all(removes).then(removed => {
+              this.database.removeGroup(this.organization, this.group).then((deleted:boolean) => {
                 loading.dismiss();
                 this.showToast("Group removed from organization");
                 this.hideModal({deleted: true});

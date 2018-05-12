@@ -1,23 +1,21 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { CheckinListPage } from './checkin-list';
+import { CheckinCardComponent } from './checkin-card';
 
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
-import { CheckinCardModule } from '../../components/checkin-card/checkin-card.module';
 
 @NgModule({
   declarations: [
-    CheckinListPage,
+    CheckinCardComponent,
   ],
   imports: [
     DateTimeModule,
     PersonAvatarModule,
-    CheckinCardModule,
-    IonicPageModule.forChild(CheckinListPage),
+    IonicPageModule.forChild(CheckinCardComponent),
   ],
   exports: [
-    CheckinListPage
+    CheckinCardComponent
   ]
 })
-export class CheckinListModule {}
+export class CheckinCardModule {}

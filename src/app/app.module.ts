@@ -92,12 +92,14 @@ import { HumanizeModule } from '../pipes/humanize/humanize.module';
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
+import { CheckinCardModule } from '../components/checkin-card/checkin-card.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
 import { DatabaseProvider } from '../providers/database/database';
 import { CountryProvider } from '../providers/country/country';
 import { StorageProvider } from '../providers/storage/storage';
+import { LocationProvider } from '../providers/location/location';
 
 @NgModule({
   declarations: [
@@ -111,6 +113,7 @@ import { StorageProvider } from '../providers/storage/storage';
     PersonAvatarModule,
     ColorPickerModule,
     SendViaModule,
+    CheckinCardModule,
     GroupListModule,
     GroupEditModule,
     GroupDetailsModule,
@@ -199,7 +202,8 @@ import { StorageProvider } from '../providers/storage/storage';
     { provide: CountryProvider, useClass: CountryProvider },
     { provide: DatabaseProvider, useClass: DatabaseProvider },
     { provide: StorageProvider, useClass: StorageProvider },
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    LocationProvider
   ]
 })
 export class AppModule {}

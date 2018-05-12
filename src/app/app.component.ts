@@ -57,9 +57,11 @@ export class TenFourApp {
   person:Person = null;
   tablet:boolean = false;
   mobile:boolean = false;
+  phone:boolean = false;
   android:boolean = false;
   ios:boolean = false;
-  web:boolean = false;
+  browser:boolean = false;
+  desktop:boolean = false;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -71,7 +73,7 @@ export class TenFourApp {
   navController:NavController;
 
   constructor(
-    protected _zone: NgZone,
+    protected _zone:NgZone,
     protected platform:Platform,
     protected events:Events,
     protected injector:Injector,
@@ -94,37 +96,52 @@ export class TenFourApp {
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
-    this.platform.ready()
-      .then(() => this.loadPlatforms())
-      .then(() => this.loadStatusBar())
-      .then(() => this.loadOrientation())
-      .then(() => this.loadDeepLinks())
-      .then(() => this.loadAnalytics())
-      .then(() => this.loadEvents())
-      .then(() => this.loadNotifications())
-      .then(() => this.loadApplication([
-        new Organization(),
-        new Email(),
-        new Group(),
-        new Person(),
-        new Contact(),
-        new Checkin(),
-        new Answer(),
-        new Reply(),
-        new Recipient(),
-        new Settings(),
-        new Country(),
-        new Notification(),
-        new Subscription()]));
+    this.platform.ready().then((ready) => {
+      if (this.platform.is("cordova")) {
+        Promise.resolve()
+          .then(() => this.loadPlatforms())
+          .then(() => this.loadStatusBar())
+          .then(() => this.loadOrientation())
+          .then(() => this.loadDeepLinks())
+          .then(() => this.loadAnalytics())
+          .then(() => this.loadEvents())
+          .then(() => this.loadNotifications())
+          .then(() => this.loadMobileApp([
+                new Organization(),
+                new Email(),
+                new Group(),
+                new Person(),
+                new Contact(),
+                new Checkin(),
+                new Answer(),
+                new Reply(),
+                new Recipient(),
+                new Settings(),
+                new Country(),
+                new Notification(),
+                new Subscription()]));
+      }
+      else {
+        Promise.resolve()
+          .then(() => this.loadPlatforms())
+          .then(() => this.loadAnalytics())
+          .then(() => this.loadEvents())
+          .then(() => this.loadNotifications())
+          .then(() => this.loadWebApp());
+      }
+    });
   }
 
   private loadPlatforms():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadPlatforms");
       this.ios = this.platform.is('ios');
       this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
-      this.web = this.platform.is('core');
+      this.phone = this.platform.is('ios') || this.platform.is('android');
+      this.browser = this.platform.is('core');
+      this.desktop = this.platform.is('core');
       resolve(true);
     });
   }
@@ -147,20 +164,17 @@ export class TenFourApp {
 
   private loadStatusBar():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.android) {
-        this.logger.info(this, "loadStatusBar", "Android");
-        this.statusBar.styleLightContent();
-        this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#000000");
-      }
-      else if (this.ios) {
+      if (this.ios) {
         this.logger.info(this, "loadStatusBar", "iOS");
         this.statusBar.styleDefault();
         this.statusBar.overlaysWebView(false);
         this.statusBar.backgroundColorByHexString("#f5f5f1");
       }
-      else {
-        this.logger.info(this, "loadStatusBar", "Web");
+      else if (this.android) {
+        this.logger.info(this, "loadStatusBar", "Android");
+        this.statusBar.styleLightContent();
+        this.statusBar.overlaysWebView(false);
+        this.statusBar.backgroundColorByHexString("#000000");
       }
       resolve(true);
     });
@@ -258,8 +272,8 @@ export class TenFourApp {
   }
 
   private verifyEmail(email:string, token:string) {
+    this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
     if (email && email.length > 0 && token && token.length > 0) {
-      this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
       let loading = this.showLoading("Verifying...");
       this.api.verifyEmail(email, token).then((_email:Email) => {
         this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
@@ -267,9 +281,7 @@ export class TenFourApp {
         this.showToast(`Email address ${email} verified`);
         let organization = new Organization({});
         organization.email = email;
-        this.navController.push(SignupOwnerPage, {
-          organization: organization
-        });
+        this.showSignupOwner(organization);
       },
       (error:any) => {
         this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Failed");
@@ -279,95 +291,105 @@ export class TenFourApp {
     }
   }
 
-  private loadApplication(models:Model[]):Promise<any> {
+  private loadWebApp() {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadApplication");
-        this.loadDatabase(models).then(
-          (loaded:any) => {
-            this.logger.info(this, "loadApplication", "Database", loaded);
-            this.database.getOrganizations().then((organizations:Organization[]) => {
-              if (organizations && organizations.length > 0) {
-                this.organization = organizations[0];
-                this.logger.info(this, "loadApplication", "Organization", this.organization);
-                this.database.getPerson(this.organization, null, true).then(
-                  (person:Person) => {
-                    this.logger.info(this, "loadApplication", "Person", person);
-                    if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                      this.person = person;
-                      this.showCheckinList();
-                      resolve(true);
-                    }
-                    else {
-                      this.showOnboardList(person);
-                      resolve(true);
-                    }
-                  },
-                  (error:any) => {
-                    this.logger.error(this, "loadApplication", "Person", error);
-                    this.showOnboardList();
-                    resolve(true);
-                  });
-              }
-              else {
-                this.logger.info(this, "loadApplication", "No Organizations");
-                this.showSigninUrl();
+      this.logger.info(this, "loadWebApp");
+      this.storage.getOrganization().then((organization:Organization) => {
+        this.logger.info(this, "loadWebApp", "Organization", organization);
+        this.organization = organization;
+        this.storage.getPerson().then((person:Person) => {
+          this.logger.info(this, "loadWebApp", "Person", person);
+          if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+            this.person = person;
+            this.showCheckinList();
+            resolve(true);
+          }
+          else {
+            this.showOnboardList(person);
+            resolve(true);
+          }
+        },
+        (error:any) => {
+          this.logger.info(this, "loadWebApp", "Person", "None");
+          this.showSigninUrl();
+          resolve(false);
+        });
+      },
+      (error:any) => {
+        this.logger.info(this, "loadWebApp", "Organization", "None");
+        this.showSigninUrl();
+        resolve(false);
+      });
+    });
+  }
+
+  private loadMobileApp(models:Model[]):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadMobileApp");
+      this.loadDatabase(models).then((loaded:any) => {
+        this.logger.info(this, "loadMobileApp", "Database", loaded);
+        this.storage.getOrganization().then((organization:Organization) => {
+          if (organization) {
+            this.organization = organization;
+            this.logger.info(this, "loadMobileApp", "Organization", this.organization);
+            this.storage.getPerson().then((person:Person) => {
+              this.logger.info(this, "loadMobileApp", "Person", person);
+              if (person && person.config_profile_reviewed && person.config_self_test_sent) {
+                this.person = person;
+                this.showCheckinList();
                 resolve(true);
               }
-            });
-          },
-          (error:any) => {
-            this.logger.error(this, "loadApplication", "loadDatabase", error);
-            this.hideSplashScreen();
-            this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
-              text: 'Reset Database',
-              handler: (clicked) => {
-                let loading = this.showLoading("Resetting...");
-                this.resetDatabase().then(
-                  (reset:any) => {
-                    this.loadDatabase(models).then(
-                      (created:any) => {
-                        loading.dismiss();
-                        this.showSigninUrl();
-                      },
-                      (error:any) => {
-                        loading.dismiss();
-                        this.showAlert("Problem Creating Database", "There was a problem creating the database.");
-                      }
-                    );
-                  },
-                  (error:any) => {
-                    loading.dismiss();
-                    this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
-                });
+              else {
+                this.logger.info(this, "loadMobileApp", "Person", "None");
+                this.showOnboardList(person);
+                resolve(true);
               }
-            }]);
-            resolve(false);
-          });
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          this.storage.getPerson().then((person:Person) => {
-            if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-              this.person = person;
-              this.showCheckinList();
+            },
+            (error:any) => {
+              this.logger.info(this, "loadMobileApp", "Person", "None");
+              this.showOnboardList();
               resolve(true);
-            }
-            else {
-              this.showOnboardList(person);
-              resolve(true);
-            }
+            });
+          }
+          else {
+            this.logger.info(this, "loadMobileApp", "Organization", "None");
+            this.showSigninUrl();
+            resolve(true);
+          }
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "loadMobileApp", "loadDatabase", error);
+        this.hideSplashScreen();
+        this.databaseChanged(models);
+        resolve(false);
+      });
+    });
+  }
+
+  private databaseChanged(models:Model[]) {
+    this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
+      text: 'Reset Database',
+      handler: (clicked) => {
+        let loading = this.showLoading("Resetting...");
+        this.resetDatabase().then((reset:any) => {
+          this.loadDatabase(models).then((created:any) => {
+            loading.dismiss();
+            this.showSigninUrl();
           },
           (error:any) => {
-            this.showSigninUrl();
+            loading.dismiss();
+            this.showAlert("Problem Creating Database", "There was a problem creating the database.");
+            //TODO log error message
           });
         },
         (error:any) => {
-            this.showSigninUrl();
+          loading.dismiss();
+          this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
+          //TODO log error message
         });
       }
-    });
+    }]);
   }
 
   private loadDatabase(models:Model[]):Promise<any> {
@@ -389,8 +411,20 @@ export class TenFourApp {
   }
 
   private resetDatabase():Promise<any> {
-    this.logger.info(this, "resetDatabase");
-    return this.database.deleteDatabase();
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "resetDatabase");
+      if (this.mobile) {
+        this.database.deleteDatabase().then((deleted:any) => {
+          resolve(deleted);
+        },
+        (error:any) => {
+          reject(error);
+        })
+      }
+      else {
+        resolve();
+      }
+    });
   }
 
   private loadMenu() {
@@ -406,32 +440,36 @@ export class TenFourApp {
       });
   }
 
-  private loadOrganization():Promise<any> {
+  private loadOrganization():Promise<Organization> {
     return new Promise((resolve, reject) => {
       this.storage.getOrganization().then((organization:Organization) => {
         this.logger.info(this, "loadOrganization", organization);
         this.zone.run(() => {
           this.organization = organization;
         });
+        resolve(organization);
       },
       (error:any) => {
         this.logger.error(this, "loadOrganization", error);
         this.organization = null;
+        resolve(null);
       });
     });
   }
 
-  private loadPerson():Promise<any> {
+  private loadPerson():Promise<Person> {
     return new Promise((resolve, reject) => {
       this.storage.getPerson().then((person:Person) => {
         this.logger.info(this, "loadPerson", person);
         this.zone.run(() => {
           this.person = person;
         });
+        resolve(person);
       },
       (error:any) => {
         this.logger.error(this, "loadPerson", error);
         this.person = null;
+        resolve(null);
       });
     });
   }
@@ -439,16 +477,17 @@ export class TenFourApp {
   private showSigninUrl(event:any=null) {
     this.logger.info(this, "showSigninUrl");
     this.nav.setRoot(SigninUrlPage, { });
-    this.menuController.close();
+    this.hideSideMenu();
     this.hideSplashScreen();
   }
 
   private showOnboardList(person:Person=null) {
     this.logger.info(this, "showOnboardList");
-    this.nav.setRoot(OnboardListPage,
-      { organization: this.organization,
-        person: person });
-    this.menuController.close();
+    this.nav.setRoot(OnboardListPage, {
+      organization: this.organization,
+      person: person
+    });
+    this.hideSideMenu();
     this.hideSplashScreen();
   }
 
@@ -458,16 +497,17 @@ export class TenFourApp {
       organization: this.organization,
       person: this.person
     });
-    this.menuController.close();
+    this.hideSideMenu();
     this.hideSplashScreen();
   }
 
   private showGroupList() {
     this.logger.info(this, "showGroupList");
-    this.nav.setRoot(GroupListPage,
-      { organization: this.organization,
-        person: this.person });
-    this.menuController.close();
+    this.nav.setRoot(GroupListPage, {
+      organization: this.organization,
+      person: this.person
+    });
+    this.hideSideMenu();
   }
 
   private showPersonList() {
@@ -476,7 +516,7 @@ export class TenFourApp {
       organization: this.organization,
       person: this.person
     });
-    this.menuController.close();
+    this.hideSideMenu();
   }
 
   private showSettingsList() {
@@ -485,7 +525,7 @@ export class TenFourApp {
       organization: this.organization,
       person: this.person
     });
-    this.menuController.close();
+    this.hideSideMenu();
   }
 
   private showPersonDetails() {
@@ -497,7 +537,14 @@ export class TenFourApp {
       profile: true,
       title: "Profile"
     });
-    this.menuController.close();
+    this.hideSideMenu();
+  }
+
+  private showSignupOwner(organization:Organization) {
+    this.logger.info(this, "showSignupOwner");
+    this.navController.push(SignupOwnerPage, {
+      organization: organization
+    });
   }
 
   private userLogout(event:any=null) {
@@ -505,27 +552,26 @@ export class TenFourApp {
     let loading = this.showLoading("Logging out...");
     let removes = [
       this.storage.removePerson(),
-      this.storage.removeOrganization(),
-      this.database.removeOrganizations(),
-      this.database.removeSubscriptions(),
-      this.database.removeNotifications(),
-      this.database.removeCheckins(),
-      this.database.removeAnswers(),
-      this.database.removeReplies(),
-      this.database.removeRecipients(),
-      this.database.removeGroups(),
-      this.database.removeEmails(),
-      this.database.removePeople(),
-      this.database.removeContacts()];
+      this.storage.removeOrganization()
+    ];
+    if (this.mobile) {
+      removes.push(
+        this.database.removeOrganizations(),
+        this.database.removeSubscriptions(),
+        this.database.removeNotifications(),
+        this.database.removeCheckins(),
+        this.database.removeAnswers(),
+        this.database.removeReplies(),
+        this.database.removeRecipients(),
+        this.database.removeGroups(),
+        this.database.removeEmails(),
+        this.database.removePeople(),
+        this.database.removeContacts());
+    }
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
       this.person = null;
-      this.badge.clear().then((cleared:any) => {
-        this.logger.info(this, "badge", "Cleared", cleared);
-      },
-      (error:any) => {
-        this.logger.error(this, "badge", "Clear Failed", error);
-      });
+      this.clearBadgeCount();
       loading.dismiss();
       this.showSigninUrl(event);
     });
@@ -578,8 +624,25 @@ export class TenFourApp {
   }
 
   private hideSplashScreen() {
-    if (this.platform.is("cordova")) {
+    if (this.mobile) {
       this.splashScreen.hide();
+    }
+  }
+
+  private hideSideMenu() {
+    if (this.tablet == false || this.browser == false) {
+      this.menuController.close();
+    }
+  }
+
+  private clearBadgeCount() {
+    if (this.mobile) {
+      this.badge.clear().then((cleared:any) => {
+        this.logger.info(this, "badge", "Cleared", cleared);
+      },
+      (error:any) => {
+        this.logger.error(this, "badge", "Clear Failed", error);
+      });
     }
   }
 

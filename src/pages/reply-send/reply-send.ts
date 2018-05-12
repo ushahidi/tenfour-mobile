@@ -1,13 +1,11 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { Geolocation } from '@ionic-native/geolocation';
-import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
-
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
+import { LocationProvider } from '../../providers/location/location';
 
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
@@ -47,8 +45,7 @@ export class ReplySendPage extends BasePage {
     protected actionController:ActionSheetController,
     protected api:ApiProvider,
     protected database:DatabaseProvider,
-    protected geolocation:Geolocation,
-    protected geocoder:NativeGeocoder) {
+    protected location:LocationProvider) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -103,56 +100,22 @@ export class ReplySendPage extends BasePage {
   private loadLocation():Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadLocation");
-      this.geolocation.getCurrentPosition().then((position:any) => {
-        this.logger.info(this, "loadLocation", position);
-        if (position && position.coords) {
-          let location = <Location>{
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
-          this.loadAddress(position.coords.latitude, position.coords.longitude).then((address:string) => {
-            location.address = address;
-            resolve(location);
-          },
-          (error:any) => {
-            resolve(location);
-          });
-        }
-        else {
-          reject(null);
-        }
-      }).catch((error:any) => {
-        this.logger.error(this, "loadLocation", error);
-        reject(null);
-      });
-    });
-  }
-
-  private loadAddress(latitude:number, longitude:number):Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadAddress", latitude, longitude);
-      this.geocoder.reverseGeocode(latitude, longitude)
-        .then((result:NativeGeocoderReverseResult) => {
-          this.logger.info(this, "loadAddress", latitude, longitude, result);
-          let location:any[] = [];
-          if (result.thoroughfare) {
-            location.push(result.thoroughfare);
-          }
-          if (result.locality) {
-            location.push(result.locality);
-          }
-          if (result.administrativeArea) {
-            location.push(result.administrativeArea);
-          }
-          if (result.countryName) {
-            location.push(result.countryName);
-          }
-          resolve(location.join(", "));
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "loadAddress", latitude, longitude, error);
-          reject(error);
+      this.location.detectLocation().then((location:Location) => {
+        this.logger.info(this, "loadLocation", location);
+        this.location.lookupAddress(location).then((address:string) => {
+          this.logger.info(this, "loadLocation", address);
+          location.address = address;
+          resolve(location);
+        },
+        (error:any) => {
+          this.logger.error(this, "loadLocation", error);
+          resolve(location);
         });
+      },
+      (error:any) => {
+        this.logger.error(this, "loadLocation", error);
+        reject(error);
+      });
     });
   }
 
@@ -183,6 +146,11 @@ export class ReplySendPage extends BasePage {
         this.hideModal({
           canceled: true
         });
+      },
+      (error:any) => {
+        this.hideModal({
+          canceled: true
+        });
       });
     }
     else {
@@ -199,9 +167,9 @@ export class ReplySendPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.sendReply(this.organization, checkin, reply).then(
-        (replied:Reply) => {
-          this.logger.info(this, "sendReply", "Reply", replied);
+      this.api.sendReply(this.organization, checkin, reply).then((replied:Reply) => {
+        this.logger.info(this, "sendReply", "Reply", replied);
+        if (this.mobile) {
           this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "sendReply", "Person", person);
             replied.user_name = person.name;
@@ -213,11 +181,16 @@ export class ReplySendPage extends BasePage {
               this.hideCheckin(checkin, replied);
             });
           });
-        },
-        (error:any) => {
+        }
+        else {
           loading.dismiss();
-          this.showAlert("Problem Sending Reply", error);
-        });
+          this.hideCheckin(checkin, replied);
+        }
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Sending Reply", error);
+      });
     }
   }
 
@@ -228,9 +201,9 @@ export class ReplySendPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...");
-      this.api.updateReply(this.organization, checkin, reply).then(
-        (replied:Reply) => {
-          this.logger.info(this, "saveReply", "Reply", replied);
+      this.api.updateReply(this.organization, checkin, reply).then((replied:Reply) => {
+        this.logger.info(this, "saveReply", "Reply", replied);
+        if (this.mobile) {
           this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "saveReply", "Person", person);
             replied.user_name = person.name;
@@ -242,11 +215,16 @@ export class ReplySendPage extends BasePage {
               this.hideCheckin(checkin, replied);
             });
           });
-        },
-        (error:any) => {
+        }
+        else {
           loading.dismiss();
-          this.showAlert("Problem Saving Reply", error);
-        });
+          this.hideCheckin(checkin, replied);
+        }
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Saving Reply", error);
+      });
     }
   }
 
@@ -284,7 +262,7 @@ export class ReplySendPage extends BasePage {
   private onKeyPress(event:any) {
     if (event.keyCode == 13) {
       this.logger.info(this, "onKeyPress", "Enter");
-      this.keyboard.close();
+      this.hideKeyboard();
       return false;
     }
     else {

@@ -46,18 +46,18 @@ export class SignupEmailPage extends BasePage {
     this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
       let loading = this.showLoading("Registering...");
-      this.api.registerEmail(this.email.value).then(
-        (email:Email) => {
-          loading.dismiss();
-          let organization = new Organization({});
-          organization.email = this.email.value;
-          this.showPage(SignupCheckPage,
-            { organization: organization });
-        },
-        (error:any) => {
-          loading.dismiss();
-          this.showAlert("Email Verification", error);
+      this.api.registerEmail(this.email.value).then((email:Email) => {
+        loading.dismiss();
+        let organization = new Organization({});
+        organization.email = this.email.value;
+        this.showPage(SignupCheckPage, {
+          organization: organization
         });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Email Verification", error);
+      });
     }
   }
 

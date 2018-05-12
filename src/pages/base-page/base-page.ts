@@ -29,7 +29,8 @@ export class BasePage {
   protected mobile:boolean = false;
   protected android:boolean = false;
   protected ios:boolean = false;
-  protected web:boolean = false;
+  protected browser:boolean = false;
+  protected desktop:boolean = false;
 
   protected connection:any = null;
   protected disconnection:any = null;
@@ -78,7 +79,8 @@ export class BasePage {
       this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
-      this.web = this.platform.is('core');
+      this.browser = this.platform.is('core');
+      this.desktop = this.platform.is('core');
     })
   }
 
@@ -133,6 +135,9 @@ export class BasePage {
         });
       });
     }
+    else {
+      //TODO handle subscribe network on web
+    }
   }
 
   protected unsubscribeNetwork() {
@@ -146,7 +151,10 @@ export class BasePage {
         this.disconnection.unsubscribe();
         this.disconnection = null;
       }
-    };
+    }
+    else {
+      //TODO handle unsubscribe network on web
+    }
   }
 
   protected loadStatusBar(lightContent:boolean=true) {
@@ -285,8 +293,10 @@ export class BasePage {
       return browser;
     }
     else {
-      window.open(url, target);
-      return null;
+      if (event) {
+        event.stopPropagation();
+      }
+      return window.open(url, target);
     }
   }
 

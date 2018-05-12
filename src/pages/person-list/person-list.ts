@@ -88,6 +88,68 @@ export class PersonListPage extends BasePage {
       });
   }
 
+  private loadPeople(cache:boolean=true) {
+    return new Promise((resolve, reject) => {
+      this.offset = 0;
+      if (cache && this.mobile) {
+        this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
+          if (people && people.length > 1) {
+            this.organization.people = people;
+            this.loading = false;
+            resolve(people);
+          }
+          else {
+            this.loadPeople(false).then((people:Person[]) => {
+              resolve(people);
+            },
+            (error:any) => {
+              this.organization.people = [];
+              reject(error);
+            });
+          }
+        },
+        (error:any) => {
+          this.loadPeople(false).then((people:Person[]) => {
+            resolve(people);
+          },
+          (error:any) => {
+            this.organization.people = [];
+            reject(error);
+          });
+        });
+      }
+      else {
+        this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
+          if (this.mobile) {
+            this.database.savePeople(this.organization, people).then((saved:boolean) => {
+              this.database.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
+                this.organization.people = _people;
+                this.loading = false;
+                resolve(_people);
+              },
+              (error:any) => {
+                this.organization.people = people;
+                this.loading = false;
+                resolve(people);
+              });
+            });
+          }
+          else {
+            this.organization.people = people;
+            this.loading = false;
+            resolve(people);
+          }
+        },
+        (error:any) => {
+          this.organization.people = [];
+          this.loading = false;
+          this.showToast(error);
+          reject(error);
+        });
+      }
+    });
+  }
+
   private loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
@@ -126,72 +188,6 @@ export class PersonListPage extends BasePage {
     });
   }
 
-  private loadPeople(cache:boolean=true) {
-    return new Promise((resolve, reject) => {
-      this.offset = 0;
-      if (cache && this.mobile) {
-        this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.organization.people = people;
-            this.loading = false;
-            resolve(people);
-          }
-          else {
-            this.loadPeople(false).then((people:Person[]) => {
-              resolve(people);
-            },
-            (error:any) => {
-              this.organization.people = [];
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadPeople(false).then((people:Person[]) => {
-            resolve(people);
-          },
-          (error:any) => {
-            this.organization.people = [];
-            reject(error);
-          });
-        });
-      }
-      else {
-        this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-          if (this.mobile) {
-            let saves = [];
-            for (let person of people) {
-              saves.push(this.database.savePerson(this.organization, person));
-            }
-            Promise.all(saves).then(saved => {
-              this.database.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
-                this.organization.people = _people;
-                this.loading = false;
-                resolve(_people);
-              },
-              (error:any) => {
-                this.organization.people = people;
-                this.loading = false;
-                resolve(people);
-              });
-            });
-          }
-          else {
-            this.organization.people = people;
-            this.loading = false;
-            resolve(people);
-          }
-        },
-        (error:any) => {
-          this.organization.people = [];
-          this.loading = false;
-          this.showToast(error);
-          reject(error);
-        });
-      }
-    });
-  }
-
   private addPeople(event:any) {
     this.logger.info(this, "addPeople");
     let buttons = [];
@@ -213,7 +209,7 @@ export class PersonListPage extends BasePage {
         handler: () => {
           this.importPerson();
         }
-      });  
+      });
     }
     buttons.push({
       text: 'Cancel',
@@ -224,9 +220,10 @@ export class PersonListPage extends BasePage {
 
   private addPerson() {
     this.logger.info(this, "addPerson");
-    let modal = this.showModal(PersonEditPage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonEditPage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
       if (data) {
@@ -246,9 +243,10 @@ export class PersonListPage extends BasePage {
 
   private invitePerson() {
     this.logger.info(this, "invitePerson");
-    let modal = this.showModal(PersonInvitePage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonInvitePage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
       if (data) {
@@ -265,9 +263,10 @@ export class PersonListPage extends BasePage {
 
   private importPerson() {
     this.logger.info(this, "importPerson");
-    let modal = this.showModal(PersonImportPage,
-      { organization: this.organization,
-        user: this.person });
+    let modal = this.showModal(PersonImportPage, {
+      organization: this.organization,
+      user: this.person
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
       if (data) {

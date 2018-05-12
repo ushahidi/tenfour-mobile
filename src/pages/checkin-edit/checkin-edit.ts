@@ -91,7 +91,7 @@ export class CheckinEditPage extends BasePage {
   }
 
   private showNext() {
-    if (this.tablet || this.web) {
+    if (this.tablet || this.browser) {
       this.showModal(CheckinSendPage, {
         organization: this.organization,
         person: this.person,

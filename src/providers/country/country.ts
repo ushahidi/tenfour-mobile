@@ -25,26 +25,24 @@ export class CountryProvider {
       else {
         this.http.get(this.file)
           .map((res:Response) => res.json())
-          .subscribe(
-            (data:any) => {
-              this.logger.info(this, "getcountries", data);
-              let countries = [];
-              for (let _country of data) {
-                if (codes == null || codes.indexOf(_country.code) != -1) {
-                  let country = new Country(_country);
-                  country.image = `assets/flags/${country.code.toLowerCase()}.png`;
-                  countries.push(country);
-                }
+          .subscribe((data:any) => {
+            this.logger.info(this, "getcountries", data);
+            let countries = [];
+            for (let _country of data) {
+              if (codes == null || codes.indexOf(_country.code) != -1) {
+                let country = new Country(_country);
+                country.image = `assets/flags/${country.code.toLowerCase()}.png`;
+                countries.push(country);
               }
-              this.countries = countries;
-              resolve(countries);
-            },
-            (error:any) => {
-              this.logger.error(this, "getcountries", error);
-              this.countries = null;
-              reject(error);
             }
-          );
+            this.countries = countries;
+            resolve(countries);
+          },
+          (error:any) => {
+            this.logger.error(this, "getcountries", error);
+            this.countries = null;
+            reject(error);
+          });
       }
     });
   }

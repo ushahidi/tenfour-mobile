@@ -137,11 +137,7 @@ export class NotificationListPage extends BasePage {
       else {
         this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
           if (this.mobile) {
-            let saves = [];
-            for (let notification of notifications) {
-              saves.push(this.database.saveNotification(this.organization, notification));
-            }
-            Promise.all(saves).then(saved => {
+            this.database.saveNotifications(this.organization, notifications).then((saved:boolean) => {
               this.database.getNotifications(this.organization, this.limit, this.offset).then((_notifications:Notification[]) => {
                 this.notifications = _notifications;
                 resolve(_notifications);
@@ -167,16 +163,11 @@ export class NotificationListPage extends BasePage {
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
     if (this.mobile) {
-      let saves = [];
       for (let notification of this.notifications) {
         notification.viewed_at = new Date();
-        saves.push(this.database.saveNotification(this.organization, notification));
       }
-      Promise.all(saves).then(saved => {
+      this.database.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
         this.logger.info(this, "viewNotifications", "Saved", saved);
-      },
-      (error:any) => {
-        this.logger.error(this, "viewNotifications", "Failed", error);
       });
     }
     else {

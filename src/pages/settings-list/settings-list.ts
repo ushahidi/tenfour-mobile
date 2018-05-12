@@ -61,51 +61,58 @@ export class SettingsListPage extends BasePage {
 
   private settingsEdit(event:any) {
     this.logger.info(this, "settingsEdit");
-    this.showModal(SettingsEditPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showModal(SettingsEditPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsTypes(event:any) {
     this.logger.info(this, "settingsTypes");
-    this.showModal(SettingsTypesPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showModal(SettingsTypesPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsSizes(event:any) {
     this.logger.info(this, "settingsSizes");
-    this.showModal(SettingsSizesPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showModal(SettingsSizesPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsRegions(event:any) {
     this.logger.info(this, "settingsRegions");
-    this.showModal(SettingsRegionsPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showModal(SettingsRegionsPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsRoles(event:any) {
     this.logger.info(this, "settingsRoles");
-    this.showPage(SettingsRolesPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showPage(SettingsRolesPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.showPage(SettingsPaymentsPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showPage(SettingsPaymentsPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
   private settingsCheckins(event:any) {
     this.logger.info(this, "settingsCheckins");
-    this.showModal(SettingsCheckinsPage,
-      { organization: this.organization,
-        person: this.person });
+    this.showModal(SettingsCheckinsPage, {
+      organization: this.organization,
+      person: this.person
+    });
   }
 
 }

@@ -17,7 +17,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
 })
 export class SettingsTypesPage extends BasePage {
@@ -92,10 +92,20 @@ export class SettingsTypesPage extends BasePage {
     this.organization.types = selected.join(",");
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.database.saveOrganization(organization).then(saved => {
+      if (this.mobile) {
+        this.database.saveOrganization(organization).then(saved => {
+          loading.dismiss();
+          this.hideModal({
+            organization: organization
+          });
+        });
+      }
+      else {
         loading.dismiss();
-        this.hideModal({ organization: organization });
-      });
+        this.hideModal({
+          organization: organization
+        });
+      }
     },
     (error:any) => {
       loading.dismiss();

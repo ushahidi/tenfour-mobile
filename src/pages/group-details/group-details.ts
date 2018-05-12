@@ -109,10 +109,11 @@ export class GroupDetailsPage extends BasePage {
 
   private editGroup(event:any) {
     this.logger.info(this, "editGroup");
-    let modal = this.showModal(GroupEditPage,
-      { organization: this.organization,
-        person: this.person,
-        group: this.group });
+    let modal = this.showModal(GroupEditPage, {
+      organization: this.organization,
+      person: this.person,
+      group: this.group
+    });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editGroup", "Modal", data);
       if (data) {
@@ -136,10 +137,11 @@ export class GroupDetailsPage extends BasePage {
 
   private showPerson(_person:Person) {
     this.logger.info(this, "showPerson", _person);
-    this.showPage(PersonDetailsPage,
-      { organization: this.organization,
-        person: _person,
-        user: this.person })
+    this.showPage(PersonDetailsPage, {
+      organization: this.organization,
+      person: _person,
+      user: this.person
+    });
   }
 
 }

@@ -100,21 +100,20 @@ export class PersonInvitePage extends BasePage {
       });
     }
     else {
-      return this.api.getPeople(this.organization).then(
-        (people:Person[]) => {
-          this.people = people.filter(person => person.needsInvite() == true);
-          if (event) {
-            event.complete();
-          }
-          this.loading = false;
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          this.loading = false;
-          this.showToast(error);
-        });
+      return this.api.getPeople(this.organization).then((people:Person[]) => {
+        this.people = people.filter(person => person.needsInvite() == true);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
     }
   }
 

@@ -105,28 +105,21 @@ export class ReplyListPage extends BasePage {
       }
       else {
         this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
-          let saves = [];
-          for (let answer of checkin.answers) {
-            saves.push(this.database.saveAnswer(this.organization, checkin, answer));
-          }
-          for (let recipient of checkin.recipients) {
-            saves.push(this.database.saveRecipient(this.organization, checkin, recipient));
-          }
           for (let reply of checkin.replies) {
-            saves.push(this.database.saveReply(this.organization, checkin, reply));
             if (this.person && this.person.id == reply.user_id) {
               checkin.replied = true;
             }
           }
-          saves.push(this.database.saveCheckin(this.organization, checkin));
-          Promise.all(saves).then(saved => {
+          if (this.mobile) {
+            this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+              this.checkin = checkin;
+              resolve(checkin.replies);
+            });
+          }
+          else {
             this.checkin = checkin;
             resolve(checkin.replies);
-          },
-          (error:any) => {
-            this.checkin = checkin;
-            resolve(checkin.replies);
-          });
+          }
         },
         (error:any) => {
           reject(error);
@@ -139,7 +132,8 @@ export class ReplyListPage extends BasePage {
     this.logger.info(this, "sendReply");
     let modal = this.showModal(ReplySendPage, {
       organization: this.organization,
-      checkin: this.checkin });
+      checkin: this.checkin
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
       if (data) {
@@ -162,7 +156,8 @@ export class ReplyListPage extends BasePage {
       let modal = this.showModal(ReplySendPage, {
         organization: this.organization,
         checkin: this.checkin,
-        reply: reply });
+        reply: reply
+      });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
         if (data) {

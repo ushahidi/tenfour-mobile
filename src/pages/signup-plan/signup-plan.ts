@@ -49,13 +49,15 @@ export class SignupPlanPage extends BasePage {
   private showNext(event:any) {
     if (this.trial) {
       this.logger.info(this, "showNext", "SignupPasswordPage");
-      this.showPage(SignupPasswordPage,
-        { organization: this.organization });
+      this.showPage(SignupPasswordPage, {
+        organization: this.organization
+      });
     }
     else {
       this.logger.info(this, "showNext", "SignupPaymentPage");
-      this.showPage(SignupPaymentPage,
-        { organization: this.organization });
+      this.showPage(SignupPaymentPage, {
+        organization: this.organization
+      });
     }
   }
 
