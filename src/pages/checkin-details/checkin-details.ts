@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { ReplySendPage } from '../../pages/reply-send/reply-send';
+import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
@@ -17,12 +17,12 @@ import { Reply } from '../../models/reply';
   defaultHistory: ['checkins']
 })
 @Component({
-  selector: 'page-reply-list',
-  templateUrl: 'reply-list.html',
+  selector: 'page-checkin-details',
+  templateUrl: 'checkin-details.html',
   providers: [ ApiProvider ],
-  entryComponents:[ ReplySendPage ]
+  entryComponents:[ CheckinRespondPage ]
 })
-export class ReplyListPage extends BasePage {
+export class CheckinDetailsPage extends BasePage {
 
   @ViewChild('notifications')
   notifications:Button;
@@ -133,7 +133,7 @@ export class ReplyListPage extends BasePage {
 
   private sendReply(event:any) {
     this.logger.info(this, "sendReply");
-    let modal = this.showModal(ReplySendPage, {
+    let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkin: this.checkin
     });
@@ -156,7 +156,7 @@ export class ReplyListPage extends BasePage {
   private editReply(reply:Reply, event:any) {
     this.logger.info(this, "editReply");
     if (reply.user_id == this.person.id) {
-      let modal = this.showModal(ReplySendPage, {
+      let modal = this.showModal(CheckinRespondPage, {
         organization: this.organization,
         checkin: this.checkin,
         reply: reply

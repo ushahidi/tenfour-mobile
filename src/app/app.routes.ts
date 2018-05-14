@@ -19,12 +19,11 @@ import { PersonImportPage } from '../pages/person-import/person-import';
 import { PersonSelectPage } from '../pages/person-select/person-select';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
+import { CheckinDetailsPage } from '../pages/checkin-details/checkin-details';
 import { CheckinEditPage } from '../pages/checkin-edit/checkin-edit';
 import { CheckinSendPage } from '../pages/checkin-send/checkin-send';
 import { CheckinTestPage } from '../pages/checkin-test/checkin-test';
-
-import { ReplyListPage } from '../pages/reply-list/reply-list';
-import { ReplySendPage } from '../pages/reply-send/reply-send';
+import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 
 import { GroupListPage } from '../pages/group-list/group-list';
 import { GroupEditPage } from '../pages/group-edit/group-edit';
@@ -56,7 +55,10 @@ export class TenFourRoutes {
     { component: SignupPaymentPage, segment: 'signup/payment', defaultHistory: [SignupEmailPage] },
 
     { component: CheckinListPage, segment: 'checkins' },
-    { component: ReplyListPage, segment: 'checkins/:checkin_id', defaultHistory: [CheckinListPage] },
+    { component: CheckinEditPage, segment: 'checkins/edit', defaultHistory: [CheckinListPage] },
+    { component: CheckinDetailsPage, segment: 'checkins/:checkin_id', defaultHistory: [CheckinListPage] },
+    { component: CheckinSendPage, segment: 'checkins/send', defaultHistory: [CheckinListPage] },
+    { component: CheckinRespondPage, segment: 'checkins/:checkin_id/respond', defaultHistory: [CheckinListPage] },
 
     { component: GroupListPage, segment: 'groups' },
     { component: GroupDetailsPage, segment: 'groups/:group_id', defaultHistory: [GroupListPage] },

@@ -19,12 +19,12 @@ import { Location } from '../../models/location';
   defaultHistory: ['checkins']
 })
 @Component({
-  selector: 'page-reply-send',
-  templateUrl: 'reply-send.html',
+  selector: 'page-checkin-respond',
+  templateUrl: 'checkin-respond.html',
   providers: [ ApiProvider ],
   entryComponents:[  ]
 })
-export class ReplySendPage extends BasePage {
+export class CheckinRespondPage extends BasePage {
 
   @ViewChild(Slides)
   slides:Slides;

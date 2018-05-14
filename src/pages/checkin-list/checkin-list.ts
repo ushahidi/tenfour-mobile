@@ -5,8 +5,8 @@ import { Badge } from '@ionic-native/badge';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
-import { ReplyListPage } from '../../pages/reply-list/reply-list';
-import { ReplySendPage } from '../../pages/reply-send/reply-send';
+import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
+import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
 import { NotificationListPage } from '../../pages/notification-list/notification-list';
 
 import { ApiProvider } from '../../providers/api/api';
@@ -24,7 +24,7 @@ import { Notification } from '../../models/notification';
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
   providers: [ ApiProvider, DatabaseProvider ],
-  entryComponents:[ CheckinEditPage, ReplyListPage, ReplySendPage, NotificationListPage ]
+  entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage, NotificationListPage ]
 })
 export class CheckinListPage extends BasePage {
 
@@ -344,7 +344,7 @@ export class CheckinListPage extends BasePage {
           }
         }
         if (checkins.length > 0) {
-          let modal = this.showModal(ReplySendPage, {
+          let modal = this.showModal(CheckinRespondPage, {
             organization: this.organization,
             checkins: checkins
           });
@@ -418,7 +418,7 @@ export class CheckinListPage extends BasePage {
   }
 
   private showReplies(checkin:Checkin, event:any=null) {
-    this.showPage(ReplyListPage, {
+    this.showPage(CheckinDetailsPage, {
       organization: this.organization,
       person: this.person,
       checkin: checkin,
@@ -427,7 +427,7 @@ export class CheckinListPage extends BasePage {
   }
 
   private sendReply(checkin:Checkin, event:any=null) {
-    let modal = this.showModal(ReplySendPage, {
+    let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkin: checkin
     });

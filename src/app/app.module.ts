@@ -62,8 +62,8 @@ import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 
-import { ReplyListModule } from '../pages/reply-list/reply-list.module';
-import { ReplySendModule } from '../pages/reply-send/reply-send.module';
+import { ReplyListModule } from '../pages/checkin-details/checkin-details.module';
+import { ReplySendModule } from '../pages/checkin-respond/checkin-respond.module';
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 

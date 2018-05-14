@@ -3,7 +3,7 @@ import { IonicPage, Events, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
-import { ReplyListPage } from '../../pages/reply-list/reply-list';
+import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
@@ -21,7 +21,7 @@ import { Checkin } from '../../models/checkin';
   selector: 'page-person-details',
   templateUrl: 'person-details.html',
   providers: [ ApiProvider, DatabaseProvider ],
-  entryComponents:[ PersonEditPage, ReplyListPage ]
+  entryComponents:[ PersonEditPage, CheckinDetailsPage ]
 })
 export class PersonDetailsPage extends BasePage {
 
@@ -252,7 +252,7 @@ export class PersonDetailsPage extends BasePage {
   }
 
   private showReplies(checkin:Checkin, event:any=null) {
-    this.showPage(ReplyListPage, {
+    this.showPage(CheckinDetailsPage, {
       organization: this.organization,
       person: this.person,
       checkin: checkin
