@@ -535,7 +535,8 @@ export class TenFourApp {
       person: this.person,
       user: this.person,
       profile: true,
-      title: "Profile"
+      title: "Profile",
+      person_id: this.person.id
     });
     this.hideSideMenu();
   }

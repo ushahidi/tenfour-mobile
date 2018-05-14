@@ -10,7 +10,9 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Notification } from '../../models/notification';
 
-@IonicPage()
+@IonicPage({
+  segment: 'notifications'
+})
 @Component({
   selector: 'page-notification-list',
   templateUrl: 'notification-list.html',

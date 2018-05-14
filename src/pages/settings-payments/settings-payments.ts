@@ -8,7 +8,10 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/payments',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
@@ -46,6 +49,10 @@ export class SettingsPaymentsPage extends BasePage {
     this.trackPage({
       organization: this.organization.name
     });
+  }
+
+  private cancelEdit(event:any) {
+    this.hideModal();
   }
 
 }

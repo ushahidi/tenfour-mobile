@@ -10,7 +10,9 @@ import { Organization } from '../../models/organization';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people/select'
+})
 @Component({
   selector: 'page-person-select',
   templateUrl: 'person-select.html',

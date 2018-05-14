@@ -11,7 +11,10 @@ import { ApiProvider } from '../../providers/api/api';
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
 
-@IonicPage()
+@IonicPage({
+  name: 'signup-check',
+  segment: 'signup-check'
+})
 @Component({
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',

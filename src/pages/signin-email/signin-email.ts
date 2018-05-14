@@ -8,7 +8,10 @@ import { ApiProvider } from '../../providers/api/api';
 
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'signin/email',
+  defaultHistory: ['signin']
+})
 @Component({
   selector: 'page-signin-email',
   templateUrl: 'signin-email.html',

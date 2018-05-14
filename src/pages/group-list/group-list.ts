@@ -12,7 +12,9 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
-@IonicPage()
+@IonicPage({
+  segment: 'groups'
+})
 @Component({
   selector: 'page-group-list',
   templateUrl: 'group-list.html',
@@ -208,7 +210,8 @@ export class GroupListPage extends BasePage {
     this.showPage(GroupDetailsPage, {
       organization: this.organization,
       person: this.person,
-      group: group
+      group: group,
+      group_id: group.id
     });
   }
 

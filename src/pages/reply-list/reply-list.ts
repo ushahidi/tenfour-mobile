@@ -12,7 +12,10 @@ import { Checkin } from '../../models/checkin';
 import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
 
-@IonicPage()
+@IonicPage({
+  segment: 'checkins/:checkin_id',
+  defaultHistory: ['checkins']
+})
 @Component({
   selector: 'page-reply-list',
   templateUrl: 'reply-list.html',

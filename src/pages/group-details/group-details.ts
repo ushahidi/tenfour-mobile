@@ -12,7 +12,10 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
-@IonicPage()
+@IonicPage({
+  segment: 'groups/:group_id',
+  defaultHistory: ['groups']
+})
 @Component({
   selector: 'page-group-details',
   templateUrl: 'group-details.html',

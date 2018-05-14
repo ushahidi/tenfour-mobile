@@ -12,7 +12,9 @@ import { Checkin } from '../../models/checkin';
 import { Recipient } from '../../models/recipient';
 import { Answer } from '../../models/answer';
 
-@IonicPage()
+@IonicPage({
+  segment: 'checkins/test'
+})
 @Component({
   selector: 'page-checkin-test',
   templateUrl: 'checkin-test.html',
@@ -92,7 +94,7 @@ export class CheckinTestPage extends BasePage {
           loading.dismiss();
           this.showToast("Test Check-In sent");
           this.hideModal({
-            checkin: checkin 
+            checkin: checkin
           });
         });
       }

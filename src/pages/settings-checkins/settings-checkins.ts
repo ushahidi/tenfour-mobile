@@ -8,7 +8,10 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/checkins',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-checkins',
   templateUrl: 'settings-checkins.html',

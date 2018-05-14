@@ -11,7 +11,10 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people/invite',
+  defaultHistory: ['people']
+})
 @Component({
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',

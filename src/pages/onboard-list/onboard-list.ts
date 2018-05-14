@@ -14,7 +14,9 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'setup'
+})
 @Component({
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',

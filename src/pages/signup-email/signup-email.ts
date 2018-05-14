@@ -10,7 +10,9 @@ import { SignupCheckPage } from '../../pages/signup-check/signup-check';
 import { Email } from '../../models/email';
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'signup'
+})
 @Component({
   selector: 'page-signup-email',
   templateUrl: 'signup-email.html',

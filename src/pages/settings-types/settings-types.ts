@@ -13,7 +13,10 @@ import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-che
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/types',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',

@@ -15,7 +15,10 @@ import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people/import',
+  defaultHistory: ['people']
+})
 @Component({
   selector: 'page-person-import',
   templateUrl: 'person-import.html',

@@ -14,7 +14,10 @@ import { Answer } from '../../models/answer';
 import { Person } from '../../models/person';
 import { Location } from '../../models/location';
 
-@IonicPage()
+@IonicPage({
+  segment: 'checkins/send',
+  defaultHistory: ['checkins']
+})
 @Component({
   selector: 'page-reply-send',
   templateUrl: 'reply-send.html',

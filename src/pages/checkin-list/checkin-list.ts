@@ -17,7 +17,9 @@ import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Notification } from '../../models/notification';
 
-@IonicPage()
+@IonicPage({
+  segment: 'checkins'
+})
 @Component({
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
@@ -419,7 +421,8 @@ export class CheckinListPage extends BasePage {
     this.showPage(ReplyListPage, {
       organization: this.organization,
       person: this.person,
-      checkin: checkin
+      checkin: checkin,
+      checkin_id: checkin.id
     });
   }
 

@@ -5,8 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { NgxLocalStorageModule } from 'ngx-localstorage';
 import { SegmentModule } from 'ngx-segment-analytics';
+import { NgxLocalStorageModule } from 'ngx-localstorage';
 
 import { HTTP } from '@ionic-native/http';
 import { AppVersion } from '@ionic-native/app-version';
@@ -35,12 +35,13 @@ import { Badge } from '@ionic-native/badge';
 import { Firebase } from '@ionic-native/firebase';
 
 import { TenFourApp } from './app.component';
+import { TenFourRoutes } from './app.routes';
 
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
-import { SignupUrlModule} from '../pages/signup-url/signup-url.module';
+import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
 import { SignupNameModule } from '../pages/signup-name/signup-name.module';
 import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
@@ -162,10 +163,7 @@ import { LocationProvider } from '../providers/location/location';
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
-    IonicModule.forRoot(TenFourApp, {
-      scrollAssist: true,
-      autoFocusAssist: true
-    })
+    IonicModule.forRoot(TenFourApp, { scrollAssist: true, autoFocusAssist: true },{ links: TenFourRoutes.LINKS })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

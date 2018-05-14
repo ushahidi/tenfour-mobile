@@ -16,7 +16,10 @@ import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
 import { Region } from '../../models/region';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people/edit',
+  defaultHistory: ['people']
+})
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',

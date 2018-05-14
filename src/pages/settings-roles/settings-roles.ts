@@ -8,7 +8,10 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/roles',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-roles',
   templateUrl: 'settings-roles.html',

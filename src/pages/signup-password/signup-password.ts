@@ -11,7 +11,10 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Token } from '../../models/token';
 
-@IonicPage()
+@IonicPage({
+  segment: 'signup/password',
+  defaultHistory: ['signup']
+})
 @Component({
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',

@@ -16,7 +16,10 @@ import { Person } from '../../models/person';
 import { Region } from '../../models/region';
 import { Country } from '../../models/country';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/regions',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-regions',
   templateUrl: 'settings-regions.html',

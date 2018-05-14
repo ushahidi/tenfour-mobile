@@ -16,7 +16,9 @@ import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-che
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings'
+})
 @Component({
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
@@ -93,7 +95,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsRoles(event:any) {
     this.logger.info(this, "settingsRoles");
-    this.showPage(SettingsRolesPage, {
+    this.showModal(SettingsRolesPage, {
       organization: this.organization,
       person: this.person
     });
@@ -101,7 +103,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.showPage(SettingsPaymentsPage, {
+    this.showModal(SettingsPaymentsPage, {
       organization: this.organization,
       person: this.person
     });

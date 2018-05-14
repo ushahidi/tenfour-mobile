@@ -13,7 +13,10 @@ import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'signin/password',
+  defaultHistory: ['signin', 'signin/email']
+})
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',

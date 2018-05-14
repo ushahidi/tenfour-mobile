@@ -13,7 +13,10 @@ import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-che
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/sizes',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-sizes',
   templateUrl: 'settings-sizes.html',

@@ -13,7 +13,9 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people'
+})
 @Component({
   selector: 'page-person-list',
   templateUrl: 'person-list.html',
@@ -286,7 +288,8 @@ export class PersonListPage extends BasePage {
     this.showPage(PersonDetailsPage, {
       organization: this.organization,
       person: person,
-      user: this.person
+      user: this.person,
+      person_id: person.id
     });
   }
 

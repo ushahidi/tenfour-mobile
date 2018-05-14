@@ -11,7 +11,10 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
-@IonicPage()
+@IonicPage({
+  segment: 'groups/edit',
+  defaultHistory: ['groups']
+})
 @Component({
   selector: 'page-group-edit',
   templateUrl: 'group-edit.html',

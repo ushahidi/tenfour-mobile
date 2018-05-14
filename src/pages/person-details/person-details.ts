@@ -13,7 +13,10 @@ import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
 
-@IonicPage()
+@IonicPage({
+  segment: 'people/:person_id',
+  defaultHistory: ['people']
+})
 @Component({
   selector: 'page-person-details',
   templateUrl: 'person-details.html',

@@ -10,7 +10,10 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 import { Organization } from '../../models/organization';
 
-@IonicPage()
+@IonicPage({
+  segment: 'settings/edit',
+  defaultHistory: ['settings']
+})
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',

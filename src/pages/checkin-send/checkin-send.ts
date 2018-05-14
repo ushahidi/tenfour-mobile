@@ -17,7 +17,9 @@ import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
-@IonicPage()
+@IonicPage({
+  segment: 'checkins/send'
+})
 @Component({
   selector: 'page-checkin-send',
   templateUrl: 'checkin-send.html',
