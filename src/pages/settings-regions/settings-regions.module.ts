@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { SettingsRegionsPage } from './settings-regions';
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
@@ -13,6 +14,9 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
     IonicPageModule.forChild(SettingsRegionsPage),
   ],
   exports: [
+    SettingsRegionsPage
+  ],
+  entryComponents: [
     SettingsRegionsPage
   ]
 })

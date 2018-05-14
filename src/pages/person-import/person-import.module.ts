@@ -11,6 +11,9 @@ import { PersonImportPage } from './person-import';
   ],
   exports: [
     PersonImportPage
+  ],
+  entryComponents: [
+    PersonImportPage
   ]
 })
 export class PersonImportModule {}

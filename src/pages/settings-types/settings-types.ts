@@ -5,10 +5,6 @@ import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
-import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
-import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
-import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-checkins';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -21,7 +17,7 @@ import { Person } from '../../models/person';
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',
   providers: [ ApiProvider, DatabaseProvider ],
-  entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
+  entryComponents:[  ]
 })
 export class SettingsTypesPage extends BasePage {
 

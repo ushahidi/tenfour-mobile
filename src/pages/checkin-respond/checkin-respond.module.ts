@@ -16,6 +16,9 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
   ],
   exports: [
     CheckinRespondPage
+  ],
+  entryComponents: [
+    CheckinRespondPage
   ]
 })
-export class ReplySendModule {}
+export class CheckinRespondModule {}

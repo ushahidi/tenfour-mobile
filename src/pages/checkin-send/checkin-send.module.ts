@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { CheckinSendPage } from './checkin-send';
+
+import { PersonSelectModule } from '../../pages/person-select/person-select.module';
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 import { SendViaModule } from '../../components/send-via/send-via.module';
@@ -14,9 +17,13 @@ import { HumanizeModule } from '../../pipes/humanize/humanize.module';
     SendViaModule,
     HumanizeModule,
     PersonAvatarModule,
+    PersonSelectModule,
     IonicPageModule.forChild(CheckinSendPage),
   ],
   exports: [
+    CheckinSendPage
+  ],
+  entryComponents: [
     CheckinSendPage
   ]
 })

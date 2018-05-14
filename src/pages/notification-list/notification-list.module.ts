@@ -16,6 +16,9 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
   ],
   exports: [
     NotificationListPage
+  ],
+  entryComponents: [
+    NotificationListPage
   ]
 })
 export class NotificationListModule {}

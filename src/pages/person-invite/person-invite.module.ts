@@ -14,6 +14,9 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
   ],
   exports: [
     PersonInvitePage
+  ],
+  entryComponents: [
+    PersonInvitePage
   ]
 })
 export class PersonInviteModule {}

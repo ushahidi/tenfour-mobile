@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { SettingsPaymentsPage } from './settings-payments';
 
 @NgModule({
@@ -10,6 +11,9 @@ import { SettingsPaymentsPage } from './settings-payments';
     IonicPageModule.forChild(SettingsPaymentsPage),
   ],
   exports: [
+    SettingsPaymentsPage
+  ],
+  entryComponents: [
     SettingsPaymentsPage
   ]
 })

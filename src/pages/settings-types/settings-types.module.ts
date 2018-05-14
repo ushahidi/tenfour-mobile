@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { SettingsTypesPage } from './settings-types';
 
 @NgModule({
@@ -10,6 +11,9 @@ import { SettingsTypesPage } from './settings-types';
     IonicPageModule.forChild(SettingsTypesPage),
   ],
   exports: [
+    SettingsTypesPage
+  ],
+  entryComponents: [
     SettingsTypesPage
   ]
 })

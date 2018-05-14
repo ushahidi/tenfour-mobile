@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { SettingsCheckinsPage } from './settings-checkins';
 
 @NgModule({
@@ -10,6 +11,9 @@ import { SettingsCheckinsPage } from './settings-checkins';
     IonicPageModule.forChild(SettingsCheckinsPage),
   ],
   exports: [
+    SettingsCheckinsPage
+  ],
+  entryComponents: [
     SettingsCheckinsPage
   ]
 })

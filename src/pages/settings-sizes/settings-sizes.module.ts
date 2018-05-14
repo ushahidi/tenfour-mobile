@@ -11,6 +11,9 @@ import { SettingsSizesPage } from './settings-sizes';
   ],
   exports: [
     SettingsSizesPage
+  ],
+  entryComponents: [
+    SettingsSizesPage
   ]
 })
 export class SettingsSizesModule {}

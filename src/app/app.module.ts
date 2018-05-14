@@ -1,6 +1,6 @@
 import { ErrorHandler, NgModule } from '@angular/core';
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
-import { HttpModule } from '@angular/http';
+import { Http, HttpModule } from '@angular/http';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -62,8 +62,8 @@ import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 
-import { ReplyListModule } from '../pages/checkin-details/checkin-details.module';
-import { ReplySendModule } from '../pages/checkin-respond/checkin-respond.module';
+import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
+import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
@@ -135,8 +135,8 @@ import { LocationProvider } from '../providers/location/location';
     CheckinEditModule,
     CheckinSendModule,
     CheckinTestModule,
-    ReplyListModule,
-    ReplySendModule,
+    CheckinDetailsModule,
+    CheckinRespondModule,
     NotificationListModule,
     PersonListModule,
     PersonEditModule,
@@ -162,7 +162,7 @@ import { LocationProvider } from '../providers/location/location';
     HumanizeModule,
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
-    SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
+    SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: false }),
     IonicModule.forRoot(TenFourApp, { scrollAssist: true, autoFocusAssist: true },{ links: TenFourRoutes.ROUTES })
   ],
   bootstrap: [IonicApp],
@@ -193,6 +193,7 @@ import { LocationProvider } from '../providers/location/location';
     { provide: Contacts, useClass: Contacts },
     { provide: Badge, useClass: Badge },
     { provide: Sim, useClass: Sim },
+    // { provide: Http, useClass: Http },
     { provide: HTTP, useClass: HTTP },
     { provide: Firebase, useClass: Firebase },
     { provide: ApiProvider, useClass: ApiProvider },
@@ -200,8 +201,8 @@ import { LocationProvider } from '../providers/location/location';
     { provide: CountryProvider, useClass: CountryProvider },
     { provide: DatabaseProvider, useClass: DatabaseProvider },
     { provide: StorageProvider, useClass: StorageProvider },
-    { provide: ErrorHandler, useClass: IonicErrorHandler },
-    LocationProvider
+    { provide: LocationProvider, useClass: LocationProvider },
+    { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })
 export class AppModule {}
