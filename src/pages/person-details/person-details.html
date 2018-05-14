@@ -51,7 +51,7 @@
   </ion-list>
   <ion-list *ngIf="checkins && checkins.length > 0">
     <ion-list-header>Check-Ins</ion-list-header>
-    <ion-card color="white" tappable (click)="showReplies(checkin, $event)" *ngFor="let checkin of checkins">
+    <ion-card color="white" tappable (click)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of checkins">
       <ion-card-content text-center>
         <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
         <h1>{{checkin.message}}</h1>

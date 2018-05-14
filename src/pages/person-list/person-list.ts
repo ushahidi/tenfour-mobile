@@ -224,7 +224,8 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      user: this.person
+      user: this.person,
+      person_id: this.person.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);

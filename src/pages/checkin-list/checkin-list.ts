@@ -417,7 +417,7 @@ export class CheckinListPage extends BasePage {
     });
   }
 
-  private showReplies(checkin:Checkin, event:any=null) {
+  private showCheckinDetails(checkin:Checkin, event:any=null) {
     this.showPage(CheckinDetailsPage, {
       organization: this.organization,
       person: this.person,

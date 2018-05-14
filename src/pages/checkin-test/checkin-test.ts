@@ -13,7 +13,8 @@ import { Recipient } from '../../models/recipient';
 import { Answer } from '../../models/answer';
 
 @IonicPage({
-  segment: 'checkins/test'
+  segment: 'checkins/test',
+  defaultHistory: ['checkins']
 })
 @Component({
   selector: 'page-checkin-test',

@@ -149,7 +149,8 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      user: this.person
+      user: this.person,
+      person_id: this.person.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
@@ -212,7 +213,9 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "taskReviewContact");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      person: this.person });
+      person: this.person,
+      person_id: this.person.id 
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "taskReviewContact", "Modal", data);
       if (data) {

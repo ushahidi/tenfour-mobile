@@ -18,7 +18,8 @@ import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
 @IonicPage({
-  segment: 'checkins/send'
+  segment: 'checkins/send',
+  defaultHistory: ['checkins']
 })
 @Component({
   selector: 'page-checkin-send',

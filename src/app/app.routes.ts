@@ -40,7 +40,7 @@ import { SettingsCheckinsPage } from '../pages/settings-checkins/settings-checki
 
 export class TenFourRoutes {
 
-  static readonly LINKS = [
+  static readonly ROUTES = [
     { component: SigninUrlPage, segment: 'signin' },
     { component: SigninEmailPage, segment: 'signin/email', defaultHistory: [SigninUrlPage] },
     { component: SigninPasswordPage, segment: 'signin/password', defaultHistory: [SigninUrlPage, SigninEmailPage] },

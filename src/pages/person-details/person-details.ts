@@ -178,7 +178,8 @@ export class PersonDetailsPage extends BasePage {
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
       person: this.person,
-      user: this.user
+      user: this.user,
+      person_id: this.person.id
     });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);
@@ -208,8 +209,8 @@ export class PersonDetailsPage extends BasePage {
   private invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
     let loading = this.showLoading("Inviting...");
-    this.api.invitePerson(this.organization, this.person).then(
-      (invited:Person) => {
+    this.api.invitePerson(this.organization, this.person).then((invited:Person) => {
+      if (this.mobile) {
         this.database.savePerson(this.organization, invited).then(saved => {
           this.person = invited;
           loading.dismiss();
@@ -220,42 +221,60 @@ export class PersonDetailsPage extends BasePage {
             this.showToast("Person invited to organization");
           }
         });
-      },
-      (error:any) => {
+      }
+      else {
+        this.person = invited;
         loading.dismiss();
-        this.showAlert("Problem Inviting Person", error);
-      });
+        if (this.person.name) {
+          this.showToast(`${this.person.name} invited to organization`);
+        }
+        else {
+          this.showToast("Person invited to organization");
+        }
+      }
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Inviting Person", error);
+    });
   }
 
   private phoneContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
-      window.open("tel:" + contact.contact);
+      window.open("tel:" + contact.contact, '_blank');
     }
   }
 
   private emailContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
-      this.socialSharing.canShareViaEmail().then(() => {
-        this.socialSharing.shareViaEmail('', '', [contact.contact])
-        .then(() => {
-          this.logger.info(this, "emailContact", contact.contact, "Emailed");
-        })
-        .catch(() => {
-          this.logger.error(this, "emailContact", "Error");
+      if (this.mobile) {
+        this.socialSharing.canShareViaEmail().then(() => {
+          this.socialSharing.shareViaEmail('', '', [contact.contact])
+          .then(() => {
+            this.logger.info(this, "emailContact", contact.contact, "Emailed");
+          })
+          .catch(() => {
+            this.logger.error(this, "emailContact", "Error");
+          });
+        }).catch(() => {
+          this.showToast("Email is not available...");
         });
-      }).catch(() => {
-        this.showToast("Email is not available...");
-      });
+      }
+      else {
+        window.open("mailto:" + contact.contact, '_blank');
+      }
     }
   }
 
-  private showReplies(checkin:Checkin, event:any=null) {
+  private showCheckinDetails(checkin:Checkin, event:any=null) {
+    this.logger.info(this, "showCheckinDetails", checkin);
     this.showPage(CheckinDetailsPage, {
       organization: this.organization,
       person: this.person,
-      checkin: checkin
+      checkin: checkin,
+      checkin_id: checkin.id
     });
   }
 

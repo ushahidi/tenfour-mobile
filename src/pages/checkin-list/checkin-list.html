@@ -34,7 +34,7 @@
             <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins waiting response...</h2>
           </ion-item>
           <checkin-card [checkin]="checkin" [person]="person" [selected]="selected == checkin"
-                        (cardSelected)="showReplies(checkin, $event)" (sendSelected)="sendReply(checkin, $event)" (resendSelected)="resendCheckin(checkin, $event)"
+                        (cardSelected)="showCheckinDetails(checkin, $event)" (sendSelected)="sendReply(checkin, $event)" (resendSelected)="resendCheckin(checkin, $event)"
                         *ngFor="let checkin of checkins"></checkin-card>
         </ion-list>
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">

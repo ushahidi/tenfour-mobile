@@ -163,7 +163,7 @@ import { LocationProvider } from '../providers/location/location';
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: true }),
-    IonicModule.forRoot(TenFourApp, { scrollAssist: true, autoFocusAssist: true },{ links: TenFourRoutes.LINKS })
+    IonicModule.forRoot(TenFourApp, { scrollAssist: true, autoFocusAssist: true },{ links: TenFourRoutes.ROUTES })
   ],
   bootstrap: [IonicApp],
   entryComponents: [
