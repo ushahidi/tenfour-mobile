@@ -25,7 +25,7 @@ export class PersonSelectPage extends BasePage {
   people:Person[] = null;
   groups:Group[] = null;
   show_groups:boolean = true;
-  limit:number = 20;
+  limit:number = 25;
   offset:number = 0;
 
   constructor(
@@ -152,14 +152,7 @@ export class PersonSelectPage extends BasePage {
       for (let person of people) {
         let previous = this.people.filter(_person => _person.id == person.id);
         if (previous && previous.length > 0) {
-          if (previous[0].selected == true) {
-            person.selected = true;
-            this.logger.error(this, "updatePeople", person.name, "Selected");
-          }
-          else {
-            person.selected = false;
-            this.logger.info(this, "updatePeople", person.name, "Not Selected");
-          }
+          person.selected = true;
         }
       }
     }
