@@ -9,6 +9,7 @@ import { CheckinDetailsModule } from '../../pages/checkin-details/checkin-detail
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { TitleizeModule } from '../../pipes/titleize/titleize.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
+import { CheckinCardModule } from '../../components/checkin-card/checkin-card.module';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
     DateTimeModule,
     TitleizeModule,
     PersonAvatarModule,
+    CheckinCardModule,
     PersonEditModule,
     CheckinDetailsModule,
     IonicPageModule.forChild(PersonDetailsPage),

@@ -29,11 +29,18 @@ export class CheckinCardComponent {
   @Output()
   resendSelected = new EventEmitter();
 
+  hasCardSelected:boolean = false;
+  hasSendSelected:boolean = false;
+  hasResendSelected:boolean = false;
+
   constructor(private logger:LoggerProvider) {
 
   }
 
   ngOnInit() {
+    this.hasCardSelected = this.cardSelected && this.cardSelected.observers.length > 0;
+    this.hasSendSelected = this.sendSelected && this.sendSelected.observers.length > 0;
+    this.hasResendSelected = this.resendSelected && this.resendSelected.observers.length > 0;
   }
 
   onCardSelected(event:any) {

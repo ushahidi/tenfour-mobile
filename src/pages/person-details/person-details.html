@@ -51,15 +51,8 @@
   </ion-list>
   <ion-list *ngIf="checkins && checkins.length > 0">
     <ion-list-header>Check-Ins</ion-list-header>
-    <ion-card color="white" tappable (click)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of checkins">
-      <ion-card-content text-center>
-        <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
-        <h1>{{checkin.message}}</h1>
-        <p>{{checkin.created_at | dateTime}}. <strong>From {{checkin.user_name}}.</strong></p>
-        <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
-        <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
-      </ion-card-content>
-    </ion-card>
+    <checkin-card [checkin]="checkin" [person]="person" [selected]="selected == checkin"
+                  (cardSelected)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of checkins"></checkin-card>
   </ion-list>
   <ion-infinite-scroll *ngIf="checkins && checkins.length >= limit" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>

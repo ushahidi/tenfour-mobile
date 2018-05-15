@@ -6,7 +6,7 @@
     <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
     <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
   </ion-card-content>
-  <ion-row no-padding no-margin *ngIf="checkin.canRespond(person) || checkin.canResend(person)">
+  <ion-row no-padding no-margin *ngIf="(hasSendSelected && checkin.canRespond(person)) || (hasResendSelected && checkin.canResend(person))">
     <ion-col col-6 text-left no-padding no-margin>
       <button ion-button clear color="primary" tappable *ngIf="checkin.canRespond(person)" (click)="onSendSelected($event)">Respond</button>
     </ion-col>
