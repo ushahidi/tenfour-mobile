@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
@@ -46,6 +46,7 @@ export class SignupPasswordPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected events:Events,
       protected api:ApiProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -87,6 +88,7 @@ export class SignupPasswordPage extends BasePage {
               ];
               Promise.all(saves).then(saved => {
                 this.trackLogin(organization, person);
+                this.events.publish('user:login');
                 loading.dismiss();
                 if (person.name && person.name.length > 0) {
                   this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);

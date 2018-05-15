@@ -237,6 +237,9 @@ export class TenFourApp {
       this.events.subscribe('account:deleted', () => {
         this.userLogout(false);
       });
+      this.events.subscribe('user:login', () => {
+        this.loadMenu();
+      });
       resolve(true);
     })
   }
@@ -573,6 +576,7 @@ export class TenFourApp {
       this.organization = null;
       this.person = null;
       this.clearBadgeCount();
+      this.events.publish('user:logout');
       loading.dismiss();
       this.showSigninUrl(event);
     });
