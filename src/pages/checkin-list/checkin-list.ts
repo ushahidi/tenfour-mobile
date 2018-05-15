@@ -476,10 +476,11 @@ export class CheckinListPage extends BasePage {
   }
 
   private showNotifications(event:any) {
-    this.showPage(NotificationListPage, {
+    this.showModal(NotificationListPage, {
       organization: this.organization,
       person: this.person,
-      notifications: this.notifications
+      notifications: this.notifications,
+      modal: true
     });
   }
 

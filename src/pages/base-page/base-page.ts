@@ -180,7 +180,12 @@ export class BasePage {
     let loading = this.loadingController.create({
       content: message
     });
-    loading.present();
+    if (this.mobile) {
+      loading.present();
+    }
+    else {
+
+    }
     return loading;
   }
 

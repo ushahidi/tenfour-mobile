@@ -27,6 +27,7 @@ export class NotificationListPage extends BasePage {
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
+  modal:boolean = true;
 
   constructor(
       protected zone:NgZone,
@@ -49,6 +50,7 @@ export class NotificationListPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     this.notifications = this.getParameter<Notification[]>("notifications");
+    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then(updated => {
       loading.dismiss();
@@ -68,6 +70,10 @@ export class NotificationListPage extends BasePage {
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.viewNotifications();
+  }
+
+  private close(event:any) {
+    this.hideModal();
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {

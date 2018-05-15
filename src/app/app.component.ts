@@ -24,6 +24,7 @@ import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
+import { NotificationListPage } from '../pages/notification-list/notification-list';
 
 import { ApiProvider } from '../providers/api/api';
 import { LoggerProvider } from '../providers/logger/logger';
@@ -509,6 +510,16 @@ export class TenFourApp {
     this.nav.setRoot(GroupListPage, {
       organization: this.organization,
       person: this.person
+    });
+    this.hideSideMenu();
+  }
+
+  private showNotificationList() {
+    this.logger.info(this, "showNotificationList");
+    this.nav.setRoot(NotificationListPage, {
+      organization: this.organization,
+      person: this.person,
+      notifications: this.person.notifications,
     });
     this.hideSideMenu();
   }

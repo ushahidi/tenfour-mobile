@@ -1,5 +1,8 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left *ngIf="modal == true">
+      <button ion-button color="primary" (click)="close($event)">Close</button>
+    </ion-buttons>
     <ion-title>Notifications</ion-title>
   </ion-navbar>
 </ion-header>
