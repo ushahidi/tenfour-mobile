@@ -429,6 +429,7 @@ export class CheckinListPage extends BasePage {
   private sendReply(checkin:Checkin, event:any=null) {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
+      checkins: [checkin],
       checkin: checkin
     });
     modal.onDidDismiss(data => {

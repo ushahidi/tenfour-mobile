@@ -1,3 +1,21 @@
 page-settings-checkins {
+  ion-item {
+    &.hidden {
+      height:0px !important;
+      min-height:2px !important;
+    }
+    &.webhook {
+      margin-top: 0 !important;
+      padding-top: 0 !important;
+    }
+    ion-icon {
 
+    }
+    ion-label {
+      h2 {
+        font-weight: 500 !important;
+        color: #000 !important;
+      }
+    }
+  }
 }

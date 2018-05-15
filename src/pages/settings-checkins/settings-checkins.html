@@ -3,7 +3,7 @@
     <ion-buttons left>
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Check-Ins</ion-title>
+    <ion-title>Channels</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
     </ion-buttons>
@@ -14,28 +14,36 @@
     <ion-list-header>How to send Check-Ins</ion-list-header>
     <ion-item color="white">
       <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
-      <ion-label>Email</ion-label>
+      <ion-label>
+        <h2>Email</h2>
+      </ion-label>
       <ion-toggle [(ngModel)]="organization.email_enabled" (ionChange)="onEmailEnabled($event)"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
-      <ion-label>SMS</ion-label>
+      <ion-label>
+        <h2>SMS</h2>
+      </ion-label>
       <ion-toggle [(ngModel)]="organization.sms_enabled" (ionChange)="onSmsEnabled($event)"></ion-toggle>
     </ion-item>
-    <ion-item color="white">
+    <ion-item color="white" no-lines>
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
-      <ion-label>Slack</ion-label>
+      <ion-label>
+        <h2>Slack</h2>
+      </ion-label>
       <ion-toggle [(ngModel)]="organization.slack_enabled" (ionChange)="onSlackEnabled($event)"></ion-toggle>
+    </ion-item>
+    <ion-item color="white" class="webhook" [class.hidden]="organization.slack_enabled == false">
+      <ion-icon color="white" ios="ios-chatboxes" md="md-chatboxes" item-left *ngIf="organization.slack_enabled"></ion-icon>
+      <ion-label *ngIf="organization.slack_enabled">Webhook</ion-label>
+      <ion-input type="url" autocorrect="off" autocapitalize="none" placeholder="https://" [(ngModel)]="organization.slack_webhook" *ngIf="organization.slack_enabled"></ion-input>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-      <ion-label>App Only</ion-label>
+      <ion-label>
+        <h2>App Only</h2>
+      </ion-label>
       <ion-toggle [(ngModel)]="organization.app_enabled" (ionChange)="onAppOnly($event)"></ion-toggle>
     </ion-item>
   </ion-list>
-  <p text-center>
-    <button ion-button text-wrap clear color="primary"(click)="visitWebsite($event)">
-      Login to TenFour on the web to configure Slack
-    </button>
-  </p>
 </ion-content>

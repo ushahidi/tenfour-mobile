@@ -14,20 +14,20 @@
 <ion-content>
   <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged($event)">
     <ion-slide *ngFor="let checkin of checkins">
-      <ion-list no-margin>
+      <ion-list no-margin *ngIf="checkin">
         <ion-item text-wrap color="white">
           <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
           <h1 text-center>{{checkin.message}}</h1>
-          <p text-center>{{checkin.created_at | dateTime}}. <strong>From {{checkin.user_name}}.</strong></p>
+          <p text-center>{{checkin.created_at | dateTime}} <strong> {{checkin.user_name}}</strong></p>
         </ion-item>
       </ion-list>
-      <div class="buttons" margin-top margin-bottom *ngIf="checkin.reply">
+      <div class="buttons" margin-top margin-bottom *ngIf="checkin && checkin.reply">
         <div padding-left padding-right *ngFor="let answer of checkin.answers">
           <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
           <button ion-button block outline color="grey" *ngIf="answer.answer != checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
         </div>
       </div>
-      <ion-list *ngIf="checkin.reply">
+      <ion-list *ngIf="checkin && checkin.reply">
         <ion-item color="dark">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
           <ion-input type="text" placeholder="Add message" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.message"></ion-input>

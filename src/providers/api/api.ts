@@ -332,10 +332,18 @@ export class ApiProvider extends HttpProvider {
       let url = `${this.api}/api/v1/organizations/${organization.id}`;
       let settings = {
         channels: {
-          app: { enabled: organization.app_enabled == true },
-			    email: { enabled: organization.email_enabled == true },
-			    sms: { enabled: organization.sms_enabled == true },
-			    slack: { enabled: organization.slack_enabled == true }
+          app: {
+            enabled: organization.app_enabled == true
+          },
+			    email: {
+            enabled: organization.email_enabled == true
+          },
+			    sms: {
+            enabled: organization.sms_enabled == true
+          },
+			    slack: {
+            enabled: organization.slack_enabled == true
+          }
 		    },
 		    location: {
           name: organization.location
@@ -346,6 +354,9 @@ export class ApiProvider extends HttpProvider {
       }
       if (organization.size) {
         settings['organization_size'] = {size: organization.size};
+      }
+      if (organization.slack_webhook && organization.slack_webhook.length > 0) {
+        settings['channels']['slack']['webhook_url'] = organization.slack_webhook;
       }
       if (organization.countries && organization.countries.length > 0) {
         let regions = [];

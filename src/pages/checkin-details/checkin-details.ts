@@ -135,6 +135,7 @@ export class CheckinDetailsPage extends BasePage {
     this.logger.info(this, "sendReply");
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
+      checkins: [this.checkin],
       checkin: this.checkin
     });
     modal.onDidDismiss(data => {
@@ -158,6 +159,7 @@ export class CheckinDetailsPage extends BasePage {
     if (reply.user_id == this.person.id) {
       let modal = this.showModal(CheckinRespondPage, {
         organization: this.organization,
+        checkins: [this.checkin],
         checkin: this.checkin,
         reply: reply
       });

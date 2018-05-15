@@ -71,6 +71,12 @@ export class Organization extends Model {
               }
               if (_settings.values.slack) {
                 this.slack_enabled = _settings.values.slack.enabled;
+                if (_settings.values.slack.webhook_url) {
+                  this.slack_webhook = _settings.values.slack.webhook_url;
+                }
+                else {
+                  this.slack_webhook = null;
+                }
               }
               else {
                 this.slack_enabled = null;
@@ -148,6 +154,9 @@ export class Organization extends Model {
 
   @Column("slack_enabled", BOOLEAN)
   public slack_enabled:boolean = null;
+
+  @Column("slack_webhook", TEXT)
+  public slack_webhook:string = null;
 
   @Column("preferred_enabled", BOOLEAN)
   public preferred_enabled:boolean = null;

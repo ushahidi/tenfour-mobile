@@ -110,9 +110,4 @@ export class SettingsCheckinsPage extends BasePage {
     }
   }
 
-  private visitWebsite(event:any) {
-    this.logger.info(this, "visitWebsite", this.website);
-    this.showUrl(this.website, "_blank");
-  }
-
 }
