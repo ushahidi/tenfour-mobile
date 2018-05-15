@@ -1,14 +1,11 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
-
-import { StatusBar } from '@ionic-native/status-bar';
-import { Diagnostic } from '@ionic-native/diagnostic';
-import { Camera, CameraOptions } from '@ionic-native/camera';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
+import { CameraProvider } from '../../providers/camera/camera';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -33,7 +30,6 @@ export class PersonEditPage extends BasePage {
   person:Person = null;
   editing:boolean = true;
   profile:boolean = false;
-  cameraPresent:boolean = true;
   countryOptions:any = {
     multiple: false,
     title: 'Country Code'
@@ -42,6 +38,11 @@ export class PersonEditPage extends BasePage {
     multiple: false,
     title: 'Roles'
   };
+
+  @ViewChild("fileInput")
+  fileInput:any = null;
+  cameraPresent:boolean = true;
+  cameraRollPresent:boolean = true;
 
   constructor(
       protected zone:NgZone,
@@ -56,10 +57,8 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected database:DatabaseProvider,
-      protected events:Events,
-      protected camera:Camera,
-      protected statusBar:StatusBar,
-      protected diagnostic:Diagnostic) {
+      protected camera:CameraProvider,
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -92,6 +91,17 @@ export class PersonEditPage extends BasePage {
     this.trackPage({
       organization: this.organization.name,
       person: this.person.name
+    });
+  }
+
+  private loadCamera() {
+    this.camera.cameraPresent().then((cameraPresent:boolean) => {
+      this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
+      this.cameraPresent = cameraPresent;
+    });
+    this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
+      this.logger.info(this, "loadCamera", "cameraRollPresent", cameraRollPresent);
+      this.cameraRollPresent = cameraRollPresent;
     });
   }
 
@@ -268,88 +278,67 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
 
-  private showCameraOptions() {
-    let buttons = [];
-    if (this.cameraPresent) {
-      buttons.push({
-        text: 'Take Photo',
-        handler: () => {
-          this.showCamera();
-        }
-      });
-    }
-    buttons.push({
-      text: 'Photo Library',
-      handler: () => {
-        this.showCameraRoll();
-      }
-    });
-    buttons.push({
-      text: 'Cancel',
-      role: 'cancel'
-    });
-    let actionSheet = this.actionController.create({
-      buttons: buttons
-    });
-    actionSheet.present();
-  }
-
-  private loadCamera() {
+  private showCameraOptions(event:any) {
     if (this.mobile) {
-      return this.diagnostic.isCameraPresent().then(
-        (cameraPresent:boolean) => {
-          this.logger.info(this, "loadCamera", "isCameraPresent", cameraPresent);
-          this.cameraPresent = cameraPresent;
-        },
-        (error:any) => {
-          this.logger.error(this, "loadCamera", "isCameraPresent", error);
-          this.cameraPresent = false;
+      let buttons = [];
+      if (this.cameraPresent) {
+        buttons.push({
+          text: 'Take Photo',
+          handler: () => {
+            this.camera.showCamera().then((photo:any) => {
+              this.person.profile_picture = photo;
+            },
+            (error:any) => {
+              this.person.profile_picture = null;
+              this.showAlert("Problem Taking Photo", error);
+            });
+          }
         });
+      }
+      if (this.cameraRollPresent) {
+        buttons.push({
+          text: 'Photo Library',
+          handler: () => {
+            this.camera.showCameraRoll().then((photo:any) => {
+              this.person.profile_picture = photo;
+            },
+            (error:any) => {
+              this.person.profile_picture = null;
+              this.showAlert("Problem Taking Photo", error);
+            });
+          }
+        });
+      }
+      buttons.push({
+        text: 'Cancel',
+        role: 'cancel'
+      });
+      let actionSheet = this.actionController.create({
+        buttons: buttons
+      });
+      actionSheet.present();
     }
-    else {
-      this.cameraPresent = false;
+    else if (this.fileInput) {
+      this.fileInput.nativeElement.click();
     }
   }
 
-  private showCamera() {
-    this.logger.info(this, "showCamera");
-    let options:CameraOptions = {
-      mediaType: this.camera.MediaType.PICTURE,
-      encodingType: this.camera.EncodingType.JPEG,
-      destinationType: this.camera.DestinationType.DATA_URL,
-      sourceType: this.camera.PictureSourceType.CAMERA
+  private onFileChanged(event:any){
+    this.logger.info(this, "onFileChanged", event.target);
+    if (event.target.files && event.target.files.length > 0) {
+      let reader = new FileReader();
+      let file = event.target.files[0];
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        let imageData = reader.result.split(',')[1];
+        if (imageData) {
+          this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
+        }
+        else {
+          this.person.profile_picture = null;
+        }
+      };
     }
-    this.camera.getPicture(options).then((imageData:any) => {
-      this.logger.info(this, "showCamera", "Captured");
-      this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
-    },
-    (error:any) => {
-      this.logger.error(this, "showCamera", error);
-      this.showAlert("Problem Taking Photo", error);
-    });
-  }
-
-  private showCameraRoll() {
-    this.logger.info(this, "showCameraRoll");
-    let options:CameraOptions = {
-      mediaType: this.camera.MediaType.PICTURE,
-      encodingType: this.camera.EncodingType.JPEG,
-      destinationType: this.camera.DestinationType.DATA_URL,
-      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
-    }
-    this.camera.getPicture(options).then((imageData:any) => {
-      this.logger.info(this, "showCameraRoll", "Selected");
-      if (imageData) {
-        this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
-      }
-      else {
-        this.person.profile_picture = null;
-      }
-    },
-    (error:any) => {
-      this.logger.error(this, "showCameraRoll", error);
-      this.showAlert("Problem Selecting Photo", error);
-    });
   }
 
   private addRole(event:any) {

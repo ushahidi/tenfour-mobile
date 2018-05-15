@@ -101,6 +101,7 @@ import { DatabaseProvider } from '../providers/database/database';
 import { CountryProvider } from '../providers/country/country';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
+import { CameraProvider } from '../providers/camera/camera';
 
 @NgModule({
   declarations: [
@@ -202,6 +203,7 @@ import { LocationProvider } from '../providers/location/location';
     { provide: DatabaseProvider, useClass: DatabaseProvider },
     { provide: StorageProvider, useClass: StorageProvider },
     { provide: LocationProvider, useClass: LocationProvider },
+    { provide: CameraProvider, useClass: CameraProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

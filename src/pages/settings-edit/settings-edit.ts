@@ -1,14 +1,14 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
-
-import { Camera, CameraOptions } from '@ionic-native/camera';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
+import { Organization } from '../../models/organization';
+
+
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
-
-import { Organization } from '../../models/organization';
+import { CameraProvider } from '../../providers/camera/camera';
 
 @IonicPage({
   segment: 'settings/edit',
@@ -26,6 +26,11 @@ export class SettingsEditPage extends BasePage {
   logo:string = "assets/images/dots.png";
   location:string = null;
 
+  @ViewChild("fileInput")
+  fileInput:any = null;
+  cameraPresent:boolean = true;
+  cameraRollPresent:boolean = true;
+
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -39,8 +44,13 @@ export class SettingsEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected database:DatabaseProvider,
-      protected camera:Camera) {
+      protected camera:CameraProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+  }
+
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.loadCamera();
   }
 
   ionViewWillEnter() {
@@ -83,22 +93,78 @@ export class SettingsEditPage extends BasePage {
     });
   }
 
-  private showCameraRoll(event:any) {
-    this.logger.info(this, "showCameraRoll");
-    let options:CameraOptions = {
-      mediaType: this.camera.MediaType.PICTURE,
-      encodingType: this.camera.EncodingType.JPEG,
-      destinationType: this.camera.DestinationType.DATA_URL,
-      sourceType: this.camera.PictureSourceType.PHOTOLIBRARY
-    }
-    this.camera.getPicture(options).then((imageData:any) => {
-      this.logger.info(this, "showCameraRoll", "Selected");
-      this.organization.profile_picture = 'data:image/jpeg;base64,' + imageData;
-    },
-    (error:any) => {
-      this.logger.error(this, "showCameraRoll", error);
-      this.showAlert("Problem Selecting Photo", error);
+  private loadCamera() {
+    this.camera.cameraPresent().then((cameraPresent:boolean) => {
+      this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
+      this.cameraPresent = cameraPresent;
     });
+    this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
+      this.logger.info(this, "loadCamera", "cameraRollPresent", cameraRollPresent);
+      this.cameraRollPresent = cameraRollPresent;
+    });
+  }
+
+  private showCameraOptions(event:any) {
+    if (this.mobile) {
+      let buttons = [];
+      if (this.cameraPresent) {
+        buttons.push({
+          text: 'Take Photo',
+          handler: () => {
+            this.camera.showCamera().then((photo:any) => {
+              this.organization.profile_picture = photo;
+            },
+            (error:any) => {
+              this.organization.profile_picture = null;
+              this.showAlert("Problem Taking Photo", error);
+            });
+          }
+        });
+      }
+      if (this.cameraRollPresent) {
+        buttons.push({
+          text: 'Photo Library',
+          handler: () => {
+            this.camera.showCameraRoll().then((photo:any) => {
+              this.organization.profile_picture = photo;
+            },
+            (error:any) => {
+              this.organization.profile_picture = null;
+              this.showAlert("Problem Taking Photo", error);
+            });
+          }
+        });
+      }
+      buttons.push({
+        text: 'Cancel',
+        role: 'cancel'
+      });
+      let actionSheet = this.actionController.create({
+        buttons: buttons
+      });
+      actionSheet.present();
+    }
+    else if (this.fileInput) {
+      this.fileInput.nativeElement.click();
+    }
+  }
+
+  private onFileChanged(event:any){
+    this.logger.info(this, "onFileChanged", event.target);
+    if (event.target.files && event.target.files.length > 0) {
+      let reader = new FileReader();
+      let file = event.target.files[0];
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        let imageData = reader.result.split(',')[1];
+        if (imageData) {
+          this.organization.profile_picture = 'data:image/jpeg;base64,' + imageData;
+        }
+        else {
+          this.organization.profile_picture = null;
+        }
+      };
+    }
   }
 
   private onKeyPress(event:any) {

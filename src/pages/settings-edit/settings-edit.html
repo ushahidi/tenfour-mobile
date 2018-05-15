@@ -14,8 +14,9 @@
     <ion-item color="white" text-center>
       <person-avatar item-center [image]="logo" [large]="true" *ngIf="organization.profile_picture == null"></person-avatar>
       <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization.profile_picture != null"></person-avatar>
-      <button ion-button clear color="primary" *ngIf="organization.profile_picture" (click)="showCameraRoll($event)">Change photo</button>
-      <button ion-button clear color="primary" *ngIf="organization.profile_picture == null" (click)="showCameraRoll($event)">Add photo</button>
+      <button ion-button clear color="primary" *ngIf="organization.profile_picture" (click)="showCameraOptions($event)">Change photo</button>
+      <button ion-button clear color="primary" *ngIf="organization.profile_picture == null" (click)="showCameraOptions($event)">Add photo</button>
+      <input style="display:none" type="file" (change)="onFileChanged($event)" #fileInput *ngIf="browser == true">
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Name</ion-label>

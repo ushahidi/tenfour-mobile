@@ -373,7 +373,8 @@ export class ApiProvider extends HttpProvider {
         id: organization.id,
         name: organization.name,
         subdomain: organization.subdomain,
-        settings: settings };
+        settings: settings
+      };
       this.getToken(organization).then((token:Token) => {
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.organization) {
