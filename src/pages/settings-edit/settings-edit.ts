@@ -18,7 +18,7 @@ import { CameraProvider } from '../../providers/camera/camera';
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
   providers: [ ApiProvider, DatabaseProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SettingsEditPage extends BasePage {
 

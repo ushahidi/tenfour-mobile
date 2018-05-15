@@ -375,6 +375,9 @@ export class ApiProvider extends HttpProvider {
         subdomain: organization.subdomain,
         settings: settings
       };
+      if (organization.profile_picture && organization.profile_picture.startsWith("data:image")) {
+        params['_input_image'] = organization.profile_picture;
+      }
       this.getToken(organization).then((token:Token) => {
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.organization) {
