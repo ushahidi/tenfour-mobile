@@ -11,7 +11,7 @@
       <button ion-button clear color="primary" tappable *ngIf="checkin.canRespond(person)" (click)="onSendSelected($event)">Respond</button>
     </ion-col>
     <ion-col col-6 text-right no-padding no-margin>
-      <button ion-button clear color="secondary" tappable *ngIf="checkin.canResend(person)" (click)="onResendSelected($event)">Resend</button>
+      <button ion-button clear color="primary" tappable *ngIf="checkin.canResend(person)" (click)="onResendSelected($event)">Resend</button>
     </ion-col>
   </ion-row>
 </ion-card>
