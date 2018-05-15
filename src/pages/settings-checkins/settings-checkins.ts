@@ -22,6 +22,7 @@ export class SettingsCheckinsPage extends BasePage {
 
   website:string = "https://app.tenfour.org";
   organization:Organization = null;
+  help:string = "https://www.tenfour.org/support/configuring-how-to-send-checkins";
 
   constructor(
       protected zone:NgZone,
