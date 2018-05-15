@@ -9,7 +9,7 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content color="white">
   <div padding *ngIf="mobile">
     <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
     <button ion-button block color="primary" (click)="showUrl(website, '_blank', $event)">Visit Website</button>
@@ -31,6 +31,13 @@
         <p>Unlimited email messages</p>
         <p>Unlimited Slack messages</p>
         <p>5 text messages (SMS) credits per user, per month</p>
+      </ion-item>
+      <ion-item text-wrap text-center no-lines color="white" *ngIf="person && person.isOwner() == true">
+        <ion-spinner name="ios" *ngIf="url == null"></ion-spinner>
+        <iframe [src]="url" frameborder="0" *ngIf="url"></iframe>
+      </ion-item>
+      <ion-item text-wrap no-lines color="white" *ngIf="person && person.isOwner() == false">
+        <h2 text-center>Note, only organization owners can edit payment information.</h2>
       </ion-item>
    </ion-list>
   </div>

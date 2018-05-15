@@ -1,12 +1,14 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
+import { Organization } from '../../models/organization';
+import { Person } from '../../models/person';
+
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
-
-import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'settings/payments',
@@ -21,7 +23,9 @@ import { Organization } from '../../models/organization';
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
+  person:Person = null;
   website:string = "https://app.tenfour.org/settings/plan-and-credits";
+  url:SafeResourceUrl = null;
 
   constructor(
       protected zone:NgZone,
@@ -35,13 +39,16 @@ export class SettingsPaymentsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected database:DatabaseProvider,
+      protected sanitizer:DomSanitizer) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+    this.person = this.getParameter<Person>("person");
+    this.loadPaymentForm();
   }
 
   ionViewDidEnter() {
@@ -49,6 +56,18 @@ export class SettingsPaymentsPage extends BasePage {
     this.trackPage({
       organization: this.organization.name
     });
+  }
+
+  private loadPaymentForm() {
+    if (this.person.isOwner()) {
+      this.api.getPaymentUrl(this.organization).then((url:string) => {
+        this.logger.info(this, "ChargeBee", url);
+        this.url = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      },
+      (error:any) => {
+        this.logger.error(this, "ChargeBee", error);
+      });  
+    }
   }
 
   private cancelEdit(event:any) {

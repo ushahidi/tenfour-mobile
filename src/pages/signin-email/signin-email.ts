@@ -22,7 +22,7 @@ export class SigninEmailPage extends BasePage {
 
   @ViewChild('email')
   email:TextInput;
-
+  logo:string = "assets/images/dots.png";
   organization:Organization = null;
 
   constructor(

@@ -1065,4 +1065,32 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getPaymentUrl(organization:Organization):Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/hostedpage`;
+        let params = {
+          callback: `https://${organization.subdomain}.tenfour.org/settings/plan-and-credits/add-payment-method`,
+          organization_id: organization.id
+        };
+        this.logger.info(this, "getPaymentUrl", url);
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          if (data && data.url) {
+            this.logger.info(this, "getPaymentUrl", url, data.url);
+            resolve(data.url);
+          }
+          else {
+            reject("Payment Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
 }

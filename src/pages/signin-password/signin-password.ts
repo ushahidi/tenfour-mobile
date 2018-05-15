@@ -30,6 +30,7 @@ export class SigninPasswordPage extends BasePage {
 
   organization:Organization = null;
   email:string = null;
+  logo:string = "assets/images/dots.png";
 
   constructor(
       protected zone:NgZone,
