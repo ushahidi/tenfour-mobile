@@ -55,4 +55,9 @@ export class SettingsPaymentsPage extends BasePage {
     this.hideModal();
   }
 
+  private doneEdit(event:any) {
+    //TODO wire up credit card payments
+    this.hideModal();
+  }
+
 }

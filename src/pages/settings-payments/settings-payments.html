@@ -4,22 +4,34 @@
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
     <ion-title>Payments</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content padding>
-  <p text-center>
-    You can edit your plan or add more credits to your organization from the TenFour website.
-  </p>
-  <button ion-button block color="primary" (click)="showUrl(website, '_blank', $event)">Visit Website</button>
-  <!-- <ion-list *ngIf="organization">
-    <ion-list-header>Payment options</ion-list-header>
-    <ion-item color="white" tappable>
-      <ion-icon ios="ios-card" md="md-card" item-left></ion-icon>
-      <ion-label>Credit Card</ion-label>
-    </ion-item>
-    <ion-item color="white" tappable>
-      <ion-icon ios="ios-cash" md="md-cash" item-left></ion-icon>
-      <ion-label>PayPal</ion-label>
-    </ion-item>
-  </ion-list> -->
+<ion-content>
+  <div padding *ngIf="mobile">
+    <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
+    <button ion-button block color="primary" (click)="showUrl(website, '_blank', $event)">Visit Website</button>
+  </div>
+  <div *ngIf="browser">
+    <ion-list>
+      <ion-item text-wrap no-lines text-center color="white">
+        <ion-grid>
+          <ion-row>
+            <ion-col>
+              <h1 text-right no-padding no-margin>$3</h1>
+            </ion-col>
+            <ion-col>
+              <p text-left no-padding no-margin>per user,<br>per month</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+        <p>Unlimited in-app messages</p>
+        <p>Unlimited email messages</p>
+        <p>Unlimited Slack messages</p>
+        <p>5 text messages (SMS) credits per user, per month</p>
+      </ion-item>
+   </ion-list>
+  </div>
 </ion-content>
