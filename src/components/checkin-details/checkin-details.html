@@ -7,7 +7,7 @@
     <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
   </ion-item>
   <ion-item text-wrap color="white">
-    <button ion-button text-only item-left clear color="primary" tappable *ngIf="hasSendClicked && checkin.canRespond(person)" (click)="onSendClicked($event)">Respond</button>
+    <button ion-button text-only item-left clear color="primary" tappable *ngIf="hasRespondClicked && checkin.canRespond(person)" (click)="onRespondClicked($event)">Respond</button>
     <button ion-button text-only item-right clear color="primary" tappable *ngIf="hasResendClicked && checkin.canResend(person)" (click)="onResendClicked($event)">Resend</button>
   </ion-item>
 </ion-list>

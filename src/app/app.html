@@ -34,8 +34,8 @@
     </ion-header>
     <ion-content>
       <checkin-details [checkin]="checkin" [person]="person"
-                       [canSend]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
-                       (sendClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin"></checkin-details>
+                       [canRespond]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
+                       (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin"></checkin-details>
     </ion-content>
   </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>

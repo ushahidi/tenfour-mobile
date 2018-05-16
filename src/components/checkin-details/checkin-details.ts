@@ -16,30 +16,30 @@ export class CheckinDetailsComponent {
   person:Person;
 
   @Input()
-  canSend:boolean = false;
+  canRespond:boolean = false;
 
   @Input()
   canResend:boolean = false;
 
   @Output()
-  sendClicked = new EventEmitter();
+  respondClicked = new EventEmitter();
 
   @Output()
   resendClicked = new EventEmitter();
 
-  hasSendClicked:boolean = false;
+  hasRespondClicked:boolean = false;
   hasResendClicked:boolean = false;
 
   constructor() {
   }
 
   ngOnInit() {
-    this.hasSendClicked = this.sendClicked && this.sendClicked.observers.length > 0;
+    this.hasRespondClicked = this.respondClicked && this.respondClicked.observers.length > 0;
     this.hasResendClicked = this.resendClicked && this.resendClicked.observers.length > 0;
   }
 
-  onSendClicked(event:any) {
-    this.sendClicked.emit();
+  onRespondClicked(event:any) {
+    this.respondClicked.emit();
   }
 
   onResendClicked(event:any) {

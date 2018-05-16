@@ -417,7 +417,7 @@ export class CheckinListPage extends BasePage {
   }
 
   private showCheckinDetails(checkin:Checkin, event:any=null) {
-    if (this.platform.width() > this.WIDTH_LARGE) {
+    if (document.body.clientWidth > this.WIDTH_LARGE) {
       // this.showModal(CheckinDetailsPage, {
       //   organization: this.organization,
       //   person: this.person,
@@ -425,6 +425,7 @@ export class CheckinListPage extends BasePage {
       //   checkin_id: checkin.id,
       //   modal: true
       // });
+      // this.selected = checkin;
       this.events.publish('checkin:details', {
         checkin: checkin
       });
