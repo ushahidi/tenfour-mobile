@@ -28,6 +28,9 @@
             <ion-segment-button value="waiting">Waiting Response</ion-segment-button>
           </ion-segment>
         </div>
+        <div text-center class="spinner" *ngIf="loading == true && checkins.length == 0">
+          <ion-spinner name="ios"></ion-spinner>
+        </div>
         <ion-list *ngIf="checkins">
           <ion-item no-lines text-wrap margin-top *ngIf="loading == false && checkins.length == 0">
             <h2 text-center padding-top margin-top *ngIf="filter == 'all'">There currently are no Check-Ins...</h2>

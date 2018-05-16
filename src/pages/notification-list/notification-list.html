@@ -10,6 +10,9 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <div text-center class="spinner" *ngIf="loading == true && (notifications == null || notifications.length == 0)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
   <ion-list *ngIf="notifications">
     <ion-item no-lines *ngIf="loading == false && notifications.length == 0">
       <h2>There currently are no Notifications...</h2>

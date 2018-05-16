@@ -128,6 +128,11 @@ ion-list {
     }
   }
 }
+.spinner {
+  ion-spinner {
+    margin-top: 100px;
+  }
+}
 .truncate {
   display: block;
   overflow: hidden;

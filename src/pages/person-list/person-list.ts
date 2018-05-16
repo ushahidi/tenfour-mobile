@@ -54,12 +54,15 @@ export class PersonListPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadPeople(true).then((finished:any) => {
       loading.dismiss();
+      this.loading = false;
     },
     (error:any) => {
       loading.dismiss();
+      this.loading = false;
     });
   }
 
@@ -93,6 +96,7 @@ export class PersonListPage extends BasePage {
   private loadPeople(cache:boolean=true) {
     return new Promise((resolve, reject) => {
       this.offset = 0;
+      this.loading = true;
       if (cache && this.mobile) {
         this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           if (people && people.length > 1) {

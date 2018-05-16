@@ -15,6 +15,9 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.people == null || organization.people.length == 0)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
   <ion-list *ngIf="organization && organization.people">
     <ion-item-sliding color="white" *ngFor="let _person of organization.people">
       <ion-item color="white" detail-push tappable (click)="showPerson(_person, $event)">
