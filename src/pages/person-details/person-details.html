@@ -51,6 +51,10 @@
       <div item-content class="content" *ngIf="person.role =='viewer'">Viewer</div>
       <div item-content class="content" *ngIf="person.role =='responder'">Reply Only</div>
     </ion-item>
+    <ion-item color="white" class="groups" text-wrap>
+      <ion-icon ios="ios-people" md="md-people" item-left></ion-icon>
+      <div item-content class="content">{{person.groupNames()}}</div>
+    </ion-item>
   </ion-list>
   <ion-list *ngIf="checkins && checkins.length > 0">
     <ion-list-header>Check-Ins</ion-list-header>

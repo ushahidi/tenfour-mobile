@@ -4,6 +4,7 @@ import { Column } from '../decorators/column';
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Contact } from '../models/contact';
 import { Checkin } from '../models/checkin';
+import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
 @Table("people")
@@ -33,7 +34,6 @@ export class Person extends Model {
       if (data.checkins && data.checkins.length > 0) {
         this.checkins = [];
         for (let _checkin of data.checkins) {
-          console.log(`Checkin ${JSON.stringify(_checkin)}`);
           let checkin = new Checkin(_checkin);
           //TODO verify this is correct logic to re-use person attributes
           checkin.user_id = this.id;
@@ -41,6 +41,13 @@ export class Person extends Model {
           checkin.user_initials = this.initials;
           checkin.user_picture = this.profile_picture;
           this.checkins.push(checkin);
+        }
+      }
+      if (data.groups && data.groups.length > 0) {
+        this.groups = [];
+        for (let _group of data.groups) {
+          let group = new Group(_group);
+          this.groups.push(group);
         }
       }
     }
@@ -117,6 +124,8 @@ export class Person extends Model {
 
   public contacts:Contact[] = [];
 
+  public groups:Group[] = [];
+
   public checkins:Checkin[] = [];
 
   public notifications:Notification[] = [];
@@ -185,6 +194,17 @@ export class Person extends Model {
       return this.hasEmails();
     }
     return false;
+  }
+
+  public groupNames(separator:string=", "):string {
+    if (this.groups && this.groups.length > 0) {
+      let groupNames = [];
+      for (let group of this.groups) {
+        groupNames.push(group.name);
+      }
+      return groupNames.join(separator);
+    }
+    return "";
   }
 
 }
