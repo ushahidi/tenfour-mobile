@@ -23,11 +23,9 @@
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
     </ion-item>
     <ion-list *ngIf="organization && organization.groups">
-      <ion-item color="white" detail-push tappable (click)="showGroup(group)" *ngFor="let group of organization.groups">
-        <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
-        <h2>{{group.name}}</h2>
-        <p>{{group.member_count || 0}} people</p>
-      </ion-item>
+      <group-row [group]="group" [user]=person [selected]="selected == person"
+                 (rowSelected)="showGroup(group)"  (removeSelected)="removeGroup(group)"
+                 *ngFor="let group of organization.groups"></group-row>
     </ion-list>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">

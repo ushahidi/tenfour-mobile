@@ -35,6 +35,7 @@ export class Person extends Model {
         for (let _checkin of data.checkins) {
           console.log(`Checkin ${JSON.stringify(_checkin)}`);
           let checkin = new Checkin(_checkin);
+          //TODO verify this is correct logic to re-use person attributes
           checkin.user_id = this.id;
           checkin.user_name = this.name;
           checkin.user_initials = this.initials;

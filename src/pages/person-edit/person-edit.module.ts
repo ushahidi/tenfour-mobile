@@ -5,6 +5,7 @@ import { PersonEditPage } from './person-edit';
 
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
+import { PersonRowModule } from '../../components/person-row/person-row.module';
 
 @NgModule({
   declarations: [
@@ -12,6 +13,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
   ],
   imports: [
     DateTimeModule,
+    PersonRowModule,
     PersonAvatarModule,
     IonicPageModule.forChild(PersonEditPage),
   ],

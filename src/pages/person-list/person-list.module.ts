@@ -8,6 +8,7 @@ import { PersonInviteModule } from '../../pages/person-invite/person-invite.modu
 import { PersonImportModule } from '../../pages/person-import/person-import.module';
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
+import { PersonRowModule } from '../../components/person-row/person-row.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
   ],
   imports: [
     PersonAvatarModule,
+    PersonRowModule,
     PersonEditModule,
     PersonDetailsModule,
     PersonInviteModule,

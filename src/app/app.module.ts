@@ -94,6 +94,8 @@ import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
 import { CheckinCardModule } from '../components/checkin-card/checkin-card.module';
+import { PersonRowModule } from '../components/person-row/person-row.module';
+import { GroupRowModule } from '../components/group-row/group-row.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -116,6 +118,8 @@ import { CameraProvider } from '../providers/camera/camera';
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,
+    PersonRowModule,
+    GroupRowModule,
     GroupListModule,
     GroupEditModule,
     GroupDetailsModule,

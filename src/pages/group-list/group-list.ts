@@ -205,6 +205,37 @@ export class GroupListPage extends BasePage {
     });
   }
 
+  private removeGroup(group:Group) {
+    this.logger.info(this, "removeGroup", group);
+    let loading = this.showLoading("Removing...");
+    this.api.deleteGroup(this.organization, group).then((deleted:any) => {
+      if (this.mobile) {
+        this.database.removeGroup(this.organization, group).then((removed:any) => {
+          let index = this.organization.groups.indexOf(group);
+          if (index > -1) {
+            this.organization.groups.splice(index, 1);
+          }
+          loading.dismiss();
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem Removing Group", error);
+        });
+      }
+      else {
+        let index = this.organization.groups.indexOf(group);
+        if (index > -1) {
+          this.organization.groups.splice(index, 1);
+        }
+        loading.dismiss();
+      }
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Removing Group", error);
+    });
+  }
+
   private showGroup(group:Group) {
     this.logger.info(this, "showGroup", group);
     this.showPage(GroupDetailsPage, {

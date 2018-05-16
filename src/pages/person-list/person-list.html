@@ -19,17 +19,9 @@
     <ion-spinner name="ios"></ion-spinner>
   </div>
   <ion-list *ngIf="organization && organization.people">
-    <ion-item-sliding color="white" *ngFor="let _person of organization.people">
-      <ion-item color="white" detail-push tappable (click)="showPerson(_person, $event)">
-        <person-avatar item-left [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
-        <h2>{{_person.name}}</h2>
-      </ion-item>
-      <ion-item-options side="right" *ngIf="person && person.isOwnerOrAdmin()">
-        <button ion-button color="danger" (click)="removePerson(_person)">
-          <ion-icon name="trash"></ion-icon> Remove
-        </button>
-      </ion-item-options>
-    </ion-item-sliding>
+    <person-row [person]="_person" [user]="person" [selected]="selected == person"
+                (rowSelected)="showPerson(_person, $event)" (removeSelected)="removePerson(_person)"
+                *ngFor="let _person of organization.people"></person-row>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>

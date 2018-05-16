@@ -1,0 +1,12 @@
+<ion-item-sliding color="white">
+  <ion-item color="white" detail-push tappable (click)="onRowSelected($event)">
+    <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
+    <h2>{{group.name}}</h2>
+    <p>{{group.member_count || 0}} people</p>
+  </ion-item>
+  <ion-item-options side="right" *ngIf="user && user.isOwnerOrAdmin()">
+    <button ion-button color="danger" (click)="onRemoveSelected()">
+      <ion-icon name="trash"></ion-icon> Remove
+    </button>
+  </ion-item-options>
+</ion-item-sliding>
