@@ -238,12 +238,23 @@ export class GroupListPage extends BasePage {
 
   private showGroup(group:Group) {
     this.logger.info(this, "showGroup", group);
-    this.showPage(GroupDetailsPage, {
-      organization: this.organization,
-      person: this.person,
-      group: group,
-      group_id: group.id
-    });
+    if (this.platform.width() > this.WIDTH_LARGE) {
+      this.showModal(GroupDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        group: group,
+        group_id: group.id,
+        modal:true
+      });
+    }
+    else {
+      this.showPage(GroupDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        group: group,
+        group_id: group.id
+      });
+    }
   }
 
 }

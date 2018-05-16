@@ -290,12 +290,23 @@ export class PersonListPage extends BasePage {
 
   private showPerson(person:Person, event:any=null) {
     this.logger.info(this, "showPerson");
-    this.showPage(PersonDetailsPage, {
-      organization: this.organization,
-      person: person,
-      user: this.person,
-      person_id: person.id
-    });
+    if (this.platform.width() > this.WIDTH_LARGE) {
+      this.showModal(PersonDetailsPage, {
+        organization: this.organization,
+        person: person,
+        user: this.person,
+        person_id: person.id,
+        modal: true
+      });
+    }
+    else {
+      this.showPage(PersonDetailsPage, {
+        organization: this.organization,
+        person: person,
+        user: this.person,
+        person_id: person.id
+      });
+    }
   }
 
   private removePerson(person:Person) {

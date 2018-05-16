@@ -1,5 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left *ngIf="modal == true">
+      <button ion-button color="primary" (click)="hideModal($event)">
+        Cancel
+      </button>
+    </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons right *ngIf="person">
       <button ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin()" (click)="editGroup($event)">Edit</button>

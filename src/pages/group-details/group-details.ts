@@ -28,6 +28,7 @@ export class GroupDetailsPage extends BasePage {
   group:Group = null;
   person:Person = null;
   loading:boolean = false;
+  modal:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -50,6 +51,7 @@ export class GroupDetailsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
     this.group = this.getParameter<Group>("group");
+    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadGroup(true).then(loaded => {
       loading.dismiss();

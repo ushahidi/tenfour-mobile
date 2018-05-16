@@ -33,6 +33,7 @@ export class PersonDetailsPage extends BasePage {
   checkins:Checkin[] = [];
   limit:number = 3;
   offset:number = 0;
+  modal:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -57,6 +58,7 @@ export class PersonDetailsPage extends BasePage {
     this.person = this.getParameter<Person>("person");
     this.user = this.getParameter<Person>("user");
     this.title = this.getParameter<string>("title");
+    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

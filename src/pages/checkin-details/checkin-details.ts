@@ -36,6 +36,8 @@ export class CheckinDetailsPage extends BasePage {
 
   person:Person = null;
 
+  modal:boolean = false;
+
   loading:boolean = false;
 
   constructor(
@@ -60,6 +62,7 @@ export class CheckinDetailsPage extends BasePage {
     this.organization = this.getParameter<Organization>("organization");
     this.checkin = this.getParameter<Checkin>("checkin");
     this.person = this.getParameter<Person>("person");
+    this.modal = this.getParameter<boolean>("modal");
     this.loadUpdates(true);
   }
 
@@ -191,6 +194,10 @@ export class CheckinDetailsPage extends BasePage {
       loading.dismiss();
       this.showAlert("Problem Resending Check-In", error);
     });
+  }
+
+  private closeModal(event:any) {
+    this.hideModal({});
   }
 
   private shareCheckin(event:any) {

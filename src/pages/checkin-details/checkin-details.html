@@ -1,10 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <button ion-button icon-only menuToggle color="primary">
-      <ion-icon name="menu"></ion-icon>
-    </button>
+    <ion-buttons left *ngIf="modal == true">
+      <button ion-button color="primary" (click)="closeModal($event)">Close</button>
+    </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons right *ngIf="person">
+    <ion-buttons right *ngIf="person && mobile">
       <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="shareCheckin($event)">
         <ion-icon ios="ios-share-outline" md="md-share"></ion-icon>
       </button>

@@ -28,8 +28,6 @@ import { Notification } from '../../models/notification';
 })
 export class CheckinListPage extends BasePage {
 
-  LARGE_WIDTH:number = 992;
-
   filter:string = "all";
   organization:Organization = null;
   checkins:Checkin[] = [];
@@ -418,12 +416,23 @@ export class CheckinListPage extends BasePage {
   }
 
   private showCheckinDetails(checkin:Checkin, event:any=null) {
-    this.showPage(CheckinDetailsPage, {
-      organization: this.organization,
-      person: this.person,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (this.platform.width() > this.WIDTH_LARGE) {
+      this.showModal(CheckinDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id,
+        modal: true
+      });
+    }
+    else {
+      this.showPage(CheckinDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
   private sendReply(checkin:Checkin, event:any=null) {

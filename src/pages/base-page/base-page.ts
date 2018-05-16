@@ -24,6 +24,11 @@ import { Person } from '../../models/person';
 })
 export class BasePage {
 
+  protected WIDTH_SMALL:number = 540;
+  protected WIDTH_MEDIUM:number = 720;
+  protected WIDTH_LARGE:number = 960;
+  protected WIDTH_EXTRA_LARGE:number = 1140;
+
   protected offline:boolean = false;
   protected tablet:boolean = false;
   protected mobile:boolean = false;
