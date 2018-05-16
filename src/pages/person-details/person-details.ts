@@ -121,6 +121,7 @@ export class PersonDetailsPage extends BasePage {
           }
           else {
             this.person = person;
+            this.checkins = person.checkins;
             resolve(person);
           }
         },
@@ -143,7 +144,8 @@ export class PersonDetailsPage extends BasePage {
         });
       }
       else {
-        resolve([]);
+        this.checkins = this.person.checkins;
+        resolve(this.person.checkins);
       }
     });
   }

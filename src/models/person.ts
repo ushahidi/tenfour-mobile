@@ -3,6 +3,7 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Contact } from '../models/contact';
+import { Checkin } from '../models/checkin';
 import { Notification } from '../models/notification';
 
 @Table("people")
@@ -28,6 +29,18 @@ export class Person extends Model {
       }
       if (data.name && data.initials == null) {
         this.initials = data.name.split(" ").map((n)=>n[0]).join("").substring(0, 3);
+      }
+      if (data.checkins && data.checkins.length > 0) {
+        this.checkins = [];
+        for (let _checkin of data.checkins) {
+          console.log(`Checkin ${JSON.stringify(_checkin)}`);
+          let checkin = new Checkin(_checkin);
+          checkin.user_id = this.id;
+          checkin.user_name = this.name;
+          checkin.user_initials = this.initials;
+          checkin.user_picture = this.profile_picture;
+          this.checkins.push(checkin);
+        }
       }
     }
   }
@@ -102,6 +115,8 @@ export class Person extends Model {
   public selected:boolean = null;
 
   public contacts:Contact[] = [];
+
+  public checkins:Checkin[] = [];
 
   public notifications:Notification[] = [];
 
