@@ -6,6 +6,7 @@ import { CheckinRespondModule } from '../../pages/checkin-respond/checkin-respon
 
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
+import { CheckinDetailModule } from '../../components/checkin-details/checkin-details.module';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
     DateTimeModule,
     PersonAvatarModule,
     CheckinRespondModule,
+    CheckinDetailModule,
     IonicPageModule.forChild(CheckinDetailsPage),
   ],
   exports: [

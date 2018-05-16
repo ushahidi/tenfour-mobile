@@ -21,5 +21,22 @@
       </p>
     </ion-content>
   </ion-menu>
+  <ion-menu #details [content]="content" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">
+    <ion-header>
+      <ion-toolbar color="navbar">
+        <ion-buttons left>
+          <button ion-button icon-only color="primary" (click)="hideCheckin()">
+            <ion-icon ios="ios-close" md="md-close"></ion-icon>
+          </button>
+        </ion-buttons>
+        <ion-title>Check-In</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <checkin-details [checkin]="checkin" [person]="person"
+                       [canSend]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
+                       (sendClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin"></checkin-details>
+    </ion-content>
+  </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
 </ion-split-pane>

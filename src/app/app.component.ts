@@ -1,5 +1,5 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
-import { Platform, Events, Nav, SplitPane, NavController, ModalController, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
+import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
 import { Badge } from '@ionic-native/badge';
 import { Device } from '@ionic-native/device';
@@ -19,7 +19,10 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
+
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
+import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
+
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
@@ -63,6 +66,8 @@ export class TenFourApp {
   ios:boolean = false;
   browser:boolean = false;
   desktop:boolean = false;
+
+  checkin:Checkin = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -240,6 +245,9 @@ export class TenFourApp {
       });
       this.events.subscribe('user:login', () => {
         this.loadMenu();
+      });
+      this.events.subscribe('checkin:details', (data:any) => {
+        this.showCheckinDetails(data.checkin);
       });
       resolve(true);
     })
@@ -620,6 +628,12 @@ export class TenFourApp {
     return toast;
   }
 
+  protected showModal(page:any, params:any={}, options:any={}):Modal {
+    let modal = this.modalController.create(page, params, options);
+    modal.present();
+    return modal;
+  }
+
   private trackEvent(event:string, properties:any=null) {
     return this.segment.track(event, properties).then(() => {
       this.logger.info(this, "Segment", "trackEvent", event);
@@ -660,6 +674,76 @@ export class TenFourApp {
         this.logger.error(this, "badge", "Clear Failed", error);
       });
     }
+  }
+
+
+  private showCheckinDetails(checkin:Checkin) {
+    this.logger.info(this, "showCheckinDetails", checkin);
+    this.zone.run(() => {
+      this.checkin = checkin;
+    });
+  }
+
+  private hideCheckin() {
+    this.zone.run(() => {
+      this.checkin = null;
+    });
+  }
+
+  private editReply(reply:Reply, event:any) {
+    this.logger.info(this, "editReply");
+    if (reply.user_id == this.person.id) {
+      let modal = this.showModal(CheckinRespondPage, {
+        organization: this.organization,
+        checkins: [this.checkin],
+        checkin: this.checkin,
+        reply: reply
+      });
+      modal.onDidDismiss(data => {
+        this.logger.info(this, "editReply", "Modal", data);
+        if (data) {
+          if (data.canceled) {
+            this.logger.info(this, "editReply", "Modal", "Canceled");
+          }
+          else {
+            // TODO refresh the checkin list
+          }
+        }
+     });
+    }
+  }
+
+  private respondCheckin(event:any) {
+    this.logger.info(this, "sendReply");
+    let modal = this.showModal(CheckinRespondPage, {
+      organization: this.organization,
+      checkins: [this.checkin],
+      checkin: this.checkin
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "sendReply", "Modal", data);
+      if (data) {
+        if (data.canceled) {
+          this.logger.info(this, "sendReply", "Modal", "Canceled");
+        }
+        else {
+          // TODO refresh the checkin list
+        }
+      }
+   });
+  }
+
+  private resendCheckin(event:any) {
+    this.logger.info(this, "resendCheckin");
+    let loading = this.showLoading("Resending...");
+    this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
+      loading.dismiss();
+      this.showToast(`Check-In ${this.checkin.message} resent`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Resending Check-In", error);
+    });
   }
 
 }

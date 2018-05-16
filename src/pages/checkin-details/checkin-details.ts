@@ -134,18 +134,18 @@ export class CheckinDetailsPage extends BasePage {
     });
   }
 
-  private sendReply(event:any) {
-    this.logger.info(this, "sendReply");
+  private respondCheckin(event:any) {
+    this.logger.info(this, "respondCheckin");
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
       checkin: this.checkin
     });
     modal.onDidDismiss(data => {
-      this.logger.info(this, "sendReply", "Modal", data);
+      this.logger.info(this, "respondCheckin", "Modal", data);
       if (data) {
         if (data.canceled) {
-          this.logger.info(this, "sendReply", "Modal", "Canceled");
+          this.logger.info(this, "respondCheckin", "Modal", "Canceled");
         }
         else {
           let loading = this.showLoading("Refreshing...");

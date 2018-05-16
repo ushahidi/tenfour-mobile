@@ -94,6 +94,7 @@ import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
 import { CheckinCardModule } from '../components/checkin-card/checkin-card.module';
+import { CheckinDetailModule } from '../components/checkin-details/checkin-details.module';
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
 
@@ -118,6 +119,7 @@ import { CameraProvider } from '../providers/camera/camera';
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,
+    CheckinDetailModule,
     PersonRowModule,
     GroupRowModule,
     GroupListModule,
@@ -198,7 +200,6 @@ import { CameraProvider } from '../providers/camera/camera';
     { provide: Contacts, useClass: Contacts },
     { provide: Badge, useClass: Badge },
     { provide: Sim, useClass: Sim },
-    // { provide: Http, useClass: Http },
     { provide: HTTP, useClass: HTTP },
     { provide: Firebase, useClass: Firebase },
     { provide: ApiProvider, useClass: ApiProvider },

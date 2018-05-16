@@ -15,66 +15,7 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-list *ngIf="checkin">
-    <ion-item text-wrap text-center color="white">
-      <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
-      <h1>{{checkin.message}}</h1>
-      <p>{{checkin.created_at | dateTime}}. <strong>From {{checkin.user_name}}.</strong></p>
-      <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
-      <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
-    </ion-item>
-    <ion-item text-wrap color="white">
-      <button ion-button text-only item-left clear color="primary" tappable *ngIf="checkin.canRespond(person)" (click)="sendReply($event)">Respond</button>
-      <button ion-button text-only item-right clear color="primary" tappable *ngIf="checkin.canResend(person)" (click)="resendCheckin($event)">Resend</button>
-    </ion-item>
-  </ion-list>
-  <div *ngIf="checkin">
-    <ion-list *ngFor="let answer of checkin.answers">
-      <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
-      <ion-item color="white" [attr.detail-push]="reply.user_id == person.id ? 'true' : null" [attr.tappable]="reply.user_id == person.id ? 'true' : null" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)">
-        <person-avatar item-left [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
-        <ion-grid no-padding>
-          <ion-row no-padding>
-            <ion-col col-7 text-left no-padding>
-              <h2>{{reply.user_name}}</h2>
-            </ion-col>
-            <ion-col col-5 text-right no-padding>
-              <small>{{reply.created_at | dateTime}}</small>
-            </ion-col>
-          </ion-row>
-          <ion-row no-padding *ngIf="reply.message">
-            <ion-col text-left no-padding>
-              <p text-wrap>{{reply.message}}</p>
-            </ion-col>
-          </ion-row>
-          <ion-row no-padding *ngIf="reply.location_text">
-            <ion-col text-left no-padding>
-              <p text-wrap>
-                <ion-icon ios="ios-pin-outline" md="md-pin"></ion-icon>
-                {{reply.location_text}}
-              </p>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    </ion-list>
-    <ion-list *ngIf="checkin.replies.length < checkin.recipients.length">
-      <ion-list-header>No Response</ion-list-header>
-      <ion-item color="white" *ngFor="let recipient of checkin.recipientsPending()">
-        <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
-        <ion-grid no-padding>
-          <ion-row no-padding>
-            <ion-col text-left no-padding>
-              <h2>{{recipient.name}}</h2>
-            </ion-col>
-          </ion-row>
-          <ion-row no-padding>
-            <ion-col text-left no-padding>
-              <p text-wrap>{{recipient.response_status}}</p>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-      </ion-item>
-    </ion-list>
-  </div>
+  <checkin-details [checkin]="checkin" [person]="person"
+                   [canSend]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
+                   (sendClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)"></checkin-details>
 </ion-content>

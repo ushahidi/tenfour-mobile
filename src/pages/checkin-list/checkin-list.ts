@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, Events, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { Badge } from '@ionic-native/badge';
 
@@ -50,6 +50,7 @@ export class CheckinListPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected events:Events,
       protected badge:Badge,
       protected api:ApiProvider,
       protected database:DatabaseProvider) {
@@ -417,12 +418,15 @@ export class CheckinListPage extends BasePage {
 
   private showCheckinDetails(checkin:Checkin, event:any=null) {
     if (this.platform.width() > this.WIDTH_LARGE) {
-      this.showModal(CheckinDetailsPage, {
-        organization: this.organization,
-        person: this.person,
-        checkin: checkin,
-        checkin_id: checkin.id,
-        modal: true
+      // this.showModal(CheckinDetailsPage, {
+      //   organization: this.organization,
+      //   person: this.person,
+      //   checkin: checkin,
+      //   checkin_id: checkin.id,
+      //   modal: true
+      // });
+      this.events.publish('checkin:details', {
+        checkin: checkin
       });
     }
     else {
