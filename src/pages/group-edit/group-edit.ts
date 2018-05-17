@@ -13,7 +13,7 @@ import { Group } from '../../models/group';
 
 @IonicPage({
   segment: 'groups/edit',
-  defaultHistory: ['groups']
+  defaultHistory: ['GroupListPage']
 })
 @Component({
   selector: 'page-group-edit',
@@ -51,9 +51,10 @@ export class GroupEditPage extends BasePage {
     this.person = this.getParameter<Person>("person");
     this.group = this.getParameter<Group>("group");
     if (this.group == null || this.group.id == null) {
-      this.group = new Group({
-        organization_id: this.organization.id
-      });
+      this.group = new Group({});
+      if (this.organization) {
+        this.group.organization_id = this.organization.id;
+      }
       this.editing = false;
     }
     else {
@@ -63,10 +64,12 @@ export class GroupEditPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      group: this.group.name
-    });
+    if (this.organization && this.group) {
+      this.trackPage({
+        organization: this.organization.name,
+        group: this.group.name
+      });
+    }
   }
 
   private cancelEdit(event:any) {

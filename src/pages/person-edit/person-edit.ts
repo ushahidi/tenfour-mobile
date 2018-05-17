@@ -15,7 +15,7 @@ import { Region } from '../../models/region';
 
 @IonicPage({
   segment: 'people/edit',
-  defaultHistory: ['people']
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-edit',
@@ -88,10 +88,12 @@ export class PersonEditPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      person: this.person.name
-    });
+    if (this.organization && this.person) {
+      this.trackPage({
+        organization: this.organization.name,
+        person: this.person.name
+      });
+    }
   }
 
   private loadCamera() {

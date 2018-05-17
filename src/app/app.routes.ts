@@ -29,6 +29,8 @@ import { GroupListPage } from '../pages/group-list/group-list';
 import { GroupEditPage } from '../pages/group-edit/group-edit';
 import { GroupDetailsPage } from '../pages/group-details/group-details';
 
+import { NotificationListPage } from '../pages/notification-list/notification-list';
+
 import { SettingsListPage} from '../pages/settings-list/settings-list';
 import { SettingsEditPage } from '../pages/settings-edit/settings-edit';
 import { SettingsTypesPage } from '../pages/settings-types/settings-types';
@@ -61,8 +63,8 @@ export class TenFourRoutes {
     { component: CheckinDetailsPage, segment: 'checkins/:checkin_id', defaultHistory: [CheckinListPage] },
 
     { component: GroupListPage, segment: 'groups' },
-    { component: GroupDetailsPage, segment: 'groups/:group_id', defaultHistory: [GroupListPage] },
     { component: GroupEditPage, segment: 'groups/edit', defaultHistory: [GroupListPage] },
+    { component: GroupDetailsPage, segment: 'groups/:group_id', defaultHistory: [GroupListPage] },
 
     { component: PersonListPage, segment: 'people' },
     { component: PersonEditPage, segment: 'people/edit', defaultHistory: [PersonListPage] },
@@ -70,7 +72,9 @@ export class TenFourRoutes {
     { component: PersonImportPage, segment: 'people/import', defaultHistory: [PersonListPage] },
     { component: PersonSelectPage, segment: 'people/select', defaultHistory: [PersonListPage] },
     { component: PersonDetailsPage, segment: 'people/:person_id', defaultHistory: [PersonListPage] },
-    
+
+    { component: NotificationListPage, segment: 'notifications' },
+
     { component: SettingsListPage, segment: 'settings' },
     { component: SettingsEditPage, segment: 'settings/edit', defaultHistory: [SettingsListPage] },
     { component: SettingsCheckinsPage, segment: 'settings/checkins', defaultHistory: [SettingsListPage] },

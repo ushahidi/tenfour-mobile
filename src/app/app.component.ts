@@ -313,7 +313,26 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", "Person", person);
           if (person && person.config_profile_reviewed && person.config_self_test_sent) {
             this.person = person;
-            this.showCheckinList();
+            this.logger.info(this, "loadWebApp", "Location", location.hash);
+            if (location.hash == "#/checkins") {
+              this.showCheckinList();
+            }
+            else if (location.hash === "#/groups") {
+              this.showGroupList();
+            }
+            else if (location.hash === "#/people") {
+              this.showPersonList();
+            }
+            else if (location.hash === "#/notifications") {
+              this.showNotificationList();
+            }
+            else if (location.hash === "#/settings") {
+              this.showSettingsList();
+            }
+            else {
+              this.showCheckinList();
+            }
+            resolve(true);
           }
           else {
             this.showOnboardList(person);

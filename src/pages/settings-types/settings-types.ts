@@ -11,7 +11,7 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'settings/types',
-  defaultHistory: ['settings']
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-types',
@@ -72,9 +72,11 @@ export class SettingsTypesPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private cancelEdit(event:any) {

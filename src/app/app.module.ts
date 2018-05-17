@@ -169,8 +169,16 @@ import { CameraProvider } from '../providers/camera/camera';
     HumanizeModule,
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
-    SegmentModule.forRoot({ apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok', debug: false }),
-    IonicModule.forRoot(TenFourApp, { scrollAssist: true, autoFocusAssist: true }, { links: TenFourRoutes.ROUTES })
+    SegmentModule.forRoot({
+      apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
+      debug: false
+    }),
+    IonicModule.forRoot(TenFourApp, {
+      scrollAssist: true,
+      autoFocusAssist: true
+    },{
+      links: TenFourRoutes.ROUTES
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

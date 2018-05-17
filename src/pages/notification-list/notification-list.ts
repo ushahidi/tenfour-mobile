@@ -3,12 +3,12 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Notification } from '../../models/notification';
+
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   segment: 'notifications'
@@ -62,9 +62,11 @@ export class NotificationListPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   ionViewWillLeave() {

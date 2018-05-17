@@ -14,7 +14,7 @@ import { Reply } from '../../models/reply';
 
 @IonicPage({
   segment: 'checkins/:checkin_id',
-  defaultHistory: ['checkins']
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-details',
@@ -68,10 +68,12 @@ export class CheckinDetailsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      checkin: this.checkin.message
-    });
+    if (this.organization && this.person) {
+      this.trackPage({
+        organization: this.organization.name,
+        checkin: this.checkin.message
+      });
+    }
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {

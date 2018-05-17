@@ -12,7 +12,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   segment: 'settings/payments',
-  defaultHistory: ['settings']
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-payments',
@@ -53,9 +53,11 @@ export class SettingsPaymentsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private loadPaymentForm() {
@@ -66,7 +68,7 @@ export class SettingsPaymentsPage extends BasePage {
       },
       (error:any) => {
         this.logger.error(this, "ChargeBee", error);
-      });  
+      });
     }
   }
 

@@ -14,7 +14,7 @@ import { Group } from '../../models/group';
 
 @IonicPage({
   segment: 'groups/:group_id',
-  defaultHistory: ['groups']
+  defaultHistory: ['GroupListPage']
 })
 @Component({
   selector: 'page-group-details',
@@ -60,10 +60,12 @@ export class GroupDetailsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      group: this.group.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name,
+        group: this.group.name
+      });
+    }
   }
 
   private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {

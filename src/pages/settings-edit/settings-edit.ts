@@ -12,7 +12,7 @@ import { CameraProvider } from '../../providers/camera/camera';
 
 @IonicPage({
   segment: 'settings/edit',
-  defaultHistory: ['settings']
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-edit',
@@ -60,9 +60,11 @@ export class SettingsEditPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private cancelEdit(event:any) {

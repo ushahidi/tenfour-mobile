@@ -1,13 +1,8 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
-import { StatusBar } from '@ionic-native/status-bar';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
-
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
 
 import { SendViaComponent } from '../../components/send-via/send-via';
 
@@ -17,9 +12,12 @@ import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
+import { ApiProvider } from '../../providers/api/api';
+import { DatabaseProvider } from '../../providers/database/database';
+
 @IonicPage({
   segment: 'checkins/send',
-  defaultHistory: ['checkins']
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-send',
@@ -49,8 +47,7 @@ export class CheckinSendPage extends BasePage {
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
-      protected statusBar:StatusBar) {
+      protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -63,10 +60,12 @@ export class CheckinSendPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      checkin: this.checkin.message
-    });
+    if (this.organization && this.checkin) {
+      this.trackPage({
+        organization: this.organization.name,
+        checkin: this.checkin.message
+      });
+    }
   }
 
   private cancelEdit(event:any) {

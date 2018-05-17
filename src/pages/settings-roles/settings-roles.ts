@@ -10,7 +10,7 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'settings/roles',
-  defaultHistory: ['settings']
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-roles',
@@ -45,9 +45,11 @@ export class SettingsRolesPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
 }

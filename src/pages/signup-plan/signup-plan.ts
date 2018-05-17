@@ -12,7 +12,7 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'signup/plan',
-  defaultHistory: ['signup']
+  defaultHistory: ['SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-plan',

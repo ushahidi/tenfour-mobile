@@ -7,7 +7,6 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
-import { NotificationListPage } from '../../pages/notification-list/notification-list';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
@@ -24,7 +23,7 @@ import { Notification } from '../../models/notification';
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
   providers: [ ApiProvider, DatabaseProvider ],
-  entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage, NotificationListPage ]
+  entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
 })
 export class CheckinListPage extends BasePage {
 
@@ -32,10 +31,8 @@ export class CheckinListPage extends BasePage {
   organization:Organization = null;
   checkins:Checkin[] = [];
   selected:Checkin = null;
-  notifications:Notification[] = [];
   person:Person = null;
   loading:boolean = false;
-  notify:boolean = false;
   limit:number = 5;
   offset:number = 0;
 
@@ -76,17 +73,16 @@ export class CheckinListPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    if (this.loading == false) {
-      this.loadNotifications(true);
-    }
     this.selected = null;
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -96,7 +92,6 @@ export class CheckinListPage extends BasePage {
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      .then(() => { return this.loadNotifications(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
@@ -283,55 +278,6 @@ export class CheckinListPage extends BasePage {
     });
   }
 
-  private loadNotifications(cache:boolean=true):Promise<any> {
-    this.notify = false;
-    return new Promise((resolve, reject) => {
-      let limit = 10;
-      let offset = 0;
-      if (cache && this.mobile) {
-        this.database.getNotifications(this.organization, limit, offset).then((notifications:Notification[]) => {
-          this.notifications = notifications;
-          for (let notification of notifications) {
-            if (notification.viewed_at == null) {
-              this.notify = true;
-            }
-          }
-          resolve(notifications);
-        },
-        (error:any) => {
-          resolve([]);
-        });
-      }
-      else {
-        this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          if (this.mobile) {
-            this.database.saveNotifications(this.organization, notifications).then((saved:boolean) => {
-              this.database.getNotifications(this.organization, limit, offset).then((_notifications:Notification[]) => {
-                this.notifications = _notifications;
-                for (let notification of _notifications) {
-                  if (notification.viewed_at == null) {
-                    this.notify = true;
-                  }
-                }
-                resolve(_notifications);
-              },
-              (error:any) => {
-                resolve(notifications);
-              });
-            });
-          }
-          else {
-            this.notifications = notifications;
-            resolve(notifications);
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
-      }
-    });
-  }
-
   private loadWaitingResponse() {
     if (this.mobile) {
       this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
@@ -486,15 +432,6 @@ export class CheckinListPage extends BasePage {
           this.loadCheckins(false);
         }
       }
-    });
-  }
-
-  private showNotifications(event:any) {
-    this.showModal(NotificationListPage, {
-      organization: this.organization,
-      person: this.person,
-      notifications: this.notifications,
-      modal: true
     });
   }
 

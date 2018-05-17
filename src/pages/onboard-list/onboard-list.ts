@@ -73,9 +73,11 @@ export class OnboardListPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private loadPerson():Promise<any> {
@@ -214,7 +216,7 @@ export class OnboardListPage extends BasePage {
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
       person: this.person,
-      person_id: this.person.id 
+      person_id: this.person.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "taskReviewContact", "Modal", data);

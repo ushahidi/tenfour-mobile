@@ -13,7 +13,7 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'people/invite',
-  defaultHistory: ['people']
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-invite',
@@ -53,9 +53,11 @@ export class PersonInvitePage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private cancelInvite(event:any) {

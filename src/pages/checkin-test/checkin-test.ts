@@ -14,7 +14,7 @@ import { Answer } from '../../models/answer';
 
 @IonicPage({
   segment: 'checkins/test',
-  defaultHistory: ['checkins']
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-test',
@@ -53,9 +53,11 @@ export class CheckinTestPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private initCheckin() {

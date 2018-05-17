@@ -18,7 +18,7 @@ import { Country } from '../../models/country';
 
 @IonicPage({
   segment: 'settings/regions',
-  defaultHistory: ['settings']
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-regions',
@@ -64,9 +64,11 @@ export class SettingsRegionsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {

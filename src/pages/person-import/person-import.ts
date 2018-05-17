@@ -17,7 +17,7 @@ import { Country } from '../../models/country';
 
 @IonicPage({
   segment: 'people/import',
-  defaultHistory: ['people']
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-import',
@@ -70,9 +70,11 @@ export class PersonImportPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name
-    });
+    if (this.organization) {
+      this.trackPage({
+        organization: this.organization.name
+      });
+    }
   }
 
   private cancelImport(event:any) {

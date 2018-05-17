@@ -15,7 +15,7 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'signin/password',
-  defaultHistory: ['signin', 'signin/email']
+  defaultHistory: ['SigninUrlPage', 'SigninEmailPage']
 })
 @Component({
   selector: 'page-signin-password',
@@ -54,6 +54,11 @@ export class SigninPasswordPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.email = this.getParameter<string>("email");
+  }
+
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
   }
 
   private showNext(event:any) {

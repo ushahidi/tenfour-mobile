@@ -13,7 +13,7 @@ import { Token } from '../../models/token';
 
 @IonicPage({
   segment: 'signup/password',
-  defaultHistory: ['signup']
+  defaultHistory: ['SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-password',
@@ -55,6 +55,11 @@ export class SignupPasswordPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
+  }
+
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.trackPage();
   }
 
   private createOrganization(event:any) {

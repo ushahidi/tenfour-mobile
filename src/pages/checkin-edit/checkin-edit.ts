@@ -16,7 +16,7 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
 
 @IonicPage({
   segment: 'checkins/edit',
-  defaultHistory: ['checkins']
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-edit',
@@ -68,9 +68,11 @@ export class CheckinEditPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      checkin: this.checkin.id
-    });
+    if (this.checkin) {
+      this.trackPage({
+        checkin: this.checkin.id
+      });
+    }
   }
 
   private initCheckin() {

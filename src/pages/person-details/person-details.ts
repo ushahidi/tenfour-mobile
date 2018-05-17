@@ -15,7 +15,7 @@ import { Checkin } from '../../models/checkin';
 
 @IonicPage({
   segment: 'people/:person_id',
-  defaultHistory: ['people']
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-details',
@@ -67,10 +67,12 @@ export class PersonDetailsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage({
-      organization: this.organization.name,
-      person: this.person.name
-    });
+    if (this.organization && this.person) {
+      this.trackPage({
+        organization: this.organization.name,
+        person: this.person.name
+      });
+    }
   }
 
   private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {

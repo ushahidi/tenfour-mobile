@@ -16,7 +16,7 @@ import { Location } from '../../models/location';
 
 @IonicPage({
   segment: 'checkins/respond',
-  defaultHistory: ['checkins']
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-respond',
