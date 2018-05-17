@@ -4,12 +4,12 @@
 ---
 
 #### Page Flow
-Visit [PAGES.md](docs/PAGES.md) to see the hierarchy of pages in the app.
+Visit [PAGES.md](/docs/PAGES.md) to see the hierarchy of pages in the app.
 
 ---
 
 #### Project Setup
-Visit [SETUP.md](docs/SETUP.md) for getting your Ionic environment setup.
+Visit [SETUP.md](/docs/SETUP.md) for getting your Ionic environment setup.
 
 ---
 

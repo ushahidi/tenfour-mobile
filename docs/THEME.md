@@ -48,4 +48,4 @@ Visit [Overriding Ionic Sass Variables](https://ionicframework.com/docs/theming/
 ---
 
 #### Page Styling
-Each individual page provides ability to override or add custom styling. Visit [PAGES.md](docs/PAGES.md) for entire hierarchy structure of pages.
+Each individual page provides ability to override or add custom styling. Visit [PAGES.md](/docs/PAGES.md) for entire hierarchy structure of pages.
