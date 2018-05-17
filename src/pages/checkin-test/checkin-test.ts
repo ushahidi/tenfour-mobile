@@ -14,7 +14,8 @@ import { Answer } from '../../models/answer';
 
 @IonicPage({
   segment: 'checkins/test',
-  defaultHistory: ['CheckinListPage']
+  defaultHistory: ['CheckinListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-checkin-test',

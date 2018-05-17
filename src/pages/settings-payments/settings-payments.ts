@@ -12,7 +12,8 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   segment: 'settings/payments',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-payments',

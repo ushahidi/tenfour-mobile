@@ -12,7 +12,8 @@ import { CameraProvider } from '../../providers/camera/camera';
 
 @IonicPage({
   segment: 'settings/edit',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-edit',

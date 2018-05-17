@@ -10,7 +10,8 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'signin/email',
-  defaultHistory: ['SigninUrlPage']
+  defaultHistory: ['SigninUrlPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-signin-email',

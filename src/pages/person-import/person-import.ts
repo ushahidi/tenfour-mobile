@@ -17,7 +17,8 @@ import { Country } from '../../models/country';
 
 @IonicPage({
   segment: 'people/import',
-  defaultHistory: ['PersonListPage']
+  defaultHistory: ['PersonListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-person-import',

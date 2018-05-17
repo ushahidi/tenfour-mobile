@@ -13,7 +13,8 @@ import { Email } from '../../models/email';
 
 @IonicPage({
   segment: 'signup-check',
-  defaultHistory: ['SignupEmailPage']
+  defaultHistory: ['SignupEmailPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-signup-check',

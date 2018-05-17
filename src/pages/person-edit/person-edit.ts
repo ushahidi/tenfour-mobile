@@ -15,7 +15,8 @@ import { Region } from '../../models/region';
 
 @IonicPage({
   segment: 'people/edit',
-  defaultHistory: ['PersonListPage']
+  defaultHistory: ['PersonListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-person-edit',
@@ -80,9 +81,11 @@ export class PersonEditPage extends BasePage {
       this.person = new Person({
         name: null,
         description: null,
-        role: "responder",
-        organization_id: this.organization.id
+        role: "responder"
       });
+      if (this.organization) {
+        this.person.organization_id = this.organization.id;
+      }
     }
   }
 

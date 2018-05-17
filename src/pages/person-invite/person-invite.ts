@@ -13,7 +13,8 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'people/invite',
-  defaultHistory: ['PersonListPage']
+  defaultHistory: ['PersonListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-person-invite',

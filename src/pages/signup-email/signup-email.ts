@@ -11,7 +11,8 @@ import { Email } from '../../models/email';
 import { Organization } from '../../models/organization';
 
 @IonicPage({
-  segment: 'signup'
+  segment: 'signup',
+  priority: 'off'
 })
 @Component({
   selector: 'page-signup-email',

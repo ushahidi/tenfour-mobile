@@ -175,6 +175,7 @@ import { CameraProvider } from '../providers/camera/camera';
     }),
     IonicModule.forRoot(TenFourApp, {
       scrollAssist: true,
+      preloadModules: false,
       autoFocusAssist: true
     },{
       links: TenFourRoutes.ROUTES

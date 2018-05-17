@@ -15,7 +15,8 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'settings/sizes',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-sizes',

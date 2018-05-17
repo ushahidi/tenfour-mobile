@@ -10,7 +10,8 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'settings/checkins',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-checkins',

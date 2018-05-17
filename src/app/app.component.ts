@@ -56,7 +56,7 @@ import { Subscription } from '../models/subscription';
 export class TenFourApp {
 
   zone:NgZone = null;
-  rootPage:any;
+  rootPage:any = SigninUrlPage;
   organization:Organization = null;
   person:Person = null;
   tablet:boolean = false;
@@ -329,6 +329,9 @@ export class TenFourApp {
             else if (location.hash === "#/settings") {
               this.showSettingsList();
             }
+            else if (location.hash === "#/profile") {
+              this.showPersonDetails();
+            }
             else {
               this.showCheckinList();
             }
@@ -538,6 +541,7 @@ export class TenFourApp {
       person: this.person
     });
     this.hideSideMenu();
+    this.hideSplashScreen();
   }
 
   private showNotificationList() {
@@ -548,6 +552,7 @@ export class TenFourApp {
       notifications: this.person.notifications,
     });
     this.hideSideMenu();
+    this.hideSplashScreen();
   }
 
   private showPersonList() {
@@ -557,6 +562,7 @@ export class TenFourApp {
       person: this.person
     });
     this.hideSideMenu();
+    this.hideSplashScreen();
   }
 
   private showSettingsList() {
@@ -566,6 +572,7 @@ export class TenFourApp {
       person: this.person
     });
     this.hideSideMenu();
+    this.hideSplashScreen();
   }
 
   private showPersonDetails() {
@@ -579,6 +586,7 @@ export class TenFourApp {
       person_id: this.person.id
     });
     this.hideSideMenu();
+    this.hideSplashScreen();
   }
 
   private showSignupOwner(organization:Organization) {

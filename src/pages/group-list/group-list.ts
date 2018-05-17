@@ -13,7 +13,8 @@ import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 @IonicPage({
-  segment: 'groups'
+  segment: 'groups',
+  priority: 'off'
 })
 @Component({
   selector: 'page-group-list',

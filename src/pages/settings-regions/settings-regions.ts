@@ -18,7 +18,8 @@ import { Country } from '../../models/country';
 
 @IonicPage({
   segment: 'settings/regions',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-regions',

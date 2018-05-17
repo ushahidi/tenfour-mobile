@@ -14,7 +14,8 @@ import { Group } from '../../models/group';
 
 @IonicPage({
   segment: 'groups/:group_id',
-  defaultHistory: ['GroupListPage']
+  defaultHistory: ['GroupListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-group-details',
@@ -144,11 +145,21 @@ export class GroupDetailsPage extends BasePage {
 
   private showPerson(_person:Person) {
     this.logger.info(this, "showPerson", _person);
-    this.showPage(PersonDetailsPage, {
-      organization: this.organization,
-      person: _person,
-      user: this.person
-    });
+    if (this.tablet || this.browser) {
+      this.showModal(PersonDetailsPage, {
+        organization: this.organization,
+        person: _person,
+        user: this.person,
+        modal: true
+      });
+    }
+    else {
+      this.showPage(PersonDetailsPage, {
+        organization: this.organization,
+        person: _person,
+        user: this.person
+      });
+    }
   }
 
 }

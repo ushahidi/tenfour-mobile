@@ -16,7 +16,8 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
 
 @IonicPage({
   segment: 'checkins/edit',
-  defaultHistory: ['CheckinListPage']
+  defaultHistory: ['CheckinListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-checkin-edit',

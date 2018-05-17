@@ -17,7 +17,8 @@ import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   segment: 'checkins/send',
-  defaultHistory: ['CheckinListPage']
+  defaultHistory: ['CheckinListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-checkin-send',

@@ -14,7 +14,8 @@ import { Reply } from '../../models/reply';
 
 @IonicPage({
   segment: 'checkins/:checkin_id',
-  defaultHistory: ['CheckinListPage']
+  defaultHistory: ['CheckinListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-checkin-details',

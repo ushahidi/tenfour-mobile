@@ -13,7 +13,8 @@ import { Group } from '../../models/group';
 
 @IonicPage({
   segment: 'groups/edit',
-  defaultHistory: ['GroupListPage']
+  defaultHistory: ['GroupListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-group-edit',

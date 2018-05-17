@@ -15,7 +15,8 @@ import { Checkin } from '../../models/checkin';
 
 @IonicPage({
   segment: 'people/:person_id',
-  defaultHistory: ['PersonListPage']
+  defaultHistory: ['PersonListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-person-details',

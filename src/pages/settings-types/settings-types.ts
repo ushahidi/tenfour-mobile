@@ -11,7 +11,8 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'settings/types',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-types',

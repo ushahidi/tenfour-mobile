@@ -15,7 +15,8 @@ import { Person } from '../../models/person';
 
 @IonicPage({
   segment: 'signin/password',
-  defaultHistory: ['SigninUrlPage', 'SigninEmailPage']
+  defaultHistory: ['SigninUrlPage', 'SigninEmailPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-signin-password',

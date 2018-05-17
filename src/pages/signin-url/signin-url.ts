@@ -10,7 +10,8 @@ import { ApiProvider } from '../../providers/api/api';
 import { Organization } from '../../models/organization';
 
 @IonicPage({
-  segment: 'signin'
+  segment: 'signin',
+  priority: 'off'
 })
 @Component({
   selector: 'page-signin-url',

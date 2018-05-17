@@ -11,7 +11,8 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'signup/name',
-  defaultHistory: ['SignupEmailPage']
+  defaultHistory: ['SignupEmailPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-signup-name',

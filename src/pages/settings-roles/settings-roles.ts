@@ -10,7 +10,8 @@ import { Organization } from '../../models/organization';
 
 @IonicPage({
   segment: 'settings/roles',
-  defaultHistory: ['SettingsListPage']
+  defaultHistory: ['SettingsListPage'],
+  priority: 'off'
 })
 @Component({
   selector: 'page-settings-roles',
