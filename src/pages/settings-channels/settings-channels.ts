@@ -9,17 +9,17 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { Organization } from '../../models/organization';
 
 @IonicPage({
-  segment: 'settings/checkins',
+  segment: 'settings/channels',
   defaultHistory: ['SettingsListPage'],
   priority: 'off'
 })
 @Component({
-  selector: 'page-settings-checkins',
-  templateUrl: 'settings-checkins.html',
+  selector: 'page-settings-channels',
+  templateUrl: 'settings-channels.html',
   providers: [ ApiProvider, DatabaseProvider ],
   entryComponents:[  ]
 })
-export class SettingsCheckinsPage extends BasePage {
+export class SettingsChannelsPage extends BasePage {
 
   website:string = "https://app.tenfour.org";
   organization:Organization = null;

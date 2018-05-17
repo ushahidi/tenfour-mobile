@@ -38,7 +38,7 @@ import { SettingsSizesPage } from '../pages/settings-sizes/settings-sizes';
 import { SettingsRegionsPage } from '../pages/settings-regions/settings-regions';
 import { SettingsRolesPage } from '../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
-import { SettingsCheckinsPage } from '../pages/settings-checkins/settings-checkins';
+import { SettingsChannelsPage } from '../pages/settings-channels/settings-channels';
 
 export class TenFourRoutes {
 
@@ -77,7 +77,7 @@ export class TenFourRoutes {
 
     { component: SettingsListPage, segment: 'settings', priority: 'off' },
     { component: SettingsEditPage, segment: 'settings/edit', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsCheckinsPage, segment: 'settings/checkins', priority: 'off', defaultHistory: [SettingsListPage] },
+    { component: SettingsChannelsPage, segment: 'settings/channels', priority: 'off', defaultHistory: [SettingsListPage] },
     { component: SettingsRegionsPage, segment: 'settings/regions', priority: 'off', defaultHistory: [SettingsListPage] },
     { component: SettingsRolesPage, segment: 'settings/roles', priority: 'off', defaultHistory: [SettingsListPage] },
     { component: SettingsSizesPage, segment: 'settings/sizes', priority: 'off', defaultHistory: [SettingsListPage] },

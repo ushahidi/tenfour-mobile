@@ -80,7 +80,7 @@ import { SettingsSizesModule } from '../pages/settings-sizes/settings-sizes.modu
 import { SettingsRegionsModule } from '../pages/settings-regions/settings-regions.module';
 import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
-import { SettingsCheckinsModule } from '../pages/settings-checkins/settings-checkins.module';
+import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
 
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
@@ -156,7 +156,7 @@ import { CameraProvider } from '../providers/camera/camera';
     SettingsTypesModule,
     SettingsRolesModule,
     SettingsPaymentsModule,
-    SettingsCheckinsModule,
+    SettingsChannelsModule,
     SettingsSizesModule,
     SettingsRegionsModule,
     DateTimeModule,

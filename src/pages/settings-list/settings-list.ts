@@ -11,7 +11,7 @@ import { SettingsTypesPage } from '../../pages/settings-types/settings-types';
 import { SettingsSizesPage } from '../../pages/settings-sizes/settings-sizes';
 import { SettingsRegionsPage } from '../../pages/settings-regions/settings-regions';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
-import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-checkins';
+import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -24,7 +24,7 @@ import { Person } from '../../models/person';
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
   providers: [ ApiProvider ],
-  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
+  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsListPage extends BasePage {
 
@@ -114,7 +114,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsCheckins(event:any) {
     this.logger.info(this, "settingsCheckins");
-    this.showModal(SettingsCheckinsPage, {
+    this.showModal(SettingsChannelsPage, {
       organization: this.organization,
       person: this.person
     });

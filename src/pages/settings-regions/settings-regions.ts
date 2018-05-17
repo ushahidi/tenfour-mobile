@@ -9,7 +9,7 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
 import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
-import { SettingsCheckinsPage } from '../../pages/settings-checkins/settings-checkins';
+import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
@@ -25,7 +25,7 @@ import { Country } from '../../models/country';
   selector: 'page-settings-regions',
   templateUrl: 'settings-regions.html',
   providers: [ ApiProvider ],
-  entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsCheckinsPage ]
+  entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsRegionsPage extends BasePage {
 
