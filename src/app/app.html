@@ -4,8 +4,8 @@
       <ion-toolbar color="navbar">
         <ion-buttons left>
           <button ion-button clear color="primary" *ngIf="organization">
-            <img [src]="logo" *ngIf="organization.profile_picture == null">
-            <img [src]="organization.profile_picture" *ngIf="organization.profile_picture != null">
+            <img [src]="logo" *ngIf="organization.profile_picture == null || organization.profile_picture.length == 0">
+            <img [src]="organization.profile_picture" *ngIf="organization.profile_picture != null && organization.profile_picture.length > 0">
           </button>
         </ion-buttons>
         <ion-title *ngIf="organization">
