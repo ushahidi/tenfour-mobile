@@ -11,7 +11,6 @@ $font-path: "../assets/fonts";
 // To view all the possible Ionic variables, see:
 // http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
 
-
 $background-color: #F7F7F4;
 $toolbar-text-color: #5BAB60;
 
@@ -39,7 +38,6 @@ $colors: (
   black:      #000000
 );
 
-
 // App Web Variables
 // --------------------------------------------------
 // Web only Sass variables can go here
@@ -53,14 +51,12 @@ $modal-inset-height-small: 90%;
 $toolbar-ios-text-color: #5BAB60;
 $toolbar-ios-button-color: #5BAB60;
 
-
 // App Material Design Variables
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
 $toolbar-md-text-color: #5BAB60;
 $toolbar-md-button-color: #5BAB60;
-
 
 // App Windows Variables
 // --------------------------------------------------
@@ -76,14 +72,12 @@ $toolbar-md-button-color: #5BAB60;
 
 @import "ionic.theme.default";
 
-
 // Ionicons
 // --------------------------------------------------
 // The premium icon font for Ionic. For more info, please see:
 // http://ionicframework.com/docs/v2/ionicons/
 
 @import "ionic.ionicons";
-
 
 // Fonts
 // --------------------------------------------------
