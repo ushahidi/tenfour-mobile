@@ -314,7 +314,6 @@ export class TenFourApp {
           if (person && person.config_profile_reviewed && person.config_self_test_sent) {
             this.person = person;
             this.showCheckinList();
-            resolve(true);
           }
           else {
             this.showOnboardList(person);
@@ -675,7 +674,6 @@ export class TenFourApp {
       });
     }
   }
-
 
   private showCheckinDetails(checkin:Checkin) {
     this.logger.info(this, "showCheckinDetails", checkin);

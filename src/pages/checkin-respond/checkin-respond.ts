@@ -15,7 +15,7 @@ import { Person } from '../../models/person';
 import { Location } from '../../models/location';
 
 @IonicPage({
-  segment: 'checkins/send',
+  segment: 'checkins/respond',
   defaultHistory: ['checkins']
 })
 @Component({
@@ -98,7 +98,7 @@ export class CheckinRespondPage extends BasePage {
     if (this.organization) {
       this.trackPage({
         organization: this.organization.name
-      });  
+      });
     }
   }
 

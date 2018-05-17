@@ -128,13 +128,12 @@ export class StorageProvider {
   public get(key:string):Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
-        this.nativeStorage.getItem(key).then(
-          (data:any) => {
-            resolve(data);
-          },
-          (error:any) => {
-            reject(error);
-          });
+        this.nativeStorage.getItem(key).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
       }
       else {
         this.webStorage.asPromisable().get(key).then((data:any) => {

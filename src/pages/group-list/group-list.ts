@@ -45,6 +45,10 @@ export class GroupListPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+  }
+
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");

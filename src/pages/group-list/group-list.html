@@ -23,7 +23,7 @@
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
     </ion-item>
     <ion-list *ngIf="organization && organization.groups">
-      <group-row [group]="group" [user]=person [selected]="selected == person"
+      <group-row [group]="group" [user]="person" [selected]="selected == person"
                  (rowSelected)="showGroup(group)"  (removeSelected)="removeGroup(group)"
                  *ngFor="let group of organization.groups"></group-row>
     </ion-list>

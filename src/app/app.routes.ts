@@ -56,21 +56,21 @@ export class TenFourRoutes {
 
     { component: CheckinListPage, segment: 'checkins' },
     { component: CheckinEditPage, segment: 'checkins/edit', defaultHistory: [CheckinListPage] },
-    { component: CheckinDetailsPage, segment: 'checkins/:checkin_id', defaultHistory: [CheckinListPage] },
     { component: CheckinSendPage, segment: 'checkins/send', defaultHistory: [CheckinListPage] },
-    { component: CheckinRespondPage, segment: 'checkins/:checkin_id/respond', defaultHistory: [CheckinListPage] },
+    { component: CheckinRespondPage, segment: 'checkins/respond', defaultHistory: [CheckinListPage] },
+    { component: CheckinDetailsPage, segment: 'checkins/:checkin_id', defaultHistory: [CheckinListPage] },
 
     { component: GroupListPage, segment: 'groups' },
     { component: GroupDetailsPage, segment: 'groups/:group_id', defaultHistory: [GroupListPage] },
     { component: GroupEditPage, segment: 'groups/edit', defaultHistory: [GroupListPage] },
 
     { component: PersonListPage, segment: 'people' },
-    { component: PersonDetailsPage, segment: 'people/:person_id', defaultHistory: [PersonListPage] },
     { component: PersonEditPage, segment: 'people/edit', defaultHistory: [PersonListPage] },
     { component: PersonInvitePage, segment: 'people/invite', defaultHistory: [PersonListPage] },
     { component: PersonImportPage, segment: 'people/import', defaultHistory: [PersonListPage] },
     { component: PersonSelectPage, segment: 'people/select', defaultHistory: [PersonListPage] },
-
+    { component: PersonDetailsPage, segment: 'people/:person_id', defaultHistory: [PersonListPage] },
+    
     { component: SettingsListPage, segment: 'settings' },
     { component: SettingsEditPage, segment: 'settings/edit', defaultHistory: [SettingsListPage] },
     { component: SettingsCheckinsPage, segment: 'settings/checkins', defaultHistory: [SettingsListPage] },
