@@ -2,7 +2,15 @@
   <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">
-        <ion-title *ngIf="organization">{{organization.name}}</ion-title>
+        <ion-buttons left>
+          <button ion-button clear color="primary" *ngIf="organization">
+            <img [src]="logo" *ngIf="organization.profile_picture == null">
+            <img [src]="organization.profile_picture" *ngIf="organization.profile_picture != null">
+          </button>
+        </ion-buttons>
+        <ion-title *ngIf="organization">
+          {{organization.name}}
+        </ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
