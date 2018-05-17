@@ -4,7 +4,7 @@
 ---
 
 #### Theme Colors
-The [variables.scss](src/theme/variables.scss) defines global color codes, as well as potential overrides for platform specific styling. For example:
+The [variables.scss](/src/theme/variables.scss) defines global color codes, as well as potential overrides for platform specific styling. For example:
 
 ```
 $colors: (
@@ -29,7 +29,7 @@ Visit [Theming your Ionic App](https://ionicframework.com/docs/theming/theming-y
 ---
 
 #### Application Styling
-The [app.scss](src/app/app.scss) define application wide styling. For example, to round the organization logo in navbar:
+The [app.scss](/src/app/app.scss) define application wide styling. For example, to round the organization logo in navbar:
 ```
 ion-toolbar {
   button {

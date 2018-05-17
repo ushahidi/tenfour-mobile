@@ -14,7 +14,7 @@ Visit [SETUP.md](/docs/SETUP.md) for getting your Ionic environment setup.
 ---
 
 #### Design Theme
-Visit [THEME.md](docs/THEME.md) for information on changing colors and styling.
+Visit [THEME.md](/docs/THEME.md) for information on changing colors and styling.
 
 ---
 
