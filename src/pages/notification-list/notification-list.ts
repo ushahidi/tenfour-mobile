@@ -11,8 +11,8 @@ import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
-  segment: 'notifications',
-  priority: 'off'
+  name: 'NotificationListPage',
+  segment: 'notifications'
 })
 @Component({
   selector: 'page-notification-list',

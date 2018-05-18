@@ -16,9 +16,9 @@ import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
 
 @IonicPage({
+  name: 'PersonImportPage',
   segment: 'people/import',
-  defaultHistory: ['PersonListPage'],
-  priority: 'off'
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-import',

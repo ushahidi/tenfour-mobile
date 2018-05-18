@@ -11,8 +11,8 @@ import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
 @IonicPage({
-  segment: 'people/select',
-  priority: 'off'
+  name: 'PersonSelectPage',
+  segment: 'people/select'
 })
 @Component({
   selector: 'page-person-select',

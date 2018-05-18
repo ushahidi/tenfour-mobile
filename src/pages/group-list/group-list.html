@@ -15,7 +15,7 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <div text-center class="spinner" *ngIf="loading == true && (organization.groups == null || organization.groups.length == 0)">
+  <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
   <ion-list *ngIf="organization && organization.groups">

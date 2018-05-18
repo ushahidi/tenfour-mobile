@@ -1,3 +1,7 @@
+import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
+
+import { OnboardListPage } from '../pages/onboard-list/onboard-list';
+
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
@@ -43,45 +47,49 @@ import { SettingsChannelsPage } from '../pages/settings-channels/settings-channe
 export class TenFourRoutes {
 
   static readonly ROUTES = [
-    { component: SigninUrlPage, segment: 'signin', priority: 'off' },
-    { component: SigninEmailPage, segment: 'signin/email', priority: 'off', defaultHistory: [SigninUrlPage] },
-    { component: SigninPasswordPage, segment: 'signin/password', priority: 'off', defaultHistory: [SigninUrlPage, SigninEmailPage] },
+    { component: SplashScreenPage, name: 'SplashScreenPage', segment: 'loading' },
 
-    { component: SignupEmailPage, segment: 'signup', priority: 'off' },
-    { component: SignupCheckPage, segment: 'signup/check', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupNamePage, segment: 'signup/name', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupUrlPage, segment: 'signup/url', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupPasswordPage, segment: 'signup/password', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupOwnerPage, segment: 'signup/owner', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupPlanPage, segment: 'signup/plan', priority: 'off', defaultHistory: [SignupEmailPage] },
-    { component: SignupPaymentPage, segment: 'signup/payment', priority: 'off', defaultHistory: [SignupEmailPage] },
+    { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
+    { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage'] },
 
-    { component: CheckinListPage, segment: 'checkins', priority: 'off' },
-    { component: CheckinEditPage, segment: 'checkins/edit', priority: 'off', defaultHistory: [CheckinListPage] },
-    { component: CheckinSendPage, segment: 'checkins/send', priority: 'off', defaultHistory: [CheckinListPage] },
-    { component: CheckinRespondPage, segment: 'checkins/respond', priority: 'off', defaultHistory: [CheckinListPage] },
-    { component: CheckinDetailsPage, segment: 'checkins/:checkin_id', priority: 'off', defaultHistory: [CheckinListPage] },
+    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup' },
+    { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SignupEmailPage'] },
 
-    { component: PersonListPage, segment: 'people', priority: 'off' },
-    { component: PersonEditPage, segment: 'people/edit', priority: 'off', defaultHistory: [PersonListPage] },
-    { component: PersonInvitePage, segment: 'people/invite', priority: 'off', defaultHistory: [PersonListPage] },
-    { component: PersonImportPage, segment: 'people/import', priority: 'off', defaultHistory: [PersonListPage] },
-    { component: PersonSelectPage, segment: 'people/select', priority: 'off', defaultHistory: [PersonListPage] },
-    { component: PersonDetailsPage, segment: 'people/:person_id', priority: 'off', defaultHistory: [PersonListPage] },
+    { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 
-    { component: GroupListPage, segment: 'groups', priority: 'off' },
-    { component: GroupEditPage, segment: 'groups/edit', priority: 'off', defaultHistory: [GroupListPage] },
-    { component: GroupDetailsPage, segment: 'groups/:group_id', priority: 'off', defaultHistory: [GroupListPage] },
+    { component: CheckinListPage, name: 'CheckinListPage', segment: 'checkins' },
+    { component: CheckinEditPage, name: 'CheckinEditPage', segment: 'checkins/edit', defaultHistory: ['CheckinListPage'] },
+    { component: CheckinSendPage, name: 'CheckinSendPage', segment: 'checkins/send', defaultHistory: ['CheckinListPage'] },
+    { component: CheckinRespondPage, name: 'CheckinRespondPage', segment: 'checkins/respond', defaultHistory: ['CheckinListPage'] },
+    { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
 
-    { component: NotificationListPage, segment: 'notifications', priority: 'off' },
+    { component: PersonListPage, name: 'PersonListPage', segment: 'people' },
+    { component: PersonEditPage, name: 'PersonEditPage', segment: 'people/edit', defaultHistory: ['PersonListPage'] },
+    { component: PersonInvitePage, name: 'PersonInvitePage', segment: 'people/invite', defaultHistory: ['PersonListPage'] },
+    { component: PersonImportPage, name: 'PersonImportPage', segment: 'people/import', defaultHistory: ['PersonListPage'] },
+    { component: PersonSelectPage, name: 'PersonSelectPage', segment: 'people/select', defaultHistory: ['PersonListPage'] },
+    { component: PersonDetailsPage, name: 'PersonDetailsPage', segment: 'people/:person_id', defaultHistory: ['PersonListPage'] },
 
-    { component: SettingsListPage, segment: 'settings', priority: 'off' },
-    { component: SettingsEditPage, segment: 'settings/edit', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsChannelsPage, segment: 'settings/channels', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsRegionsPage, segment: 'settings/regions', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsRolesPage, segment: 'settings/roles', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsSizesPage, segment: 'settings/sizes', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsTypesPage, segment: 'settings/types', priority: 'off', defaultHistory: [SettingsListPage] },
-    { component: SettingsPaymentsPage, segment: 'settings/payments', priority: 'off', defaultHistory: [SettingsListPage] }
+    { component: GroupListPage, name: 'GroupListPage', segment: 'groups' },
+    { component: GroupEditPage, name: 'GroupEditPage', segment: 'groups/edit', defaultHistory: ['GroupListPage'] },
+    { component: GroupDetailsPage, name: 'GroupDetailsPage', segment: 'groups/:group_id', defaultHistory: ['GroupListPage'] },
+
+    { component: NotificationListPage, name: 'NotificationListPage', segment: 'notifications' },
+
+    { component: SettingsListPage, name: 'SettingsListPage', segment: 'settings' },
+    { component: SettingsEditPage, name: 'SettingsEditPage', segment: 'settings/edit', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsChannelsPage, name: 'SettingsChannelsPage', segment: 'settings/channels', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsRegionsPage, name: 'SettingsRegionsPage', segment: 'settings/regions', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsRolesPage, name: 'SettingsRolesPage', segment: 'settings/roles', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsSizesPage, name: 'SettingsSizesPage', segment: 'settings/sizes', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] }
   ];
 }

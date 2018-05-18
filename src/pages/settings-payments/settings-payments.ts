@@ -11,9 +11,9 @@ import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
+  name: 'SettingsPaymentsPage',
   segment: 'settings/payments',
-  defaultHistory: ['SettingsListPage'],
-  priority: 'off'
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-payments',

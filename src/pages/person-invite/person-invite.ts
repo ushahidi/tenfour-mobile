@@ -12,9 +12,9 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
 @IonicPage({
+  name: 'PersonInvitePage',
   segment: 'people/invite',
-  defaultHistory: ['PersonListPage'],
-  priority: 'off'
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-invite',

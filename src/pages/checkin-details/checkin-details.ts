@@ -13,9 +13,9 @@ import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
 
 @IonicPage({
+  name: 'CheckinDetailsPage',
   segment: 'checkins/:checkin_id',
-  defaultHistory: ['CheckinListPage'],
-  priority: 'off'
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-details',

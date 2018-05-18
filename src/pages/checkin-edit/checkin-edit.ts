@@ -15,9 +15,9 @@ import { Answer } from '../../models/answer';
 import { ColorPickerComponent } from '../../components/color-picker/color-picker';
 
 @IonicPage({
+  name: 'CheckinEditPage',
   segment: 'checkins/edit',
-  defaultHistory: ['CheckinListPage'],
-  priority: 'off'
+  defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-edit',

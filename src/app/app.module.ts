@@ -37,6 +37,8 @@ import { Firebase } from '@ionic-native/firebase';
 import { TenFourApp } from './app.component';
 import { TenFourRoutes } from './app.routes';
 
+import { SplashScreenModule } from '../pages/splash-screen/splash-screen.module';
+
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
@@ -115,6 +117,7 @@ import { CameraProvider } from '../providers/camera/camera';
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
+    SplashScreenModule,
     PersonAvatarModule,
     ColorPickerModule,
     SendViaModule,
@@ -175,11 +178,12 @@ import { CameraProvider } from '../providers/camera/camera';
     }),
     IonicModule.forRoot(TenFourApp, {
       scrollAssist: true,
-      preloadModules: false,
       autoFocusAssist: true
-    },{
+    },
+    {
       links: TenFourRoutes.ROUTES
-    })
+    }
+  )
   ],
   bootstrap: [IonicApp],
   entryComponents: [

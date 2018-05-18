@@ -12,9 +12,9 @@ import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
 
 @IonicPage({
+  name: 'SignupCheckPage',
   segment: 'signup-check',
-  defaultHistory: ['SignupEmailPage'],
-  priority: 'off'
+  defaultHistory: ['SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-check',

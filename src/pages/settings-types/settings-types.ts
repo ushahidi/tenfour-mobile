@@ -10,9 +10,9 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
 @IonicPage({
+  name: 'SettingsTypesPage',
   segment: 'settings/types',
-  defaultHistory: ['SettingsListPage'],
-  priority: 'off'
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-types',

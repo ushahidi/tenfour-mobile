@@ -14,9 +14,9 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
 @IonicPage({
+  name: 'SettingsSizesPage',
   segment: 'settings/sizes',
-  defaultHistory: ['SettingsListPage'],
-  priority: 'off'
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-sizes',

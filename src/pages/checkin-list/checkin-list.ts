@@ -17,8 +17,8 @@ import { Checkin } from '../../models/checkin';
 import { Notification } from '../../models/notification';
 
 @IonicPage({
-  segment: 'checkins',
-  priority: 'off'
+  name: 'CheckinListPage',
+  segment: 'checkins'
 })
 @Component({
   selector: 'page-checkin-list',

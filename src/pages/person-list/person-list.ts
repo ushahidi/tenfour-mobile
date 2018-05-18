@@ -14,8 +14,8 @@ import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 
 @IonicPage({
-  segment: 'people',
-  priority: 'off'
+  name: 'PersonListPage',
+  segment: 'people'
 })
 @Component({
   selector: 'page-person-list',

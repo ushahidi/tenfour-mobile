@@ -11,9 +11,9 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { CameraProvider } from '../../providers/camera/camera';
 
 @IonicPage({
+  name: 'SettingsEditPage',
   segment: 'settings/edit',
-  defaultHistory: ['SettingsListPage'],
-  priority: 'off'
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-edit',

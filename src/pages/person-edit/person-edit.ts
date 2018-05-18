@@ -14,9 +14,9 @@ import { Country } from '../../models/country';
 import { Region } from '../../models/region';
 
 @IonicPage({
+  name: 'PersonEditPage',
   segment: 'people/edit',
-  defaultHistory: ['PersonListPage'],
-  priority: 'off'
+  defaultHistory: ['PersonListPage']
 })
 @Component({
   selector: 'page-person-edit',

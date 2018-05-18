@@ -9,9 +9,9 @@ import { DatabaseProvider } from '../../providers/database/database';
 import { Organization } from '../../models/organization';
 
 @IonicPage({
+  name: 'SettingsChannelsPage',
   segment: 'settings/channels',
-  defaultHistory: ['SettingsListPage'],
-  priority: 'off'
+  defaultHistory: ['SettingsListPage']
 })
 @Component({
   selector: 'page-settings-channels',

@@ -10,9 +10,9 @@ import { ApiProvider } from '../../providers/api/api';
 import { Organization } from '../../models/organization';
 
 @IonicPage({
+  name: 'SignupNamePage',
   segment: 'signup/name',
-  defaultHistory: ['SignupEmailPage'],
-  priority: 'off'
+  defaultHistory: ['SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-name',

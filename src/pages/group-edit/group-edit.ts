@@ -12,9 +12,9 @@ import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 @IonicPage({
+  name: 'GroupEditPage',
   segment: 'groups/edit',
-  defaultHistory: ['GroupListPage'],
-  priority: 'off'
+  defaultHistory: ['GroupListPage']
 })
 @Component({
   selector: 'page-group-edit',

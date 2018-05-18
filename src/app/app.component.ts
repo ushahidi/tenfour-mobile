@@ -10,6 +10,8 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Deeplinks } from '@ionic-native/deeplinks';
 
+import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
+
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
@@ -56,7 +58,7 @@ import { Subscription } from '../models/subscription';
 export class TenFourApp {
 
   zone:NgZone = null;
-  rootPage:any = SigninUrlPage;
+  rootPage:any = SplashScreenPage;
   organization:Organization = null;
   person:Person = null;
   tablet:boolean = false;
@@ -511,9 +513,14 @@ export class TenFourApp {
 
   private showSigninUrl(event:any=null) {
     this.logger.info(this, "showSigninUrl");
-    this.nav.setRoot(SigninUrlPage, { });
-    this.hideSideMenu();
-    this.hideSplashScreen();
+    this.nav.setRoot(SigninUrlPage, { }).then((loaded:any) => {
+      this.logger.info(this, "showSigninUrl", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showSigninUrl", error);
+    });
   }
 
   private showOnboardList(person:Person=null) {
@@ -521,9 +528,14 @@ export class TenFourApp {
     this.nav.setRoot(OnboardListPage, {
       organization: this.organization,
       person: person
+    }).then((loaded:any) => {
+      this.logger.info(this, "showOnboardList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showOnboardList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showCheckinList() {
@@ -531,9 +543,14 @@ export class TenFourApp {
     this.nav.setRoot(CheckinListPage, {
       organization: this.organization,
       person: this.person
+    }).then((loaded:any) => {
+      this.logger.info(this, "showCheckinList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showCheckinList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showGroupList() {
@@ -541,9 +558,14 @@ export class TenFourApp {
     this.nav.setRoot(GroupListPage, {
       organization: this.organization,
       person: this.person
+    }).then((loaded:any) => {
+      this.logger.info(this, "showGroupList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showGroupList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showNotificationList() {
@@ -552,9 +574,14 @@ export class TenFourApp {
       organization: this.organization,
       person: this.person,
       notifications: this.person.notifications,
+    }).then((loaded:any) => {
+      this.logger.info(this, "showNotificationList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showNotificationList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showPersonList() {
@@ -562,9 +589,14 @@ export class TenFourApp {
     this.nav.setRoot(PersonListPage, {
       organization: this.organization,
       person: this.person
+    }).then((loaded:any) => {
+      this.logger.info(this, "showPersonList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showPersonList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showSettingsList() {
@@ -572,9 +604,14 @@ export class TenFourApp {
     this.nav.setRoot(SettingsListPage, {
       organization: this.organization,
       person: this.person
+    }).then((loaded:any) => {
+      this.logger.info(this, "showSettingsList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showSettingsList", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showPersonDetails() {
@@ -586,9 +623,14 @@ export class TenFourApp {
       profile: true,
       title: "Profile",
       person_id: this.person.id
+    }).then((loaded:any) => {
+      this.logger.info(this, "showPersonDetails", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showPersonDetails", error);
     });
-    this.hideSideMenu();
-    this.hideSplashScreen();
   }
 
   private showSignupOwner(organization:Organization) {

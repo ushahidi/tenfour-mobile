@@ -12,9 +12,9 @@ import { Person } from '../../models/person';
 import { Token } from '../../models/token';
 
 @IonicPage({
+  name: 'SignupPasswordPage',
   segment: 'signup/password',
-  defaultHistory: ['SignupEmailPage'],
-  priority: 'off'
+  defaultHistory: ['SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-password',

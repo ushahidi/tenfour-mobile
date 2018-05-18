@@ -13,9 +13,9 @@ import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 @IonicPage({
+  name: 'GroupDetailsPage',
   segment: 'groups/:group_id',
-  defaultHistory: ['GroupListPage'],
-  priority: 'off'
+  defaultHistory: ['GroupListPage']
 })
 @Component({
   selector: 'page-group-details',

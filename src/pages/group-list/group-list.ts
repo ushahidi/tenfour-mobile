@@ -7,19 +7,20 @@ import { GroupDetailsPage } from '../../pages/group-details/group-details';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 @IonicPage({
-  segment: 'groups',
-  priority: 'off'
+  name: 'GroupListPage',
+  segment: 'groups'
 })
 @Component({
   selector: 'page-group-list',
   templateUrl: 'group-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ GroupEditPage, GroupDetailsPage ]
 })
 export class GroupListPage extends BasePage {
@@ -42,7 +43,8 @@ export class GroupListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected database:DatabaseProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -57,7 +59,7 @@ export class GroupListPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-    })
+    });
   }
 
   ionViewDidEnter() {
