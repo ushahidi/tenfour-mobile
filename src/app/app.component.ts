@@ -67,8 +67,8 @@ export class TenFourApp {
   browser:boolean = false;
   desktop:boolean = false;
 
-  logo:string = "assets/images/dots.png";
-  
+  defaultLogo:string = "assets/images/dots.png";
+
   checkin:Checkin = null;
 
   @ViewChild(Nav)
