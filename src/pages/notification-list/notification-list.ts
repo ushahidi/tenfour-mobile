@@ -10,7 +10,6 @@ import { Notification } from '../../models/notification';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'NotificationListPage',
@@ -19,7 +18,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-notification-list',
   templateUrl: 'notification-list.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class NotificationListPage extends BasePage {
@@ -44,8 +43,7 @@ export class NotificationListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -138,7 +136,7 @@ export class NotificationListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       if (cache && this.mobile) {
-        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
+        this.storage.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
           if (notifications && notifications.length > 0) {
             this.notifications = notifications;
             resolve(notifications);
@@ -157,21 +155,21 @@ export class NotificationListPage extends BasePage {
       }
       else {
         this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          if (this.mobile) {
-            this.database.saveNotifications(this.organization, notifications).then((saved:boolean) => {
-              this.database.getNotifications(this.organization, this.limit, this.offset).then((_notifications:Notification[]) => {
+          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
+            this.storage.getNotifications(this.organization, this.limit, this.offset).then((_notifications:Notification[]) => {
+              if (_notifications && _notifications.length > 0) {
                 this.notifications = _notifications;
                 resolve(_notifications);
-              },
-              (error:any) => {
-                resolve(notifications);
-              });
+              }
+              else {
+                this.notifications = notifications;
+                resolve(this.notifications);
+              }
+            },
+            (error:any) => {
+              resolve(notifications);
             });
-          }
-          else {
-            this.notifications = notifications;
-            resolve(notifications);
-          }
+          });
         },
         (error:any) => {
           this.notifications = [];
@@ -187,7 +185,7 @@ export class NotificationListPage extends BasePage {
       if (this.mobile) {
         this.offset = this.offset + this.limit;
         this.logger.info(this, "loadMore", this.offset);
-        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
+        this.storage.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
           this.notifications = [...this.notifications, ...notifications];
           if (event) {
             event.complete();
@@ -214,7 +212,7 @@ export class NotificationListPage extends BasePage {
       for (let notification of this.notifications) {
         notification.viewed_at = new Date();
       }
-      this.database.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
+      this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
         this.logger.info(this, "viewNotifications", "Saved", saved);
       });
     }

@@ -15,7 +15,6 @@ import { Country } from '../../models/country';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 import { CountryProvider } from '../../providers/country/country';
 
 @IonicPage({
@@ -26,7 +25,7 @@ import { CountryProvider } from '../../providers/country/country';
 @Component({
   selector: 'page-settings-regions',
   templateUrl: 'settings-regions.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsRegionsPage extends BasePage {
@@ -47,7 +46,6 @@ export class SettingsRegionsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected database:DatabaseProvider,
       protected countries:CountryProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -133,8 +131,8 @@ export class SettingsRegionsPage extends BasePage {
   private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadRegions");
-      if (cache && this.mobile) {
-        this.database.getCountries(this.organization).then((countries:Country[]) => {
+      if (cache) {
+        this.storage.getCountries(this.organization).then((countries:Country[]) => {
           if (countries && countries.length > 0) {
             this.organization.countries = countries;
             if (event) {
@@ -164,29 +162,20 @@ export class SettingsRegionsPage extends BasePage {
         this.api.getRegions(this.organization).then((regions:Region[]) => {
           let codes = regions.map(region => region.code);
           this.countries.getCountries(codes).then((countries:Country[]) => {
-            if (this.mobile) {
-              this.database.saveCountries(this.organization, countries).then((saved:boolean) => {
-                this.organization.countries = countries;
-                if (event) {
-                  event.complete();
-                }
-                resolve(regions);
-              },
-              (error:any) => {
-                this.organization.countries = countries;
-                if (event) {
-                  event.complete();
-                }
-                resolve(regions);
-              });
-            }
-            else {
+            this.storage.saveCountries(this.organization, countries).then((saved:boolean) => {
               this.organization.countries = countries;
               if (event) {
                 event.complete();
               }
               resolve(regions);
-            }
+            },
+            (error:any) => {
+              this.organization.countries = countries;
+              if (event) {
+                event.complete();
+              }
+              resolve(regions);
+            });
           });
         },
         (error:any) => {
@@ -214,26 +203,18 @@ export class SettingsRegionsPage extends BasePage {
         codes.push(country.country_code);
         regions.push(country.code);
       }
-      saves.push(this.database.saveCountry(this.organization, country));
+      saves.push(this.storage.saveCountry(this.organization, country));
     }
     this.organization.codes = Array.from(new Set(codes)).sort().join(",");
     this.organization.regions = Array.from(new Set(regions)).sort().join(",");
     Promise.all(saves).then(saved => {
       this.api.updateOrganization(this.organization).then((organization:Organization) => {
-        if (this.mobile) {
-          this.database.saveOrganization(organization).then(saved => {
-            loading.dismiss();
-            this.hideModal({
-              organization: organization
-            });
-          });
-        }
-        else {
+        this.storage.saveOrganization(organization).then(saved => {
           loading.dismiss();
           this.hideModal({
             organization: organization
           });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();

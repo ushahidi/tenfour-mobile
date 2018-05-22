@@ -32,12 +32,6 @@ import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 
-import { ApiProvider } from '../providers/api/api';
-import { LoggerProvider } from '../providers/logger/logger';
-import { DatabaseProvider } from '../providers/database/database';
-import { InjectorProvider } from '../providers/injector/injector';
-import { StorageProvider } from '../providers/storage/storage';
-
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
 import { User } from '../models/user';
@@ -53,6 +47,11 @@ import { Notification } from '../models/notification';
 import { Settings } from '../models/settings';
 import { Country } from '../models/country';
 import { Subscription } from '../models/subscription';
+
+import { ApiProvider } from '../providers/api/api';
+import { LoggerProvider } from '../providers/logger/logger';
+import { StorageProvider } from '../providers/storage/storage';
+import { InjectorProvider } from '../providers/injector/injector';
 
 @Component({
   templateUrl: 'app.html'
@@ -93,7 +92,6 @@ export class TenFourApp {
     protected splashScreen:SplashScreen,
     protected api:ApiProvider,
     protected storage:StorageProvider,
-    protected database:DatabaseProvider,
     protected logger:LoggerProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
@@ -365,7 +363,7 @@ export class TenFourApp {
   private loadMobileApp(models:Model[]):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadMobileApp");
-      this.loadDatabase(models).then((loaded:any) => {
+      this.loadDatastore(models).then((loaded:any) => {
         this.logger.info(this, "loadMobileApp", "Database", loaded);
         this.storage.getOrganization().then((organization:Organization) => {
           if (organization) {
@@ -398,7 +396,7 @@ export class TenFourApp {
         });
       },
       (error:any) => {
-        this.logger.error(this, "loadMobileApp", "loadDatabase", error);
+        this.logger.error(this, "loadMobileApp", "loadDatastore", error);
         this.hideSplashScreen();
         this.databaseChanged(models);
         resolve(false);
@@ -411,8 +409,8 @@ export class TenFourApp {
       text: 'Reset Database',
       handler: (clicked) => {
         let loading = this.showLoading("Resetting...");
-        this.resetDatabase().then((reset:any) => {
-          this.loadDatabase(models).then((created:any) => {
+        this.resetDatastore().then((reset:any) => {
+          this.loadDatastore(models).then((created:any) => {
             loading.dismiss();
             this.showSigninUrl();
           },
@@ -431,11 +429,11 @@ export class TenFourApp {
     }]);
   }
 
-  private loadDatabase(models:Model[]):Promise<any> {
+  private loadDatastore(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.mobile) {
-        this.logger.info(this, "loadDatabase", "Cordova");
-        this.database.loadDatabase(models).then((loaded:any) => {
+        this.logger.info(this, "loadDatastore", "Cordova");
+        this.storage.initialize(models).then((loaded:any) => {
           resolve(loaded);
         },
         (error:any) => {
@@ -443,18 +441,18 @@ export class TenFourApp {
         })
       }
       else {
-        this.logger.info(this, "loadDatabase", "Web");
+        this.logger.info(this, "loadDatastore", "Web");
         resolve([]);
       }
     });
   }
 
-  private resetDatabase():Promise<any> {
+  private resetDatastore():Promise<any> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "resetDatabase");
+      this.logger.info(this, "resetDatastore");
       if (this.mobile) {
-        this.database.deleteDatabase().then((deleted:any) => {
-          resolve(deleted);
+        this.storage.reset().then((reset:any) => {
+          resolve(reset);
         },
         (error:any) => {
           reject(error);
@@ -651,17 +649,17 @@ export class TenFourApp {
     ];
     if (this.mobile) {
       removes.push(
-        this.database.removeOrganizations(),
-        this.database.removeSubscriptions(),
-        this.database.removeNotifications(),
-        this.database.removeCheckins(),
-        this.database.removeAnswers(),
-        this.database.removeReplies(),
-        this.database.removeRecipients(),
-        this.database.removeGroups(),
-        this.database.removeEmails(),
-        this.database.removePeople(),
-        this.database.removeContacts());
+        this.storage.removeOrganizations(),
+        this.storage.removeSubscriptions(),
+        this.storage.removeNotifications(),
+        this.storage.removeCheckins(),
+        this.storage.removeAnswers(),
+        this.storage.removeReplies(),
+        this.storage.removeRecipients(),
+        this.storage.removeGroups(),
+        this.storage.removeEmails(),
+        this.storage.removePeople(),
+        this.storage.removeContacts());
     }
     Promise.all(removes).then((removed:any) => {
       this.organization = null;

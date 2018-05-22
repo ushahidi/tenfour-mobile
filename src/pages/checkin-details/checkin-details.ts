@@ -12,7 +12,6 @@ import { Reply } from '../../models/reply';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinDetailsPage',
@@ -22,7 +21,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-checkin-details',
   templateUrl: 'checkin-details.html',
-  providers: [ ApiProvider, StorageProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinRespondPage ]
 })
 export class CheckinDetailsPage extends BasePage {
@@ -34,6 +33,7 @@ export class CheckinDetailsPage extends BasePage {
   create:Button;
 
   organization:Organization = null;
+
   user:User = null;
 
   checkin:Checkin = null;
@@ -54,7 +54,6 @@ export class CheckinDetailsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -62,7 +61,6 @@ export class CheckinDetailsPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.checkin = this.getParameter<Checkin>("checkin");
     this.modal = this.getParameter<boolean>("modal");
     this.loadUpdates(true);
   }
@@ -83,6 +81,7 @@ export class CheckinDetailsPage extends BasePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCheckin(cache); })
       .then(() => { return this.loadReplies(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
@@ -137,12 +136,55 @@ export class CheckinDetailsPage extends BasePage {
     });
   }
 
+  private loadCheckin(cache:boolean=true):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.checkin) {
+        resolve(this.checkin);
+      }
+      else if (this.hasParameter("checkin")){
+        this.checkin = this.getParameter<Checkin>("checkin");
+        resolve(this.checkin);
+      }
+      else if (this.hasParameter("checkin_id")){
+        let checkinId = this.getParameter<number>("checkin_id");
+        this.api.getCheckin(this.organization, checkinId).then((checkin:Checkin) => {
+          for (let reply of checkin.replies) {
+            if (this.user && this.user.id == reply.user_id) {
+              checkin.replied = true;
+            }
+          }
+          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+            this.checkin = checkin;
+            resolve(checkin);
+          });
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+      else {
+        reject("Checkin Not Provided");
+      }
+    });
+  }
+
   private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       if (cache) {
-        this.database.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
-          this.checkin.replies = replies;
-          resolve(replies);
+        this.storage.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
+          if (replies && replies.length > 0) {
+            this.checkin.replies = replies;
+            resolve(replies);
+          }
+          else {
+            this.loadReplies(false).then((replies:Reply[]) => {
+              this.checkin.replies = replies;
+              resolve(replies);
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }
         },
         (error:any) => {
           this.loadReplies(false).then((replies:Reply[]) => {
@@ -161,16 +203,10 @@ export class CheckinDetailsPage extends BasePage {
               checkin.replied = true;
             }
           }
-          if (this.mobile) {
-            this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-              this.checkin = checkin;
-              resolve(checkin.replies);
-            });
-          }
-          else {
+          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
             this.checkin = checkin;
             resolve(checkin.replies);
-          }
+          });
         },
         (error:any) => {
           reject(error);

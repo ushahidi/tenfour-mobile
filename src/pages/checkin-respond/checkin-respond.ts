@@ -13,7 +13,6 @@ import { Location } from '../../models/location';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 import { LocationProvider } from '../../providers/location/location';
 
 @IonicPage({
@@ -24,7 +23,7 @@ import { LocationProvider } from '../../providers/location/location';
 @Component({
   selector: 'page-checkin-respond',
   templateUrl: 'checkin-respond.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[  ]
 })
 export class CheckinRespondPage extends BasePage {
@@ -52,7 +51,6 @@ export class CheckinRespondPage extends BasePage {
     protected actionController:ActionSheetController,
     protected api:ApiProvider,
     protected storage:StorageProvider,
-    protected database:DatabaseProvider,
     protected location:LocationProvider) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -221,7 +219,7 @@ export class CheckinRespondPage extends BasePage {
   private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
     if (this.checkin && this.checkin.reply && this.checkin.reply.id) {
-      this.database.getReply(this.organization, this.checkin.reply.id).then((reply:Reply) => {
+      this.storage.getReply(this.organization, this.checkin.reply.id).then((reply:Reply) => {
         this.checkin.reply.answer = reply.answer;
         this.checkin.reply.message = reply.message;
         this.checkin.reply.location_text = reply.location_text;
@@ -252,13 +250,13 @@ export class CheckinRespondPage extends BasePage {
       this.api.sendReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "sendReply", "Reply", replied);
         if (this.mobile) {
-          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
+          this.storage.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "sendReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(this.organization, checkin, replied).then(saved => {
+            this.storage.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });
@@ -286,13 +284,13 @@ export class CheckinRespondPage extends BasePage {
       this.api.updateReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "saveReply", "Reply", replied);
         if (this.mobile) {
-          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
+          this.storage.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "saveReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(this.organization, checkin, replied).then(saved => {
+            this.storage.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });

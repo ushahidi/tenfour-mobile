@@ -10,7 +10,6 @@ import { Token } from '../../models/token';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SignupPasswordPage',
@@ -20,7 +19,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
 export class SignupPasswordPage extends BasePage {
@@ -33,6 +32,7 @@ export class SignupPasswordPage extends BasePage {
 
   organization:Organization;
 
+  loading:boolean = false;
   accepted:boolean = false;
   termsOfService:string = "https://www.tenfour.org/terms-of-service";
   privacyPolicy:string = "https://www.tenfour.org/privacy-policy";
@@ -50,8 +50,7 @@ export class SignupPasswordPage extends BasePage {
       protected actionController:ActionSheetController,
       protected events:Events,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -77,6 +76,7 @@ export class SignupPasswordPage extends BasePage {
       this.showAlert("Terms of Service", "You must accept the Terms of Service before you can continue.");
     }
     else {
+      this.loading = true;
       let loading = this.showLoading("Creating...");
       this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then((organization:Organization) => {
@@ -91,13 +91,14 @@ export class SignupPasswordPage extends BasePage {
               organization.user_name = person.name;
               organization.password = this.password.value;
               let saves = [
-                this.database.saveOrganization(organization),
-                this.database.savePerson(organization, person)
+                this.storage.saveOrganization(organization),
+                this.storage.savePerson(organization, person)
               ];
               Promise.all(saves).then(saved => {
                 this.trackLogin(organization, person);
                 this.events.publish('user:login');
                 loading.dismiss();
+                this.loading = false;
                 if (person.name && person.name.length > 0) {
                   this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
                 }
@@ -113,24 +114,28 @@ export class SignupPasswordPage extends BasePage {
             (error:any) => {
               this.logger.error(this, "createOrganization", error);
               loading.dismiss();
+              this.loading = false;
               this.showAlert("Problem Creating Organization", error);
             });
           },
           (error:any) => {
             this.logger.error(this, "createOrganization", error);
             loading.dismiss();
+            this.loading = false;
             this.showAlert("Problem Creating Account", error);
           });
         },
         (error:any) => {
           this.logger.error(this, "createOrganization", error);
           loading.dismiss();
+          this.loading = false;
           this.showAlert("Problem Logging In", error);
         });
       },
       (error:any) => {
         this.logger.error(this, "createOrganization", error);
         loading.dismiss();
+        this.loading = false;
         this.showAlert("Problem Creating Organization", error);
       });
     }

@@ -103,6 +103,7 @@ import { GroupRowModule } from '../components/group-row/group-row.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
+import { WebstoreProvider } from '../providers/webstore/webstore';
 import { DatabaseProvider } from '../providers/database/database';
 import { CountryProvider } from '../providers/country/country';
 import { StorageProvider } from '../providers/storage/storage';
@@ -220,8 +221,9 @@ import { CameraProvider } from '../providers/camera/camera';
     { provide: ApiProvider, useClass: ApiProvider },
     { provide: LoggerProvider, useClass: LoggerProvider },
     { provide: CountryProvider, useClass: CountryProvider },
-    { provide: DatabaseProvider, useClass: DatabaseProvider },
     { provide: StorageProvider, useClass: StorageProvider },
+    { provide: DatabaseProvider, useClass: DatabaseProvider },
+    { provide: WebstoreProvider, useClass: WebstoreProvider },
     { provide: LocationProvider, useClass: LocationProvider },
     { provide: CameraProvider, useClass: CameraProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }

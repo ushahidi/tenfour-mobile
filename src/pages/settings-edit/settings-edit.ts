@@ -9,7 +9,6 @@ import { User } from '../../models/user';
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SettingsEditPage',
@@ -19,7 +18,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class SettingsEditPage extends BasePage {
@@ -46,7 +45,6 @@ export class SettingsEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected database:DatabaseProvider,
       protected camera:CameraProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -77,20 +75,12 @@ export class SettingsEditPage extends BasePage {
   private doneEdit(event:any) {
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      if (this.mobile) {
-        this.database.saveOrganization(organization).then(saved => {
-          loading.dismiss();
-          this.hideModal({
-            organization: organization
-          });
-        });
-      }
-      else {
+      this.storage.saveOrganization(organization).then(saved => {
         loading.dismiss();
         this.hideModal({
           organization: organization
         });
-      }
+      });
     },
     (error:any) => {
       loading.dismiss();

@@ -11,7 +11,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonInvitePage',
@@ -21,7 +20,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class PersonInvitePage extends BasePage {
@@ -43,7 +42,6 @@ export class PersonInvitePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider,
       protected statusBar:StatusBar) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -93,7 +91,7 @@ export class PersonInvitePage extends BasePage {
   private loadPeople(event:any, cache:boolean=true) {
     this.loading = true;
     if (cache && this.mobile) {
-      return this.database.getPeople(this.organization).then((people:Person[]) => {
+      return this.storage.getPeople(this.organization).then((people:Person[]) => {
         this.logger.info(this, "loadPeople", people);
         if (people && people.length > 0) {
           this.people = people.filter(person => person.needsInvite() == true);

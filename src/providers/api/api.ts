@@ -7,11 +7,6 @@ import { File } from '@ionic-native/file';
 import { Device } from '@ionic-native/device';
 import { FileTransfer } from '@ionic-native/file-transfer';
 
-import { HttpProvider } from '../../providers/http/http';
-import { LoggerProvider } from '../../providers/logger/logger';
-import { DatabaseProvider } from '../../providers/database/database';
-import { StorageProvider } from '../../providers/storage/storage';
-
 import { Token } from '../../models/token';
 import { Email } from '../../models/email';
 import { Person } from '../../models/person';
@@ -25,6 +20,10 @@ import { Settings } from '../../models/settings';
 import { Region } from '../../models/region';
 import { Subscription } from '../../models/subscription';
 import { Notification } from '../../models/notification';
+
+import { HttpProvider } from '../../providers/http/http';
+import { LoggerProvider } from '../../providers/logger/logger';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -43,7 +42,6 @@ export class ApiProvider extends HttpProvider {
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerProvider,
-    protected database:DatabaseProvider,
     protected storage:StorageProvider) {
     super(platform, http, httpNative, file, transfer, logger);
   }

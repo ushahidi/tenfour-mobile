@@ -13,7 +13,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SettingsSizesPage',
@@ -23,7 +22,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-sizes',
   templateUrl: 'settings-sizes.html',
-  providers: [ ApiProvider, StorageProvider, DatabaseProvider],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsSizesPage extends BasePage {
@@ -52,8 +51,7 @@ export class SettingsSizesPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -142,20 +140,12 @@ export class SettingsSizesPage extends BasePage {
     this.logger.info(this, "doneEdit", "Size", this.organization.size)
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      if (this.mobile) {
-        this.database.saveOrganization(organization).then(saved => {
-          loading.dismiss();
-          this.hideModal({
-            organization: organization
-          });
-        });
-      }
-      else {
+      this.storage.saveOrganization(organization).then(saved => {
         loading.dismiss();
         this.hideModal({
           organization: organization
         });
-      }
+      });
     },
     (error:any) => {
       loading.dismiss();

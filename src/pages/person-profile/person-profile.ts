@@ -14,7 +14,6 @@ import { Checkin } from '../../models/checkin';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonProfilePage',
@@ -23,7 +22,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-details',
   templateUrl: '../../pages/person-details/person-details.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, CheckinDetailsPage ]
 })
 export class PersonProfilePage extends PersonDetailsPage {
@@ -40,10 +39,9 @@ export class PersonProfilePage extends PersonDetailsPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, database, storage, events);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, storage, events);
   }
 
 }

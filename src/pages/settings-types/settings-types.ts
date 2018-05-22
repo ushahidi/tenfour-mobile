@@ -9,7 +9,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SettingsTypesPage',
@@ -19,7 +18,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class SettingsTypesPage extends BasePage {
@@ -57,8 +56,7 @@ export class SettingsTypesPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -166,7 +164,7 @@ export class SettingsTypesPage extends BasePage {
     let loading = this.showLoading("Updating...");
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       if (this.mobile) {
-        this.database.saveOrganization(organization).then(saved => {
+        this.storage.saveOrganization(organization).then(saved => {
           loading.dismiss();
           this.hideModal({
             organization: organization

@@ -13,8 +13,8 @@ import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
 
 import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 import { CountryProvider } from '../../providers/country/country';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonImportPage',
@@ -24,7 +24,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-import',
   templateUrl: 'person-import.html',
-  providers: [ ApiProvider, DatabaseProvider, CountryProvider ],
+  providers: [ ApiProvider, StorageProvider, CountryProvider ],
   entryComponents:[  ]
 })
 export class PersonImportPage extends BasePage {
@@ -47,7 +47,7 @@ export class PersonImportPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
+      protected storage:StorageProvider,
       protected countries:CountryProvider,
       protected contacts:Contacts,
       protected sim:Sim) {
@@ -249,7 +249,7 @@ export class PersonImportPage extends BasePage {
   private createPerson(person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       this.api.createPerson(this.organization, person).then((newPerson:Person) => {
-        this.database.savePerson(this.organization, newPerson).then((saved:any) => {
+        this.storage.savePerson(this.organization, newPerson).then((saved:any) => {
           let creates = [];
           for (let contact of person.contacts) {
             creates.push(this.createContact(newPerson, contact));
@@ -285,7 +285,7 @@ export class PersonImportPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.api.createContact(this.organization, person, contact).then((newContact:Contact) => {
         if (this.mobile) {
-          this.database.saveContact(this.organization, person, newContact).then((saved:any) => {
+          this.storage.saveContact(this.organization, person, newContact).then((saved:any) => {
             resolve(newContact);
           },
           (error:any) => {

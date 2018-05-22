@@ -46,7 +46,7 @@
     <preference name="iosExtraFilesystems" value="library,library-nosync,documents,documents-nosync,cache,bundle,root" />
     <preference name="AndroidExtraFilesystems" value="files,files-external,documents,sdcard,cache,cache-external,assets,root" />
     <platform name="browser">
-      <preference name="ShowSplashScreen" value="false" />
+        <preference name="ShowSplashScreen" value="false" />
     </platform>
     <platform name="android">
         <allow-intent href="market:*" />
@@ -133,6 +133,7 @@
     <allow-navigation href="http://192.168.178.192:8100" />
     <engine name="android" spec="~6.4.0" />
     <engine name="browser" spec="~5.0.3" />
+    <engine name="ios" spec="~4.5.4" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
@@ -178,5 +179,4 @@
         <variable name="ANDROID_SUPPORT_VERSION" value="26.+" />
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
-    <engine name="ios" spec="~4.5.4" />
 </widget>

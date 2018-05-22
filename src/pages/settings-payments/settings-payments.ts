@@ -10,7 +10,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SettingsPaymentsPage',
@@ -20,7 +19,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class SettingsPaymentsPage extends BasePage {
@@ -43,7 +42,6 @@ export class SettingsPaymentsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected database:DatabaseProvider,
       protected sanitizer:DomSanitizer) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -128,7 +126,7 @@ export class SettingsPaymentsPage extends BasePage {
 
   private loadPaymentForm(cache:boolean=true) {
     return new Promise((resolve, reject) => {
-      if (this.user.isOwner()) {
+      if (this.user && this.user.isOwner()) {
         this.api.getPaymentUrl(this.organization).then((url:string) => {
           this.logger.info(this, "ChargeBee", url);
           this.url = this.sanitizer.bypassSecurityTrustResourceUrl(url);

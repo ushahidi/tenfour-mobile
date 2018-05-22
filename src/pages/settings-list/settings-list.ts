@@ -16,7 +16,6 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
@@ -26,7 +25,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsListPage extends BasePage {
@@ -47,7 +46,6 @@ export class SettingsListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

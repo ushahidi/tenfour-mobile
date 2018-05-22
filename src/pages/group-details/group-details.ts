@@ -12,7 +12,6 @@ import { Group } from '../../models/group';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'GroupDetailsPage',
@@ -22,7 +21,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-group-details',
   templateUrl: 'group-details.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ GroupEditPage, PersonDetailsPage ]
 })
 export class GroupDetailsPage extends BasePage {
@@ -45,7 +44,6 @@ export class GroupDetailsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -135,61 +133,24 @@ export class GroupDetailsPage extends BasePage {
         }
         resolve(this.group);
       }
-      else if (cache && this.hasParameter("group")){
+      else if (this.hasParameter("group")){
         this.group = this.getParameter<Group>("group");
         resolve(this.group);
       }
       else if (this.hasParameter("group_id")) {
         let groupId = this.getParameter<number>("group_id");
         this.api.getGroup(this.organization, groupId).then((group:Group) => {
-          this.group = group;
-          if (event) {
-            event.complete();
-          }
-          resolve(group);
-        });
-      }
-      else if (this.mobile) {
-        this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
-          this.group = group;
-          if (event) {
-            event.complete();
-          }
-          resolve(group);
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          reject(error);
-        });
-      }
-      else {
-        let groupId =
-        this.api.getGroup(this.organization, this.group.id).then((group:Group) => {
-          if (this.mobile) {
-            this.database.saveGroup(this.organization, group).then((saved:any) => {
-              this.group = group;
-              if (event) {
-                event.complete();
-              }
-              resolve(group);
-            });
-          }
-          else {
+          this.storage.saveGroup(this.organization, group).then((saved:any) => {
             this.group = group;
             if (event) {
               event.complete();
             }
             resolve(group);
-          }
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          reject(error);
+          });
         });
+      }
+      else {
+        reject("Group Not Provided");
       }
     });
   }
@@ -198,6 +159,7 @@ export class GroupDetailsPage extends BasePage {
     this.logger.info(this, "editGroup");
     let modal = this.showModal(GroupEditPage, {
       organization: this.organization,
+      user: this.user,
       person: this.user,
       group: this.group
     });
@@ -227,16 +189,16 @@ export class GroupDetailsPage extends BasePage {
     if (this.tablet || this.browser) {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
-        person: _person,
         user: this.user,
+        person: _person,
         modal: true
       });
     }
     else {
       this.showPage(PersonDetailsPage, {
         organization: this.organization,
-        person: _person,
-        user: this.user
+        user: this.user,
+        person: _person
       });
     }
   }

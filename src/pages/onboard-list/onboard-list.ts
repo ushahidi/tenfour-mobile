@@ -14,7 +14,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'OnboardListPage',
@@ -23,7 +22,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
 export class OnboardListPage extends BasePage {
@@ -44,8 +43,7 @@ export class OnboardListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -87,17 +85,10 @@ export class OnboardListPage extends BasePage {
   private loadPerson():Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPerson(this.organization, "me").then((person:Person) => {
-        this.logger.info(this, "loadPerson", person);
-        if (this.mobile) {
-          this.database.savePerson(this.organization, person).then(saved => {
-            this.person = person;
-            resolve(person);
-          });
-        }
-        else {
+        this.storage.savePerson(this.organization, person).then(saved => {
           this.person = person;
           resolve(person);
-        }
+        });
       });
     });
   }
@@ -111,14 +102,9 @@ export class OnboardListPage extends BasePage {
         else {
           this.person.config_people_invited = false;
         }
-        if (this.mobile) {
-          this.database.savePeople(this.organization, people).then((saved:boolean) => {
-            resolve();
-          });
-        }
-        else {
+        this.storage.savePeople(this.organization, people).then((saved:boolean) => {
           resolve();
-        }
+        });
       });
     });
   }
@@ -160,16 +146,14 @@ export class OnboardListPage extends BasePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -181,16 +165,14 @@ export class OnboardListPage extends BasePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -202,16 +184,14 @@ export class OnboardListPage extends BasePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.person.config_people_invited = true;
+        }
+        else {
+          this.person.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -256,7 +236,7 @@ export class OnboardListPage extends BasePage {
       person.config_people_invited = true;
       person.config_profile_reviewed = true;
       person.config_self_test_sent = true;
-      this.database.savePerson(this.organization, this.person).then(saved => {
+      this.storage.savePerson(this.organization, this.person).then(saved => {
         loading.dismiss();
         this.showRootPage(CheckinListPage,{
           organization: this.organization

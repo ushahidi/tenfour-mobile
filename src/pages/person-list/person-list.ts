@@ -13,7 +13,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonListPage',
@@ -22,7 +21,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-list',
   templateUrl: 'person-list.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonDetailsPage, PersonEditPage, PersonInvitePage, PersonImportPage ]
 })
 export class PersonListPage extends BasePage {
@@ -45,7 +44,6 @@ export class PersonListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -140,8 +138,8 @@ export class PersonListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       this.loading = true;
-      if (cache && this.mobile) {
-        this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
+      if (cache) {
+        this.storage.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           if (people && people.length > 1) {
             this.organization.people = people;
             this.loading = false;
@@ -149,6 +147,7 @@ export class PersonListPage extends BasePage {
           }
           else {
             this.loadPeople(false).then((people:Person[]) => {
+              this.organization.people = people;
               resolve(people);
             },
             (error:any) => {
@@ -169,25 +168,23 @@ export class PersonListPage extends BasePage {
       }
       else {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-          if (this.mobile) {
-            this.database.savePeople(this.organization, people).then((saved:boolean) => {
-              this.database.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
+          this.storage.savePeople(this.organization, people).then((saved:boolean) => {
+            this.storage.getPeople(this.organization, null, this.limit, this.offset).then((_people:Person[]) => {
+              if (_people && _people.length > 0) {
                 this.organization.people = _people;
-                this.loading = false;
-                resolve(_people);
-              },
-              (error:any) => {
+              }
+              else {
                 this.organization.people = people;
-                this.loading = false;
-                resolve(people);
-              });
+              }
+              this.loading = false;
+              resolve(people);
+            },
+            (error:any) => {
+              this.organization.people = people;
+              this.loading = false;
+              resolve(people);
             });
-          }
-          else {
-            this.organization.people = people;
-            this.loading = false;
-            resolve(people);
-          }
+          });
         },
         (error:any) => {
           this.organization.people = [];
@@ -207,7 +204,7 @@ export class PersonListPage extends BasePage {
         if (this.mobile) {
           let saves = [];
           for (let person of people) {
-            saves.push(this.database.savePerson(this.organization, person));
+            saves.push(this.storage.savePerson(this.organization, person));
           }
           Promise.all(saves).then(saved => {
             this.organization.people = [...this.organization.people, ...people];
@@ -332,7 +329,7 @@ export class PersonListPage extends BasePage {
   }
 
   private showPerson(person:Person, event:any=null) {
-    this.logger.info(this, "showPerson");
+    this.logger.info(this, "showPerson", person);
     if (this.platform.width() > this.WIDTH_LARGE) {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
@@ -358,9 +355,9 @@ export class PersonListPage extends BasePage {
     this.api.deletePerson(this.organization, person).then((deleted:any) => {
       if (this.mobile) {
         let removes = [];
-        removes.push(this.database.removePerson(this.organization, person));
+        removes.push(this.storage.removePerson(this.organization, person));
         for (let contact of person.contacts) {
-          removes.push(this.database.removeContact(this.organization, contact));
+          removes.push(this.storage.removeContact(this.organization, contact));
         }
         Promise.all(removes).then(removed => {
           let index = this.organization.people.indexOf(person);

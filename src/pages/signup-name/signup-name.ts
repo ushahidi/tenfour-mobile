@@ -8,6 +8,7 @@ import { SignupUrlPage } from '../../pages/signup-url/signup-url';
 import { Organization } from '../../models/organization';
 
 import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupNamePage',
@@ -17,7 +18,7 @@ import { ApiProvider } from '../../providers/api/api';
 @Component({
   selector: 'page-signup-name',
   templateUrl: 'signup-name.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SignupUrlPage ]
 })
 export class SignupNamePage extends BasePage {
@@ -38,7 +39,8 @@ export class SignupNamePage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiProvider) {
+      protected api:ApiProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

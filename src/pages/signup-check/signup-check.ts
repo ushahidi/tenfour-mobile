@@ -10,6 +10,7 @@ import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
 
 import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupCheckPage',
@@ -19,7 +20,7 @@ import { ApiProvider } from '../../providers/api/api';
 @Component({
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SignupOwnerPage ]
 })
 export class SignupCheckPage extends BasePage {
@@ -41,6 +42,7 @@ export class SignupCheckPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected appAvailability:AppAvailability) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

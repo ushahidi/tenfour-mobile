@@ -9,7 +9,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SettingsRolesPage',
@@ -19,7 +18,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-roles',
   templateUrl: 'settings-roles.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class SettingsRolesPage extends BasePage {
@@ -39,8 +38,7 @@ export class SettingsRolesPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 

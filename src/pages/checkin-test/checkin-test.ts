@@ -12,7 +12,6 @@ import { Answer } from '../../models/answer';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinTestPage',
@@ -22,7 +21,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-checkin-test',
   templateUrl: 'checkin-test.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class CheckinTestPage extends BasePage {
@@ -43,8 +42,7 @@ export class CheckinTestPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -162,7 +160,7 @@ export class CheckinTestPage extends BasePage {
     let loading = this.showLoading("Sending...");
     this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       if (this.mobile) {
-        this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
           loading.dismiss();
           this.showToast("Test Check-In sent");
           this.hideModal({

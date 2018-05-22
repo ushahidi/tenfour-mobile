@@ -13,7 +13,6 @@ import { Region } from '../../models/region';
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonEditPage',
@@ -23,7 +22,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiProvider, DatabaseProvider, CameraProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider, CameraProvider ],
   entryComponents:[ ]
 })
 export class PersonEditPage extends BasePage {
@@ -59,7 +58,6 @@ export class PersonEditPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected camera:CameraProvider,
       protected storage:StorageProvider,
       protected events:Events) {
@@ -117,11 +115,11 @@ export class PersonEditPage extends BasePage {
     this.logger.info(this, "cancelEdit");
     if (this.editing && this.mobile) {
       let loading = this.showLoading("Canceling...");
-      this.database.getPerson(this.organization, this.person.id).then((person:Person) => {
+      this.storage.getPerson(this.organization, this.person.id).then((person:Person) => {
         this.person.name = person.name;
         this.person.description = person.description;
         this.person.profile_picture = person.profile_picture;
-        this.database.getContacts(this.organization, person).then((contacts:Contact[]) => {
+        this.storage.getContacts(this.organization, person).then((contacts:Contact[]) => {
           for (let contact of this.person.contacts) {
             let _contact = contacts.filter(_contact => _contact.id == contact.id);
             if (_contact && _contact.length > 0) {
@@ -153,20 +151,12 @@ export class PersonEditPage extends BasePage {
         contacts.push(this.saveContact(this.organization, person, contact));
       }
       Promise.all(contacts).then((updated:any) => {
-        if (this.mobile) {
-          this.database.savePerson(this.organization, person).then((saved:any) => {
-            loading.dismiss();
-            this.hideModal({
-              person: person
-            });
-          });
-        }
-        else {
+        this.storage.savePerson(this.organization, person).then((saved:any) => {
           loading.dismiss();
           this.hideModal({
             person: person
           });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();
@@ -184,14 +174,9 @@ export class PersonEditPage extends BasePage {
       if (person.id) {
         this.logger.info(this, "savePerson", "Update", person);
         this.api.updatePerson(this.organization, person).then((person:Person) => {
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then((saved:any) => {
-              resolve(person);
-            });
-          }
-          else {
+          this.storage.savePerson(this.organization, person).then((saved:any) => {
             resolve(person);
-          }
+          });
         },
         (error:any) => {
           reject(error);
@@ -201,14 +186,9 @@ export class PersonEditPage extends BasePage {
         this.logger.info(this, "savePerson", "Create", person);
         this.api.createPerson(this.organization, person).then((person:Person) => {
           this.person.id = person.id;
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then((saved:any) => {
-              resolve(person);
-            });
-          }
-          else {
+          this.storage.savePerson(this.organization, person).then((saved:any) => {
             resolve(person);
-          }
+          });
         },
         (error:any) => {
           reject(error);
@@ -226,14 +206,9 @@ export class PersonEditPage extends BasePage {
         }
         if (contact.contact && contact.contact.length > 0) {
           this.api.updateContact(organization, person, contact).then((updated:Contact) => {
-            if (this.mobile) {
-              this.database.saveContact(this.organization, person, updated).then((saved:any) => {
-                resolve(updated);
-              });
-            }
-            else {
+            this.storage.saveContact(this.organization, person, updated).then((saved:any) => {
               resolve(updated);
-            }
+            });
           },
           (error:any) => {
             reject(error);
@@ -251,14 +226,9 @@ export class PersonEditPage extends BasePage {
         if (contact.contact && contact.contact.length > 0) {
           this.api.createContact(organization, person, contact).then((created:Contact) => {
             contact.id = created.id;
-            if (this.mobile) {
-              this.database.saveContact(this.organization, person, created).then((saved:any) => {
-                resolve(created);
-              });
-            }
-            else {
+            this.storage.saveContact(this.organization, person, created).then((saved:any) => {
               resolve(created);
-            }
+            });
           },
           (error:any) => {
             reject(error);
@@ -362,9 +332,9 @@ export class PersonEditPage extends BasePage {
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
             if (this.mobile) {
               let removes = [];
-              removes.push(this.database.removePerson(this.organization, this.person));
+              removes.push(this.storage.removePerson(this.organization, this.person));
               for (let contact of this.person.contacts) {
-                removes.push(this.database.removeContact(this.organization, contact));
+                removes.push(this.storage.removeContact(this.organization, contact));
               }
               Promise.all(removes).then(removed => {
                 loading.dismiss();

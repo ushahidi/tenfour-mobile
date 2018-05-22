@@ -13,7 +13,6 @@ import { Checkin } from '../../models/checkin';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonDetailsPage',
@@ -23,7 +22,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-details',
   templateUrl: 'person-details.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, CheckinDetailsPage ]
 })
 export class PersonDetailsPage extends BasePage {
@@ -50,7 +49,6 @@ export class PersonDetailsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -141,47 +139,25 @@ export class PersonDetailsPage extends BasePage {
 
   protected loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
-          if (contacts && contacts.length > 0) {
-            this.person.contacts = contacts;
-            resolve(this.person);
-          }
-          else {
-            this.loadPerson(false).then((person:Person) => {
-              resolve(person);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadPerson(false).then((person:Person) => {
-            resolve(person);
-          });
-        });
+      if (cache && this.person) {
+        resolve(this.person);
       }
       else if (this.hasParameter("person")){
         this.person = this.getParameter<Person>("person");
-        this.checkins = this.person.checkins;
         resolve(this.person);
       }
-      else if (this.person){
-        this.api.getPerson(this.organization, this.person.id).then((person:Person) => {
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then((saved:boolean) => {
-              this.person = person;
-              this.checkins = person.checkins;
-              resolve(person);
-            });
-          }
-          else {
-            this.person = person;
-            this.checkins = person.checkins;
-            resolve(person);
-          }
+      else if (this.hasParameter("person_id")) {
+        let personId = this.getParameter<number>("person_id");
+        this.api.getPerson(this.organization, personId).then((person:Person) => {
+          this.person = person;
+          resolve(person);
         },
         (error:any) => {
           resolve(null);
         });
+      }
+      else {
+        reject("Person Not Provided");
       }
     });
   }
@@ -189,7 +165,7 @@ export class PersonDetailsPage extends BasePage {
   protected loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       if (this.mobile) {
-        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
           this.checkins = checkins;
           resolve(this.checkins);
         },
@@ -213,7 +189,7 @@ export class PersonDetailsPage extends BasePage {
       if (this.mobile) {
         this.offset = this.offset + this.limit;
         this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
           this.checkins = [...this.checkins, ...checkins];
           if (event) {
             event.complete();
@@ -237,8 +213,8 @@ export class PersonDetailsPage extends BasePage {
     this.logger.info(this, "editPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      person: this.person,
       user: this.user,
+      person: this.person,
       person_id: this.person.id
     });
     modal.onDidDismiss((data:any) => {
@@ -271,7 +247,7 @@ export class PersonDetailsPage extends BasePage {
     let loading = this.showLoading("Inviting...");
     this.api.invitePerson(this.organization, this.person).then((invited:Person) => {
       if (this.mobile) {
-        this.database.savePerson(this.organization, invited).then(saved => {
+        this.storage.savePerson(this.organization, invited).then(saved => {
           this.person = invited;
           loading.dismiss();
           if (this.person.name) {
@@ -333,6 +309,7 @@ export class PersonDetailsPage extends BasePage {
     if (this.platform.width() > this.WIDTH_LARGE) {
       this.showModal(CheckinDetailsPage, {
         organization: this.organization,
+        user: this.user,
         person: this.person,
         checkin: checkin,
         checkin_id: checkin.id,
@@ -342,6 +319,7 @@ export class PersonDetailsPage extends BasePage {
     else {
       this.showPage(CheckinDetailsPage, {
         organization: this.organization,
+        user: this.user,
         person: this.person,
         checkin: checkin,
         checkin_id: checkin.id

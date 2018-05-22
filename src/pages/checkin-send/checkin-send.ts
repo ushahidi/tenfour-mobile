@@ -15,7 +15,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -25,7 +24,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-checkin-send',
   templateUrl: 'checkin-send.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class CheckinSendPage extends BasePage {
@@ -50,8 +49,7 @@ export class CheckinSendPage extends BasePage {
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -203,7 +201,7 @@ export class CheckinSendPage extends BasePage {
       let loading = this.showLoading("Sending...");
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
         if (this.mobile) {
-          this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
             loading.dismiss();
             let recipients = this.checkin.recipientIds().length;
             if (recipients == 1) {

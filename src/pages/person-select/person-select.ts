@@ -10,7 +10,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonSelectPage',
@@ -19,7 +18,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-person-select',
   templateUrl: 'person-select.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class PersonSelectPage extends BasePage {
@@ -43,8 +42,7 @@ export class PersonSelectPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -93,8 +91,8 @@ export class PersonSelectPage extends BasePage {
   private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
+      if (cache) {
+        this.storage.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
           if (people && people.length > 1) {
             this.updatePeople(people);
@@ -115,16 +113,10 @@ export class PersonSelectPage extends BasePage {
       else {
         this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
           this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
-          if (this.mobile) {
-            this.database.savePeople(this.organization, people).then((saved:boolean) => {
-              this.updatePeople(people);
-              resolve(people);
-            });
-          }
-          else {
+          this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.updatePeople(people);
             resolve(people);
-          }
+          });
         },
         (error:any) => {
           this.updatePeople([]);
@@ -173,8 +165,8 @@ export class PersonSelectPage extends BasePage {
   private loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getGroups(this.organization).then((groups:Group[]) => {
+      if (cache) {
+        this.storage.getGroups(this.organization).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "Database", groups);
           if (groups && groups.length > 0) {
             this.updateGroups(groups);
@@ -195,16 +187,10 @@ export class PersonSelectPage extends BasePage {
       else {
         this.api.getGroups(this.organization).then((groups:Group[]) => {
           this.logger.info(this, "loadGroups", "API", groups);
-          if (this.mobile) {
-            this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
-              this.updateGroups(groups);
-              resolve(groups);
-            });
-          }
-          else {
+          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
             this.updateGroups(groups);
             resolve(groups);
-          }
+          });
         },
         (error:any) => {
           this.updateGroups([]);

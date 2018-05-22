@@ -11,7 +11,6 @@ import { Person } from '../../models/person';
 import { Group } from '../../models/group';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
@@ -21,7 +20,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-group-list',
   templateUrl: 'group-list.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ GroupEditPage, GroupDetailsPage ]
 })
 export class GroupListPage extends BasePage {
@@ -44,7 +43,6 @@ export class GroupListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -132,9 +130,8 @@ export class GroupListPage extends BasePage {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.mobile) {
-        this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", "Database", groups);
+      if (cache) {
+        this.storage.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
           if (groups && groups.length > 0) {
             this.organization.groups = groups;
             resolve(groups);
@@ -151,34 +148,20 @@ export class GroupListPage extends BasePage {
           }
         },
         (error:any) => {
-          this.loadGroups(false).then((groups:Group[]) => {
+          this.organization.groups = [];
+          reject(error);
+        });
+      }
+      else {
+        this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
             this.organization.groups = groups;
             resolve(groups);
           },
           (error:any) => {
-            this.organization.groups = [];
-            reject(error);
-          });
-        });
-      }
-      else {
-        this.api.getGroups(this.organization).then((groups:Group[]) => {
-          if (this.mobile) {
-            this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
-              this.database.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-                this.organization.groups = groups;
-                resolve(groups);
-              },
-              (error:any) => {
-                this.organization.groups = groups;
-                resolve(groups);
-              });
-            });
-          }
-          else {
             this.organization.groups = groups;
             resolve(groups);
-          }
+          });
         },
         (error:any) => {
           this.organization.groups = [];
@@ -194,8 +177,8 @@ export class GroupListPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
         if (this.mobile) {
-          this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
-            this.database.getGroups(this.organization, this.limit, this.offset).then((_groups:Group[]) => {
+          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
+            this.storage.getGroups(this.organization, this.limit, this.offset).then((_groups:Group[]) => {
               this.organization.groups = [...this.organization.groups, ..._groups];
               if (event) {
                 event.complete();
@@ -257,7 +240,7 @@ export class GroupListPage extends BasePage {
     let loading = this.showLoading("Removing...");
     this.api.deleteGroup(this.organization, group).then((deleted:any) => {
       if (this.mobile) {
-        this.database.removeGroup(this.organization, group).then((removed:any) => {
+        this.storage.removeGroup(this.organization, group).then((removed:any) => {
           let index = this.organization.groups.indexOf(group);
           if (index > -1) {
             this.organization.groups.splice(index, 1);

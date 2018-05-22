@@ -16,7 +16,6 @@ import { Notification } from '../../models/notification';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinListPage',
@@ -25,7 +24,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
 })
 export class CheckinListPage extends BasePage {
@@ -53,7 +52,6 @@ export class CheckinListPage extends BasePage {
       protected events:Events,
       protected badge:Badge,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -151,8 +149,8 @@ export class CheckinListPage extends BasePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.mobile) {
-        this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
+      if (cache) {
+        this.storage.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
             this.organization.checkins = checkins;
             this.checkins = this.filterCheckins(checkins);
@@ -181,24 +179,30 @@ export class CheckinListPage extends BasePage {
               }
             }
           }
-          if (this.mobile) {
-            this.database.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-              this.database.getCheckins(this.organization, this.limit, this.offset).then((_checkins:Checkin[]) => {
+          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
+            this.storage.getCheckins(this.organization, this.limit, this.offset).then((_checkins:Checkin[]) => {
+              if (_checkins && _checkins.length > 0) {
                 this.organization.checkins = _checkins;
                 this.checkins = this.filterCheckins(_checkins);
                 resolve(_checkins);
-              },
-              (error:any) => {
-                this.checkins = checkins;
+              }
+              else {
+                this.organization.checkins = checkins;
+                this.checkins = this.filterCheckins(checkins);
                 resolve(checkins);
-              });
+              }
+            },
+            (error:any) => {
+              this.organization.checkins = checkins;
+              this.checkins = checkins;
+              resolve(checkins);
             });
-          }
-          else {
+          },
+          (error:any) => {
             this.organization.checkins = checkins;
-            this.checkins = this.filterCheckins(checkins);
+            this.checkins = checkins;
             resolve(checkins);
-          }
+          });
         },
         (error:any) => {
           this.organization.checkins = [];
@@ -214,18 +218,7 @@ export class CheckinListPage extends BasePage {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-        if (this.mobile) {
-          this.database.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.organization.checkins = [...this.organization.checkins, ...checkins];
-            this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
-            if (event) {
-              event.complete();
-            }
-            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
-            resolve(this.checkins);
-          });
-        }
-        else {
+        this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
           this.organization.checkins = [...this.organization.checkins, ...checkins];
           this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
           if (event) {
@@ -233,14 +226,14 @@ export class CheckinListPage extends BasePage {
           }
           this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
           resolve(this.checkins);
-        }
+        });
       });
     });
   }
 
   private loadWaitingResponse() {
     if (this.mobile) {
-      this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
+      this.storage.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
         this.logger.info(this, "loadWaitingResponse", waiting.length);
         let checkins = [];
         for (let checkin of waiting) {

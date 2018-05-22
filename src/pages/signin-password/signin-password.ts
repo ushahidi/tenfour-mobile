@@ -12,7 +12,6 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SigninPasswordPage',
@@ -22,7 +21,7 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinListPage, OnboardListPage ]
 })
 export class SigninPasswordPage extends BasePage {
@@ -33,6 +32,7 @@ export class SigninPasswordPage extends BasePage {
   organization:Organization = null;
   email:string = null;
   logo:string = "assets/images/dots.png";
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -47,8 +47,7 @@ export class SigninPasswordPage extends BasePage {
       protected actionController:ActionSheetController,
       protected events:Events,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -65,6 +64,7 @@ export class SigninPasswordPage extends BasePage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
+    this.loading = true;
     if (this.password.value && this.password.value.length > 0) {
       let loading = this.showLoading("Logging in...");
       let password = this.password.value;
@@ -83,13 +83,14 @@ export class SigninPasswordPage extends BasePage {
               this.storage.setUser(person)
             ];
             if (this.mobile) {
-              saves.push(this.database.saveOrganization(organization));
-              saves.push(this.database.savePerson(organization, person));
+              saves.push(this.storage.saveOrganization(organization));
+              saves.push(this.storage.savePerson(organization, person));
             }
             Promise.all(saves).then(saved => {
               this.trackLogin(organization, person);
               this.events.publish('user:login');
               loading.dismiss();
+              this.loading = false;
               if (person.name && person.name.length > 0) {
                 this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
               }
@@ -110,6 +111,7 @@ export class SigninPasswordPage extends BasePage {
             },
             (error:any) => {
               this.logger.error(this, "showNext", error);
+              this.loading = false;
               if (person.config_profile_reviewed && person.config_self_test_sent) {
                 this.showRootPage(CheckinListPage, {
                   organization: organization
@@ -127,6 +129,7 @@ export class SigninPasswordPage extends BasePage {
       },
       (error:any) => {
         this.logger.error(this, "showNext", error);
+        this.loading = false;
         loading.dismiss();
         this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
       });

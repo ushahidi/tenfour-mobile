@@ -12,7 +12,6 @@ import { Answer } from '../../models/answer';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { DatabaseProvider } from '../../providers/database/database';
 
 import { ColorPickerComponent } from '../../components/color-picker/color-picker';
 
@@ -24,7 +23,7 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
 @Component({
   selector: 'page-checkin-edit',
   templateUrl: 'checkin-edit.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinSendPage ]
 })
 export class CheckinEditPage extends BasePage {
@@ -47,8 +46,7 @@ export class CheckinEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -139,7 +137,7 @@ export class CheckinEditPage extends BasePage {
           this.initCheckin();
         }
         else if (this.mobile) {
-          this.database.getPerson(this.organization, null, true).then((person:Person) => {
+          this.storage.getPerson(this.organization, null, true).then((person:Person) => {
             this.user = person;
             this.initCheckin();
           });
