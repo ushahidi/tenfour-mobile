@@ -18,6 +18,7 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonEditPage } from '../pages/person-edit/person-edit';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
+import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { PersonInvitePage } from '../pages/person-invite/person-invite';
 import { PersonImportPage } from '../pages/person-import/person-import';
 import { PersonSelectPage } from '../pages/person-select/person-select';
@@ -69,6 +70,8 @@ export class TenFourRoutes {
     { component: CheckinSendPage, name: 'CheckinSendPage', segment: 'checkins/send', defaultHistory: ['CheckinListPage'] },
     { component: CheckinRespondPage, name: 'CheckinRespondPage', segment: 'checkins/respond', defaultHistory: ['CheckinListPage'] },
     { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
+
+    { component: PersonProfilePage, name: 'PersonProfilePage', segment: 'profile' },
 
     { component: PersonListPage, name: 'PersonListPage', segment: 'people' },
     { component: PersonEditPage, name: 'PersonEditPage', segment: 'people/edit', defaultHistory: ['PersonListPage'] },

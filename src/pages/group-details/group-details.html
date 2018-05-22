@@ -6,8 +6,8 @@
       </button>
     </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons right *ngIf="person">
-      <button ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin()" (click)="editGroup($event)">Edit</button>
+    <ion-buttons right *ngIf="user">
+      <button ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="editGroup($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -23,9 +23,9 @@
         <p>{{group.description}}</p>
       </ion-label>
     </ion-item>
-    <ion-item detail-push color="white" tappable (click)="showPerson(_person)" *ngFor="let _person of group.members">
-      <person-avatar item-left [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
-      <h2>{{_person.name}}</h2>
+    <ion-item detail-push color="white" tappable (click)="showPerson(person)" *ngFor="let person of group.members">
+      <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+      <h2>{{person.name}}</h2>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -1,10 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { CountryProvider } from '../../providers/country/country';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
 import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
@@ -12,9 +8,15 @@ import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-pay
 import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Region } from '../../models/region';
 import { Country } from '../../models/country';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
+import { CountryProvider } from '../../providers/country/country';
 
 @IonicPage({
   name: 'SettingsRegionsPage',
@@ -30,7 +32,7 @@ import { Country } from '../../models/country';
 export class SettingsRegionsPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
 
   constructor(
       protected zone:NgZone,
@@ -44,6 +46,7 @@ export class SettingsRegionsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider,
       protected countries:CountryProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -51,10 +54,8 @@ export class SettingsRegionsPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
-    this.loadRegions(true).then((loaded:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
     },
     (error:any) => {
@@ -70,6 +71,63 @@ export class SettingsRegionsPage extends BasePage {
         organization: this.organization.name
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadRegions(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
   }
 
   private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {

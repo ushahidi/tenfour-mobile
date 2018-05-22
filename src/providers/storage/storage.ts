@@ -9,7 +9,7 @@ import { NativeStorage } from '@ionic-native/native-storage';
 import { LoggerProvider } from '../../providers/logger/logger';
 
 import { Organization } from '../../models/organization';
-import { Person } from '../../models/person';
+import { User } from '../../models/user';
 
 @Injectable()
 export class StorageProvider {
@@ -62,39 +62,39 @@ export class StorageProvider {
     });
   }
 
-  public getPerson():Promise<Person> {
+  public getUser():Promise<User> {
     return new Promise((resolve, reject) => {
-      this.get("person").then((data:any) => {
+      this.get("user").then((data:any) => {
         if (data) {
-          let person = new Person(JSON.parse(data));
-          resolve(person);
+          let user = new User(JSON.parse(data));
+          resolve(user);
         }
         else {
-          reject("No Person");
+          reject("No User");
         }
       },
       (error:any) => {
-        reject("No Person");
+        reject("No User");
       });
     });
   }
 
-  public setPerson(person:Person):Promise<boolean> {
+  public setUser(user:User):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.set("person", JSON.stringify(person)).then((saved:any) => {
-        this.logger.info(this, "setPerson", person, "Stored");
+      this.set("user", JSON.stringify(user)).then((saved:any) => {
+        this.logger.info(this, "setUser", user, "Stored");
         resolve(true);
       },
       (error:any) => {
-        this.logger.error(this, "setPerson", person, "Failed", error);
+        this.logger.error(this, "setUser", user, "Failed", error);
         resolve(false);
       });
     });
   }
 
-  public removePerson():Promise<boolean> {
+  public removeUser():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.remove("person").then((removed:any) => {
+      this.remove("user").then((removed:any) => {
         resolve(true);
       },
       (error:any) => {
@@ -106,13 +106,12 @@ export class StorageProvider {
   public set(key:string, value:any):Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
-        this.nativeStorage.setItem(key, value).then(
-          (data:any) => {
-            resolve(data);
-          },
-          (error:any) => {
-            reject(error);
-          });
+        this.nativeStorage.setItem(key, value).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
       }
       else {
         this.webStorage.asPromisable().set(key, value).then((saved:any) => {
@@ -149,13 +148,12 @@ export class StorageProvider {
   public remove(key:string):Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
-        this.nativeStorage.remove(key).then(
-          (removed:any) => {
-            resolve(true);
-          },
-          (error:any) => {
-            reject(error);
-          });
+        this.nativeStorage.remove(key).then((removed:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
       }
       else {
         this.webStorage.asPromisable().remove(key).then((deleted:any) => {

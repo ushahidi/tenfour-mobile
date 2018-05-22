@@ -3,12 +3,12 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { SignupCheckPage } from '../../pages/signup-check/signup-check';
 
 import { Email } from '../../models/email';
 import { Organization } from '../../models/organization';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SignupEmailPage',

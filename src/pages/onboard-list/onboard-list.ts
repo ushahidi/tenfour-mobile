@@ -8,11 +8,13 @@ import { PersonImportPage } from '../../pages/person-import/person-import';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'OnboardListPage',
@@ -21,7 +23,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
 export class OnboardListPage extends BasePage {
@@ -42,6 +44,7 @@ export class OnboardListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

@@ -3,12 +3,14 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonSelectPage',
@@ -41,6 +43,7 @@ export class PersonSelectPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }

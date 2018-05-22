@@ -6,14 +6,15 @@ import { Contacts } from '@ionic-native/contacts';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { CountryProvider } from '../../providers/country/country';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
+
+import { ApiProvider } from '../../providers/api/api';
+import { CountryProvider } from '../../providers/country/country';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonImportPage',

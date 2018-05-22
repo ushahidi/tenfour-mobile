@@ -8,13 +8,15 @@ import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Notification } from '../../models/notification';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinListPage',
@@ -30,9 +32,9 @@ export class CheckinListPage extends BasePage {
 
   filter:string = "all";
   organization:Organization = null;
+  user:User = null;
   checkins:Checkin[] = [];
   selected:Checkin = null;
-  person:Person = null;
   loading:boolean = false;
   limit:number = 5;
   offset:number = 0;
@@ -51,14 +53,13 @@ export class CheckinListPage extends BasePage {
       protected events:Events,
       protected badge:Badge,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected database:DatabaseProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
@@ -90,8 +91,8 @@ export class CheckinListPage extends BasePage {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
-      .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckins(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
@@ -102,6 +103,7 @@ export class CheckinListPage extends BasePage {
         this.loading = false;
       })
       .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
@@ -110,80 +112,37 @@ export class CheckinListPage extends BasePage {
       });
   }
 
-  private loadPerson(cache:boolean=true):Promise<Person> {
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getPerson(this.organization, null, true).then((person:Person) => {
-          if (person) {
-            this.person = person;
-            resolve(person);
-          }
-          else {
-            this.loadPerson(false).then((person:Person) => {
-              resolve(person);
-            },
-            (error:any) => {
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadPerson(false).then((person:Person) => {
-            resolve(person);
-          },
-          (error:any) => {
-            reject(error);
-          });
-        });
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
       }
       else {
-        this.api.getPerson(this.organization, "me").then((person:Person) => {
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then(saved => {
-              this.person = person;
-              resolve(person);
-            },
-            (error:any) => {
-              this.person = person;
-              resolve(person);
-            });
-          }
-          else {
-            this.person = person;
-            resolve(person);
-          }
-        },
-        (error:any) => {
-          reject(error);
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
         });
       }
     });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
+  private loadUser(cache:boolean=true):Promise<User> {
     return new Promise((resolve, reject) => {
-      if (cache) {
-        resolve(this.organization);
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
       }
       else {
-        this.api.getOrganization(this.organization).then((organization:Organization) => {
-          if (this.mobile) {
-            this.database.saveOrganization(this.organization).then(saved => {
-              this.organization = organization;
-              resolve(organization);
-            },
-            (error:any) => {
-              this.organization = organization;
-              resolve(organization);
-            });
-          }
-          else {
-            this.organization = organization;
-            resolve(organization);
-          }
-        },
-        (error:any) => {
-          reject(error);
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
         });
       }
     });
@@ -217,7 +176,7 @@ export class CheckinListPage extends BasePage {
         this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
-              if (this.person && this.person.id == reply.user_id) {
+              if (this.user && this.user.id == reply.user_id) {
                 checkin.replied = true;
               }
             }
@@ -285,7 +244,7 @@ export class CheckinListPage extends BasePage {
         this.logger.info(this, "loadWaitingResponse", waiting.length);
         let checkins = [];
         for (let checkin of waiting) {
-          if (checkin.canRespond(this.person)) {
+          if (checkin.canRespond(this.user)) {
             checkins.push(checkin);
           }
         }
@@ -322,7 +281,7 @@ export class CheckinListPage extends BasePage {
           let badgeNumber = 0;
           if (this.organization && this.organization.checkins) {
             for (let checkin of this.organization.checkins) {
-              if (checkin.canRespond(this.person)) {
+              if (checkin.canRespond(this.user)) {
                 badgeNumber = badgeNumber + 1;
               }
             }
@@ -367,7 +326,7 @@ export class CheckinListPage extends BasePage {
     if (document.body.clientWidth > this.WIDTH_LARGE) {
       // this.showModal(CheckinDetailsPage, {
       //   organization: this.organization,
-      //   person: this.person,
+      //   person: this.user,
       //   checkin: checkin,
       //   checkin_id: checkin.id,
       //   modal: true
@@ -380,7 +339,7 @@ export class CheckinListPage extends BasePage {
     else {
       this.showPage(CheckinDetailsPage, {
         organization: this.organization,
-        person: this.person,
+        person: this.user,
         checkin: checkin,
         checkin_id: checkin.id
       });
@@ -421,7 +380,7 @@ export class CheckinListPage extends BasePage {
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
-      person: this.person
+      person: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "createCheckin", "Modal", data);
@@ -455,7 +414,7 @@ export class CheckinListPage extends BasePage {
         filtered.push(checkin);
       }
       else if (this.filter === "waiting") {
-        if (checkin.canRespond(this.person)) {
+        if (checkin.canRespond(this.user)) {
           filtered.push(checkin);
         }
       }

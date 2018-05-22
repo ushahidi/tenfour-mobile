@@ -13,7 +13,7 @@
 </ion-list>
 <ion-list *ngFor="let answer of checkin.answers">
   <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
-  <ion-item color="white" [attr.detail-push]="reply.user_id == person.id ? 'true' : null" [attr.tappable]="reply.user_id == person.id ? 'true' : null" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)">
+  <ion-item color="white" [attr.detail-push]="reply.user_id == user.id ? 'true' : null" [attr.tappable]="reply.user_id == user.id ? 'true' : null" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)">
     <person-avatar item-left [color]="answer.color" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
     <ion-grid no-padding>
       <ion-row no-padding>

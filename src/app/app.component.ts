@@ -28,6 +28,7 @@ import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
+import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 
@@ -39,6 +40,7 @@ import { StorageProvider } from '../providers/storage/storage';
 
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
+import { User } from '../models/user';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
@@ -60,7 +62,7 @@ export class TenFourApp {
   zone:NgZone = null;
   rootPage:any = SplashScreenPage;
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   tablet:boolean = false;
   mobile:boolean = false;
   phone:boolean = false;
@@ -313,10 +315,10 @@ export class TenFourApp {
       this.storage.getOrganization().then((organization:Organization) => {
         this.logger.info(this, "loadWebApp", "Organization", organization);
         this.organization = organization;
-        this.storage.getPerson().then((person:Person) => {
-          this.logger.info(this, "loadWebApp", "Person", person);
-          if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-            this.person = person;
+        this.storage.getUser().then((user:User) => {
+          this.logger.info(this, "loadWebApp", "User", user);
+          if (user && user.config_profile_reviewed && user.config_self_test_sent) {
+            this.user = user;
             this.logger.info(this, "loadWebApp", "Location", location.hash);
             if (location.hash == "#/checkins") {
               this.showCheckinList();
@@ -334,15 +336,15 @@ export class TenFourApp {
               this.showSettingsList();
             }
             else if (location.hash === "#/profile") {
-              this.showPersonDetails();
+              this.showPersonProfile();
             }
-            else {
+            else if (location.hash == '') {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            this.showOnboardList(person);
+            this.showOnboardList(user);
             resolve(true);
           }
         },
@@ -369,21 +371,21 @@ export class TenFourApp {
           if (organization) {
             this.organization = organization;
             this.logger.info(this, "loadMobileApp", "Organization", this.organization);
-            this.storage.getPerson().then((person:Person) => {
-              this.logger.info(this, "loadMobileApp", "Person", person);
-              if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                this.person = person;
+            this.storage.getUser().then((user:User) => {
+              this.logger.info(this, "loadMobileApp", "User", user);
+              if (user && user.config_profile_reviewed && user.config_self_test_sent) {
+                this.user = user;
                 this.showCheckinList();
                 resolve(true);
               }
               else {
-                this.logger.info(this, "loadMobileApp", "Person", "None");
-                this.showOnboardList(person);
+                this.logger.info(this, "loadMobileApp", "User", "None");
+                this.showOnboardList(user);
                 resolve(true);
               }
             },
             (error:any) => {
-              this.logger.info(this, "loadMobileApp", "Person", "None");
+              this.logger.info(this, "loadMobileApp", "User", "None");
               this.showOnboardList();
               resolve(true);
             });
@@ -468,7 +470,7 @@ export class TenFourApp {
     this.logger.info(this, "loadMenu");
     Promise.all([
       this.loadOrganization(),
-      this.loadPerson()]).then(
+      this.loadUser()]).then(
       (loaded:any) => {
         this.logger.info(this, "loadMenu", "Loaded");
       },
@@ -494,18 +496,18 @@ export class TenFourApp {
     });
   }
 
-  private loadPerson():Promise<Person> {
+  private loadUser():Promise<User> {
     return new Promise((resolve, reject) => {
-      this.storage.getPerson().then((person:Person) => {
-        this.logger.info(this, "loadPerson", person);
+      this.storage.getUser().then((user:User) => {
+        this.logger.info(this, "loadUser", user);
         this.zone.run(() => {
-          this.person = person;
+          this.user = user;
         });
-        resolve(person);
+        resolve(user);
       },
       (error:any) => {
-        this.logger.error(this, "loadPerson", error);
-        this.person = null;
+        this.logger.error(this, "loadUser", error);
+        this.user = null;
         resolve(null);
       });
     });
@@ -523,11 +525,11 @@ export class TenFourApp {
     });
   }
 
-  private showOnboardList(person:Person=null) {
+  private showOnboardList(user:Person=null) {
     this.logger.info(this, "showOnboardList");
     this.nav.setRoot(OnboardListPage, {
       organization: this.organization,
-      person: person
+      user: user
     }).then((loaded:any) => {
       this.logger.info(this, "showOnboardList", "Loaded");
       this.hideSideMenu();
@@ -542,7 +544,7 @@ export class TenFourApp {
     this.logger.info(this, "showCheckinList");
     this.nav.setRoot(CheckinListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showCheckinList", "Loaded");
       this.hideSideMenu();
@@ -557,7 +559,7 @@ export class TenFourApp {
     this.logger.info(this, "showGroupList");
     this.nav.setRoot(GroupListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showGroupList", "Loaded");
       this.hideSideMenu();
@@ -572,8 +574,8 @@ export class TenFourApp {
     this.logger.info(this, "showNotificationList");
     this.nav.setRoot(NotificationListPage, {
       organization: this.organization,
-      person: this.person,
-      notifications: this.person.notifications,
+      user: this.user,
+      notifications: this.user.notifications,
     }).then((loaded:any) => {
       this.logger.info(this, "showNotificationList", "Loaded");
       this.hideSideMenu();
@@ -588,7 +590,7 @@ export class TenFourApp {
     this.logger.info(this, "showPersonList");
     this.nav.setRoot(PersonListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showPersonList", "Loaded");
       this.hideSideMenu();
@@ -603,7 +605,7 @@ export class TenFourApp {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showSettingsList", "Loaded");
       this.hideSideMenu();
@@ -614,22 +616,22 @@ export class TenFourApp {
     });
   }
 
-  private showPersonDetails() {
-    this.logger.info(this, "showPersonDetails");
-    this.nav.setRoot(PersonDetailsPage, {
+  private showPersonProfile() {
+    this.logger.info(this, "showPersonProfile");
+    this.nav.setRoot(PersonProfilePage, {
       organization: this.organization,
-      person: this.person,
-      user: this.person,
+      user: this.user,
+      person: this.user,
+      person_id: this.user.id,
       profile: true,
-      title: "Profile",
-      person_id: this.person.id
+      title: "Profile"
     }).then((loaded:any) => {
-      this.logger.info(this, "showPersonDetails", "Loaded");
+      this.logger.info(this, "showPersonProfile", "Loaded");
       this.hideSideMenu();
       this.hideSplashScreen();
     },
     (error:any) => {
-      this.logger.error(this, "showPersonDetails", error);
+      this.logger.error(this, "showPersonProfile", error);
     });
   }
 
@@ -644,8 +646,8 @@ export class TenFourApp {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...");
     let removes = [
-      this.storage.removePerson(),
-      this.storage.removeOrganization()
+      this.storage.removeOrganization(),
+      this.storage.removeUser()
     ];
     if (this.mobile) {
       removes.push(
@@ -663,7 +665,7 @@ export class TenFourApp {
     }
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
-      this.person = null;
+      this.user = null;
       this.clearBadgeCount();
       this.events.publish('user:logout');
       loading.dismiss();
@@ -761,7 +763,7 @@ export class TenFourApp {
 
   private editReply(reply:Reply, event:any) {
     this.logger.info(this, "editReply");
-    if (reply.user_id == this.person.id) {
+    if (reply.user_id == this.user.id) {
       let modal = this.showModal(CheckinRespondPage, {
         organization: this.organization,
         checkins: [this.checkin],

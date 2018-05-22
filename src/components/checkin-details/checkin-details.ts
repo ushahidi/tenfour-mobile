@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter  } from '@angular/core';
 
-import { Person } from '../../models/person';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 
 @Component({
@@ -13,7 +13,7 @@ export class CheckinDetailsComponent {
   checkin:Checkin;
 
   @Input()
-  person:Person;
+  user:User;
 
   @Input()
   canRespond:boolean = false;

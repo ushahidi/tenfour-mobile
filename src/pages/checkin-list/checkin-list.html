@@ -4,8 +4,8 @@
       <ion-icon name="menu"></ion-icon>
     </button>
     <ion-title>Check-Ins</ion-title>
-    <ion-buttons right *ngIf="person">
-      <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor()" (click)="createCheckin($event)">
+    <ion-buttons right *ngIf="user">
+      <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor()" (click)="createCheckin($event)">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
       </button>
     </ion-buttons>
@@ -32,7 +32,7 @@
             <h2 text-center padding-top margin-top *ngIf="filter == 'all'">There currently are no Check-Ins...</h2>
             <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins waiting response...</h2>
           </ion-item>
-          <checkin-card [checkin]="checkin" [person]="person" [selected]="selected == checkin"
+          <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
                         (cardSelected)="showCheckinDetails(checkin, $event)" (sendSelected)="sendReply(checkin, $event)" (resendSelected)="resendCheckin(checkin, $event)"
                         *ngFor="let checkin of checkins"></checkin-card>
         </ion-list>

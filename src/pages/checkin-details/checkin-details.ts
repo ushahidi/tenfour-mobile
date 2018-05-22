@@ -4,13 +4,15 @@ import { IonicPage, Events, Button, Platform, NavParams, NavController, ViewCont
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 import { Person } from '../../models/person';
 import { Reply } from '../../models/reply';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'CheckinDetailsPage',
@@ -20,7 +22,7 @@ import { Reply } from '../../models/reply';
 @Component({
   selector: 'page-checkin-details',
   templateUrl: 'checkin-details.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider, DatabaseProvider ],
   entryComponents:[ CheckinRespondPage ]
 })
 export class CheckinDetailsPage extends BasePage {
@@ -32,10 +34,9 @@ export class CheckinDetailsPage extends BasePage {
   create:Button;
 
   organization:Organization = null;
+  user:User = null;
 
   checkin:Checkin = null;
-
-  person:Person = null;
 
   modal:boolean = false;
 
@@ -54,22 +55,21 @@ export class CheckinDetailsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected database:DatabaseProvider,
+      protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
     this.checkin = this.getParameter<Checkin>("checkin");
-    this.person = this.getParameter<Person>("person");
     this.modal = this.getParameter<boolean>("modal");
     this.loadUpdates(true);
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    if (this.organization && this.person) {
+    if (this.organization && this.user) {
       this.trackPage({
         organization: this.organization.name,
         checkin: this.checkin.message
@@ -78,21 +78,63 @@ export class CheckinDetailsPage extends BasePage {
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
     this.loading = true;
-    Promise.all([this.loadReplies(cache)]).then(
-      (loaded:any) =>{
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadReplies(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
         if (event) {
           event.complete();
         }
         this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
+        this.logger.info(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
         this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((person:Person) => {
+          this.user = person;
+          resolve(this.user);
+        });
+      }
+    });
   }
 
   private loadReplies(cache:boolean=true):Promise<any> {
@@ -115,7 +157,7 @@ export class CheckinDetailsPage extends BasePage {
       else {
         this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
           for (let reply of checkin.replies) {
-            if (this.person && this.person.id == reply.user_id) {
+            if (this.user && this.user.id == reply.user_id) {
               checkin.replied = true;
             }
           }
@@ -162,7 +204,7 @@ export class CheckinDetailsPage extends BasePage {
 
   private editReply(reply:Reply, event:any) {
     this.logger.info(this, "editReply");
-    if (reply.user_id == this.person.id) {
+    if (reply.user_id == this.user.id) {
       let modal = this.showModal(CheckinRespondPage, {
         organization: this.organization,
         checkins: [this.checkin],

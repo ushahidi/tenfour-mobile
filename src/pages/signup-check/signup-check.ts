@@ -6,10 +6,10 @@ import { AppAvailability } from '@ionic-native/app-availability';
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SignupCheckPage',

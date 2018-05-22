@@ -5,13 +5,15 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonDetailsPage',
@@ -27,8 +29,8 @@ import { Checkin } from '../../models/checkin';
 export class PersonDetailsPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   person:Person = null;
-  user:Person = null;
   title:string = null;
   loading:boolean = false;
   checkins:Checkin[] = [];
@@ -49,19 +51,20 @@ export class PersonDetailsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected database:DatabaseProvider,
+      protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.user = this.getParameter<Person>("user");
     this.title = this.getParameter<string>("title");
     this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
       loading.dismiss();
     });
   }
@@ -76,18 +79,22 @@ export class PersonDetailsPage extends BasePage {
     }
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
+  protected loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
     this.loading = true;
-    return Promise.all([
-      this.loadPerson(cache),
-      this.loadCheckins(cache)]).then(
-      (loaded:any) =>{
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadCheckins(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
         if (event) {
           event.complete();
         }
         this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
         if (event) {
           event.complete();
         }
@@ -96,7 +103,43 @@ export class PersonDetailsPage extends BasePage {
       });
   }
 
-  private loadPerson(cache:boolean=true):Promise<Person> {
+  protected loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  protected loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  protected loadPerson(cache:boolean=true):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (cache && this.mobile) {
         this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
@@ -116,11 +159,17 @@ export class PersonDetailsPage extends BasePage {
           });
         });
       }
-      else {
+      else if (this.hasParameter("person")){
+        this.person = this.getParameter<Person>("person");
+        this.checkins = this.person.checkins;
+        resolve(this.person);
+      }
+      else if (this.person){
         this.api.getPerson(this.organization, this.person.id).then((person:Person) => {
           if (this.mobile) {
             this.database.savePerson(this.organization, person).then((saved:boolean) => {
               this.person = person;
+              this.checkins = person.checkins;
               resolve(person);
             });
           }
@@ -137,7 +186,7 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
+  protected loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       if (this.mobile) {
         this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
@@ -148,14 +197,18 @@ export class PersonDetailsPage extends BasePage {
           resolve([]);
         });
       }
-      else {
+      else if (this.person){
         this.checkins = this.person.checkins;
         resolve(this.person.checkins);
+      }
+      else {
+        this.checkins = [];
+        resolve([]);
       }
     });
   }
 
-  private loadMore(event:any) {
+  protected loadMore(event:any) {
     return new Promise((resolve, reject) => {
       if (this.mobile) {
         this.offset = this.offset + this.limit;
@@ -180,7 +233,7 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private editPerson(event:any) {
+  protected editPerson(event:any) {
     this.logger.info(this, "editPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
@@ -213,7 +266,7 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private invitePerson(event:any) {
+  protected invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
     let loading = this.showLoading("Inviting...");
     this.api.invitePerson(this.organization, this.person).then((invited:Person) => {
@@ -246,14 +299,14 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private phoneContact(contact:Contact) {
+  protected phoneContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
       window.open("tel:" + contact.contact, '_blank');
     }
   }
 
-  private emailContact(contact:Contact) {
+  protected emailContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
       if (this.mobile) {
@@ -275,14 +328,25 @@ export class PersonDetailsPage extends BasePage {
     }
   }
 
-  private showCheckinDetails(checkin:Checkin, event:any=null) {
+  protected showCheckinDetails(checkin:Checkin, event:any=null) {
     this.logger.info(this, "showCheckinDetails", checkin);
-    this.showPage(CheckinDetailsPage, {
-      organization: this.organization,
-      person: this.person,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (this.platform.width() > this.WIDTH_LARGE) {
+      this.showModal(CheckinDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id,
+        modal: true
+      });
+    }
+    else {
+      this.showPage(CheckinDetailsPage, {
+        organization: this.organization,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
 }

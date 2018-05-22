@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-import { Person } from '../../models/person';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 
 import { LoggerProvider } from '../../providers/logger/logger';
@@ -15,7 +15,7 @@ export class CheckinCardComponent {
   checkin:Checkin = null;
 
   @Input()
-  person:Person = null;
+  user:User = null;
 
   @Input()
   selected:boolean = false;

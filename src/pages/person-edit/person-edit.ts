@@ -3,15 +3,17 @@ import { IonicPage, Events, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { CameraProvider } from '../../providers/camera/camera';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
 import { Region } from '../../models/region';
+
+import { ApiProvider } from '../../providers/api/api';
+import { CameraProvider } from '../../providers/camera/camera';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonEditPage',
@@ -21,13 +23,13 @@ import { Region } from '../../models/region';
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, CameraProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class PersonEditPage extends BasePage {
 
   organization:Organization = null;
-  user:Person = null;
+  user:User = null;
   person:Person = null;
   editing:boolean = true;
   profile:boolean = false;
@@ -59,6 +61,7 @@ export class PersonEditPage extends BasePage {
       protected api:ApiProvider,
       protected database:DatabaseProvider,
       protected camera:CameraProvider,
+      protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
@@ -72,7 +75,7 @@ export class PersonEditPage extends BasePage {
     super.ionViewWillEnter();
     this.organization = this.getParameter<Organization>("organization");
     this.person = this.getParameter<Person>("person");
-    this.user = this.getParameter<Person>("user");
+    this.user = this.getParameter<User>("user");
     if (this.person) {
       this.editing = true;
     }

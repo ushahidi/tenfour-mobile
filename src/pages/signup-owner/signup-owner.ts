@@ -5,9 +5,9 @@ import { IonicPage, TextInput,
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupNamePage } from '../../pages/signup-name/signup-name';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SignupOwnerPage',

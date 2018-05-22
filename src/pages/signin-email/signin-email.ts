@@ -4,9 +4,9 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePage } from '../../pages/base-page/base-page';
 import { SigninPasswordPage } from '../../pages/signin-password/signin-password';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SigninEmailPage',

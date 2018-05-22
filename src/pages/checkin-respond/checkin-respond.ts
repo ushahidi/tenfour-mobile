@@ -3,16 +3,18 @@ import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { LocationProvider } from '../../providers/location/location';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Person } from '../../models/person';
 import { Location } from '../../models/location';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
+import { LocationProvider } from '../../providers/location/location';
 
 @IonicPage({
   name: 'CheckinRespondPage',
@@ -33,6 +35,7 @@ export class CheckinRespondPage extends BasePage {
   loading:boolean = false;
 
   organization:Organization = null;
+  user:User = null;
   checkins:Checkin[] = [];
   checkin:Checkin = null;
 
@@ -48,6 +51,7 @@ export class CheckinRespondPage extends BasePage {
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController,
     protected api:ApiProvider,
+    protected storage:StorageProvider,
     protected database:DatabaseProvider,
     protected location:LocationProvider) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -55,42 +59,14 @@ export class CheckinRespondPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.checkins = this.getParameter<Checkin[]>("checkins");
-    this.checkin = this.getParameter<Checkin>("checkin");
-    if (this.checkins && this.checkin) {
-      this.index = this.checkins.indexOf(this.checkin);
-    }
-    else if (this.checkins) {
-      this.index = 0;
-      this.checkin = this.checkins[0];
-    }
-    else {
-      this.index = 0;
-      this.checkins = [this.checkin];
-      this.checkin.reply = this.getParameter<Reply>("reply");
-    }
-    for (let checkin of this.checkins) {
-      if (checkin.reply == null) {
-        checkin.reply = new Reply();
-        checkin.reply.organization_id = this.organization.id;
-        checkin.reply.checkin_id = this.checkin.id;
-      }
-    }
-    this.loadLocation().then((location:Location) => {
-      this.logger.info(this, "Location", location);
-      if (location) {
-        for (let checkin of this.checkins) {
-          if (checkin.reply.location_text == null) {
-            checkin.reply.latitude = location.latitude;
-            checkin.reply.longitude = location.longitude;
-            checkin.reply.location_text = location.address;
-          }
-        }
-      }
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(false).then((finished:any) => {
+      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
+      loading.dismiss();
     },
     (error:any) => {
-      this.logger.error(this, "Location", error);
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
+      loading.dismiss();
     });
   }
 
@@ -103,7 +79,94 @@ export class CheckinRespondPage extends BasePage {
     }
   }
 
-  private loadLocation():Promise<Location> {
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCheckins(cache); })
+      .then(() => { return this.loadLocation(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((person:Person) => {
+          this.user = person;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadCheckins(cache:boolean=true):Promise<Location> {
+    return new Promise((resolve, reject) => {
+      this.checkins = this.getParameter<Checkin[]>("checkins");
+      this.checkin = this.getParameter<Checkin>("checkin");
+      if (this.checkins && this.checkin) {
+        this.index = this.checkins.indexOf(this.checkin);
+      }
+      else if (this.checkins) {
+        this.index = 0;
+        this.checkin = this.checkins[0];
+      }
+      else {
+        this.index = 0;
+        this.checkins = [this.checkin];
+        this.checkin.reply = this.getParameter<Reply>("reply");
+      }
+      for (let checkin of this.checkins) {
+        if (checkin.reply == null) {
+          checkin.reply = new Reply();
+          checkin.reply.organization_id = this.organization.id;
+          checkin.reply.checkin_id = this.checkin.id;
+        }
+      }
+    });
+  }
+
+  private loadLocation(cache:boolean=true):Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadLocation");
       this.location.detectLocation().then((location:Location) => {
@@ -111,10 +174,23 @@ export class CheckinRespondPage extends BasePage {
         this.location.lookupAddress(location).then((address:string) => {
           this.logger.info(this, "loadLocation", address);
           location.address = address;
+          for (let checkin of this.checkins) {
+            if (checkin.reply.location_text == null) {
+              checkin.reply.latitude = location.latitude;
+              checkin.reply.longitude = location.longitude;
+              checkin.reply.location_text = location.address;
+            }
+          }
           resolve(location);
         },
         (error:any) => {
           this.logger.error(this, "loadLocation", error);
+          for (let checkin of this.checkins) {
+            if (checkin.reply.location_text == null) {
+              checkin.reply.latitude = location.latitude;
+              checkin.reply.longitude = location.longitude;
+            }
+          }
           resolve(location);
         });
       },

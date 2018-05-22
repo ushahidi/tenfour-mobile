@@ -5,9 +5,10 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SigninUrlPage',

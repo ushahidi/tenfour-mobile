@@ -4,6 +4,7 @@ import { Column } from '../decorators/column';
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Group } from '../models/group';
 import { Person } from '../models/person';
+import { User } from '../models/user';
 import { Recipient } from '../models/recipient';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
@@ -131,7 +132,7 @@ export class Checkin extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
-  public user:Person = null;
+  public user:User = null;
 
   public answers:Answer[] = [];
 
@@ -186,6 +187,9 @@ export class Checkin extends Model {
   }
 
   canResend(person:Person):boolean {
+    if (person == null) {
+      return false;
+    }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
       if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
         return true;

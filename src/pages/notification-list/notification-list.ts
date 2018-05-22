@@ -4,10 +4,12 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Notification } from '../../models/notification';
 
 import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
@@ -17,13 +19,13 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-notification-list',
   templateUrl: 'notification-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class NotificationListPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   notifications:Notification[] = [];
   loading:boolean = false;
   limit:number = 20;
@@ -42,22 +44,23 @@ export class NotificationListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.notifications = this.getParameter<Notification[]>("notifications");
     this.modal = this.getParameter<boolean>("modal");
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then(updated => {
       loading.dismiss();
+      this.loading = false;
     },
     (error:any) => {
       loading.dismiss();
+      this.loading = false;
     });
   }
 
@@ -75,55 +78,62 @@ export class NotificationListPage extends BasePage {
     this.viewNotifications();
   }
 
-  private close(event:any) {
-    this.hideModal();
-  }
-
   private loadUpdates(cache:boolean=true, event:any=null) {
-    this.loading = true;
-    return Promise.all([this.loadNotifications(cache)]).then(
-      (loaded:any) =>{
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadNotifications(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Done");
         if (event) {
           event.complete();
         }
-        this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
-        this.loading = false;
         this.showToast(error);
       });
   }
 
-  private loadMore(event:any) {
-    this.logger.info(this, "loadMore");
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.offset = this.offset + this.limit;
-        this.logger.info(this, "loadMore", this.offset);
-        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-          this.notifications = [...this.notifications, ...notifications];
-          if (event) {
-            event.complete();
-          }
-          resolve(this.notifications);
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          reject(error);
-          this.showToast(error);
-        });
+      if (cache && this.organization) {
+        resolve(this.organization);
       }
-      else if (event) {
-        event.complete();
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
       }
     });
   }
 
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
   private loadNotifications(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
@@ -171,6 +181,33 @@ export class NotificationListPage extends BasePage {
     });
   }
 
+  private loadMore(event:any) {
+    this.logger.info(this, "loadMore");
+    return new Promise((resolve, reject) => {
+      if (this.mobile) {
+        this.offset = this.offset + this.limit;
+        this.logger.info(this, "loadMore", this.offset);
+        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
+          this.notifications = [...this.notifications, ...notifications];
+          if (event) {
+            event.complete();
+          }
+          resolve(this.notifications);
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          reject(error);
+          this.showToast(error);
+        });
+      }
+      else if (event) {
+        event.complete();
+      }
+    });
+  }
+
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
     if (this.mobile) {
@@ -184,6 +221,10 @@ export class NotificationListPage extends BasePage {
     else {
 
     }
+  }
+
+  private close(event:any) {
+    this.hideModal();
   }
 
 }

@@ -5,13 +5,14 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { StorageProvider } from '../../providers/storage/storage';
-
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SigninPasswordPage',
@@ -79,7 +80,7 @@ export class SigninPasswordPage extends BasePage {
             organization.password = password;
             let saves = [
               this.storage.setOrganization(organization),
-              this.storage.setPerson(person)
+              this.storage.setUser(person)
             ];
             if (this.mobile) {
               saves.push(this.database.saveOrganization(organization));

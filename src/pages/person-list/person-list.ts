@@ -7,11 +7,13 @@ import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'PersonListPage',
@@ -20,13 +22,13 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-person-list',
   templateUrl: 'person-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ PersonDetailsPage, PersonEditPage, PersonInvitePage, PersonImportPage ]
 })
 export class PersonListPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
@@ -43,21 +45,20 @@ export class PersonListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected database:DatabaseProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.loading = true;
     let loading = this.showLoading("Loading...");
-    this.loadPeople(true).then((finished:any) => {
+    this.loadUpdates(true).then((finished:any) => {
       loading.dismiss();
       this.loading = false;
     },
@@ -79,21 +80,60 @@ export class PersonListPage extends BasePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-    return Promise.all([this.loadPeople(cache)]).then(
-      (loaded:any) =>{
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPeople(cache); })
+      .then(() => {
         this.logger.info(this, "loadUpdates", "Done");
         if (event) {
           event.complete();
         }
         this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
         if (event) {
           event.complete();
         }
         this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((person:Person) => {
+          this.user = person;
+          resolve(this.user);
+        });
+      }
+    });
   }
 
   private loadPeople(cache:boolean=true) {
@@ -231,8 +271,8 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      user: this.person,
-      person_id: this.person.id
+      user: this.user,
+      person_id: this.user.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
@@ -255,7 +295,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "invitePerson");
     let modal = this.showModal(PersonInvitePage, {
       organization: this.organization,
-      user: this.person
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
@@ -275,7 +315,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "importPerson");
     let modal = this.showModal(PersonImportPage, {
       organization: this.organization,
-      user: this.person
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
@@ -297,7 +337,7 @@ export class PersonListPage extends BasePage {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
         person: person,
-        user: this.person,
+        user: this.user,
         person_id: person.id,
         modal: true
       });
@@ -306,7 +346,7 @@ export class PersonListPage extends BasePage {
       this.showPage(PersonDetailsPage, {
         organization: this.organization,
         person: person,
-        user: this.person,
+        user: this.user,
         person_id: person.id
       });
     }

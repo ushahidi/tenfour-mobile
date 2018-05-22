@@ -55,6 +55,7 @@ import { SignupPasswordModule } from '../pages/signup-password/signup-password.m
 import { PersonListModule } from '../pages/person-list/person-list.module';
 import { PersonEditModule } from '../pages/person-edit/person-edit.module';
 import { PersonDetailsModule } from '../pages/person-details/person-details.module';
+import { PersonProfileModule } from '../pages/person-profile/person-profile.module';
 import { PersonInviteModule } from '../pages/person-invite/person-invite.module';
 import { PersonImportModule } from '../pages/person-import/person-import.module';
 import { PersonSelectModule } from '../pages/person-select/person-select.module';
@@ -151,6 +152,7 @@ import { CameraProvider } from '../providers/camera/camera';
     PersonListModule,
     PersonEditModule,
     PersonDetailsModule,
+    PersonProfileModule,
     PersonInviteModule,
     PersonImportModule,
     PersonSelectModule,

@@ -6,9 +6,10 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SignupPaymentPage } from '../../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
+
+import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'SignupPlanPage',

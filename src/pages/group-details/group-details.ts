@@ -5,12 +5,14 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { GroupEditPage } from '../../pages/group-edit/group-edit';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'GroupDetailsPage',
@@ -20,14 +22,14 @@ import { Group } from '../../models/group';
 @Component({
   selector: 'page-group-details',
   templateUrl: 'group-details.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
   entryComponents:[ GroupEditPage, PersonDetailsPage ]
 })
 export class GroupDetailsPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   group:Group = null;
-  person:Person = null;
   loading:boolean = false;
   modal:boolean = false;
 
@@ -43,25 +45,23 @@ export class GroupDetailsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected database:DatabaseProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.group = this.getParameter<Group>("group");
     this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
-    this.loadGroup(true).then(loaded => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
     });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    if (this.organization) {
+    if (this.organization && this.group) {
       this.trackPage({
         organization: this.organization.name,
         group: this.group.name
@@ -69,9 +69,87 @@ export class GroupDetailsPage extends BasePage {
     }
   }
 
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => this.loadOrganization(cache))
+      .then(() => this.loadUser(cache))
+      .then(() => this.loadGroup(cache))
+      .then((loaded:any) =>{
+        this.logger.info(this, "loadUpdates", "Done");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
   private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
+      if (cache && this.group) {
+        if (event) {
+          event.complete();
+        }
+        resolve(this.group);
+      }
+      else if (cache && this.hasParameter("group")){
+        this.group = this.getParameter<Group>("group");
+        resolve(this.group);
+      }
+      else if (this.hasParameter("group_id")) {
+        let groupId = this.getParameter<number>("group_id");
+        this.api.getGroup(this.organization, groupId).then((group:Group) => {
+          this.group = group;
+          if (event) {
+            event.complete();
+          }
+          resolve(group);
+        });
+      }
+      else if (this.mobile) {
         this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
           this.group = group;
           if (event) {
@@ -87,6 +165,7 @@ export class GroupDetailsPage extends BasePage {
         });
       }
       else {
+        let groupId =
         this.api.getGroup(this.organization, this.group.id).then((group:Group) => {
           if (this.mobile) {
             this.database.saveGroup(this.organization, group).then((saved:any) => {
@@ -119,7 +198,7 @@ export class GroupDetailsPage extends BasePage {
     this.logger.info(this, "editGroup");
     let modal = this.showModal(GroupEditPage, {
       organization: this.organization,
-      person: this.person,
+      person: this.user,
       group: this.group
     });
     modal.onDidDismiss((data:any) => {
@@ -149,7 +228,7 @@ export class GroupDetailsPage extends BasePage {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
         person: _person,
-        user: this.person,
+        user: this.user,
         modal: true
       });
     }
@@ -157,7 +236,7 @@ export class GroupDetailsPage extends BasePage {
       this.showPage(PersonDetailsPage, {
         organization: this.organization,
         person: _person,
-        user: this.person
+        user: this.user
       });
     }
   }

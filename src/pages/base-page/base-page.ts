@@ -177,6 +177,10 @@ export class BasePage {
     });
   }
 
+  protected hasParameter(param:string):boolean {
+    return this.navParams.get(param) != null;
+  }
+
   protected getParameter<T extends Object>(param:string):T {
     return <T>this.navParams.get(param);
   }

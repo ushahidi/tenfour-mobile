@@ -4,12 +4,13 @@ import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewC
 import { BasePage } from '../../pages/base-page/base-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Token } from '../../models/token';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { DatabaseProvider } from '../../providers/database/database';
 
 @IonicPage({
   name: 'SignupPasswordPage',
@@ -49,6 +50,7 @@ export class SignupPasswordPage extends BasePage {
       protected actionController:ActionSheetController,
       protected events:Events,
       protected api:ApiProvider,
+      protected storage:StorageProvider,
       protected database:DatabaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
