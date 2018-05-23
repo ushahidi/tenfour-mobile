@@ -37,7 +37,6 @@ export class StorageProvider {
     private webstore:WebstoreProvider,
     private database:DatabaseProvider,
     private logger:LoggerProvider) {
-    this.provider = this.webstore;
     this.platform.ready().then((ready) => {
       if (this.platform.is("cordova")) {
         this.provider = this.database;

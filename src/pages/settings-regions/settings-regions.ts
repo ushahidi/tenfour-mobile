@@ -32,6 +32,7 @@ export class SettingsRegionsPage extends BasePage {
 
   organization:Organization = null;
   user:User = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -52,11 +53,14 @@ export class SettingsRegionsPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
+      this.loading = false;
       loading.dismiss();
     },
     (error:any) => {
+      this.loading = false;
       loading.dismiss();
       this.showToast(error);
     });

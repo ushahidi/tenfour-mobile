@@ -20,5 +20,8 @@
       <person-avatar item-left [initials]="country.code" [image]="country.image" [large]="false"></person-avatar>
       <ion-checkbox item-right color="primary" [(ngModel)]="country.selected"></ion-checkbox>
     </ion-item>
+    <div text-center class="spinner" *ngIf="loading == true">
+      <ion-spinner name="ios"></ion-spinner>
+    </div>
   </ion-list>
 </ion-content>
