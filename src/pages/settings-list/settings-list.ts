@@ -76,7 +76,7 @@ export class SettingsListPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }

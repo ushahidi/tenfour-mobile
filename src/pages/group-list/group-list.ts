@@ -53,8 +53,14 @@ export class GroupListPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
+      this.loading = false;
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.loading = false;
       loading.dismiss();
     });
   }
@@ -74,14 +80,15 @@ export class GroupListPage extends BasePage {
       .then(() => this.loadOrganization(cache))
       .then(() => this.loadUser(cache))
       .then(() => this.loadGroups(cache))
-      .then((loaded:any) =>{
-        this.logger.info(this, "loadUpdates", "Done");
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
         this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
@@ -95,7 +102,7 @@ export class GroupListPage extends BasePage {
       if (cache && this.organization) {
         resolve(this.organization);
       }
-      else if (this.hasParameter("organization")){
+      else if (cache && this.hasParameter("organization")){
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
       }
@@ -113,7 +120,7 @@ export class GroupListPage extends BasePage {
       if (cache && this.user) {
         resolve(this.user);
       }
-      else if (this.hasParameter("user")){
+      else if (cache && this.hasParameter("user")){
         this.user = this.getParameter<User>("user");
         resolve(this.user);
       }
@@ -130,30 +137,9 @@ export class GroupListPage extends BasePage {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache) {
-        this.storage.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-          if (groups && groups.length > 0) {
-            this.organization.groups = groups;
-            resolve(groups);
-          }
-          else {
-            this.loadGroups(false).then((groups:Group[]) => {
-              this.organization.groups = groups;
-              resolve(groups);
-            },
-            (error:any) => {
-              this.organization.groups = [];
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.organization.groups = [];
-          reject(error);
-        });
-      }
-      else {
-        this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
+      this.promiseFallback(cache,
+        this.storage.getGroups(this.organization, this.limit, this.offset),
+        this.api.getGroups(this.organization, this.limit, this.offset)).then((groups:Group[]) => {
           this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
             this.organization.groups = groups;
             resolve(groups);
@@ -167,7 +153,6 @@ export class GroupListPage extends BasePage {
           this.organization.groups = [];
           reject(error);
         });
-      }
     });
   }
 
@@ -175,43 +160,18 @@ export class GroupListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.api.getGroups(this.organization, this.limit, this.offset).then((groups:Group[]) => {
-        if (this.mobile) {
+      this.promiseFallback(true,
+        this.storage.getGroups(this.organization, this.limit, this.offset),
+        this.api.getGroups(this.organization, this.limit, this.offset)).then((groups:Group[]) => {
           this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
-            this.storage.getGroups(this.organization, this.limit, this.offset).then((_groups:Group[]) => {
-              this.organization.groups = [...this.organization.groups, ..._groups];
-              if (event) {
-                event.complete();
-              }
-              this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
-              resolve(this.organization.groups);
-            },
-            (error:any) => {
-              this.organization.groups = [...this.organization.groups, ...groups];
-              if (event) {
-                event.complete();
-              }
-              this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
-              resolve(this.organization.groups);
-            });
+            this.organization.groups = [...this.organization.groups, ...groups];
+            if (event) {
+              event.complete();
+            }
+            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
+            resolve(this.organization.groups);
           });
-        }
-        else {
-          this.organization.groups = [...this.organization.groups, ...groups];
-          if (event) {
-            event.complete();
-          }
-          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.groups.length);
-          resolve(this.organization.groups);
-        }
-      },
-      (error:any) => {
-        this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Error", error);
-        if (event) {
-          event.complete();
-        }
-        resolve(this.organization.groups);
-      });
+        });
     });
   }
 

@@ -109,6 +109,7 @@ import { CountryProvider } from '../providers/country/country';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
+import { BadgeProvider } from '../providers/badge/badge';
 
 @NgModule({
   declarations: [
@@ -226,6 +227,7 @@ import { CameraProvider } from '../providers/camera/camera';
     { provide: WebstoreProvider, useClass: WebstoreProvider },
     { provide: LocationProvider, useClass: LocationProvider },
     { provide: CameraProvider, useClass: CameraProvider },
+    { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

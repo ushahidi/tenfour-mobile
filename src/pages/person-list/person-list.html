@@ -20,7 +20,7 @@
   </div>
   <ion-list *ngIf="organization && organization.people">
     <person-row [person]="person" [user]="user" [selected]="selected == person"
-                (rowSelected)="showPerson(person, $event)" (removeSelected)="removePerson(person)"
+                (rowSelected)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
                 *ngFor="let person of organization.people"></person-row>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">

@@ -1,7 +1,5 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
-
 
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { Camera, CameraOptions } from '@ionic-native/camera';

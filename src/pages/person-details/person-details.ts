@@ -32,7 +32,6 @@ export class PersonDetailsPage extends BasePage {
   person:Person = null;
   title:string = null;
   loading:boolean = false;
-  checkins:Checkin[] = [];
   limit:number = 3;
   offset:number = 0;
   modal:boolean = false;
@@ -58,11 +57,14 @@ export class PersonDetailsPage extends BasePage {
     super.ionViewWillEnter();
     this.title = this.getParameter<string>("title");
     this.modal = this.getParameter<boolean>("modal");
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
+      this.loading = false;
       loading.dismiss();
     },
     (error:any) => {
+      this.loading = false;
       loading.dismiss();
     });
   }
@@ -79,24 +81,22 @@ export class PersonDetailsPage extends BasePage {
 
   protected loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
-    this.loading = true;
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadCheckins(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
-        this.loading = false;
       })
-      .catch((error) => {
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
-        this.loading = false;
         this.showToast(error);
       });
   }
@@ -106,7 +106,7 @@ export class PersonDetailsPage extends BasePage {
       if (cache && this.organization) {
         resolve(this.organization);
       }
-      else if (this.hasParameter("organization")){
+      else if (cache && this.hasParameter("organization")){
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
       }
@@ -124,7 +124,7 @@ export class PersonDetailsPage extends BasePage {
       if (cache && this.user) {
         resolve(this.user);
       }
-      else if (this.hasParameter("user")){
+      else if (cache && this.hasParameter("user")){
         this.user = this.getParameter<User>("user");
         resolve(this.user);
       }
@@ -142,15 +142,17 @@ export class PersonDetailsPage extends BasePage {
       if (cache && this.person) {
         resolve(this.person);
       }
-      else if (this.hasParameter("person")){
+      else if (cache && this.hasParameter("person")){
         this.person = this.getParameter<Person>("person");
         resolve(this.person);
       }
       else if (this.hasParameter("person_id")) {
         let personId = this.getParameter<number>("person_id");
-        this.api.getPerson(this.organization, personId).then((person:Person) => {
-          this.person = person;
-          resolve(person);
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, personId),
+          this.api.getPerson(this.organization, personId)).then((person:Person) => {
+            this.person = person;
+            resolve(person);
         },
         (error:any) => {
           resolve(null);
@@ -164,48 +166,41 @@ export class PersonDetailsPage extends BasePage {
 
   protected loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-          this.checkins = checkins;
-          resolve(this.checkins);
-        },
-        (error:any) => {
-          resolve([]);
-        });
-      }
-      else if (this.person){
-        this.checkins = this.person.checkins;
-        resolve(this.person.checkins);
+      if (this.person.groups == null || this.person.groups.length == 0 ||
+          this.person.checkins == null || this.person.checkins.length == 0) {
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, this.person.id),
+          this.api.getPerson(this.organization, this.person.id)).then((person:Person) => {
+            this.person.groups = person.groups;
+            this.person.checkins = person.checkins;
+            resolve(this.person.checkins);
+          },
+          (error:any) => {
+            this.person.groups = [];
+            this.person.checkins = [];
+            resolve([]);
+          });
       }
       else {
-        this.checkins = [];
-        resolve([]);
+        resolve(this.person.checkins);
       }
     });
   }
 
   protected loadMore(event:any) {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.offset = this.offset + this.limit;
-        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-          this.checkins = [...this.checkins, ...checkins];
-          if (event) {
-            event.complete();
-          }
-          resolve(this.checkins);
+      this.offset = this.offset + this.limit;
+      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+      this.promiseFallback(true,
+        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset),
+        this.api.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset)).then((checkins:Checkin[]) => {
+          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Checkins", checkins);
+          this.person.checkins = [...this.person.checkins, ...checkins];
+          resolve(this.person.checkins);
         },
         (error:any) => {
-          if (event) {
-            event.complete();
-          }
           resolve([]);
         });
-      }
-      else {
-        resolve([]);
-      }
     });
   }
 
@@ -215,7 +210,8 @@ export class PersonDetailsPage extends BasePage {
       organization: this.organization,
       user: this.user,
       person: this.person,
-      person_id: this.person.id
+      person_id: this.person.id,
+      modal: true
     });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);

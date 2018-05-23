@@ -414,4 +414,40 @@ export class BasePage {
       .trim();
   }
 
+  protected promiseFallback(cache:boolean, promise1:Promise<any>, promise2:Promise<any>):Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.mobile) {
+        promise1.then((results1:any) => {
+          if (results1 && results1.length > 0) {
+            resolve(results1);
+          }
+          else {
+            promise2.then((results2:any) => {
+              resolve(results2);
+            },
+            (error2:any) => {
+              reject(error2);
+            });
+          }
+        },
+        (error1:any) => {
+          promise2.then((results2:any) => {
+            resolve(results2);
+          },
+          (error2:any) => {
+            reject(error2);
+          });
+        });
+      }
+      else {
+        promise2.then((results2:any) => {
+          resolve(results2);
+        },
+        (error2:any) => {
+          reject(error2);
+        });
+      }
+    });
+  }
+
 }

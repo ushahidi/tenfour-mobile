@@ -67,7 +67,7 @@ export class CheckinDetailsPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    if (this.organization && this.user) {
+    if (this.organization && this.checkin) {
       this.trackPage({
         organization: this.organization.name,
         checkin: this.checkin.message
@@ -84,7 +84,7 @@ export class CheckinDetailsPage extends BasePage {
       .then(() => { return this.loadCheckin(cache); })
       .then(() => { return this.loadReplies(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
@@ -105,7 +105,7 @@ export class CheckinDetailsPage extends BasePage {
       if (cache && this.organization) {
         resolve(this.organization);
       }
-      else if (this.hasParameter("organization")){
+      else if (cache && this.hasParameter("organization")){
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
       }
@@ -123,13 +123,13 @@ export class CheckinDetailsPage extends BasePage {
       if (cache && this.user) {
         resolve(this.user);
       }
-      else if (this.hasParameter("user")){
+      else if (cache && this.hasParameter("user")){
         this.user = this.getParameter<User>("user");
         resolve(this.user);
       }
       else {
-        this.storage.getUser().then((person:Person) => {
-          this.user = person;
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
           resolve(this.user);
         });
       }
@@ -141,26 +141,28 @@ export class CheckinDetailsPage extends BasePage {
       if (cache && this.checkin) {
         resolve(this.checkin);
       }
-      else if (this.hasParameter("checkin")){
+      else if (cache && this.hasParameter("checkin")){
         this.checkin = this.getParameter<Checkin>("checkin");
         resolve(this.checkin);
       }
       else if (this.hasParameter("checkin_id")){
         let checkinId = this.getParameter<number>("checkin_id");
-        this.api.getCheckin(this.organization, checkinId).then((checkin:Checkin) => {
-          for (let reply of checkin.replies) {
-            if (this.user && this.user.id == reply.user_id) {
-              checkin.replied = true;
+        this.promiseFallback(cache,
+          this.storage.getCheckin(this.organization, checkinId),
+          this.api.getCheckin(this.organization, checkinId)).then((checkin:Checkin) => {
+            for (let reply of checkin.replies) {
+              if (this.user && this.user.id == reply.user_id) {
+                checkin.replied = true;
+              }
             }
-          }
-          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-            this.checkin = checkin;
-            resolve(checkin);
+            this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+              this.checkin = checkin;
+              resolve(checkin);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
-        });
       }
       else {
         reject("Checkin Not Provided");
@@ -170,48 +172,16 @@ export class CheckinDetailsPage extends BasePage {
 
   private loadReplies(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
-      if (cache) {
-        this.storage.getReplies(this.organization, this.checkin).then((replies:Reply[]) => {
-          if (replies && replies.length > 0) {
+      this.logger.info(this, "loadReplies");
+      this.promiseFallback(cache,
+        this.storage.getReplies(this.organization, this.checkin),
+        this.api.getReplies(this.organization, this.checkin)).then((replies:Reply[]) => {
+          this.logger.info(this, "loadReplies", replies);
+          this.storage.saveReplies(this.organization,  this.checkin, replies).then((saved:boolean) => {
             this.checkin.replies = replies;
             resolve(replies);
-          }
-          else {
-            this.loadReplies(false).then((replies:Reply[]) => {
-              this.checkin.replies = replies;
-              resolve(replies);
-            },
-            (error:any) => {
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadReplies(false).then((replies:Reply[]) => {
-            this.checkin.replies = replies;
-            resolve(replies);
-          },
-          (error:any) => {
-            reject(error);
           });
         });
-      }
-      else {
-        this.api.getCheckin(this.organization, this.checkin.id).then((checkin:Checkin) => {
-          for (let reply of checkin.replies) {
-            if (this.user && this.user.id == reply.user_id) {
-              checkin.replied = true;
-            }
-          }
-          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-            this.checkin = checkin;
-            resolve(checkin.replies);
-          });
-        },
-        (error:any) => {
-          reject(error);
-        });
-      }
     });
   }
 
@@ -220,7 +190,8 @@ export class CheckinDetailsPage extends BasePage {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin
+      checkin: this.checkin,
+      modal: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "respondCheckin", "Modal", data);
@@ -245,7 +216,8 @@ export class CheckinDetailsPage extends BasePage {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply
+        reply: reply,
+        modal: true
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
@@ -278,7 +250,7 @@ export class CheckinDetailsPage extends BasePage {
   }
 
   private closeModal(event:any) {
-    this.hideModal({});
+    this.hideModal();
   }
 
   private shareCheckin(event:any) {

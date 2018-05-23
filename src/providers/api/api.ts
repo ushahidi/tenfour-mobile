@@ -9,6 +9,7 @@ import { FileTransfer } from '@ionic-native/file-transfer';
 
 import { Token } from '../../models/token';
 import { Email } from '../../models/email';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Organization } from '../../models/organization';
@@ -430,7 +431,6 @@ export class ApiProvider extends HttpProvider {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${id}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then((data:any) => {
-          this.logger.info(this, "getPerson", data);
           if (data && data.person) {
             let person = new Person(data.person);
             person.me = person.hasEmail(token.username);
@@ -627,6 +627,65 @@ export class ApiProvider extends HttpProvider {
           if (data && data.checkins) {
             for (let _checkin of data.checkins) {
               let checkin = new Checkin(_checkin);
+              checkins.push(checkin);
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+
+  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let checkins = [];
+          if (data && data.checkins) {
+            for (let _checkin of data.checkins) {
+              let checkin = new Checkin(_checkin);
+              if (checkin.canRespond(user)) {
+                checkins.push(checkin);
+              }
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getCheckinsForPerson(organization:Organization, person:Person, limit:number=10, offset:number=0):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person.id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          this.logger.info(this, "getCheckinsForPerson", data);
+          let checkins = [];
+          if (data && data.person && data.person.checkins) {
+            this.logger.info(this, "getCheckinsForPerson", "Checkins", data.person.checkins);
+            for (let _checkin of data.person.checkins) {
+              let checkin = new Checkin(_checkin);
+              checkin.user_id = person.id;
+              checkin.user_name = person.name;
+              checkin.user_initials = person.initials;
+              checkin.user_picture = person.profile_picture;
               checkins.push(checkin);
             }
           }
@@ -1079,6 +1138,30 @@ export class ApiProvider extends HttpProvider {
           }
           else {
             reject("Payment Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getReplies(organization:Organization, checkin:Checkin):Promise<Reply[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.checkin && data.checkin.replies) {
+            let checkin = new Checkin(data.checkin);
+            resolve(checkin.replies);
+          }
+          else {
+            reject("Checkin Not Found");
           }
         },
         (error:any) => {

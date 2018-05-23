@@ -83,7 +83,7 @@ export class CheckinSendPage extends BasePage {
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckin(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }

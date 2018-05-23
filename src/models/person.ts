@@ -35,7 +35,6 @@ export class Person extends Model {
         this.checkins = [];
         for (let _checkin of data.checkins) {
           let checkin = new Checkin(_checkin);
-          //TODO verify this is correct logic to re-use person attributes
           checkin.user_id = this.id;
           checkin.user_name = this.name;
           checkin.user_initials = this.initials;

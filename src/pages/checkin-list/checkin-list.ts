@@ -1,8 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, Events, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { Badge } from '@ionic-native/badge';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
@@ -15,6 +13,7 @@ import { Checkin } from '../../models/checkin';
 import { Notification } from '../../models/notification';
 
 import { ApiProvider } from '../../providers/api/api';
+import { BadgeProvider } from '../../providers/badge/badge';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
@@ -24,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
-  providers: [ ApiProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider, BadgeProvider ],
   entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
 })
 export class CheckinListPage extends BasePage {
@@ -50,7 +49,7 @@ export class CheckinListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected events:Events,
-      protected badge:Badge,
+      protected badge:BadgeProvider,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
@@ -94,13 +93,13 @@ export class CheckinListPage extends BasePage {
       .then(() => { return this.loadCheckins(cache); })
       .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
         this.loading = false;
       })
-      .catch((error) => {
+      .catch((error:any) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
@@ -115,7 +114,7 @@ export class CheckinListPage extends BasePage {
       if (cache && this.organization) {
         resolve(this.organization);
       }
-      else if (this.hasParameter("organization")){
+      else if (cache && this.hasParameter("organization")){
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
       }
@@ -133,7 +132,7 @@ export class CheckinListPage extends BasePage {
       if (cache && this.user) {
         resolve(this.user);
       }
-      else if (this.hasParameter("user")){
+      else if (cache && this.hasParameter("user")){
         this.user = this.getParameter<User>("user");
         resolve(this.user);
       }
@@ -149,29 +148,9 @@ export class CheckinListPage extends BasePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache) {
-        this.storage.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-          if (checkins && checkins.length > 0) {
-            this.organization.checkins = checkins;
-            this.checkins = this.filterCheckins(checkins);
-            resolve(this.checkins);
-          }
-          else {
-            this.loadCheckins(false).then((checkins:Checkin[]) => {
-              this.organization.checkins = checkins;
-              this.checkins = this.filterCheckins(checkins);
-              resolve(this.checkins);
-            },
-            (error:any) => {
-              this.organization.checkins = [];
-              this.checkins = [];
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
+      this.promiseFallback(cache,
+        this.storage.getCheckins(this.organization, this.limit, this.offset),
+        this.api.getCheckins(this.organization, this.limit, this.offset)).then((checkins:Checkin[]) => {
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
               if (this.user && this.user.id == reply.user_id) {
@@ -180,28 +159,9 @@ export class CheckinListPage extends BasePage {
             }
           }
           this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.storage.getCheckins(this.organization, this.limit, this.offset).then((_checkins:Checkin[]) => {
-              if (_checkins && _checkins.length > 0) {
-                this.organization.checkins = _checkins;
-                this.checkins = this.filterCheckins(_checkins);
-                resolve(_checkins);
-              }
-              else {
-                this.organization.checkins = checkins;
-                this.checkins = this.filterCheckins(checkins);
-                resolve(checkins);
-              }
-            },
-            (error:any) => {
-              this.organization.checkins = checkins;
-              this.checkins = checkins;
-              resolve(checkins);
-            });
-          },
-          (error:any) => {
             this.organization.checkins = checkins;
-            this.checkins = checkins;
-            resolve(checkins);
+            this.checkins = this.filterCheckins(checkins);
+            resolve(this.checkins);
           });
         },
         (error:any) => {
@@ -209,7 +169,6 @@ export class CheckinListPage extends BasePage {
           this.checkins = [];
           reject(error);
         });
-      }
     });
   }
 
@@ -217,34 +176,38 @@ export class CheckinListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-        this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-          this.organization.checkins = [...this.organization.checkins, ...checkins];
-          this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
-          if (event) {
-            event.complete();
-          }
-          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
-          resolve(this.checkins);
+      this.promiseFallback(true,
+        this.storage.getCheckins(this.organization, this.limit, this.offset),
+        this.api.getCheckins(this.organization, this.limit, this.offset)).then((checkins:Checkin[]) => {
+          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
+            this.organization.checkins = [...this.organization.checkins, ...checkins];
+            this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
+            if (event) {
+              event.complete();
+            }
+            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Loaded", this.organization.checkins.length);
+            resolve(this.checkins);
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Failed", error);
+          reject(error);
         });
-      });
     });
   }
 
   private loadWaitingResponse() {
-    if (this.mobile) {
-      this.storage.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
-        this.logger.info(this, "loadWaitingResponse", waiting.length);
-        let checkins = [];
-        for (let checkin of waiting) {
-          if (checkin.canRespond(this.user)) {
-            checkins.push(checkin);
-          }
-        }
+    this.logger.info(this, "loadWaitingResponse");
+    this.promiseFallback(true,
+      this.storage.getCheckinsWaiting(this.organization, this.user, 25),
+      this.api.getCheckinsWaiting(this.organization, this.user, 25)).then((checkins:Checkin[]) => {
         if (checkins.length > 0) {
+          this.logger.info(this, "loadWaitingResponse", checkins.length);
           let modal = this.showModal(CheckinRespondPage, {
             organization: this.organization,
-            checkins: checkins
+            user: this.user,
+            checkins: checkins,
+            modal: true
           });
           modal.onDidDismiss(data => {
             if (data) {
@@ -259,79 +222,53 @@ export class CheckinListPage extends BasePage {
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadWaitingResponse", error);
+        this.logger.info(error, "loadWaitingResponse", error);
       });
-    }
-    else {
-
-    }
   }
 
   private loadBadgeNumber():Promise<number> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        try {
-          let badgeNumber = 0;
-          if (this.organization && this.organization.checkins) {
-            for (let checkin of this.organization.checkins) {
-              if (checkin.canRespond(this.user)) {
-                badgeNumber = badgeNumber + 1;
-              }
-            }
+      let badgeNumber = 0;
+      if (this.organization && this.organization.checkins) {
+        for (let checkin of this.organization.checkins) {
+          if (checkin.canRespond(this.user)) {
+            badgeNumber = badgeNumber + 1;
           }
-          this.logger.info(this, "loadBadgeNumber", badgeNumber);
-          this.badge.requestPermission().then((permission:any) => {
-            this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
-            if (badgeNumber > 0) {
-              this.badge.set(badgeNumber).then((result:any) => {
-                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
-                resolve(badgeNumber);
-              },
-              (error:any) => {
-                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-                resolve(0);
-              });
-            }
-            else {
-              this.badge.clear().then((cleared:boolean) => {
-                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
-                resolve(0);
-              },
-              (error:any) => {
-                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-                resolve(0);
-              });
-            }
-          });
-        }
-        catch(error) {
-          this.logger.error(this, "loadBadgeNumber", "Error", error);
-          resolve(0);
         }
       }
-      else {
-        resolve(0);
-      }
+      this.logger.info(this, "loadBadgeNumber", badgeNumber);
+      this.badge.setBadgeNumber(badgeNumber).then((set:boolean) => {
+        if (set) {
+          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set");
+        }
+        else {
+          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Not Set");
+        }
+        resolve(badgeNumber);
+      });
     });
   }
 
   private showCheckinDetails(checkin:Checkin, event:any=null) {
     if (document.body.clientWidth > this.WIDTH_LARGE) {
-      // this.showModal(CheckinDetailsPage, {
-      //   organization: this.organization,
-      //   person: this.user,
-      //   checkin: checkin,
-      //   checkin_id: checkin.id,
-      //   modal: true
-      // });
-      // this.selected = checkin;
       this.events.publish('checkin:details', {
         checkin: checkin
+      });
+    }
+    else if (document.body.clientWidth > this.WIDTH_MEDIUM) {
+      this.showModal(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.user,
+        checkin: checkin,
+        checkin_id: checkin.id,
+        modal: true
       });
     }
     else {
       this.showPage(CheckinDetailsPage, {
         organization: this.organization,
+        user: this.user,
         person: this.user,
         checkin: checkin,
         checkin_id: checkin.id
@@ -342,6 +279,7 @@ export class CheckinListPage extends BasePage {
   private sendReply(checkin:Checkin, event:any=null) {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
+      user: this.user,
       checkins: [checkin],
       checkin: checkin
     });
@@ -373,7 +311,7 @@ export class CheckinListPage extends BasePage {
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
-      person: this.user
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "createCheckin", "Modal", data);

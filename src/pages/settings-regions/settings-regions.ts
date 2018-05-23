@@ -82,7 +82,7 @@ export class SettingsRegionsPage extends BasePage {
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadRegions(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }

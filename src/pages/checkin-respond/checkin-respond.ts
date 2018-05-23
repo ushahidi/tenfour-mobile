@@ -86,7 +86,7 @@ export class CheckinRespondPage extends BasePage {
       .then(() => { return this.loadCheckins(cache); })
       .then(() => { return this.loadLocation(cache); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
@@ -130,8 +130,8 @@ export class CheckinRespondPage extends BasePage {
         resolve(this.user);
       }
       else {
-        this.storage.getUser().then((person:Person) => {
-          this.user = person;
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
           resolve(this.user);
         });
       }

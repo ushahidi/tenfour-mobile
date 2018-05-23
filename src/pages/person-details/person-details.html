@@ -56,12 +56,12 @@
       <div item-content class="content">{{person.groupNames()}}</div>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="checkins && checkins.length > 0">
+  <ion-list *ngIf="person && person.checkins && person.checkins.length > 0">
     <ion-list-header>Check-Ins</ion-list-header>
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
-                  (cardSelected)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of checkins"></checkin-card>
+                  (cardSelected)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of person.checkins"></checkin-card>
   </ion-list>
-  <ion-infinite-scroll *ngIf="checkins && checkins.length >= limit" (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll *ngIf="person && person.checkins && person.checkins.length >= limit" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>

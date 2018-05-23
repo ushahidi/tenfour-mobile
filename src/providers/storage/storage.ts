@@ -37,6 +37,7 @@ export class StorageProvider {
     private webstore:WebstoreProvider,
     private database:DatabaseProvider,
     private logger:LoggerProvider) {
+    this.provider = this.webstore;
     this.platform.ready().then((ready) => {
       if (this.platform.is("cordova")) {
         this.provider = this.database;
@@ -357,13 +358,21 @@ export class StorageProvider {
         where["me"] = true;
       }
       this.provider.getModel<Person>(new Person(), where).then((person:Person) => {
-        this.getContacts(organization, person).then((contacts:Contact[]) => {
-          person.contacts = contacts;
+        if (person) {
+          Promise.all([
+            this.getContacts(organization, person),
+            this.getCheckinsForPerson(organization, person)]).then((results:any[]) => {
+              person.contacts = results[0];
+              person.checkins = results[1];
+              resolve(person);
+            },
+            (error:any) => {
+              reject(error);
+            });
+        }
+        else {
           resolve(person);
-        },
-        (error:any) => {
-          reject(error);
-        });
+        }
       },
       (error:any) => {
         reject(error);
@@ -615,7 +624,7 @@ export class StorageProvider {
     });
   }
 
-  public getCheckinsWaiting(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
+  public getCheckinsWaiting(organization:Organization, user:User, limit:number=null, offset:number=null):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       let where = {
         organization_id: organization.id,
@@ -632,12 +641,16 @@ export class StorageProvider {
             let answers = <Answer[]>results[0];
             let replies = <Reply[]>results[1];
             let recipients = <Recipient[]>results[2];
+            let waiting = [];
             for (let checkin of checkins) {
               checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
               checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
               checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
+              if (checkin.canRespond(user)) {
+                waiting.push(checkin);
+              }
             }
-            resolve(checkins);
+            resolve(waiting);
         },
         (error:any) => {
           resolve(checkins);

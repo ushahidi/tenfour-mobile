@@ -73,14 +73,15 @@ export class GroupDetailsPage extends BasePage {
       .then(() => this.loadOrganization(cache))
       .then(() => this.loadUser(cache))
       .then(() => this.loadGroup(cache))
-      .then((loaded:any) =>{
-        this.logger.info(this, "loadUpdates", "Done");
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
         this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
+        this.logger.info(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
@@ -139,14 +140,19 @@ export class GroupDetailsPage extends BasePage {
       }
       else if (this.hasParameter("group_id")) {
         let groupId = this.getParameter<number>("group_id");
-        this.api.getGroup(this.organization, groupId).then((group:Group) => {
-          this.storage.saveGroup(this.organization, group).then((saved:any) => {
-            this.group = group;
-            if (event) {
-              event.complete();
-            }
-            resolve(group);
-          });
+        this.promiseFallback(cache,
+          this.storage.getGroup(this.organization, groupId),
+          this.api.getGroup(this.organization, groupId)).then((group:Group) => {
+            this.storage.saveGroup(this.organization, group).then((saved:any) => {
+              this.group = group;
+              if (event) {
+                event.complete();
+              }
+              resolve(group);
+            });
+        },
+        (error:any) => {
+          reject(error);
         });
       }
       else {
@@ -161,7 +167,8 @@ export class GroupDetailsPage extends BasePage {
       organization: this.organization,
       user: this.user,
       person: this.user,
-      group: this.group
+      group: this.group,
+      modal: true
     });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editGroup", "Modal", data);
@@ -184,13 +191,13 @@ export class GroupDetailsPage extends BasePage {
     });
   }
 
-  private showPerson(_person:Person) {
-    this.logger.info(this, "showPerson", _person);
+  private showPerson(person:Person) {
+    this.logger.info(this, "showPerson", person);
     if (this.tablet || this.browser) {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
         user: this.user,
-        person: _person,
+        person: person,
         modal: true
       });
     }
@@ -198,7 +205,7 @@ export class GroupDetailsPage extends BasePage {
       this.showPage(PersonDetailsPage, {
         organization: this.organization,
         user: this.user,
-        person: _person
+        person: person
       });
     }
   }

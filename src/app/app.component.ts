@@ -1,7 +1,6 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
-import { Badge } from '@ionic-native/badge';
 import { Device } from '@ionic-native/device';
 import { SegmentService } from 'ngx-segment-analytics';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
@@ -52,6 +51,7 @@ import { ApiProvider } from '../providers/api/api';
 import { LoggerProvider } from '../providers/logger/logger';
 import { StorageProvider } from '../providers/storage/storage';
 import { InjectorProvider } from '../providers/injector/injector';
+import { BadgeProvider } from '../providers/badge/badge';
 
 @Component({
   templateUrl: 'app.html'
@@ -93,6 +93,7 @@ export class TenFourApp {
     protected api:ApiProvider,
     protected storage:StorageProvider,
     protected logger:LoggerProvider,
+    protected badge:BadgeProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
     protected loadingController:LoadingController,
@@ -101,7 +102,6 @@ export class TenFourApp {
     protected deeplinks:Deeplinks,
     protected segment:SegmentService,
     protected device:Device,
-    protected badge:Badge,
     protected firebase:Firebase,
     protected screenOrientation:ScreenOrientation) {
     this.zone = _zone;
@@ -718,14 +718,12 @@ export class TenFourApp {
   }
 
   private clearBadgeCount() {
-    if (this.mobile) {
-      this.badge.clear().then((cleared:any) => {
-        this.logger.info(this, "badge", "Cleared", cleared);
-      },
-      (error:any) => {
-        this.logger.error(this, "badge", "Clear Failed", error);
-      });
-    }
+    this.badge.clear().then((cleared:any) => {
+      this.logger.info(this, "badge", "Cleared", cleared);
+    },
+    (error:any) => {
+      this.logger.error(this, "badge", "Clear Failed", error);
+    });
   }
 
   private showCheckinDetails(checkin:Checkin) {
@@ -748,7 +746,8 @@ export class TenFourApp {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply
+        reply: reply,
+        modal: true
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
