@@ -56,6 +56,9 @@
       <div item-content class="content">{{person.groupNames()}}</div>
     </ion-item>
   </ion-list>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
   <ion-list *ngIf="person && person.checkins && person.checkins.length > 0">
     <ion-list-header>Check-Ins</ion-list-header>
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
