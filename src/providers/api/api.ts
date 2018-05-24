@@ -429,7 +429,10 @@ export class ApiProvider extends HttpProvider {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${id}`;
-        let params = { };
+        let params = {
+          history_offset: 0,
+          history_limit: 10
+        };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.person) {
             let person = new Person(data.person);
@@ -674,7 +677,10 @@ export class ApiProvider extends HttpProvider {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person.id}`;
-        let params = { };
+        let params = {
+          history_offset: offset,
+          history_limit: limit
+        };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           this.logger.info(this, "getCheckinsForPerson", data);
           let checkins = [];

@@ -47,6 +47,7 @@ export class Person extends Model {
         this.replies = [];
         for (let _reply of data.replies) {
           let reply = new Reply(_reply);
+          reply.user_id = this.id;
           reply.user_name = this.name;
           reply.user_initials = this.initials;
           reply.user_picture = this.profile_picture;
