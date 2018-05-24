@@ -155,7 +155,7 @@ export class CheckinEditPage extends BasePage {
       user_picture: this.user.profile_picture
     });
     if (this.organization.app_enabled) {
-      this.checkin.send_via = 'apponly';
+      this.checkin.send_via = 'app';
     }
     this.addDefaults();
   }

@@ -7,6 +7,10 @@
       "proxyUrl": "https://api.tenfour.org"
     },
     {
+      "path": "/api.tenfour.local",
+      "proxyUrl": "https://api.tenfour.local"
+    },
+    {
       "path": "/api.dev.tenfour.org",
       "proxyUrl": "https://api.dev.tenfour.org"
     },

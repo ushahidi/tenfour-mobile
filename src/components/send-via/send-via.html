@@ -1,5 +1,10 @@
 <ion-list>
   <ion-list-header>Send Via</ion-list-header>
+  <ion-item color="white">
+    <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+    <ion-label>TenFour App</ion-label>
+    <ion-checkbox [(ngModel)]="app_selected" item-right (ionChange)="onAppSelected($event)"></ion-checkbox>
+  </ion-item>
   <ion-item color="white" *ngIf="email_enabled">
     <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
     <ion-label>Email</ion-label>
@@ -14,10 +19,5 @@
     <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
     <ion-label>Slack</ion-label>
     <ion-checkbox [(ngModel)]="slack_selected" item-right (ionChange)="onSlackChanged($event)"></ion-checkbox>
-  </ion-item>
-  <ion-item color="white">
-    <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-    <ion-label>App Only</ion-label>
-    <ion-checkbox [(ngModel)]="app_selected" item-right (ionChange)="onAppSelected($event)"></ion-checkbox>
   </ion-item>
 </ion-list>

@@ -238,12 +238,6 @@ export class CheckinSendPage extends BasePage {
     }
   }
 
-  private onAppOnly(event:any) {
-    this.logger.info(this, "onAppOnly", event);
-    this.checkin.send_via = 'apponly';
-    this.select.close();
-  }
-
   private showPopover(event:any) {
     this.logger.info(this, "showPopover", event, this.checkin.send_via);
     let popover = this.popoverController.create(SendViaComponent,

@@ -33,7 +33,7 @@ export class ApiProvider extends HttpProvider {
   clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
 
   scope:string = "user";
-  api:string = "https://api.tenfour.org";
+  api:string = "http://api.tenfour.local";
 
   constructor(
     protected device:Device,
