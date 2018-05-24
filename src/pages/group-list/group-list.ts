@@ -68,7 +68,7 @@ export class GroupListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -139,7 +139,7 @@ export class GroupListPage extends BasePage {
       this.offset = 0;
       this.promiseFallback(cache,
         this.storage.getGroups(this.organization, this.limit, this.offset),
-        this.api.getGroups(this.organization, this.limit, this.offset)).then((groups:Group[]) => {
+        this.api.getGroups(this.organization, this.limit, this.offset), 1).then((groups:Group[]) => {
           this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
             this.organization.groups = groups;
             resolve(groups);

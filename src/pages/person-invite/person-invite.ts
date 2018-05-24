@@ -1,8 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { StatusBar } from '@ionic-native/status-bar';
-
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
@@ -42,8 +40,7 @@ export class PersonInvitePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected statusBar:StatusBar) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -56,7 +53,7 @@ export class PersonInvitePage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }

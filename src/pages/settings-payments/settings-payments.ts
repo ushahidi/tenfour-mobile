@@ -26,8 +26,8 @@ export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
   user:User = null;
-  website:string = "https://app.tenfour.org/settings/plan-and-credits";
-  url:SafeResourceUrl = null;
+  url:string = "https://app.tenfour.org/settings/plan-and-credits";
+  iframe:SafeResourceUrl = null;
 
   constructor(
       protected zone:NgZone,
@@ -61,7 +61,7 @@ export class SettingsPaymentsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -129,7 +129,7 @@ export class SettingsPaymentsPage extends BasePage {
       if (this.user && this.user.isOwner()) {
         this.api.getPaymentUrl(this.organization).then((url:string) => {
           this.logger.info(this, "ChargeBee", url);
-          this.url = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+          this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         },
         (error:any) => {
           this.logger.error(this, "ChargeBee", error);

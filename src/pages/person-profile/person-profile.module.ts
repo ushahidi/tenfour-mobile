@@ -10,6 +10,7 @@ import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { TitleizeModule } from '../../pipes/titleize/titleize.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 import { CheckinCardModule } from '../../components/checkin-card/checkin-card.module';
+import { CheckinReplyModule } from '../../components/checkin-reply/checkin-reply.module';
 
 @NgModule({
   declarations: [
@@ -22,6 +23,7 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
     CheckinCardModule,
     PersonEditModule,
     CheckinDetailsModule,
+    CheckinReplyModule,
     IonicPageModule.forChild(PersonProfilePage),
   ],
   exports: [

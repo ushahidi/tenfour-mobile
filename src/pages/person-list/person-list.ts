@@ -69,7 +69,7 @@ export class PersonListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -140,7 +140,7 @@ export class PersonListPage extends BasePage {
       this.offset = 0;
       this.promiseFallback(cache,
         this.storage.getPeople(this.organization, null, this.limit, this.offset),
-        this.api.getPeople(this.organization, this.limit, this.offset)).then((people:Person[]) => {
+        this.api.getPeople(this.organization, this.limit, this.offset), 2).then((people:Person[]) => {
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.organization.people = people;
             resolve(people);
@@ -159,7 +159,7 @@ export class PersonListPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.promiseFallback(true,
         this.storage.getPeople(this.organization, null, this.limit, this.offset),
-        this.api.getPeople(this.organization, this.limit, this.offset)).then((people:Person[]) => {
+        this.api.getPeople(this.organization, this.limit, this.offset), 1).then((people:Person[]) => {
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.organization.people = [...this.organization.people, ...people];
             if (event) {

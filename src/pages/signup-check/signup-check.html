@@ -10,7 +10,7 @@
       <h2>Check your email inbox.</h2>
     </ion-item>
     <ion-item no-lines class="action">
-      <button ion-button block color="primary" *ngIf="mailer" (click)="openMail($event)">Open Mail app</button>
+      <button ion-button block color="primary" *ngIf="canOpenEmail" (click)="openMail($event)">Open Mail App</button>
       <button ion-button block color="secondary" (click)="sendEmail($event)">Resend Confirmation Email</button>
       <!-- <button ion-button block color="secondary" (click)="showNext($event)">Already verified? Skip ahead</button> -->
     </ion-item>

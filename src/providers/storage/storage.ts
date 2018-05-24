@@ -135,6 +135,48 @@ export class StorageProvider {
     });
   }
 
+  // ########## FIREBASE ##########
+
+  public getFirebase():Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.get("firebase").then((data:any) => {
+        if (data) {
+          resolve(data);
+        }
+        else {
+          reject("No Firebase");
+        }
+      },
+      (error:any) => {
+        reject("No Firebase");
+      });
+    });
+  }
+
+  public setFirebase(firebase:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.set("firebase", firebase).then((saved:any) => {
+        this.logger.info(this, "setFirebase", firebase, "Stored");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "setFirebase", firebase, "Failed", error);
+        resolve(false);
+      });
+    });
+  }
+
+  public removeFirebase():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.remove("firebase").then((removed:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
+
   // ########## USER ##########
 
   public getUser():Promise<User> {

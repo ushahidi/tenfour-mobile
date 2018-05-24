@@ -93,7 +93,7 @@ export class PersonEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.person) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name,
         person: this.person.name
       });

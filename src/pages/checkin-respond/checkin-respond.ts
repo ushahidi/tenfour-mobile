@@ -71,7 +71,7 @@ export class CheckinRespondPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -138,7 +138,7 @@ export class CheckinRespondPage extends BasePage {
     });
   }
 
-  private loadCheckins(cache:boolean=true):Promise<Location> {
+  private loadCheckins(cache:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.checkins = this.getParameter<Checkin[]>("checkins");
       this.checkin = this.getParameter<Checkin>("checkin");
@@ -161,6 +161,7 @@ export class CheckinRespondPage extends BasePage {
           checkin.reply.checkin_id = this.checkin.id;
         }
       }
+      resolve(true);
     });
   }
 

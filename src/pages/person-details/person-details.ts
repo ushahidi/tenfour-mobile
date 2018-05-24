@@ -10,6 +10,7 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+import { Reply } from '../../models/reply';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -72,7 +73,7 @@ export class PersonDetailsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.person) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name,
         person: this.person.name
       });
@@ -194,7 +195,7 @@ export class PersonDetailsPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.promiseFallback(true,
         this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset),
-        this.api.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset)).then((checkins:Checkin[]) => {
+        this.api.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
           this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Checkins", checkins);
           this.person.checkins = [...this.person.checkins, ...checkins];
           resolve(this.person.checkins);
@@ -282,22 +283,7 @@ export class PersonDetailsPage extends BasePage {
   protected emailContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
-      if (this.mobile) {
-        this.socialSharing.canShareViaEmail().then(() => {
-          this.socialSharing.shareViaEmail('', '', [contact.contact])
-          .then(() => {
-            this.logger.info(this, "emailContact", contact.contact, "Emailed");
-          })
-          .catch(() => {
-            this.logger.error(this, "emailContact", "Error");
-          });
-        }).catch(() => {
-          this.showToast("Email is not available...");
-        });
-      }
-      else {
-        window.open("mailto:" + contact.contact, '_blank');
-      }
+      this.sharing.sendEmail(contact.contact);
     }
   }
 

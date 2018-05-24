@@ -1,9 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, Loading, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { Sim } from '@ionic-native/sim';
-import { Contacts } from '@ionic-native/contacts';
-
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
@@ -14,7 +11,8 @@ import { Country } from '../../models/country';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { CountryProvider } from '../../providers/country/country';
+import { ContactsProvider } from '../../providers/contacts/contacts';
+import { CountriesProvider } from '../../providers/countries/countries';
 
 @IonicPage({
   name: 'PersonImportPage',
@@ -24,8 +22,7 @@ import { CountryProvider } from '../../providers/country/country';
 @Component({
   selector: 'page-person-import',
   templateUrl: 'person-import.html',
-  providers: [ ApiProvider, StorageProvider, CountryProvider ],
-  entryComponents:[  ]
+  providers: [ ApiProvider, StorageProvider, CountriesProvider, ContactsProvider ]
 })
 export class PersonImportPage extends BasePage {
 
@@ -48,9 +45,8 @@ export class PersonImportPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected countries:CountryProvider,
-      protected contacts:Contacts,
-      protected sim:Sim) {
+      protected countries:CountriesProvider,
+      protected contacts:ContactsProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -73,7 +69,7 @@ export class PersonImportPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -89,26 +85,18 @@ export class PersonImportPage extends BasePage {
       if (loading) {
         loading.setContent("Countries...");
       }
-      this.sim.getSimInfo().then((info:any) => {
-        this.logger.info(this, 'loadCountries', 'SIM', info);
-        this.countries.getCountry(info.countryCode).then((country:Country) => {
-          this.logger.info(this, 'loadCountries', 'Country', country);
-          if (country) {
-            this.countryCode = `+${country.country_code}`;
-          }
-          else {
-            this.countryCode = "+1";
-          }
-          resolve();
-        },
-        (error:any) => {
-          this.logger.error(this, 'loadCountries', 'Country', error);
+      this.countries.getDefaultCountry().then((country:Country) => {
+        this.logger.info(this, 'loadCountries', 'Country', country);
+        if (country) {
+          this.countryCode = `+${country.country_code}`;
+        }
+        else {
           this.countryCode = "+1";
-          resolve();
-        });
+        }
+        resolve();
       },
       (error:any) => {
-        this.logger.error(this, 'loadCountries', 'SIM', error);
+        this.logger.error(this, 'loadCountries', 'Country', error);
         this.countryCode = "+1";
         resolve();
       });
@@ -122,45 +110,17 @@ export class PersonImportPage extends BasePage {
       }
       this.logger.info(this, "loadContacts");
       this.imports = [];
-      let options = {
-        filter : "",
-        multiple:true,
-        desiredFields: [
-          'name',
-          'displayName',
-          'phoneNumbers',
-          'emails',
-          'addresses',
-          'organizations']
-      };
-      this.contacts.find(['*'], options).then((contacts:any[]) => {
-        let sorted = contacts.sort((a, b) => {
-          let givenA = a.name.givenName;
-          let givenB = b.name.givenName;
-          let familyA = a.name.familyName;
-          let familyB = b.name.familyName;
-          let formattedA = a.name.formatted;
-          let formattedB = b.name.formatted;
-          if (familyA < familyB) return -1;
-          if (familyA > familyB) return 1;
-          if (givenA < givenB) return -1;
-          if (givenA > givenB) return 1;
-          if (formattedA < formattedB) return -1;
-          if (formattedA > formattedB) return -1;
-          return 0;
-        });
+      this.contacts.loadContacts().then((contacts:any[]) => {
+        this.imports = contacts;
         if (event) {
           event.complete();
         }
-        this.imports = sorted;
-        resolve(this.imports);
       },
       (error:any) => {
+        this.imports = [];
         if (event) {
           event.complete();
         }
-        this.imports = [];
-        reject(error);
       });
     });
   }

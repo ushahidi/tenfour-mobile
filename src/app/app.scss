@@ -23,8 +23,8 @@
 ion-toolbar {
   button {
     img {
-      width: 35px;
       height: 35px;
+      max-height: 100%;
       &.dots {
 
       }

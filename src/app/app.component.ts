@@ -1,14 +1,6 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
-import { Device } from '@ionic-native/device';
-import { SegmentService } from 'ngx-segment-analytics';
-import { ScreenOrientation } from '@ionic-native/screen-orientation';
-import { Firebase } from '@ionic-native/firebase';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { Deeplinks } from '@ionic-native/deeplinks';
-
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
@@ -26,7 +18,6 @@ import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
-import { PersonDetailsPage } from '../pages/person-details/person-details';
 import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
@@ -46,12 +37,20 @@ import { Notification } from '../models/notification';
 import { Settings } from '../models/settings';
 import { Country } from '../models/country';
 import { Subscription } from '../models/subscription';
+import { Deeplink } from '../models/deeplink';
 
 import { ApiProvider } from '../providers/api/api';
+import { BadgeProvider } from '../providers/badge/badge';
 import { LoggerProvider } from '../providers/logger/logger';
 import { StorageProvider } from '../providers/storage/storage';
 import { InjectorProvider } from '../providers/injector/injector';
-import { BadgeProvider } from '../providers/badge/badge';
+import { AnalyticsProvider } from '../providers/analytics/analytics';
+import { NetworkProvider } from '../providers/network/network';
+import { OrientationProvider } from '../providers/orientation/orientation';
+import { StatusBarProvider } from '../providers/status-bar/status-bar';
+import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
+import { FirebaseProvider } from '../providers/firebase/firebase';
+import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 
 @Component({
   templateUrl: 'app.html'
@@ -67,7 +66,7 @@ export class TenFourApp {
   phone:boolean = false;
   android:boolean = false;
   ios:boolean = false;
-  browser:boolean = false;
+  website:boolean = false;
   desktop:boolean = false;
 
   defaultLogo:string = "assets/images/dots.png";
@@ -88,22 +87,22 @@ export class TenFourApp {
     protected platform:Platform,
     protected events:Events,
     protected injector:Injector,
-    protected statusBar:StatusBar,
-    protected splashScreen:SplashScreen,
     protected api:ApiProvider,
     protected storage:StorageProvider,
     protected logger:LoggerProvider,
     protected badge:BadgeProvider,
+    protected analytics:AnalyticsProvider,
+    protected network:NetworkProvider,
+    protected statusBar:StatusBarProvider,
+    protected splashScreen:SplashScreenProvider,
+    protected orientation:OrientationProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
     protected loadingController:LoadingController,
     protected alertController:AlertController,
     protected menuController:MenuController,
-    protected deeplinks:Deeplinks,
-    protected segment:SegmentService,
-    protected device:Device,
-    protected firebase:Firebase,
-    protected screenOrientation:ScreenOrientation) {
+    protected deeplinks:DeeplinksProvider,
+    protected firebase:FirebaseProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
     this.platform.ready().then((ready) => {
@@ -112,9 +111,9 @@ export class TenFourApp {
           .then(() => this.loadPlatforms())
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
-          .then(() => this.loadDeepLinks())
           .then(() => this.loadAnalytics())
           .then(() => this.loadEvents())
+          .then(() => this.loadDeepLinks())
           .then(() => this.loadNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),
@@ -150,7 +149,7 @@ export class TenFourApp {
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
       this.phone = this.platform.is('ios') || this.platform.is('android');
-      this.browser = this.platform.is('core');
+      this.website = this.platform.is('cordova') == false || this.platform.is('mobileweb');
       this.desktop = this.platform.is('core');
       resolve(true);
     });
@@ -158,16 +157,9 @@ export class TenFourApp {
 
   private loadOrientation():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadOrientation", this.screenOrientation.type);
-        this.screenOrientation.unlock();
-        this.screenOrientation.onChange().subscribe(() => {
-          this.logger.info(this, "Orientation", this.screenOrientation.type);
-        });
-      }
-      else {
-        this.logger.info(this, "loadOrientation", "Ignored");
-      }
+      this.orientation.onChanged().subscribe((type:string) => {
+        this.logger.info(this, "Orientation", type);
+      });
       resolve(true);
     });
   }
@@ -176,15 +168,15 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       if (this.ios) {
         this.logger.info(this, "loadStatusBar", "iOS");
-        this.statusBar.styleDefault();
-        this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#f5f5f1");
+        this.statusBar.setStyle(false);
+        this.statusBar.setOverlaysWebView(false);
+        this.statusBar.setColor("#F5F5F1");
       }
       else if (this.android) {
         this.logger.info(this, "loadStatusBar", "Android");
-        this.statusBar.styleLightContent();
-        this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#000000");
+        this.statusBar.setStyle(true);
+        this.statusBar.setOverlaysWebView(false);
+        this.statusBar.setColor("#000000");
       }
       resolve(true);
     });
@@ -192,51 +184,40 @@ export class TenFourApp {
 
   private loadAnalytics():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
+      this.analytics.initialize().then((loaded:any) => {
         this.logger.info(this, "loadAnalytics", "Loaded");
-        this.segment.ready().then((ready:SegmentService) => {
-          this.logger.info(this, "loadAnalytics", "Ready");
-          this.segment.debug(this.device.isVirtual);
-          resolve(true);
-        });
-      }
-      else {
-        this.logger.info(this, "loadAnalytics", "Ignored");
-        resolve(true);
-      }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadAnalytics", "Failed", error);
+      });
+      resolve(true);
     });
   }
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadDeepLinks", "Loaded");
-        this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
-          (match:any) => {
-            let path = match['$link']['path'];
-            let query = match['$link']['queryString'];
-            let parameters = this.getParameters(query);
-            this.logger.info(this, "loadDeepLinks", "Match", path, query, parameters);
-            if (path === '/organization/email/confirmation/') {
-              this.verifyEmail(parameters['email'], parameters['token']);
-            }
-            else if (path === '/login/email') {
-               //SigninEmailPage
-            }
-            else if (path === '/login/password') {
-               //SigninPasswordPage
-            }
-            else if (path === '/login/invite') {
-               //SignupPasswordPage
-            }
-          },
-          (nomatch:any) => {
-            this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
-          });
-      }
-      else {
-        this.logger.info(this, "loadDeepLinks", "Ignored");
-      }
+      this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
+        this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
+        if (deeplink) {
+          if (deeplink.path === '/organization/email/confirmation/') {
+            let email = deeplink.parameters['email'];
+            let token = deeplink.parameters['token'];
+            this.verifyEmail(email, token);
+          }
+          else if (deeplink.path === '/login/email') {
+             //SigninEmailPage
+          }
+          else if (deeplink.path === '/login/password') {
+             //SigninPasswordPage
+          }
+          else if (deeplink.path === '/login/invite') {
+             //SignupPasswordPage
+          }
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadDeepLinks", "onMatch", error);
+      });
       resolve(true);
     });
   }
@@ -259,31 +240,14 @@ export class TenFourApp {
 
   private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
+      this.firebase.initialize().then((loaded:boolean) => {
         this.logger.info(this, "loadNotifications", "Loaded");
-        this.firebase.getToken().then((token:string) => {
-          this.logger.info(this, "loadNotifications", "getToken", token);
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "loadNotifications", "getToken", error);
-        });
-        this.firebase.subscribe("test").then((data:any) => {
-          this.logger.info(this, "loadNotifications", "subscribe", data);
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "loadNotifications", "subscribe", error);
-        });
-        this.firebase.onNotificationOpen().subscribe((data:any) => {
-          this.logger.info(this, "loadNotifications", "onNotificationOpen", data);
-        },
-        (error:any) => {
-          this.logger.info(this, "loadNotifications", "onNotificationOpen", error);
-        })
-      }
-      else {
-        this.logger.info(this, "loadNotifications", "Ignored");
-      }
-      resolve(true);
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadNotifications", "Failed", error);
+        resolve(false);
+      });
     });
   }
 
@@ -348,9 +312,9 @@ export class TenFourApp {
       this.loadDatastore(models).then((loaded:any) => {
         this.logger.info(this, "loadMobileApp", "Database", loaded);
         this.storage.getOrganization().then((organization:Organization) => {
+          this.logger.info(this, "loadMobileApp", "Organization", this.organization);
           if (organization) {
             this.organization = organization;
-            this.logger.info(this, "loadMobileApp", "Organization", this.organization);
             this.storage.getUser().then((user:User) => {
               this.logger.info(this, "loadMobileApp", "User", user);
               if (user && user.config_profile_reviewed && user.config_self_test_sent) {
@@ -375,6 +339,11 @@ export class TenFourApp {
             this.showSigninUrl();
             resolve(true);
           }
+        },
+        (error:any) => {
+          this.logger.info(this, "loadMobileApp", "Organization", "None");
+          this.showSigninUrl();
+          resolve(true);
         });
       },
       (error:any) => {
@@ -413,36 +382,25 @@ export class TenFourApp {
 
   private loadDatastore(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadDatastore", "Cordova");
-        this.storage.initialize(models).then((loaded:any) => {
-          resolve(loaded);
-        },
-        (error:any) => {
-          reject(error);
-        })
-      }
-      else {
-        this.logger.info(this, "loadDatastore", "Web");
-        resolve([]);
-      }
+      this.logger.info(this, "loadDatastore", "Cordova");
+      this.storage.initialize(models).then((loaded:any) => {
+        resolve(loaded);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
   private resetDatastore():Promise<any> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "resetDatastore");
-      if (this.mobile) {
-        this.storage.reset().then((reset:any) => {
-          resolve(reset);
-        },
-        (error:any) => {
-          reject(error);
-        })
-      }
-      else {
-        resolve();
-      }
+      this.storage.reset().then((reset:any) => {
+        resolve(reset);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
@@ -455,7 +413,7 @@ export class TenFourApp {
         this.logger.info(this, "loadMenu", "Loaded");
       },
       (error:any) => {
-        this.logger.error(this, "loadMenu", error);
+        this.logger.error(this, "loadMenu", "Failed", error);
       });
   }
 
@@ -686,39 +644,31 @@ export class TenFourApp {
     return modal;
   }
 
-  private trackEvent(event:string, properties:any=null) {
-    return this.segment.track(event, properties).then(() => {
-      this.logger.info(this, "Segment", "trackEvent", event);
-    });
-  }
-
-  private getParameters(query:string) {
-    let parameters = {};
-    if (query && query.length > 0) {
-      query.split("&").forEach((parts) => {
-        let items = parts.split("=");
-        if (items && items.length >= 2) {
-          parameters[items[0]] = decodeURIComponent(items[1]);
-        }
-      });
-    }
-    return parameters;
-  }
+  // private getParameters(query:string) {
+  //   let parameters = {};
+  //   if (query && query.length > 0) {
+  //     query.split("&").forEach((parts) => {
+  //       let items = parts.split("=");
+  //       if (items && items.length >= 2) {
+  //         parameters[items[0]] = decodeURIComponent(items[1]);
+  //       }
+  //     });
+  //   }
+  //   return parameters;
+  // }
 
   private hideSplashScreen() {
-    if (this.mobile) {
-      this.splashScreen.hide();
-    }
+    this.splashScreen.hide();
   }
 
   private hideSideMenu() {
-    if (this.tablet == false || this.browser == false) {
+    if (this.tablet == false || this.website == false) {
       this.menuController.close();
     }
   }
 
   private clearBadgeCount() {
-    this.badge.clear().then((cleared:any) => {
+    this.badge.clearBadgeNumber().then((cleared:any) => {
       this.logger.info(this, "badge", "Cleared", cleared);
     },
     (error:any) => {
@@ -768,7 +718,8 @@ export class TenFourApp {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin
+      checkin: this.checkin,
+      modal: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);

@@ -66,7 +66,7 @@ export class CheckinEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.checkin) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name,
         checkin: this.checkin.id
       });
@@ -168,7 +168,7 @@ export class CheckinEditPage extends BasePage {
   }
 
   private showNext() {
-    if (this.tablet || this.browser) {
+    if (this.tablet || this.website) {
       this.showModal(CheckinSendPage, {
         organization: this.organization,
         user: this.user,

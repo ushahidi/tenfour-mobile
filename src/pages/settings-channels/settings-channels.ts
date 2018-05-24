@@ -23,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class SettingsChannelsPage extends BasePage {
 
-  website:string = "https://app.tenfour.org";
+  url:string = "https://app.tenfour.org";
   organization:Organization = null;
   user:User = null;
   help:string = "https://www.tenfour.org/support/configuring-how-to-send-checkins";
@@ -58,7 +58,7 @@ export class SettingsChannelsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }

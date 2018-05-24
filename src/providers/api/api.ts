@@ -892,7 +892,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getNotifications(organization:Organization):Promise<Notification[]> {
+  public getNotifications(organization:Organization, limit:number=20, offset:number=0):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/me`;

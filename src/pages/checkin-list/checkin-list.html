@@ -21,7 +21,7 @@
         <div padding-top padding-left padding-right>
           <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
             <ion-segment-button value="all">All Check-Ins</ion-segment-button>
-            <ion-segment-button value="waiting">Waiting Response</ion-segment-button>
+            <ion-segment-button value="waiting">Waiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
           </ion-segment>
         </div>
         <div text-center class="spinner" *ngIf="loading == true && checkins.length == 0">
@@ -33,7 +33,7 @@
             <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins waiting response...</h2>
           </ion-item>
           <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
-                        (cardSelected)="showCheckinDetails(checkin, $event)" (sendSelected)="sendReply(checkin, $event)" (resendSelected)="resendCheckin(checkin, $event)"
+                        (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)" (resendSelected)="resendCheckin(checkin)"
                         *ngFor="let checkin of checkins"></checkin-card>
         </ion-list>
         <ion-infinite-scroll (ionInfinite)="loadMore($event)">

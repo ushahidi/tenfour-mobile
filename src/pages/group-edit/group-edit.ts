@@ -67,7 +67,7 @@ export class GroupEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.group) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name,
         group: this.group.name
       });

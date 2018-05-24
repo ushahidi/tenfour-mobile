@@ -36,6 +36,7 @@ export class CheckinListPage extends BasePage {
   loading:boolean = false;
   limit:number = 5;
   offset:number = 0;
+  badgeNumber:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -62,7 +63,7 @@ export class CheckinListPage extends BasePage {
     this.loadUpdates(false).then((finished:any) => {
       this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
-      this.loadWaitingResponse();
+      this.loadWaitingResponse(true, this.mobile);
     },
     (error:any) => {
       this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
@@ -78,7 +79,7 @@ export class CheckinListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -91,7 +92,6 @@ export class CheckinListPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -150,7 +150,7 @@ export class CheckinListPage extends BasePage {
       this.offset = 0;
       this.promiseFallback(cache,
         this.storage.getCheckins(this.organization, this.limit, this.offset),
-        this.api.getCheckins(this.organization, this.limit, this.offset)).then((checkins:Checkin[]) => {
+        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
               if (this.user && this.user.id == reply.user_id) {
@@ -178,7 +178,7 @@ export class CheckinListPage extends BasePage {
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.promiseFallback(true,
         this.storage.getCheckins(this.organization, this.limit, this.offset),
-        this.api.getCheckins(this.organization, this.limit, this.offset)).then((checkins:Checkin[]) => {
+        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
           this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
             this.organization.checkins = [...this.organization.checkins, ...checkins];
             this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
@@ -196,60 +196,37 @@ export class CheckinListPage extends BasePage {
     });
   }
 
-  private loadWaitingResponse() {
-    this.logger.info(this, "loadWaitingResponse");
-    this.promiseFallback(true,
-      this.storage.getCheckinsWaiting(this.organization, this.user, 25),
-      this.api.getCheckinsWaiting(this.organization, this.user, 25)).then((checkins:Checkin[]) => {
-        if (checkins.length > 0) {
-          this.logger.info(this, "loadWaitingResponse", checkins.length);
-          let modal = this.showModal(CheckinRespondPage, {
-            organization: this.organization,
-            user: this.user,
-            checkins: checkins,
-            modal: true
-          });
-          modal.onDidDismiss(data => {
-            if (data) {
-              this.loadCheckins(false).then((loaded:any) => {
-                this.loadBadgeNumber();
-              },
-              (error:any) => {
-
-              });
-            }
-          });
-        }
-      },
-      (error:any) => {
-        this.logger.info(error, "loadWaitingResponse", error);
-      });
-  }
-
-  private loadBadgeNumber():Promise<number> {
+  private loadWaitingResponse(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      let badgeNumber = 0;
-      if (this.organization && this.organization.checkins) {
-        for (let checkin of this.organization.checkins) {
-          if (checkin.canRespond(this.user)) {
-            badgeNumber = badgeNumber + 1;
+      this.logger.info(this, "loadWaitingResponse");
+      this.promiseFallback(cache,
+        this.storage.getCheckinsWaiting(this.organization, this.user, 25),
+        this.api.getCheckinsWaiting(this.organization, this.user, 25), 1).then((checkins:Checkin[]) => {
+          if (checkins && checkins.length > 0) {
+            this.logger.info(this, "loadWaitingResponse", checkins.length);
+            this.badgeNumber = checkins.length;
+            this.badge.setBadgeNumber(this.badgeNumber);
+            if (showPopup == true) {
+              let checkin = checkins[0];
+              this.showCheckinRespond(checkin, checkins);
+            }
+            resolve(checkins);
           }
-        }
-      }
-      this.logger.info(this, "loadBadgeNumber", badgeNumber);
-      this.badge.setBadgeNumber(badgeNumber).then((set:boolean) => {
-        if (set) {
-          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set");
-        }
-        else {
-          this.logger.info(this, "loadBadgeNumber", badgeNumber, "Not Set");
-        }
-        resolve(badgeNumber);
-      });
+          else {
+            this.logger.info(this, "loadWaitingResponse", 0);
+            this.badgeNumber = 0;
+            this.badge.clearBadgeNumber();
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.logger.info(error, "loadWaitingResponse", error);
+          resolve([]);
+        });
     });
   }
 
-  private showCheckinDetails(checkin:Checkin, event:any=null) {
+  private showCheckinDetails(checkin:Checkin) {
     if (document.body.clientWidth > this.WIDTH_LARGE) {
       this.events.publish('checkin:details', {
         checkin: checkin
@@ -276,27 +253,35 @@ export class CheckinListPage extends BasePage {
     }
   }
 
-  private sendReply(checkin:Checkin, event:any=null) {
+  private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {
+    this.logger.info(this, "showCheckinRespond", checkin);
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       user: this.user,
-      checkins: [checkin],
-      checkin: checkin
+      checkins: checkins || [checkin],
+      checkin: checkin,
+      modal: true
     });
     modal.onDidDismiss(data => {
-      this.logger.info(this, "sendReply", "Modal", data);
+      this.logger.info(this, "showCheckinRespond", "Modal", data);
       if (data) {
         if (data.canceled) {
-          this.logger.info(this, "sendReply", "Modal", "Canceled");
+          this.logger.info(this, "showCheckinRespond", "Modal", "Canceled");
         }
         else {
-          this.loadCheckins(false);
+          this.loadCheckins(false).then((loaded:any) => {
+            this.logger.info(this, "showCheckinRespond", "loadCheckins", "Loaded");
+            this.loadWaitingResponse(true, false);
+          },
+          (error:any) => {
+            this.logger.info(this, "showCheckinRespond", "loadCheckins", error);
+          });
         }
       }
    });
   }
 
-  private resendCheckin(checkin:Checkin, event:any=null) {
+  private resendCheckin(checkin:Checkin) {
     let loading = this.showLoading("Resending...");
     this.api.resendCheckin(this.organization, checkin).then((checkin:Checkin) => {
       loading.dismiss();
@@ -311,7 +296,8 @@ export class CheckinListPage extends BasePage {
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
-      user: this.user
+      user: this.user,
+      modal: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "createCheckin", "Modal", data);
@@ -320,7 +306,13 @@ export class CheckinListPage extends BasePage {
           this.logger.info(this, "createCheckin", "Modal", "Canceled");
         }
         else {
-          this.loadCheckins(false);
+          this.loadCheckins(false).then((loaded:any) => {
+            this.logger.info(this, "createCheckin", "loadCheckins", "Loaded");
+            this.loadWaitingResponse(true, false);
+          },
+          (error:any) => {
+            this.logger.error(this, "createCheckin", "loadCheckins", error);
+          });
         }
       }
     });
@@ -332,10 +324,19 @@ export class CheckinListPage extends BasePage {
     this.loading = true;
     this.offset = 0;
     this.checkins = [];
-    this.loadCheckins(true).then((filtered:any) => {
-      this.loading = false;
-      loading.dismiss();
-    });
+    if (this.filter === "all") {
+      this.loadCheckins(true).then((filtered:any) => {
+        this.loading = false;
+        loading.dismiss();
+      });
+    }
+    else if (this.filter === "waiting") {
+      this.loadWaitingResponse(true, false).then((checkins:Checkin[]) => {
+        this.checkins = this.filterCheckins(checkins);
+        this.loading = false;
+        loading.dismiss();
+      });
+    }
   }
 
   private filterCheckins(checkins:Checkin[]) {

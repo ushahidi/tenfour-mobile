@@ -61,7 +61,7 @@ export class SignupPasswordPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage();
   }
 
   private createOrganization(event:any) {
@@ -95,7 +95,7 @@ export class SignupPasswordPage extends BasePage {
                 this.storage.savePerson(organization, person)
               ];
               Promise.all(saves).then(saved => {
-                this.trackLogin(organization, person);
+                this.analytics.trackLogin(organization, person);
                 this.events.publish('user:login');
                 loading.dismiss();
                 this.loading = false;

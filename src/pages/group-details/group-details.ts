@@ -60,7 +60,7 @@ export class GroupDetailsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.group) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name,
         group: this.group.name
       });
@@ -193,7 +193,7 @@ export class GroupDetailsPage extends BasePage {
 
   private showPerson(person:Person) {
     this.logger.info(this, "showPerson", person);
-    if (this.tablet || this.browser) {
+    if (this.tablet || this.website) {
       this.showModal(PersonDetailsPage, {
         organization: this.organization,
         user: this.user,

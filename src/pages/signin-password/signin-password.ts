@@ -59,7 +59,7 @@ export class SigninPasswordPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage();
   }
 
   private showNext(event:any) {
@@ -87,7 +87,7 @@ export class SigninPasswordPage extends BasePage {
               saves.push(this.storage.savePerson(organization, person));
             }
             Promise.all(saves).then(saved => {
-              this.trackLogin(organization, person);
+              this.analytics.trackLogin(organization, person);
               this.events.publish('user:login');
               loading.dismiss();
               this.loading = false;

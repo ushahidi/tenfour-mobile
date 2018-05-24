@@ -11,6 +11,7 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+import { Reply } from '../../models/reply';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';

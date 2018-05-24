@@ -14,7 +14,7 @@ export class BadgeProvider {
     private logger:LoggerProvider) {
   }
 
-  public clear():Promise<boolean> {
+  public clearBadgeNumber():Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         return this.badge.clear();

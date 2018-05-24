@@ -106,11 +106,23 @@ import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
 import { WebstoreProvider } from '../providers/webstore/webstore';
 import { DatabaseProvider } from '../providers/database/database';
-import { CountryProvider } from '../providers/country/country';
+import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
 import { BadgeProvider } from '../providers/badge/badge';
+import { AnalyticsProvider } from '../providers/analytics/analytics';
+import { BrowserProvider } from '../providers/browser/browser';
+import { NetworkProvider } from '../providers/network/network';
+import { KeyboardProvider } from '../providers/keyboard/keyboard';
+import { OrientationProvider } from '../providers/orientation/orientation';
+import { SharingProvider } from '../providers/sharing/sharing';
+import { StatusBarProvider } from '../providers/status-bar/status-bar';
+import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
+import { FirebaseProvider } from '../providers/firebase/firebase';
+import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
+import { ContactsProvider } from '../providers/contacts/contacts';
+import { MailerProvider } from '../providers/mailer/mailer';
 
 @NgModule({
   declarations: [
@@ -223,12 +235,24 @@ import { BadgeProvider } from '../providers/badge/badge';
     { provide: Firebase, useClass: Firebase },
     { provide: ApiProvider, useClass: ApiProvider },
     { provide: LoggerProvider, useClass: LoggerProvider },
-    { provide: CountryProvider, useClass: CountryProvider },
+    { provide: CountriesProvider, useClass: CountriesProvider },
     { provide: StorageProvider, useClass: StorageProvider },
     { provide: DatabaseProvider, useClass: DatabaseProvider },
     { provide: WebstoreProvider, useClass: WebstoreProvider },
     { provide: LocationProvider, useClass: LocationProvider },
+    { provide: AnalyticsProvider, useClass: AnalyticsProvider },
+    { provide: BrowserProvider, useClass: BrowserProvider },
     { provide: CameraProvider, useClass: CameraProvider },
+    { provide: NetworkProvider, useClass: NetworkProvider },
+    { provide: KeyboardProvider, useClass: KeyboardProvider },
+    { provide: OrientationProvider, useClass: OrientationProvider },
+    { provide: SharingProvider, useClass: SharingProvider },
+    { provide: StatusBarProvider, useClass: StatusBarProvider },
+    { provide: SplashScreenProvider, useClass: SplashScreenProvider },
+    { provide: FirebaseProvider, useClass: FirebaseProvider },
+    { provide: DeeplinksProvider, useClass: DeeplinksProvider },
+    { provide: ContactsProvider, useClass: ContactsProvider },
+    { provide: MailerProvider, useClass: MailerProvider },
     { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]

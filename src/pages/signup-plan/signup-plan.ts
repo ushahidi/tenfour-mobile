@@ -51,7 +51,7 @@ export class SignupPlanPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage();
   }
 
   private showNext(event:any) {

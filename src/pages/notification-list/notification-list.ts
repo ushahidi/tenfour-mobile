@@ -65,7 +65,7 @@ export class NotificationListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
@@ -132,93 +132,69 @@ export class NotificationListPage extends BasePage {
       }
     });
   }
+  
   private loadNotifications(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.mobile) {
-        this.storage.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-          if (notifications && notifications.length > 0) {
+      this.promiseFallback(cache,
+        this.storage.getNotifications(this.organization, this.limit, this.offset),
+        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
             this.notifications = notifications;
             resolve(notifications);
-          }
-          else {
-            this.loadNotifications(false).then((_notifications:Notification[]) => {
-              this.notifications = _notifications;
-              resolve(_notifications);
-            },
-            (error:any) => {
-              this.notifications = [];
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
-            this.storage.getNotifications(this.organization, this.limit, this.offset).then((_notifications:Notification[]) => {
-              if (_notifications && _notifications.length > 0) {
-                this.notifications = _notifications;
-                resolve(_notifications);
-              }
-              else {
-                this.notifications = notifications;
-                resolve(this.notifications);
-              }
-            },
-            (error:any) => {
-              resolve(notifications);
-            });
+          },
+          (error:any) => {
+            this.notifications = notifications;
+            reject(error);
           });
         },
         (error:any) => {
           this.notifications = [];
           reject(error);
         });
-      }
     });
   }
 
-  private loadMore(event:any) {
+  private loadMore(event:any):Promise<Notification[]> {
     this.logger.info(this, "loadMore");
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.offset = this.offset + this.limit;
-        this.logger.info(this, "loadMore", this.offset);
-        this.storage.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-          this.notifications = [...this.notifications, ...notifications];
-          if (event) {
-            event.complete();
-          }
-          resolve(this.notifications);
+      this.offset = this.offset + this.limit;
+      this.promiseFallback(true,
+        this.storage.getNotifications(this.organization, this.limit, this.offset),
+        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
+            this.notifications = notifications;
+            if (event) {
+              event.complete();
+            }
+            resolve(notifications);
+          },
+          (error:any) => {
+            this.notifications = notifications;
+            if (event) {
+              event.complete();
+            }
+            reject(error);
+          });
         },
         (error:any) => {
           if (event) {
             event.complete();
           }
-          reject(error);
           this.showToast(error);
+          reject(error);
         });
-      }
-      else if (event) {
-        event.complete();
-      }
     });
   }
 
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
-    if (this.mobile) {
-      for (let notification of this.notifications) {
-        notification.viewed_at = new Date();
-      }
-      this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
-        this.logger.info(this, "viewNotifications", "Saved", saved);
-      });
+    for (let notification of this.notifications) {
+      notification.viewed_at = new Date();
     }
-    else {
-
-    }
+    this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
+      this.logger.info(this, "viewNotifications", "Saved", saved);
+    });
   }
 
   private close(event:any) {

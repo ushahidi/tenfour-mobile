@@ -15,7 +15,7 @@ import { Country } from '../../models/country';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { CountryProvider } from '../../providers/country/country';
+import { CountriesProvider } from '../../providers/countries/countries';
 
 @IonicPage({
   name: 'SettingsRegionsPage',
@@ -47,7 +47,7 @@ export class SettingsRegionsPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected countries:CountryProvider) {
+      protected countries:CountriesProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -69,7 +69,7 @@ export class SettingsRegionsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage({
         organization: this.organization.name
       });
     }
