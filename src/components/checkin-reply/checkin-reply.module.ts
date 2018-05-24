@@ -1,24 +1,22 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
-import { CheckinDetailsComponent } from './checkin-details';
+import { CheckinReplyComponent } from './checkin-reply';
 
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
-import { CheckinReplyModule } from '../../components/checkin-reply/checkin-reply.module';
 
 @NgModule({
   declarations: [
-    CheckinDetailsComponent,
+    CheckinReplyComponent,
   ],
   imports: [
     DateTimeModule,
     PersonAvatarModule,
-    CheckinReplyModule,
-    IonicPageModule.forChild(CheckinDetailsComponent),
+    IonicPageModule.forChild(CheckinReplyComponent),
   ],
   exports: [
-    CheckinDetailsComponent
+    CheckinReplyComponent
   ]
 })
-export class CheckinDetailModule {}
+export class CheckinReplyModule {}

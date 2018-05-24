@@ -100,6 +100,7 @@ import { CheckinCardModule } from '../components/checkin-card/checkin-card.modul
 import { CheckinDetailModule } from '../components/checkin-details/checkin-details.module';
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
+import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -125,6 +126,7 @@ import { BadgeProvider } from '../providers/badge/badge';
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,
+    CheckinReplyModule,
     CheckinDetailModule,
     PersonRowModule,
     GroupRowModule,
