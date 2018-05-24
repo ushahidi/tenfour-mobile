@@ -64,7 +64,12 @@
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
                   (cardSelected)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of person.checkins"></checkin-card>
   </ion-list>
-  <ion-infinite-scroll *ngIf="person && person.checkins && person.checkins.length >= limit" (ionInfinite)="loadMore($event)">
+  <ion-list *ngIf="person && person.replies && person.replies.length > 0">
+    <ion-list-header>Responses</ion-list-header>
+    <checkin-reply [reply]="reply" [user]="user"
+      *ngFor="let reply of person.replies"></checkin-reply>
+  </ion-list>
+  <!-- <ion-infinite-scroll *ngIf="person && person.checkins && person.checkins.length >= limit" (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+  </ion-infinite-scroll> -->
 </ion-content>
