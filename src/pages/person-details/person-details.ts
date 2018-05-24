@@ -173,6 +173,7 @@ export class PersonDetailsPage extends BasePage {
           this.api.getPerson(this.organization, this.person.id)).then((person:Person) => {
             this.person.groups = person.groups;
             this.person.checkins = person.checkins;
+            this.person.replies = person.replies;
             resolve(this.person.checkins);
           },
           (error:any) => {
