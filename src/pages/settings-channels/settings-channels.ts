@@ -140,35 +140,4 @@ export class SettingsChannelsPage extends BasePage {
     });
   }
 
-  private onAppOnly(event:any) {
-    this.logger.info(this, "onAppOnly", this.organization.app_enabled);
-    if (this.organization.app_enabled) {
-      this.organization.email_enabled = false;
-      this.organization.sms_enabled = false;
-      this.organization.twitter_enabled = false;
-      this.organization.slack_enabled = false;
-    }
-  }
-
-  private onEmailEnabled(event:any) {
-    this.logger.info(this, "onEmailEnabled", this.organization.email_enabled);
-    if (this.organization.email_enabled) {
-      this.organization.app_enabled = false;
-    }
-  }
-
-  private onSmsEnabled(event:any) {
-    this.logger.info(this, "onSmsEnabled", this.organization.sms_enabled);
-    if (this.organization.sms_enabled) {
-      this.organization.app_enabled = false;
-    }
-  }
-
-  private onSlackEnabled(event:any) {
-    this.logger.info(this, "onSlackEnabled", this.organization.slack_enabled);
-    if (this.organization.slack_enabled) {
-      this.organization.app_enabled = false;
-    }
-  }
-
 }

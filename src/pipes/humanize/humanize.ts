@@ -19,7 +19,10 @@ export class HumanizePipe implements PipeTransform {
       }
       if (value.indexOf("apponly") != -1) {
         pretty.push("App Only");
-      }  
+      }
+      if (value.indexOf("app") != -1) {
+        pretty.push("TenFour App");
+      }
     }
     return pretty.join(", ");
   }

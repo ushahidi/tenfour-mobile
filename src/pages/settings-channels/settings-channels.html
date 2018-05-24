@@ -13,38 +13,38 @@
   <ion-list *ngIf="organization">
     <ion-list-header>How to send Check-Ins</ion-list-header>
     <ion-item color="white">
+      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+      <ion-label>
+        <h2>TenFour App</h2>
+      </ion-label>
+      <ion-toggle disabled [(ngModel)]="organization.app_enabled"></ion-toggle>
+    </ion-item>
+    <ion-item color="white">
       <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
       <ion-label>
         <h2>Email</h2>
       </ion-label>
-      <ion-toggle [(ngModel)]="organization.email_enabled" (ionChange)="onEmailEnabled($event)"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.email_enabled"></ion-toggle>
     </ion-item>
     <ion-item color="white">
       <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
       <ion-label>
         <h2>SMS</h2>
       </ion-label>
-      <ion-toggle [(ngModel)]="organization.sms_enabled" (ionChange)="onSmsEnabled($event)"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.sms_enabled"></ion-toggle>
     </ion-item>
     <ion-item color="white" no-lines>
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
       <ion-label>
         <h2>Slack</h2>
       </ion-label>
-      <ion-toggle [(ngModel)]="organization.slack_enabled" (ionChange)="onSlackEnabled($event)"></ion-toggle>
+      <ion-toggle [(ngModel)]="organization.slack_enabled"></ion-toggle>
     </ion-item>
     <ion-item color="white" class="webhook" [class.hidden]="organization.slack_enabled == false">
       <ion-icon color="white" ios="ios-chatboxes" md="md-chatboxes" item-left *ngIf="organization.slack_enabled"></ion-icon>
       <ion-label *ngIf="organization.slack_enabled">Webhook</ion-label>
       <ion-input type="url" autocorrect="off" autocapitalize="none" placeholder="https://" [(ngModel)]="organization.slack_webhook" *ngIf="organization.slack_enabled"></ion-input>
 
-    </ion-item>
-    <ion-item color="white">
-      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-      <ion-label>
-        <h2>App Only</h2>
-      </ion-label>
-      <ion-toggle [(ngModel)]="organization.app_enabled" (ionChange)="onAppOnly($event)"></ion-toggle>
     </ion-item>
   </ion-list>
   <button ion-button block clear color="primary" (click)="showUrl(help, '_blank', $event)">How to configure channels</button>

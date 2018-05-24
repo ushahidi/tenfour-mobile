@@ -134,7 +134,7 @@ export class CheckinTestPage extends BasePage {
         user_picture: this.user.profile_picture,
         message: "Did you receive this test Check-in?",
         self_test_check_in: true,
-        send_via: 'apponly'
+        send_via: ['app']
       });
       this.checkin.answers = [];
       this.checkin.answers.push(new Answer({
