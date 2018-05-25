@@ -287,6 +287,13 @@ export class PersonDetailsPage extends BasePage {
     }
   }
 
+  protected showAddress(contact:Contact) {
+    if (contact && contact.contact && contact.contact.length > 0) {
+      let url = `https://www.google.com/maps/search/${contact.contact}`;
+      this.showUrl(url);
+    }
+  }
+
   protected showCheckinDetails(checkin:Checkin, event:any=null) {
     this.logger.info(this, "showCheckinDetails", checkin);
     if (this.platform.width() > this.WIDTH_LARGE) {
