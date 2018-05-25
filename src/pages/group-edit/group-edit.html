@@ -28,7 +28,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="group">
-    <ion-list-header>People In This Group</ion-list-header>
+    <ion-list-header>
+      <h2>People In This Group</h2>
+    </ion-list-header>
     <ion-item color="white" tappable (click)="addPerson($event)">
         <ion-label color="primary">Add people</ion-label>
     </ion-item>

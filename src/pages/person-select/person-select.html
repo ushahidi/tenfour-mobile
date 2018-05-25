@@ -3,7 +3,8 @@
     <ion-buttons left>
       <button ion-button color="primary" (click)="cancelSelect($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Add people</ion-title>
+    <ion-title *ngIf="show_people == true">Select People</ion-title>
+    <ion-title *ngIf="show_people == false">Select Groups</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" (click)="doneSelect($event)">Done</button>
     </ion-buttons>
@@ -14,22 +15,29 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="show_groups && organization && organization.groups">
-    <ion-list-header>Groups</ion-list-header>
+    <ion-list-header>
+      <h2>Groups</h2>
+    </ion-list-header>
     <ion-item color="white" *ngFor="let group of organization.groups">
       <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
       <ion-label>{{group.name}}</ion-label>
       <ion-checkbox item-right [(ngModel)]="group.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="organization && organization.people">
-    <ion-list-header>People</ion-list-header>
+  <ion-list *ngIf="show_people && organization && organization.people">
+    <ion-list-header>
+      <h2>People</h2>
+    </ion-list-header>
     <ion-item color="white" *ngFor="let person of organization.people">
       <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
       <ion-label>{{person.name}}</ion-label>
       <ion-checkbox item-right [(ngModel)]="person.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
-  <ion-infinite-scroll (ionInfinite)="loadMore(true, $event)">
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+  <ion-infinite-scroll (ionInfinite)="loadMore(true, $event)" *ngIf="show_people && organization && organization.people">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>

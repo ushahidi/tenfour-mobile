@@ -461,7 +461,8 @@ export class ApiProvider extends HttpProvider {
           name: person.name,
           description: person.description || "",
           person_type: "user",
-          role: person.role || "responder"
+          role: person.role || "responder",
+          groups: person.groupIds()
         };
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
@@ -491,15 +492,17 @@ export class ApiProvider extends HttpProvider {
         let params = {
           name: person.name,
           role: person.role,
-          description: person.description || ""};
-        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
-          params['_input_image'] = person.profile_picture;
-        }
+          description: person.description || "",
+          groups: person.groupIds()
+        };
         if (person.config_self_test_sent) {
           params['config_self_test_sent'] = true;
         }
         if (person.config_profile_reviewed) {
           params['config_profile_reviewed'] = true;
+        }
+        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+          params['_input_image'] = person.profile_picture;
         }
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.person) {

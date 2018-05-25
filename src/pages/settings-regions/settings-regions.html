@@ -14,7 +14,9 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="organization">
-    <ion-list-header>Organization Region</ion-list-header>
+    <ion-list-header>
+      <h2>Organization Region</h2>
+    </ion-list-header>
     <ion-item color="white" text-wrap *ngFor="let country of organization.countries">
       <ion-label>{{country.name}}</ion-label>
       <person-avatar item-left [initials]="country.code" [image]="country.image" [large]="false"></person-avatar>

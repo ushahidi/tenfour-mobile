@@ -12,11 +12,15 @@
   </ion-item>
 </ion-list>
 <ion-list *ngFor="let answer of checkin.answers">
-  <ion-list-header *ngIf="answer.replies > 0">{{answer.answer}}</ion-list-header>
+  <ion-list-header *ngIf="answer.replies > 0">
+    <h2>{{answer.answer}}</h2>
+  </ion-list-header>
   <checkin-reply [reply]="reply" [answer]="answer" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
 </ion-list>
 <ion-list *ngIf="checkin.replies.length < checkin.recipients.length">
-  <ion-list-header>No Response</ion-list-header>
+  <ion-list-header>
+    <h2>No Response</h2>
+  </ion-list-header>
   <ion-item color="white" *ngFor="let recipient of checkin.recipientsPending()">
     <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
     <ion-grid no-padding>

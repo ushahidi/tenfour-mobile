@@ -11,7 +11,9 @@
 </ion-header>
 <ion-content>
   <ion-list radio-group [(ngModel)]="organization.size" *ngIf="organization && sizes">
-    <ion-list-header>Organization Size</ion-list-header>
+    <ion-list-header>
+      <h2>Organization Size</h2>
+    </ion-list-header>
     <ion-item color="white" text-wrap *ngFor="let size of sizes">
       <ion-label>{{size.name}}</ion-label>
       <ion-radio [value]="size.key" color="primary"></ion-radio>

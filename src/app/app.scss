@@ -35,6 +35,16 @@ ion-toolbar {
     }
   }
 }
+ion-item {
+  ion-icon {
+    color: #888888;
+  }
+  ion-label {
+    ion-icon {
+      color: #888888;
+    }
+  }
+}
 ion-menu {
   ion-select {
     padding-top: 0 !important;
@@ -57,6 +67,12 @@ ion-menu {
   }
 }
 ion-list {
+  ion-list-header {
+    margin-bottom: 0px !important;
+    h2 {
+      margin-bottom: 0px !important;
+    }
+  }
   ion-item {
     h1 {
       color: #000000;
