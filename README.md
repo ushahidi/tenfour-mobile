@@ -89,7 +89,8 @@ firebase deploy
 ISSUE_NAME="123 Fixed A Bug"
 BRANCH_NAME=$(echo $ISSUE_NAME | tr '[:upper:]' '[:lower:]' | tr '/' '-' | tr ' ' '-')
 git checkout -b $BRANCH_NAME
-git add -a
-git commit -m "Changes"
+git add .
+git add -u
+git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
 ```
