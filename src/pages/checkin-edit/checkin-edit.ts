@@ -168,7 +168,13 @@ export class CheckinEditPage extends BasePage {
   }
 
   private showNext() {
-    if (this.tablet || this.website) {
+    if (this.checkin.hasBlankAnswers()) {
+      this.showAlert("Blank Answers", "Answers must have a value.");
+    }
+    else if (this.checkin.hasDuplicateAnswers()) {
+      this.showAlert("Duplicate Answers", "Answers must be unique.");
+    }
+    else if (this.tablet || this.website) {
       this.showModal(CheckinSendPage, {
         organization: this.organization,
         user: this.user,
