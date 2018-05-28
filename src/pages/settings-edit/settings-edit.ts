@@ -5,10 +5,14 @@ import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
+import { Location } from '../../models/location';
 
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
+import { LocationProvider } from '../../providers/location/location';
+
+import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
 
 @IonicPage({
   name: 'SettingsEditPage',
@@ -18,19 +22,25 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
-  providers: [ ApiProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
 export class SettingsEditPage extends BasePage {
 
   organization:Organization = null;
   logo:string = "assets/images/dots.png";
-  location:string = null;
 
   @ViewChild("fileInput")
   fileInput:any = null;
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
+  search:string = null;
+
+  @ViewChild("location")
+  location:any = null;
+
+  locations:Location[] = [];
+  timer:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -45,7 +55,8 @@ export class SettingsEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected camera:CameraProvider) {
+      protected camera:CameraProvider,
+      protected locationProvider:LocationProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -163,14 +174,41 @@ export class SettingsEditPage extends BasePage {
   }
 
   private onKeyPress(event:any) {
+    this.logger.info(this, "onKeyPress", event.keyCode);
     if (event.keyCode == 13) {
       this.logger.info(this, "onKeyPress", "Enter");
-      this.hideKeyboard();
+      this.hideKeyboard(event);
       return false;
     }
     else {
       return true;
     }
+  }
+
+  private searchAddress() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout((search:string) => {
+      this.logger.info(this, "searchAddress", "searchAddress", search);
+      this.locationProvider.searchAddress(search, 5).then((locations:Location[]) => {
+        this.logger.info(this, "searchAddress", "searchAddress", search, locations);
+        this.zone.run(() => {
+          this.locations = locations;
+        });
+      },
+      (error:any) => {
+        this.zone.run(() => {
+          this.locations = [];
+        });
+      });
+    }, 250, this.organization.location);
+  }
+
+  private selectLocation(location:string) {
+    this.zone.run(() => {
+      this.organization.location = location;
+      this.locations = [];
+    });
+    // this.location.blur();
   }
 
 }

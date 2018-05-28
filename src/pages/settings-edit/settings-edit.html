@@ -3,7 +3,7 @@
     <ion-buttons left>
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Edit organization</ion-title>
+    <ion-title>Edit Organization</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" (click)="doneEdit($event)">Save</button>
     </ion-buttons>
@@ -24,7 +24,11 @@
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Location</ion-label>
-      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="organization.location"></ion-input>
+      <ion-input #location type="text" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="organization.location"></ion-input>
+    </ion-item>
+    <ion-item lines color="white" tappable (click)="selectLocation(location.address)" *ngFor="let location of locations">
+      <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+      <div item-content text-left item-left class="content">{{location.address}}</div>
     </ion-item>
   </ion-list>
 </ion-content>

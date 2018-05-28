@@ -207,11 +207,11 @@ export class BasePage {
     this.browser.open(url, target, event);
   }
 
-  protected showKeyboard() {
+  protected showKeyboard(event:any=null) {
     this.keyboard.show();
   }
 
-  protected hideKeyboard() {
+  protected hideKeyboard(event:any=null) {
     this.keyboard.show();
   }
 

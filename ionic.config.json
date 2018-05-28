@@ -13,6 +13,10 @@
     {
       "path": "/api.staging.tenfour.org",
       "proxyUrl": "https://api.staging.tenfour.org"
+    },
+    {
+      "path": "/maps.googleapis.com",
+      "proxyUrl": "https://maps.googleapis.com"
     }
   ],
   "integrations": {
