@@ -136,7 +136,7 @@ export class CheckinSendPage extends BasePage {
   private loadCheckin(cache:boolean=true):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.checkin = this.getParameter<Checkin>("checkin");
-      resolve(this.checkin );
+      resolve(this.checkin);
     });
   }
 
@@ -171,6 +171,7 @@ export class CheckinSendPage extends BasePage {
        if (data && data.groups) {
          this.checkin.groups = data.groups;
        }
+       this.countRecipients();
      });
   }
 
@@ -182,6 +183,7 @@ export class CheckinSendPage extends BasePage {
         break;
       }
     }
+    this.countRecipients();
   }
 
   private removeGroup(group:Group) {
@@ -192,6 +194,7 @@ export class CheckinSendPage extends BasePage {
         break;
       }
     }
+    this.countRecipients();
   }
 
   private sendCheckin(event:any) {
@@ -257,6 +260,10 @@ export class CheckinSendPage extends BasePage {
     popover.present({
       ev: event
     });
+  }
+
+  private countRecipients() {
+    this.checkin.waiting_count = this.checkin.recipientIds().length;
   }
 
 }

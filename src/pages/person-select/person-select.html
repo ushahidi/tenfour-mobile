@@ -14,6 +14,9 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
   <ion-list *ngIf="show_groups && organization && organization.groups">
     <ion-list-header>
       <h2>Groups</h2>
@@ -34,9 +37,6 @@
       <ion-checkbox item-right [(ngModel)]="person.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
-  <div text-center class="spinner" *ngIf="loading == true">
-    <ion-spinner name="ios"></ion-spinner>
-  </div>
   <ion-infinite-scroll (ionInfinite)="loadMore(true, $event)" *ngIf="show_people && organization && organization.people">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
