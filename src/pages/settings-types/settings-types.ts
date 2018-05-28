@@ -161,7 +161,7 @@ export class SettingsTypesPage extends BasePage {
       }
     }
     this.organization.types = selected.join(",");
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       if (this.mobile) {
         this.storage.saveOrganization(organization).then(saved => {

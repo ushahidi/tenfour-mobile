@@ -72,7 +72,7 @@ export class PersonInvitePage extends BasePage {
       }
     }
     if (invites.length > 0) {
-      let loading = this.showLoading("Inviting...");
+      let loading = this.showLoading("Inviting...", true);
       Promise.all(invites).then(invited => {
         loading.dismiss();
         this.showToast("Invites sent");

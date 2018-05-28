@@ -197,7 +197,7 @@ export class GroupListPage extends BasePage {
 
   private removeGroup(group:Group) {
     this.logger.info(this, "removeGroup", group);
-    let loading = this.showLoading("Removing...");
+    let loading = this.showLoading("Removing...", true);
     this.api.deleteGroup(this.organization, group).then((deleted:any) => {
       if (this.mobile) {
         this.storage.removeGroup(this.organization, group).then((removed:any) => {

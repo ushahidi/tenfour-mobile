@@ -122,15 +122,12 @@ export class BasePage {
     return <T>this.navParams.get(param);
   }
 
-  protected showLoading(message:string):Loading {
+  protected showLoading(message:string="Loading...", important:boolean=false):Loading {
     let loading = this.loadingController.create({
       content: message
     });
-    if (this.mobile) {
+    if (important || this.mobile) {
       loading.present();
-    }
-    else {
-
     }
     return loading;
   }

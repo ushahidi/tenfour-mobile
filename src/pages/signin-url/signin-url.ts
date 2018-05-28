@@ -51,7 +51,7 @@ export class SigninUrlPage extends BasePage {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
-      let loading = this.showLoading("Searching...");
+      let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
         this.logger.info(this, "showNext", organizations);
         loading.dismiss();

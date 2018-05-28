@@ -77,7 +77,7 @@ export class SignupPasswordPage extends BasePage {
     }
     else {
       this.loading = true;
-      let loading = this.showLoading("Creating...");
+      let loading = this.showLoading("Creating...", true);
       this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then((organization:Organization) => {
         this.logger.info(this, "createOrganization", "Organization", organization);

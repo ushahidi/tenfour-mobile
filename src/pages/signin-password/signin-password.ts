@@ -66,7 +66,7 @@ export class SigninPasswordPage extends BasePage {
     this.logger.info(this, "showNext");
     this.loading = true;
     if (this.password.value && this.password.value.length > 0) {
-      let loading = this.showLoading("Logging in...");
+      let loading = this.showLoading("Logging in...", true);
       let password = this.password.value;
       this.api.userLogin(this.organization, this.email, password).then((token:Token) => {
         this.logger.info(this, "showNext", "Token", token);
@@ -139,7 +139,7 @@ export class SigninPasswordPage extends BasePage {
   private resetPassword(event:any) {
     let title = "Check Your Inbox";
     let message = `If your email address ${this.email} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
-    let loading = this.showLoading("Resetting...");
+    let loading = this.showLoading("Resetting...", true);
     this.api.resetPassword(this.organization.subdomain, this.email).then((reset:any) => {
       this.logger.info(this, "resetPassword", reset);
       loading.dismiss();

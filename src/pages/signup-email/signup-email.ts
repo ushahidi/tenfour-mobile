@@ -50,7 +50,7 @@ export class SignupEmailPage extends BasePage {
   private showNext(event:any) {
     this.logger.info(this, "showNext");
     if (this.email.value && this.email.value.length > 0) {
-      let loading = this.showLoading("Registering...");
+      let loading = this.showLoading("Registering...", true);
       this.api.registerEmail(this.email.value).then((email:Email) => {
         loading.dismiss();
         let organization = new Organization({});

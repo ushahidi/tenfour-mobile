@@ -216,7 +216,7 @@ export class PersonEditPage extends BasePage {
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     if (this.editing && this.mobile) {
-      let loading = this.showLoading("Canceling...");
+      let loading = this.showLoading("Canceling...", true);
       this.storage.getPerson(this.organization, this.person.id).then((person:Person) => {
         this.person.name = person.name;
         this.person.description = person.description;
@@ -243,7 +243,7 @@ export class PersonEditPage extends BasePage {
   }
 
   private savePersonAndContacts(activity:string, event:any) {
-    let loading = this.showLoading(`${activity}...`);
+    let loading = this.showLoading(`${activity}...`, true);
     this.savePerson(this.organization, this.person).then((person:Person) => {
       let contacts = [];
       for (let contact of this.person.getPhones()) {
@@ -438,7 +438,7 @@ export class PersonEditPage extends BasePage {
       {
         text: 'Remove',
         handler: () => {
-          let loading = this.showLoading("Removing...");
+          let loading = this.showLoading("Removing...", true);
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
             if (this.mobile) {
               let removes = [];
@@ -484,7 +484,7 @@ export class PersonEditPage extends BasePage {
       {
         text: 'Delete',
         handler: () => {
-          let loading = this.showLoading("Deleting...");
+          let loading = this.showLoading("Deleting...", true);
           this.api.deletePerson(this.organization, this.person).then((deleted:any) => {
             loading.dismiss();
             this.showToast("Your account has been deleted");

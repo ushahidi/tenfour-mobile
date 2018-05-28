@@ -114,7 +114,7 @@ export class SignupCheckPage extends BasePage {
   }
 
   private sendEmail(event:any) {
-    let loading = this.showLoading("Resending...");
+    let loading = this.showLoading("Resending...", true);
     this.api.registerEmail(this.organization.email).then((email:Email) => {
       loading.dismiss();
     },

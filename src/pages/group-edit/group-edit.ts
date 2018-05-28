@@ -77,7 +77,7 @@ export class GroupEditPage extends BasePage {
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     if (this.editing && this.mobile) {
-      let loading = this.showLoading("Canceling...");
+      let loading = this.showLoading("Canceling...", true);
       this.storage.getGroup(this.organization, this.group.id).then((group:Group) => {
         this.group.name = group.name;
         this.group.description = group.description;
@@ -129,7 +129,7 @@ export class GroupEditPage extends BasePage {
       this.showAlert("Group People Required", "At least one person is required in a group.");
     }
     else {
-      let loading = this.showLoading("Creating...");
+      let loading = this.showLoading("Creating...", true);
       this.api.createGroup(this.organization, this.group).then((group:Group) => {
         if (this.group.members && this.group.members.length > 0) {
           group.member_count = this.group.members.length;
@@ -153,7 +153,7 @@ export class GroupEditPage extends BasePage {
 
   private updateGroup(event:any) {
     this.logger.info(this, "updateGroup", this.group.name, this.group.description);
-    let loading = this.showLoading("Saving...");
+    let loading = this.showLoading("Saving...", true);
     this.api.updateGroup(this.organization, this.group).then((group:Group) => {
       if (this.group.members && this.group.members.length > 0) {
         group.member_count = this.group.members.length;
@@ -180,7 +180,7 @@ export class GroupEditPage extends BasePage {
       {
         text: 'Delete',
         handler: () => {
-          let loading = this.showLoading("Removing...");
+          let loading = this.showLoading("Removing...", true);
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
             this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
               loading.dismiss();

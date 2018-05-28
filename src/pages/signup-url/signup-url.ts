@@ -57,7 +57,7 @@ export class SignupUrlPage extends BasePage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    let loading = this.showLoading("Checking...");
+    let loading = this.showLoading("Checking...", true);
     this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
       this.logger.error(this, "showNext", organizations);
       loading.dismiss();

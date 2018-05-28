@@ -157,7 +157,7 @@ export class CheckinTestPage extends BasePage {
   }
 
   private sendCheckin(event:any) {
-    let loading = this.showLoading("Sending...");
+    let loading = this.showLoading("Sending...", true);
     this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       if (this.mobile) {
         this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {

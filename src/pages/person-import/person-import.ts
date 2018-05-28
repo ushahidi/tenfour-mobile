@@ -133,7 +133,7 @@ export class PersonImportPage extends BasePage {
 
   private importContacts(event:any) {
     this.logger.info(this, "importContacts");
-    let loading = this.showLoading("Importing...");
+    let loading = this.showLoading("Importing...", true);
     let imports = [];
     for (let contact of this.imports) {
       if (contact.checked == true) {
