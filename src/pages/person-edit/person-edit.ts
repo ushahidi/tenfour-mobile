@@ -252,6 +252,9 @@ export class PersonEditPage extends BasePage {
       for (let contact of this.person.getEmails()) {
         contacts.push(this.saveContact(this.organization, person, contact));
       }
+      for (let contact of this.person.getAddresses()) {
+        contacts.push(this.saveContact(this.organization, person, contact));
+      }
       Promise.all(contacts).then((updated:any) => {
         this.storage.savePerson(this.organization, person).then((saved:any) => {
           loading.dismiss();
@@ -343,7 +346,7 @@ export class PersonEditPage extends BasePage {
     });
   }
 
-  private addPhone(event:any) {
+  private addPhone(event:any=null) {
     let countryCodes = this.organization.countryCodes();
     let countryCode = countryCodes && countryCodes.length > 0 ? countryCodes[0] : 1;
     let contact = new Contact({
@@ -353,9 +356,14 @@ export class PersonEditPage extends BasePage {
     this.person.contacts.push(contact)
   }
 
-  private addEmail(event:any) {
+  private addEmail(event:any=null) {
     let contact = new Contact({type: 'email'});
-    this.person.contacts.push(contact)
+    this.person.contacts.push(contact);
+  }
+
+  private addAddress(event:any=null) {
+    let contact = new Contact({type: 'address'});
+    this.person.contacts.push(contact);
   }
 
   private showCameraOptions(event:any) {

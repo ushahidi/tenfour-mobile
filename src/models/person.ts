@@ -183,6 +183,12 @@ export class Person extends Model {
     });
   }
 
+  public getAddresses():Contact[] {
+    return this.contacts.filter(function(contact) {
+      return contact.type == 'address';
+    });
+  }
+
   public hasEmails():boolean {
     let emails = this.getEmails();
     return emails && emails.length > 0;

@@ -52,6 +52,17 @@
       <ion-input item-right type="email" autocorrect="off" autocapitalize="none" placeholder="email address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
+  <ion-list *ngIf="person">
+    <ion-item color="white" tappable (click)="addAddress($event)">
+      <ion-label color="primary">Add address</ion-label>
+    </ion-item>
+    <ion-item class="address" color="white" *ngFor="let contact of person.getAddresses()">
+      <ion-label no-padding no-margin icon-only text-left>
+        <ion-icon ios="ios-home" md="md-home" item-left></ion-icon>
+      </ion-label>
+      <ion-input item-right type="text" autocorrect="off" autocapitalize="yes" placeholder="street address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
+    </ion-item>
+  </ion-list>
   <ion-list *ngIf="person && user && user.isOwnerOrAdmin()">
     <ion-item class="role" color="white">
       <ion-label no-padding no-margin icon-only text-left>
@@ -74,7 +85,7 @@
       </button>
     </ion-item>
   </ion-list>
-  <div padding-left padding-right padding-bottom *ngIf="user && person && this.editing">
+  <div padding margin-top *ngIf="user && person && this.editing">
     <button ion-button block color="danger" *ngIf="person.isMe()" (click)="deleteAccount($event)">Delete my account</button>
     <button ion-button block color="danger" *ngIf="person.isMe() == false && user.isOwnerOrAdmin()" (click)="removePerson($event)">Remove from organization</button>
   </div>
