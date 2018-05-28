@@ -22,5 +22,10 @@ page-checkin-respond {
         font-weight: 500 !important;
       }
     }
+    item-content, .content {
+      small {
+        color: #888 !important;
+      }
+    }
   }
 }

@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-list *ngIf="organization">
+  <ion-list lines *ngIf="organization">
     <ion-item color="white" text-center>
       <person-avatar item-center [image]="logo" [large]="true" *ngIf="organization.profile_picture == null"></person-avatar>
       <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization.profile_picture != null"></person-avatar>
@@ -24,9 +24,9 @@
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Location</ion-label>
-      <ion-input #location type="text" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="organization.location"></ion-input>
+      <ion-input type="text" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="organization.location"></ion-input>
     </ion-item>
-    <ion-item lines color="white" tappable (click)="selectLocation(location.address)" *ngFor="let location of locations">
+    <ion-item color="white" tappable (click)="selectLocation(location)" *ngFor="let location of locations">
       <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
       <div item-content text-left item-left class="content">{{location.address}}</div>
     </ion-item>

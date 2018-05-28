@@ -12,7 +12,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-slides [pager]="false" (ionSlideDidChange)="slideChanged($event)">
+  <ion-slides [pager]="false" [class.swiper-no-swiping]="checkins == null || checkins.length == 1" (ionSlideDidChange)="slideChanged($event)">
     <ion-slide *ngFor="let checkin of checkins">
       <ion-list no-margin *ngIf="checkin">
         <ion-item text-wrap color="white">
@@ -27,7 +27,7 @@
           <button ion-button block outline color="grey" *ngIf="answer.answer != checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
         </div>
       </div>
-      <ion-list *ngIf="checkin && checkin.reply">
+      <ion-list lines *ngIf="checkin && checkin.reply">
         <ion-item color="dark">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
           <ion-input type="text" placeholder="Add message" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.message"></ion-input>
@@ -38,11 +38,18 @@
         </ion-item>
         <ion-item color="dark">
           <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
-          <ion-input type="text" placeholder="Add location" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.location_text"></ion-input>
+          <ion-input type="text" placeholder="Add location" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="checkin.reply.location_text"></ion-input>
           <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(checkin.reply)"
                   *ngIf="checkin.reply.location_text && checkin.reply.location_text.length > 0">
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
           </button>
+          <button ion-button icon-only item-right clear color="black" *ngIf="locating">
+            <ion-spinner name="ios-small"></ion-spinner>
+          </button>
+        </ion-item>
+        <ion-item color="white" tappable (click)="selectLocation(location)" *ngFor="let location of locations">
+          <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+          <div item-content text-left item-left class="content">{{location.address}}</div>
         </ion-item>
       </ion-list>
     </ion-slide>

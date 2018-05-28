@@ -36,9 +36,6 @@ export class SettingsEditPage extends BasePage {
   cameraRollPresent:boolean = true;
   search:string = null;
 
-  @ViewChild("location")
-  location:any = null;
-
   locations:Location[] = [];
   timer:any = null;
 
@@ -56,7 +53,7 @@ export class SettingsEditPage extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected camera:CameraProvider,
-      protected locationProvider:LocationProvider) {
+      protected location:LocationProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -187,28 +184,36 @@ export class SettingsEditPage extends BasePage {
 
   private searchAddress() {
     clearTimeout(this.timer);
-    this.timer = setTimeout((search:string) => {
-      this.logger.info(this, "searchAddress", "searchAddress", search);
-      this.locationProvider.searchAddress(search, 5).then((locations:Location[]) => {
-        this.logger.info(this, "searchAddress", "searchAddress", search, locations);
-        this.zone.run(() => {
-          this.locations = locations;
+    this.timer = setTimeout((address:string) => {
+      if (address && address.length > 0) {
+        this.logger.info(this, "searchAddress", address);
+        this.location.searchAddress(address, 5).then((locations:Location[]) => {
+          this.logger.info(this, "searchAddress", address, locations);
+          this.zone.run(() => {
+            this.locations = locations;
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "searchAddress", address, error);
+          this.zone.run(() => {
+            this.locations = [];
+          });
         });
-      },
-      (error:any) => {
+      }
+      else {
         this.zone.run(() => {
           this.locations = [];
         });
-      });
-    }, 250, this.organization.location);
+      }
+    }, 900, this.organization.location);
   }
 
-  private selectLocation(location:string) {
+  private selectLocation(location:Location) {
+    this.logger.info(this, "selectLocation", location);
     this.zone.run(() => {
-      this.organization.location = location;
+      this.organization.location = location.address;
       this.locations = [];
     });
-    // this.location.blur();
   }
 
 }

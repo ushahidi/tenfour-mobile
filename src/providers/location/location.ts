@@ -12,7 +12,6 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/observable/throw';
 
 import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
-import { GoogleMapsAPIWrapper } from 'angular2-google-maps/core';
 
 import { Geolocation } from '@ionic-native/geolocation';
 import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
@@ -137,10 +136,13 @@ export class LocationProvider {
     });
   }
 
-  public searchAddress(address:string, limit:number=5):Promise<Location[]> {
+  public searchAddress(address:string, limit:number=5, latitude:number=null, longitude:number=null):Promise<Location[]> {
     return new Promise((resolve, reject) => {
       let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
-      let url = `${host}/maps/api/place/textsearch/json?query=${address}&key=${this.key}`;
+      let url = `${host}/maps/api/place/autocomplete/json?input=${address}&types=geocode&key=${this.key}`;
+      if (latitude && longitude) {
+        url = url + `&location=${latitude},${longitude}`;
+      }
       this.logger.info(this, "searchAddress", url);
       this.http.get(url, {})
         .timeout(12000)
@@ -152,13 +154,12 @@ export class LocationProvider {
         })
         .subscribe((data:any) => {
           this.logger.info(this, "searchAddress", url, data);
-          if (data && data.results) {
+          if (data && data.predictions) {
             let locations = [];
-            for (let result of data.results.slice(0, limit)) {
+            for (let prediction of data.predictions.slice(0, limit)) {
               let location = <Location> {
-                address: result.name || result.formatted_address,
-                latitude: result.geometry.location.lat,
-                longitude: result.geometry.location.lng
+                place: prediction.place_id,
+                address: prediction.description
               };
               locations.push(location);
             }
@@ -170,8 +171,48 @@ export class LocationProvider {
         },
         (error:any) => {
           this.logger.error(this, "searchAddress", url, error);
-          reject(error);
+          resolve([]);
         });
+    });
+  }
+
+  public placeDetails(location:Location):Promise<Location> {
+    return new Promise((resolve, reject) => {
+      if (location && location.place && location.place.length > 0) {
+        let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
+        let url = `${host}/maps/api/place/details/json?placeid=${location.place}&key=${this.key}`;
+        this.logger.info(this, "placeDetails", url);
+        this.http.get(url, {})
+          .timeout(12000)
+          .map((response:any) => {
+            return response.json();
+          })
+          .catch((error:any) => {
+            return Observable.throw(error);
+          })
+          .subscribe((data:any) => {
+            this.logger.info(this, "placeDetails", url, data);
+            if (data && data.result) {
+              let location = <Location>{
+                place: data.result.place_id,
+                address: data.result.formatted_address,
+                latitude: data.result.geometry.location.lat,
+                longitude: data.result.geometry.location.lng
+              };
+              resolve(location);
+            }
+            else {
+              resolve(null);
+            }
+          },
+          (error:any) => {
+            this.logger.error(this, "placeDetails", url, error);
+            resolve(null);
+          });
+      }
+      else {
+        resolve(null);
+      }
     });
   }
 

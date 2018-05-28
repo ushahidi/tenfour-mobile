@@ -1,3 +1,9 @@
 page-settings-edit {
-
+  ion-item {
+    item-content, .content {
+      small {
+        color: #888 !important;
+      }
+    }
+  }
 }

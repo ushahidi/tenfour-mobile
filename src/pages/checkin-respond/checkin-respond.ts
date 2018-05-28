@@ -32,11 +32,14 @@ export class CheckinRespondPage extends BasePage {
   slides:Slides;
   index:number = 0;
   loading:boolean = false;
+  locating:boolean = false;
 
   organization:Organization = null;
   user:User = null;
   checkins:Checkin[] = [];
   checkin:Checkin = null;
+  locations:Location[] = [];
+  timer:any = null;
 
   constructor(
     protected zone:NgZone,
@@ -144,15 +147,18 @@ export class CheckinRespondPage extends BasePage {
       this.checkin = this.getParameter<Checkin>("checkin");
       if (this.checkins && this.checkin) {
         this.index = this.checkins.indexOf(this.checkin);
+        this.slides.lockSwipes(false);
       }
-      else if (this.checkins) {
+      else if (this.checkins && this.checkins.length > 0) {
         this.index = 0;
         this.checkin = this.checkins[0];
+        this.slides.lockSwipes(false);
       }
       else {
         this.index = 0;
         this.checkins = [this.checkin];
         this.checkin.reply = this.getParameter<Reply>("reply");
+        this.slides.lockSwipes(true);
       }
       for (let checkin of this.checkins) {
         if (checkin.reply == null) {
@@ -168,6 +174,7 @@ export class CheckinRespondPage extends BasePage {
   private loadLocation(cache:boolean=true):Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadLocation");
+      this.locating = true;
       this.location.detectLocation().then((location:Location) => {
         this.logger.info(this, "loadLocation", location);
         this.location.lookupAddress(location).then((address:string) => {
@@ -180,6 +187,7 @@ export class CheckinRespondPage extends BasePage {
               checkin.reply.location_text = location.address;
             }
           }
+          this.locating = false;
           resolve(location);
         },
         (error:any) => {
@@ -190,11 +198,13 @@ export class CheckinRespondPage extends BasePage {
               checkin.reply.longitude = location.longitude;
             }
           }
+          this.locating = false;
           resolve(location);
         });
       },
       (error:any) => {
         this.logger.error(this, "loadLocation", error);
+        this.locating = false;
         reject(error);
       });
     });
@@ -338,6 +348,7 @@ export class CheckinRespondPage extends BasePage {
     reply.location_text = null;
     reply.latitude = null;
     reply.longitude = null;
+    this.locations = [];
   }
 
   private onKeyPress(event:any) {
@@ -349,6 +360,47 @@ export class CheckinRespondPage extends BasePage {
     else {
       return true;
     }
+  }
+
+  private searchAddress() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout((address:string, latitude:number, longitude:number) => {
+      if (address && address.length > 0) {
+        this.logger.info(this, "searchAddress", address);
+        this.location.searchAddress(address, 5, latitude, longitude).then((locations:Location[]) => {
+          this.logger.info(this, "searchAddress", address, locations);
+          this.zone.run(() => {
+            this.locations = locations;
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "searchAddress", address, error);
+          this.zone.run(() => {
+            this.locations = [];
+          });
+        });
+      }
+      else {
+        this.zone.run(() => {
+          this.locations = [];
+        });
+      }
+    }, 900, this.checkin.reply.location_text, this.checkin.reply.latitude, this.checkin.reply.longitude);
+  }
+
+  private selectLocation(location:Location) {
+    this.logger.info(this, "selectLocation", location);
+    this.location.placeDetails(location).then((_location:Location) => {
+      this.logger.info(this, "selectLocation", location, "placeDetails", _location);
+      if (_location && _location.latitude && _location.longitude) {
+        this.checkin.reply.latitude = _location.latitude;
+        this.checkin.reply.longitude = _location.longitude;
+      }
+    });
+    this.zone.run(() => {
+      this.checkin.reply.location_text = location.address;
+      this.locations = [];
+    });
   }
 
 }
