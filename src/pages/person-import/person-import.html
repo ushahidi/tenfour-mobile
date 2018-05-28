@@ -26,7 +26,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="imports">
-    <ion-list-header>Contacts</ion-list-header>
+    <ion-list-header>
+      <h2>Contacts</h2>
+    </ion-list-header>
     <ion-item color="white" tappable (click)="selectAll($event)">
       <div ion-text color="primary">Select all</div>
     </ion-item>

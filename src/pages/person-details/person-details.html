@@ -60,12 +60,16 @@
     <ion-spinner name="ios"></ion-spinner>
   </div>
   <ion-list *ngIf="person && person.checkins && person.checkins.length > 0">
-    <ion-list-header>Check-Ins</ion-list-header>
+    <ion-list-header>
+      <h2>Check-Ins</h2>
+    </ion-list-header>
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
                   (cardSelected)="showCheckinDetails(checkin, $event)" *ngFor="let checkin of person.checkins"></checkin-card>
   </ion-list>
   <ion-list *ngIf="person && person.replies && person.replies.length > 0">
-    <ion-list-header>Responses</ion-list-header>
+    <ion-list-header>
+      <h2>Responses</h2>
+    </ion-list-header>
     <checkin-reply [reply]="reply" [user]="user"
       *ngFor="let reply of person.replies"></checkin-reply>
   </ion-list>

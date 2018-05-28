@@ -65,6 +65,15 @@
       </ion-select>
     </ion-item>
   </ion-list>
+  <ion-list *ngIf="person">
+    <ion-item color="white" class="groups" text-wrap tappable (click)="showPeopleSelect($event)">
+      <ion-icon ios="ios-people" md="md-people" item-left></ion-icon>
+      <div item-content class="content">{{person.groupNames()}}</div>
+      <button ion-button clear item-right>
+        <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
+      </button>
+    </ion-item>
+  </ion-list>
   <div padding-left padding-right padding-bottom *ngIf="user && person && this.editing">
     <button ion-button block color="danger" *ngIf="person.isMe()" (click)="deleteAccount($event)">Delete my account</button>
     <button ion-button block color="danger" *ngIf="person.isMe() == false && user.isOwnerOrAdmin()" (click)="removePerson($event)">Remove from organization</button>

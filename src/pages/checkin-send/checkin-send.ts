@@ -154,7 +154,8 @@ export class CheckinSendPage extends BasePage {
       user: this.user,
       groups: this.checkin.groups,
       people: this.checkin.recipients,
-      show_groups: true
+      show_groups: true,
+      show_people: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);

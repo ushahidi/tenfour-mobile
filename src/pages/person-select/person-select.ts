@@ -24,11 +24,14 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class PersonSelectPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   people:Person[] = null;
   groups:Group[] = null;
   show_groups:boolean = true;
+  show_people:boolean = true;
   limit:number = 25;
   offset:number = 0;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -48,10 +51,8 @@ export class PersonSelectPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.groups = this.getParameter<Group[]>("groups");
-    this.people = this.getParameter<Person[]>("people");
     this.show_groups = this.getParameter<boolean>("show_groups");
+    this.show_people = this.getParameter<boolean>("show_people");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -68,29 +69,90 @@ export class PersonSelectPage extends BasePage {
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
-    this.logger.info(this, "loadUpdates", cache);
-    return Promise.all([
-      this.loadPeople(cache),
-      this.loadGroups(cache)]).then(
-      (loaded:any) =>{
-        this.logger.info(this, "loadUpdates", cache, "Done");
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPeople(cache); })
+      .then(() => { return this.loadGroups(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
-      },
-      (error:any) => {
-        this.logger.error(this, "loadUpdates", cache, error);
+        this.loading = false;
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
+        this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadGroups(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadGroups", cache);
+    return new Promise((resolve, reject) => {
+      this.groups = this.getParameter<Group[]>("groups");
+      this.promiseFallback(cache,
+        this.storage.getGroups(this.organization),
+        this.api.getGroups(this.organization), 1).then((groups:Group[]) => {
+          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
+            this.updateGroups(groups);
+            resolve(groups);
+          });
+        },
+        (error:any) => {
+          this.updateGroups([]);
+          reject(error);
+        });
+    });
   }
 
   private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
       this.offset = 0;
+      this.people = this.getParameter<Person[]>("people");
       this.promiseFallback(cache,
         this.storage.getPeople(this.organization, null, this.limit, this.offset),
         this.api.getPeople(this.organization, this.limit, this.offset), 2).then((people:Person[]) => {
@@ -130,6 +192,18 @@ export class PersonSelectPage extends BasePage {
     });
   }
 
+  private updateGroups(groups:Group[]) {
+    if (this.groups && this.groups.length > 0) {
+      for (let group of groups) {
+        let previous = this.groups.filter(_group => _group.id == group.id);
+        if (previous && previous.length > 0) {
+          group.selected = true;
+        }
+      }
+    }
+    this.organization.groups = groups;
+  }
+
   private updatePeople(people:Person[]) {
     if (this.people && this.people.length > 0) {
       for (let person of people) {
@@ -147,44 +221,6 @@ export class PersonSelectPage extends BasePage {
     }
   }
 
-  private loadGroups(cache:boolean=true):Promise<any> {
-    this.logger.info(this, "loadGroups", cache);
-    return new Promise((resolve, reject) => {
-      this.promiseFallback(cache,
-        this.storage.getGroups(this.organization),
-        this.api.getGroups(this.organization), 1).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", cache, groups);
-          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
-            this.updateGroups(groups);
-            resolve(groups);
-          });
-        },
-        (error:any) => {
-          this.updateGroups([]);
-          reject(error);
-        });
-    });
-  }
-
-  private updateGroups(groups:Group[]) {
-    if (this.groups && this.groups.length > 0) {
-      for (let group of groups) {
-        let previous = this.groups.filter(_group => _group.id == group.id);
-        if (previous && previous.length > 0) {
-          if (previous[0].selected == true) {
-            group.selected = true;
-            this.logger.error(this, "updateGroups", group.name, "Selected");
-          }
-          else {
-            group.selected = false;
-            this.logger.info(this, "updateGroups", group.name, "Not Selected");
-          }
-        }
-      }
-    }
-    this.organization.groups = groups;
-  }
-
   private cancelSelect(event:any) {
     this.hideModal({
       canceled: true
@@ -193,7 +229,6 @@ export class PersonSelectPage extends BasePage {
 
   private doneSelect(event:any) {
     let people = [];
-    let groups = [];
     if (this.organization.people && this.organization.people.length > 0) {
       for (let person of this.organization.people) {
         if (person.selected == true) {
@@ -201,6 +236,7 @@ export class PersonSelectPage extends BasePage {
         }
       }
     }
+    let groups = [];
     if (this.organization.groups && this.organization.groups.length > 0) {
       for (let group of this.organization.groups) {
         if (group.selected == true) {

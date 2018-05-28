@@ -20,7 +20,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin && checkin.answers">
-    <ion-list-header>Answers</ion-list-header>
+    <ion-list-header>
+      <h2>Answers</h2>
+    </ion-list-header>
     <ion-item color="white" tappable (click)="addAnswer()" *ngIf="checkin.answers.length > 0">
       <h2 ion-text color="primary">Add answer</h2>
     </ion-item>

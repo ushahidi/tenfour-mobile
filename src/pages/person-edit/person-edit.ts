@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -23,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
   providers: [ ApiProvider, StorageProvider, CameraProvider ],
-  entryComponents:[ ]
+  entryComponents:[ PersonSelectPage ]
 })
 export class PersonEditPage extends BasePage {
 
@@ -40,6 +41,11 @@ export class PersonEditPage extends BasePage {
     multiple: false,
     title: 'Roles'
   };
+  groupsOptions:any = {
+    multiple: false,
+    title: 'Groups'
+  };
+  loading:boolean = false;
 
   @ViewChild("fileInput")
   fileInput:any = null;
@@ -66,28 +72,20 @@ export class PersonEditPage extends BasePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.loadCamera();
+    this.loading = true;
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((finished:any) => {
+      loading.dismiss();
+      this.loading = false;
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.loading = false;
+    });
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.user = this.getParameter<User>("user");
-    if (this.person) {
-      this.editing = true;
-    }
-    else {
-      this.editing = false;
-      this.person = new Person({
-        name: null,
-        description: null,
-        role: "responder"
-      });
-      if (this.organization) {
-        this.person.organization_id = this.organization.id;
-      }
-    }
   }
 
   ionViewDidEnter() {
@@ -100,14 +98,118 @@ export class PersonEditPage extends BasePage {
     }
   }
 
-  private loadCamera() {
-    this.camera.cameraPresent().then((cameraPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
-      this.cameraPresent = cameraPresent;
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadCamera(); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
     });
-    this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraRollPresent", cameraRollPresent);
-      this.cameraRollPresent = cameraRollPresent;
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  protected loadPerson(cache:boolean=true):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.person) {
+        resolve(this.person);
+      }
+      else if (cache && this.hasParameter("person")){
+        this.editing = true;
+        this.person = this.getParameter<Person>("person");
+        resolve(this.person);
+      }
+      else if (this.hasParameter("person_id")) {
+        this.editing = true;
+        let personId = this.getParameter<number>("person_id");
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, personId),
+          this.api.getPerson(this.organization, personId)).then((person:Person) => {
+            this.person = person;
+            resolve(person);
+        },
+        (error:any) => {
+          resolve(null);
+        });
+      }
+      else {
+        this.editing = false;
+        this.person = new Person({
+          organization_id: this.organization.id,
+          name: null,
+          description: null,
+          role: "responder"
+        });
+      }
+    });
+  }
+
+  private loadCamera():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      Promise.all([
+        this.camera.cameraPresent(),
+        this.camera.cameraRollPresent()]).then((results:boolean[]) => {
+          this.logger.info(this, "loadCamera", "cameraPresent", results[0]);
+          this.cameraPresent = results[0];
+          this.logger.info(this, "loadCamera", "cameraRollPresent", results[1]);
+          this.cameraRollPresent = results[1];
+          resolve(true);
+        },
+        (error:any) => {
+          this.cameraPresent = false;
+          this.cameraRollPresent = false;
+          resolve(false);
+        });
     });
   }
 
@@ -408,6 +510,22 @@ export class PersonEditPage extends BasePage {
     else {
       return true;
     }
+  }
+
+  private showPeopleSelect(event:any=null) {
+    let modal = this.showModal(PersonSelectPage, {
+      organization: this.organization,
+      user: this.user,
+      groups: this.person.groups,
+      show_groups: true,
+      show_people: false
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "showPeopleSelect", data);
+       if (data && data.groups) {
+         this.person.groups = data.groups;
+       }
+     });
   }
 
 }

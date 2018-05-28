@@ -220,4 +220,14 @@ export class Person extends Model {
     return "";
   }
 
+  public groupIds():number[] {
+    let ids = [];
+    if (this.groups && this.groups.length > 0) {
+      for (let group of this.groups) {
+        ids.push({id: group.id});
+      }
+    }
+    return ids;
+  }
+
 }

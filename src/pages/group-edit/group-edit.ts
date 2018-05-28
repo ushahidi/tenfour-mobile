@@ -106,7 +106,8 @@ export class GroupEditPage extends BasePage {
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
       people: this.group.members,
-      show_groups: false
+      show_groups: false,
+      show_people: true
      });
     modal.onDidDismiss(data => {
        if (data && data.people) {
