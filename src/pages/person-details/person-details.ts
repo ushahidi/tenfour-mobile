@@ -242,7 +242,7 @@ export class PersonDetailsPage extends BasePage {
 
   protected invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
-    let loading = this.showLoading("Inviting...");
+    let loading = this.showLoading("Inviting...", true);
     this.api.invitePerson(this.organization, this.person).then((invited:Person) => {
       if (this.mobile) {
         this.storage.savePerson(this.organization, invited).then(saved => {

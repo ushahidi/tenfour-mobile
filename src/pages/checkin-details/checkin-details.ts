@@ -238,7 +238,7 @@ export class CheckinDetailsPage extends BasePage {
 
   private resendCheckin(event:any) {
     this.logger.info(this, "resendCheckin");
-    let loading = this.showLoading("Resending...");
+    let loading = this.showLoading("Resending...", true);
     this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       loading.dismiss();
       this.showToast(`Check-In ${this.checkin.message} resent`);

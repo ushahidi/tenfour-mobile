@@ -254,7 +254,7 @@ export class TenFourApp {
   private verifyEmail(email:string, token:string) {
     this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
     if (email && email.length > 0 && token && token.length > 0) {
-      let loading = this.showLoading("Verifying...");
+      let loading = this.showLoading("Verifying...", true);
       this.api.verifyEmail(email, token).then((_email:Email) => {
         this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
         loading.dismiss();
@@ -359,7 +359,7 @@ export class TenFourApp {
     this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
       text: 'Reset Database',
       handler: (clicked) => {
-        let loading = this.showLoading("Resetting...");
+        let loading = this.showLoading("Resetting...", true);
         this.resetDatastore().then((reset:any) => {
           this.loadDatastore(models).then((created:any) => {
             loading.dismiss();
@@ -582,7 +582,7 @@ export class TenFourApp {
 
   private userLogout(event:any=null) {
     this.logger.info(this, "userLogout");
-    let loading = this.showLoading("Logging out...");
+    let loading = this.showLoading("Logging out...", true);
     let removes = [
       this.storage.removeOrganization(),
       this.storage.removeUser()
@@ -611,11 +611,13 @@ export class TenFourApp {
     });
   }
 
-  private showLoading(message:string):Loading {
+  private showLoading(message:string, important:boolean=false):Loading {
     let loading = this.loadingController.create({
       content: message
     });
-    loading.present();
+    if (important || this.mobile) {
+      loading.present();
+    }
     return loading;
   }
 
@@ -643,19 +645,6 @@ export class TenFourApp {
     modal.present();
     return modal;
   }
-
-  // private getParameters(query:string) {
-  //   let parameters = {};
-  //   if (query && query.length > 0) {
-  //     query.split("&").forEach((parts) => {
-  //       let items = parts.split("=");
-  //       if (items && items.length >= 2) {
-  //         parameters[items[0]] = decodeURIComponent(items[1]);
-  //       }
-  //     });
-  //   }
-  //   return parameters;
-  // }
 
   private hideSplashScreen() {
     this.splashScreen.hide();
@@ -736,7 +725,7 @@ export class TenFourApp {
 
   private resendCheckin(event:any) {
     this.logger.info(this, "resendCheckin");
-    let loading = this.showLoading("Resending...");
+    let loading = this.showLoading("Resending...", true);
     this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       loading.dismiss();
       this.showToast(`Check-In ${this.checkin.message} resent`);

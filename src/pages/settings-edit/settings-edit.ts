@@ -81,7 +81,7 @@ export class SettingsEditPage extends BasePage {
   }
 
   private doneEdit(event:any) {
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       this.storage.saveOrganization(organization).then(saved => {
         loading.dismiss();

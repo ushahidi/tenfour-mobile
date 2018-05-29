@@ -199,7 +199,7 @@ export class CheckinSendPage extends BasePage {
       this.showToast("Please select how the Check-In will be sent");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
         if (this.mobile) {
           this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {

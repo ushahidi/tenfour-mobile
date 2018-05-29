@@ -198,7 +198,7 @@ export class SettingsRegionsPage extends BasePage {
   }
 
   private doneEdit(event:any) {
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     let saves = [];
     let regions = [];
     let codes = [];

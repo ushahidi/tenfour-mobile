@@ -257,7 +257,7 @@ export class CheckinRespondPage extends BasePage {
       this.showToast("Answer is required, please select your response");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.sendReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "sendReply", "Reply", replied);
         if (this.mobile) {
@@ -291,7 +291,7 @@ export class CheckinRespondPage extends BasePage {
       this.showToast("Answer is required, please select your response");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.updateReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "saveReply", "Reply", replied);
         if (this.mobile) {

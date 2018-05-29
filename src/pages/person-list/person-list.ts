@@ -291,7 +291,7 @@ export class PersonListPage extends BasePage {
 
   private removePerson(person:Person, event:any=null) {
     this.logger.info(this, "removePerson", person);
-    let loading = this.showLoading("Removing...");
+    let loading = this.showLoading("Removing...", true);
     this.api.deletePerson(this.organization, person).then((deleted:any) => {
       if (this.mobile) {
         let removes = [];
