@@ -37,6 +37,7 @@ export class PersonEditPage extends BasePage {
     multiple: false,
     title: 'Country Code'
   };
+  countryCodes:any = [];
   roleOptions:any = {
     multiple: false,
     title: 'Roles'
@@ -103,6 +104,7 @@ export class PersonEditPage extends BasePage {
     this.loading = true;
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadRegions(); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadCamera(); })
@@ -136,6 +138,32 @@ export class PersonEditPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadRegions(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.storage.getCountries(this.organization).then((countries:Country[]) => {
+          if (countries && countries.length > 0) {
+            this.countryCodes = countries
+              .map(country => country.country_code)
+              .filter((v, i, a) => a.indexOf(v) === i);
+            resolve();
+          }
+          else {
+            this.loadRegions(false).then(resolve);
+          }
+        });
+      }
+      else {
+        this.api.getRegions(this.organization).then((regions:Region[]) => {
+          this.countryCodes = regions
+            .map(region => region.country_code)
+            .filter((v, i, a) => a.indexOf(v) === i);
+          resolve();
         });
       }
     });

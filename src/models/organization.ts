@@ -53,12 +53,6 @@ export class Organization extends Model {
               }
               if (_settings.values.sms) {
                 this.sms_enabled = _settings.values.sms.enabled;
-                if (_settings.values.sms.regions) {
-                  let codes = _settings.values.sms.regions.map(region => region.country_code);
-                  this.codes = Array.from(new Set(codes)).sort().join(",");
-                  let regions = _settings.values.sms.regions.map(region => region.code);
-                  this.regions = Array.from(new Set(regions)).sort().join(",");
-                }
               }
               else {
                 this.sms_enabled = null;
