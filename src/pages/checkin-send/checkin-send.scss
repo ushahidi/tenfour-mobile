@@ -1,3 +1,25 @@
 page-checkin-send {
-
+  ion-item {
+    h3 {
+      padding-top: 4px;
+      color: #888 !important;
+    }
+    &.group {
+      ion-icon {
+      }
+      h2 {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+    &.person {
+      person-avatar {
+        margin-right: 30px !important;
+      }
+      h2 {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+  }
 }
