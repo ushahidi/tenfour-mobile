@@ -17,7 +17,13 @@
   </ion-list-header>
   <checkin-reply [reply]="reply" [answer]="answer" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
 </ion-list>
-<ion-list *ngIf="checkin.replies.length < checkin.recipients.length">
+<ion-list *ngIf="checkin.otherReplies().length > 0">
+  <ion-list-header>
+    <h2>Other Response</h2>
+  </ion-list-header>
+  <checkin-reply [reply]="reply" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.otherReplies()"></checkin-reply>
+</ion-list>
+<ion-list *ngIf="checkin.recipientsPending().length">
   <ion-list-header>
     <h2>No Response</h2>
   </ion-list-header>

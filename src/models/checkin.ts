@@ -151,6 +151,30 @@ export class Checkin extends Model {
     return [];
   }
 
+  public otherReplies():Reply[] {
+    if (!this.replies || !this.replies.length) {
+      return [];
+    }
+
+    let otherReplies = [];
+
+    for (let reply of this.replies) {
+      let otherAnswer = true;
+
+      for (let answer of this.answers) {
+        if (reply.answer === answer.answer) {
+          otherAnswer = false;
+        }
+      }
+
+      if (otherAnswer) {
+        otherReplies.push(reply);
+      }
+    }
+
+    return otherReplies;
+  }
+
   public recipientsPending():Recipient[] {
     let _recipients = [];
     for (let recipient of this.recipients) {
