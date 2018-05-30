@@ -1,0 +1,18 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list class="signin">
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>Are you sure you want to prevent {{organization}} from reaching you at {{email}}</h2>
+      <p>If you choose to stop receiving Check-Ins at this address, your organization may have a hard time reaching you in an emergency.</p>
+    </ion-item>
+    <ion-item no-lines class="action">
+      <button ion-button block color="danger" (click)="confirm($event)">Do not send Check-Ins to this address</button>
+      <button ion-button block color="primary" (click)="cancel($event)">Nevermind, I want to receive Check-Ins</button>
+    </ion-item>
+  </ion-list>
+</ion-content>
