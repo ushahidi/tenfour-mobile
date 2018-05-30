@@ -45,6 +45,8 @@ import { SettingsRolesPage } from '../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../pages/settings-channels/settings-channels';
 
+import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
+
 export class TenFourRoutes {
 
   static readonly ROUTES = [
@@ -93,6 +95,8 @@ export class TenFourRoutes {
     { component: SettingsRolesPage, name: 'SettingsRolesPage', segment: 'settings/roles', defaultHistory: ['SettingsListPage'] },
     { component: SettingsSizesPage, name: 'SettingsSizesPage', segment: 'settings/sizes', defaultHistory: ['SettingsListPage'] },
     { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
-    { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] }
+    { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
+
+    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:email/:token/:org_name' },
   ];
 }
