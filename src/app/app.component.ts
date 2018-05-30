@@ -7,9 +7,11 @@ import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
+import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
-import { SignupPasswordPage } from '../pages/signup-password/signup-password';
+import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
+import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
@@ -202,7 +204,7 @@ export class TenFourApp {
           if (deeplink.path === '/organization/email/confirmation/') {
             let email = deeplink.parameters['email'];
             let token = deeplink.parameters['token'];
-            this.verifyEmail(email, token);
+            this.showSignupVerify(email, token);
           }
           else if (deeplink.path === '/login/email') {
              //SigninEmailPage
@@ -251,26 +253,6 @@ export class TenFourApp {
     });
   }
 
-  private verifyEmail(email:string, token:string) {
-    this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
-    if (email && email.length > 0 && token && token.length > 0) {
-      let loading = this.showLoading("Verifying...", true);
-      this.api.verifyEmail(email, token).then((_email:Email) => {
-        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
-        loading.dismiss();
-        this.showToast(`Email address ${email} verified`);
-        let organization = new Organization({});
-        organization.email = email;
-        this.showSignupOwner(organization);
-      },
-      (error:any) => {
-        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Failed");
-        loading.dismiss();
-        this.showToast(`Unable to verify email ${email}`);
-      });
-    }
-  }
-
   private loadWebApp() {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadWebApp");
@@ -294,13 +276,17 @@ export class TenFourApp {
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", "Person", "None");
-          this.showSigninUrl();
+          if (location.hash == '') {
+            this.showSigninUrl();
+          }
           resolve(false);
         });
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", "Organization", "None");
-        this.showSigninUrl();
+        if (location.hash == '') {
+          this.showSigninUrl();
+        }
         resolve(false);
       });
     });
@@ -463,7 +449,23 @@ export class TenFourApp {
     });
   }
 
-  private showOnboardList(user:Person=null) {
+  private showSignupVerify(email:string, token:string) {
+    let organization = new Organization({email: email});
+    return Promise.resolve()
+      .then(() => { return this.nav.setRoot(SigninUrlPage, {}); })
+      .then(() => { return this.nav.push(SignupEmailPage, {}); })
+      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, token:token }); })
+      .then((loaded:any) => {
+        this.logger.info(this, "showSignupVerify", "Loaded");
+        this.hideSideMenu();
+        this.hideSplashScreen();
+      },
+      (error:any) => {
+        this.logger.error(this, "showSignupVerify", error);
+      });
+  }
+
+  private showOnboardList(user:User=null) {
     this.logger.info(this, "showOnboardList");
     this.nav.setRoot(OnboardListPage, {
       organization: this.organization,
@@ -539,21 +541,6 @@ export class TenFourApp {
     });
   }
 
-  private showSettingsList() {
-    this.logger.info(this, "showSettingsList");
-    this.nav.setRoot(SettingsListPage, {
-      organization: this.organization,
-      user: this.user
-    }).then((loaded:any) => {
-      this.logger.info(this, "showSettingsList", "Loaded");
-      this.hideSideMenu();
-      this.hideSplashScreen();
-    },
-    (error:any) => {
-      this.logger.error(this, "showSettingsList", error);
-    });
-  }
-
   private showPersonProfile() {
     this.logger.info(this, "showPersonProfile");
     this.nav.setRoot(PersonProfilePage, {
@@ -570,6 +557,21 @@ export class TenFourApp {
     },
     (error:any) => {
       this.logger.error(this, "showPersonProfile", error);
+    });
+  }
+
+  private showSettingsList() {
+    this.logger.info(this, "showSettingsList");
+    this.nav.setRoot(SettingsListPage, {
+      organization: this.organization,
+      user: this.user
+    }).then((loaded:any) => {
+      this.logger.info(this, "showSettingsList", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showSettingsList", error);
     });
   }
 

@@ -92,7 +92,7 @@ export class PersonEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.person) {
-      this.analytics.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name,
         person: this.person.name
       });
@@ -538,7 +538,7 @@ export class PersonEditPage extends BasePage {
   }
 
   private onKeyPress(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard();
       return false;

@@ -12,6 +12,7 @@
 ---
 [SignupEmailPage](/src/pages/signup-email/signup-email.ts) ([html](/src/pages/signup-email/signup-email.html), [scss](/src/pages/signup-email/signup-email.scss))
   * [SignupCheckPage](/src/pages/signup-url/signup-url.ts) ([html](/src/pages/signup-url/signup-url.html), [scss](/src/pages/signup-url/signup-url.scss))
+  * [SignupVerifyPage](/src/pages/signup-verify/signup-verify.ts) ([html](/src/pages/signup-verify/signup-verify.html), [scss](/src/pages/signup-verify/signup-verify.scss))
   * [SignupOwnerPage](/src/pages/signup-owner/signup-owner.ts) ([html](/src/pages/signup-owner/signup-owner.html), [scss](/src/pages/signup-owner/signup-owner.scss))
     * [SignupNamePage](/src/pages/signup-name/signup-name.ts) ([html](/src/pages/signup-name/signup-name.html), [scss](/src/pages/signup-name/signup-name.scss))
       * [SignupUrlPage](/src/pages/signup-url/signup-url.ts) ([html](/src/pages/signup-url/signup-url.html), [scss](/src/pages/signup-url/signup-url.scss))

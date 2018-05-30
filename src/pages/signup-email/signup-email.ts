@@ -13,7 +13,8 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupEmailPage',
-  segment: 'signup'
+  segment: 'signup',
+  defaultHistory: ['SigninUrlPage']
 })
 @Component({
   selector: 'page-signup-email',
@@ -44,7 +45,7 @@ export class SignupEmailPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.analytics.trackPage();
+    this.analytics.trackPage(this);
   }
 
   private showNext(event:any) {
@@ -55,19 +56,21 @@ export class SignupEmailPage extends BasePage {
         loading.dismiss();
         let organization = new Organization({});
         organization.email = this.email.value;
-        this.showPage(SignupCheckPage, {
-          organization: organization
+        this.storage.setOrganization(organization).then((stored:boolean) => {
+          this.showPage(SignupCheckPage, {
+            organization: organization
+          });
         });
       },
       (error:any) => {
         loading.dismiss();
-        this.showAlert("Email Verification", error);
+        this.showAlert("Email Signup", error);
       });
     }
   }
 
   private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.hideKeyboard();
       this.showNext(event);
       return false;

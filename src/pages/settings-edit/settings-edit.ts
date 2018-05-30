@@ -70,7 +70,7 @@ export class SettingsEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.analytics.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
@@ -172,7 +172,7 @@ export class SettingsEditPage extends BasePage {
 
   private onKeyPress(event:any) {
     this.logger.info(this, "onKeyPress", event.keyCode);
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard(event);
       return false;

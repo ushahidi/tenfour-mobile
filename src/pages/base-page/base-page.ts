@@ -22,6 +22,8 @@ export class BasePage {
   protected WIDTH_LARGE:number = 960;
   protected WIDTH_EXTRA_LARGE:number = 1140;
 
+  protected KEYCODE_RETURN:number = 13;
+
   protected offline:boolean = false;
   protected tablet:boolean = false;
   protected mobile:boolean = false;
@@ -115,11 +117,34 @@ export class BasePage {
   }
 
   protected hasParameter(param:string):boolean {
+    let urlParams = this.getUrlParams();
+    if (urlParams && urlParams[param] != null) {
+      return true;
+    }
     return this.navParams.get(param) != null;
   }
 
   protected getParameter<T extends Object>(param:string):T {
+    let urlParams = this.getUrlParams();
+    if (urlParams && urlParams[param]) {
+      let urlParam:any = urlParams[param];
+      return <T>urlParam;
+    }
     return <T>this.navParams.get(param);
+  }
+
+  protected getUrlParams():any {
+    let parameters = {};
+    if (window.location.href) {
+      let url = window.location.href;
+      let search = decodeURIComponent(url.slice(url.indexOf('?') + 1));
+      let definitions = search.split('&');
+      definitions.forEach((val, key) => {
+        let parts = val.split('=', 2);
+        parameters[parts[0]] = parts[1];
+      });
+    }
+    return parameters;
   }
 
   protected showLoading(message:string="Loading...", important:boolean=false):Loading {
@@ -176,31 +201,34 @@ export class BasePage {
     return modal;
   }
 
-  protected hideModal(data:any=null, options:any={}) {
+  protected hideModal(data:any=null, options:any={}):Promise<any> {
     return this.viewController.dismiss(data, options);
   }
 
-  protected showPage(page:any, params:any={}, options:any={}) {
+  protected showPage(page:any, params:any={}, options:any={}):Promise<any> {
     return this.navController.push(page, params, options);
   }
 
-  protected showRootPage(page:any, params:any={}, options:any={}) {
+  protected showRootPage(page:any, params:any={}, options:any={}):Promise<any> {
     return this.navController.setRoot(page, params, options);
   }
 
-  protected closePage(data:any=null, options:any={}) {
-    return this.viewController.dismiss(data, options);
+  protected closePage(data:any=null, options:any={}):Promise<any> {
+    if (this.navController.getViews().length > 1) {
+      return this.viewController.dismiss(data, options);
+    }
+    return Promise.resolve();
   }
 
-  protected showShare(subject:string, message:string=null, file:string=null, url:string=null) {
+  protected showShare(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
     return this.sharing.share(message, subject, file, url);
   }
 
-  protected showOfflineAlert() {
-    this.showAlert("Internet Offline", "There currently is no internet connection available.")
+  protected showOfflineAlert():Alert {
+    return this.showAlert("Internet Offline", "There currently is no internet connection available.")
   }
 
-  protected showUrl(url:string, target:string="_blank", event:any=null) {
+  protected showUrl(url:string, target:string="_blank", event:any=null):any {
     this.browser.open(url, target, event);
   }
 
@@ -209,7 +237,7 @@ export class BasePage {
   }
 
   protected hideKeyboard(event:any=null) {
-    this.keyboard.show();
+    this.keyboard.hide();
   }
 
   protected resizeContent(delay:number=100) {
@@ -258,6 +286,13 @@ export class BasePage {
         });
       }
     });
+  }
+
+  protected isKeyReturn(event:any):boolean {
+    if (event && event.keyCode && event.keyCode == 13) {
+      return true;
+    }
+    return false;
   }
 
 }

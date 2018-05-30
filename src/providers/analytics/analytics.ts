@@ -24,9 +24,7 @@ export class AnalyticsProvider {
   }
 
   public initialize() {
-    this.logger.info(this, "initialize", "Loaded");
     return this.segment.ready().then((ready:SegmentService) => {
-      this.logger.info(this, "initialize", "Ready");
       if (this.platform.is("cordova")) {
         this.segment.debug(this.device.isVirtual);
       }
@@ -54,8 +52,8 @@ export class AnalyticsProvider {
     });
   }
 
-  public trackPage(properties:any=null):Promise<any> {
-    let name = this.pageName();
+  public trackPage(page:any, properties:any=null):Promise<any> {
+    let name = this.pageName(page);
     return this.segment.page(name, properties).then(() => {
       this.logger.info(this, "trackPage", name, properties, "Posted");
     },
@@ -102,8 +100,8 @@ export class AnalyticsProvider {
     return name.join(" ");
   }
 
-  private pageName():string {
-    return this.constructor.name
+  private pageName(page:any):string {
+    return page.constructor.name
       .replace('Page', '')
       .replace(/([A-Z])/g, function(match) {
         return " " + match;

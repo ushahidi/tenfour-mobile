@@ -2,25 +2,25 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
+import { SignupVerifyPage } from '../../pages/signup-verify/signup-verify';
 
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
 
 import { ApiProvider } from '../../providers/api/api';
-import { StorageProvider } from '../../providers/storage/storage';
 import { MailerProvider } from '../../providers/mailer/mailer';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupCheckPage',
   segment: 'signup-check',
-  defaultHistory: ['SignupEmailPage']
+  defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
 })
 @Component({
   selector: 'page-signup-check',
   templateUrl: 'signup-check.html',
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
-  entryComponents:[ SignupOwnerPage ]
+  entryComponents:[ SignupVerifyPage ]
 })
 export class SignupCheckPage extends BasePage {
 
@@ -58,7 +58,7 @@ export class SignupCheckPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.analytics.trackPage();
+    this.analytics.trackPage(this);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -94,6 +94,10 @@ export class SignupCheckPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        },
+        (error:any) => {
+          this.organization = null;
+          resolve(null);
         });
       }
     });
@@ -111,17 +115,6 @@ export class SignupCheckPage extends BasePage {
   private openMail(event:any) {
     this.logger.info(this, "openMail");
     this.mailer.openEmail();
-  }
-
-  private sendEmail(event:any) {
-    let loading = this.showLoading("Resending...", true);
-    this.api.registerEmail(this.organization.email).then((email:Email) => {
-      loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Email Verification", error);
-    });
   }
 
 }

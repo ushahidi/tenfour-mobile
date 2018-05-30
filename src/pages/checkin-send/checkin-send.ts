@@ -69,7 +69,7 @@ export class CheckinSendPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.checkin) {
-      this.analytics.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name,
         checkin: this.checkin.message
       });

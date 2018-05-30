@@ -43,11 +43,12 @@ import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
-import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
-import { SignupNameModule } from '../pages/signup-name/signup-name.module';
-import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
+import { SignupVerifyModule } from '../pages/signup-verify/signup-verify.module';
+import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
+import { SignupNameModule } from '../pages/signup-name/signup-name.module';
+import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
 import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
 import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.module';
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
@@ -156,6 +157,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     SignupNameModule,
     SignupOwnerModule,
     SignupCheckModule,
+    SignupVerifyModule,
     SignupPlanModule,
     SignupPaymentModule,
     SignupPasswordModule,
