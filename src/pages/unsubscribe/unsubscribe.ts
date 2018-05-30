@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { SigninUrlPage } from '../signin-url/signin-url';
 
@@ -22,6 +22,21 @@ export class UnsubscribePage extends BasePage {
   token:string = null;
   email:string = null;
 
+  constructor(
+      protected zone:NgZone,
+      protected platform:Platform,
+      protected navParams:NavParams,
+      protected navController:NavController,
+      protected viewController:ViewController,
+      protected modalController:ModalController,
+      protected toastController:ToastController,
+      protected alertController:AlertController,
+      protected loadingController:LoadingController,
+      protected actionController:ActionSheetController,
+      protected api:ApiProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+  }
+
   ionViewWillEnter() {
     this.organization = this.getParameter<string>("org_name");
     this.token = this.getParameter<string>("token");
@@ -34,10 +49,22 @@ export class UnsubscribePage extends BasePage {
   }
 
   private confirm(event:any) {
+    this.logger.info(this, "confirm");
 
+    if (this.email && this.token) {
+      let loading = this.showLoading("Unsubscribing...", true);
+      this.api.unsubscribeEmail(this.email, this.token).then(() => {
+        loading.dismiss();
+        this.showToast("The email address has been unsubscribed");
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("There was an problem unsubscribing this email address. Please contact support.", error);
+      });
+    }
   }
 
-  private cancel(event:any) {
+  private done(event:any) {
     this.showPage(SigninUrlPage, {});
   }
 

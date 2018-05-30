@@ -1172,4 +1172,21 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public unsubscribeEmail(email:string, token:string):Promise<void> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/unsubscribe`;
+        let params = {
+          email: email,
+          token: token
+        };
+        this.logger.info(this, "unsubscribeEmail", url);
+        this.httpPost(url, params).then((data:any) => {
+          resolve();
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
 }
