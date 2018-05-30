@@ -85,6 +85,8 @@ import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.modu
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
 
+import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
+
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
 import { TitleizeModule } from '../pipes/titleize/titleize.module';
@@ -180,6 +182,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     SettingsChannelsModule,
     SettingsSizesModule,
     SettingsRegionsModule,
+    UnsubscribePageModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,
