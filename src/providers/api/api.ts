@@ -556,6 +556,34 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public acceptInvite(organization:Organization, person:Person, password:string, token:string):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/invite/${person.organization_id}/accept/${person.id}`;
+        let params = {
+          password: password,
+          token: token,
+          terms_of_service: true
+        };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          if (data && data.person) {
+            let person = new Person(data.person);
+            resolve(person);
+          }
+          else {
+            reject("Invitation Not Accepted");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public createContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {

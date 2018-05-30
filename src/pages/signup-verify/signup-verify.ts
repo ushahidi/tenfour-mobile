@@ -12,8 +12,8 @@ import { MailerProvider } from '../../providers/mailer/mailer';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'SignupCheckPage',
-  segment: 'signup-check',
+  name: 'SignupVerifyPage',
+  segment: 'signup/verify/:email/:token',
   defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
 })
 @Component({
@@ -59,7 +59,6 @@ export class SignupVerifyPage extends BasePage  {
     },
     (error:any) => {
       loading.dismiss();
-      this.showToast(error);
     });
   }
 

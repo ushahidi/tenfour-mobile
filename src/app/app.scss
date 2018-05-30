@@ -44,6 +44,11 @@ ion-item {
       color: #888888;
     }
   }
+  &.item-input {
+    ion-label {
+      color: #333333 !important;
+    }
+  }
 }
 ion-menu {
   ion-select {

@@ -13,7 +13,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupCheckPage',
-  segment: 'signup-check',
+  segment: 'signup/check',
   defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
 })
 @Component({
