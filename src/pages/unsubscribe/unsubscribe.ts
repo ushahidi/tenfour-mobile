@@ -1,12 +1,15 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
+import { SigninUrlPage } from '../signin-url/signin-url';
+
 import { BasePage } from '../../pages/base-page/base-page';
 import { ApiProvider } from '../../providers/api/api';
 
 @IonicPage({
   name: 'UnsubscribePage',
-  segment: 'unsubscribe/:email/:token/:org_name'
+  segment: 'unsubscribe/:email/:token/:org_name',
+  defaultHistory: ['SigninUrlPage']
 })
 @Component({
   selector: 'page-unsubscribe',
@@ -35,7 +38,7 @@ export class UnsubscribePage extends BasePage {
   }
 
   private cancel(event:any) {
-
+    this.showPage(SigninUrlPage, {});
   }
 
 }
