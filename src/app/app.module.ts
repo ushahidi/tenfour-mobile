@@ -41,6 +41,7 @@ import { SplashScreenModule } from '../pages/splash-screen/splash-screen.module'
 
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
+import { SigninInviteModule } from '../pages/signin-invite/signin-invite.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
@@ -151,6 +152,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     SigninUrlModule,
     SigninEmailModule,
     SigninUrlModule,
+    SigninInviteModule,
     SigninPasswordModule,
     SignupUrlModule,
     SignupEmailModule,

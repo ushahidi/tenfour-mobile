@@ -117,34 +117,18 @@ export class BasePage {
   }
 
   protected hasParameter(param:string):boolean {
-    let urlParams = this.getUrlParams();
-    if (urlParams && urlParams[param] != null) {
+    if (this.platform.getQueryParam(param) != null) {
       return true;
     }
     return this.navParams.get(param) != null;
   }
 
   protected getParameter<T extends Object>(param:string):T {
-    let urlParams = this.getUrlParams();
-    if (urlParams && urlParams[param]) {
-      let urlParam:any = urlParams[param];
-      return <T>urlParam;
+    this.platform.getQueryParam(param)
+    if (this.platform.getQueryParam(param) != null) {
+      return <T>this.platform.getQueryParam(param);
     }
     return <T>this.navParams.get(param);
-  }
-
-  protected getUrlParams():any {
-    let parameters = {};
-    if (window.location.href) {
-      let url = window.location.href;
-      let search = decodeURIComponent(url.slice(url.indexOf('?') + 1));
-      let definitions = search.split('&');
-      definitions.forEach((val, key) => {
-        let parts = val.split('=', 2);
-        parameters[parts[0]] = parts[1];
-      });
-    }
-    return parameters;
   }
 
   protected showLoading(message:string="Loading...", important:boolean=false):Loading {

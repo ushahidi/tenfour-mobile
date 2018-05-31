@@ -45,7 +45,7 @@ export class UnsubscribePage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.analytics.trackPage();
+    this.analytics.trackPage(this);
   }
 
   private confirm(event:any) {

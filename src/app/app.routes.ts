@@ -5,6 +5,7 @@ import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninInvitePage } from '../pages/signin-invite/signin-invite';
 
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
@@ -55,6 +56,7 @@ export class TenFourRoutes {
 
     { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
     { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:email/:subdomain/:token', defaultHistory: ['SigninUrlPage'] },
     { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },
 
     { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
