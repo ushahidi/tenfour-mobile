@@ -114,18 +114,30 @@ export class SignupPasswordPage extends BasePage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    if (this.password.value.length < 6) {
-      this.showToast("Password is too short");
+    if (this.password.value === "") {
+      this.showToast("Please enter a password");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
     }
-    else if (this.password.value != this.confirm.value) {
+    else if (this.password.value.length < 6) {
+      this.showToast("Password is too short");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
+    }
+    else if (this.password.value !== this.confirm.value) {
       this.showToast("Password and confirm do not match");
+      setTimeout(() => {
+        this.confirm.setFocus();
+      }, 500);
     }
     else if (this.accepted == false) {
-      this.showAlert("Terms of Service", "You must accept the Terms of Service before you can continue.");
+      this.showAlert("Terms of Service", "You must accept the Terms of Service and Privacy Policy before you can continue.");
     }
     else {
       this.loading = true;
-      let loading = this.showLoading("Creating...", true);
+      let loading = this.showLoading("Signing up...", true);
       this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then((organization:Organization) => {
         this.logger.info(this, "createOrganization", "Organization", organization);
@@ -139,6 +151,8 @@ export class SignupPasswordPage extends BasePage {
               organization.user_name = person.name;
               organization.password = this.password.value;
               let saves = [
+                this.storage.setOrganization(organization),
+                this.storage.setUser(person),
                 this.storage.saveOrganization(organization),
                 this.storage.savePerson(organization, person)
               ];

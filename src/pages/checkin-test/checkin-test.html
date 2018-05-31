@@ -17,6 +17,12 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
+    <ion-item color="white">
+      <ion-label>Send via</ion-label>
+      <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="checkin">
     <ion-list-header>
       <h2>Send To</h2>
     </ion-list-header>

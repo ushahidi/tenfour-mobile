@@ -204,23 +204,7 @@ export class CheckinSendPage extends BasePage {
     else {
       let loading = this.showLoading("Sending...", true);
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-        if (this.mobile) {
-          this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-            loading.dismiss();
-            let recipients = this.checkin.recipientIds().length;
-            if (recipients == 1) {
-              this.showToast(`Check-In sent to 1 person`);
-            }
-            else {
-              this.showToast(`Check-In sent to ${recipients} people`);
-            }
-            let firstViewController = this.navController.first();
-            this.navController.popToRoot({ animate: false }).then(() => {
-              firstViewController.dismiss({ checkin: Checkin });
-            });
-          });
-        }
-        else {
+        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {
@@ -233,7 +217,7 @@ export class CheckinSendPage extends BasePage {
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
           });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();

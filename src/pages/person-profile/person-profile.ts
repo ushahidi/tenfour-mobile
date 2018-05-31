@@ -43,6 +43,37 @@ export class PersonProfilePage extends PersonDetailsPage {
       protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, storage, events);
+    this.profile = true;
+  }
+
+  protected loadPerson(cache:boolean=true):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.person) {
+        resolve(this.person);
+      }
+      else if (cache && this.hasParameter("person")){
+        this.person = this.getParameter<Person>("person");
+        resolve(this.person);
+      }
+      else if (this.hasParameter("person_id")) {
+        let personId = this.getParameter<number>("person_id");
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, personId),
+          this.api.getPerson(this.organization, personId)).then((person:Person) => {
+            this.person = person;
+            resolve(person);
+        },
+        (error:any) => {
+          resolve(null);
+        });
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.person = user;
+          resolve(this.person);
+        });
+      }
+    });
   }
 
 }

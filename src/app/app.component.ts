@@ -261,8 +261,8 @@ export class TenFourApp {
         this.organization = organization;
         this.storage.getUser().then((user:User) => {
           this.logger.info(this, "loadWebApp", "User", user);
+          this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            this.user = user;
             this.logger.info(this, "loadWebApp", "Location", location.hash);
             if (location.hash == '') {
               this.showCheckinList();
@@ -270,7 +270,9 @@ export class TenFourApp {
             resolve(true);
           }
           else {
-            this.showOnboardList(user);
+            if (location.hash == '') {
+              this.showOnboardList(user);
+            }
             resolve(true);
           }
         },
@@ -472,7 +474,6 @@ export class TenFourApp {
       user: user
     }).then((loaded:any) => {
       this.logger.info(this, "showOnboardList", "Loaded");
-      this.hideSideMenu();
       this.hideSplashScreen();
     },
     (error:any) => {
@@ -480,7 +481,7 @@ export class TenFourApp {
     });
   }
 
-  private showCheckinList() {
+  private showCheckinList(event:any=null) {
     this.logger.info(this, "showCheckinList");
     this.nav.setRoot(CheckinListPage, {
       organization: this.organization,
@@ -495,7 +496,7 @@ export class TenFourApp {
     });
   }
 
-  private showGroupList() {
+  private showGroupList(event:any=null) {
     this.logger.info(this, "showGroupList");
     this.nav.setRoot(GroupListPage, {
       organization: this.organization,
@@ -510,7 +511,7 @@ export class TenFourApp {
     });
   }
 
-  private showNotificationList() {
+  private showNotificationList(event:any=null) {
     this.logger.info(this, "showNotificationList");
     this.nav.setRoot(NotificationListPage, {
       organization: this.organization,
@@ -526,7 +527,7 @@ export class TenFourApp {
     });
   }
 
-  private showPersonList() {
+  private showPersonList(event:any=null) {
     this.logger.info(this, "showPersonList");
     this.nav.setRoot(PersonListPage, {
       organization: this.organization,
@@ -541,15 +542,14 @@ export class TenFourApp {
     });
   }
 
-  private showPersonProfile() {
+  private showPersonProfile(event:any=null) {
     this.logger.info(this, "showPersonProfile");
     this.nav.setRoot(PersonProfilePage, {
       organization: this.organization,
       user: this.user,
       person: this.user,
       person_id: this.user.id,
-      profile: true,
-      title: "Profile"
+      profile: true
     }).then((loaded:any) => {
       this.logger.info(this, "showPersonProfile", "Loaded");
       this.hideSideMenu();
@@ -560,7 +560,7 @@ export class TenFourApp {
     });
   }
 
-  private showSettingsList() {
+  private showSettingsList(event:any=null) {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage, {
       organization: this.organization,
@@ -586,23 +586,22 @@ export class TenFourApp {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...", true);
     let removes = [
+      this.api.removeToken(this.organization),
+      this.storage.removeFirebase(),
       this.storage.removeOrganization(),
-      this.storage.removeUser()
+      this.storage.removeUser(),
+      this.storage.removeOrganizations(),
+      this.storage.removeSubscriptions(),
+      this.storage.removeNotifications(),
+      this.storage.removeCheckins(),
+      this.storage.removeAnswers(),
+      this.storage.removeReplies(),
+      this.storage.removeRecipients(),
+      this.storage.removeGroups(),
+      this.storage.removeEmails(),
+      this.storage.removePeople(),
+      this.storage.removeContacts()
     ];
-    if (this.mobile) {
-      removes.push(
-        this.storage.removeOrganizations(),
-        this.storage.removeSubscriptions(),
-        this.storage.removeNotifications(),
-        this.storage.removeCheckins(),
-        this.storage.removeAnswers(),
-        this.storage.removeReplies(),
-        this.storage.removeRecipients(),
-        this.storage.removeGroups(),
-        this.storage.removeEmails(),
-        this.storage.removePeople(),
-        this.storage.removeContacts());
-    }
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
       this.user = null;

@@ -73,6 +73,7 @@ export class PersonEditPage extends BasePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+    this.profile = this.getParameter<boolean>("profile");
     this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((finished:any) => {
