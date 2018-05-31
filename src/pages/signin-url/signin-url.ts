@@ -44,7 +44,7 @@ export class SigninUrlPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.analytics.trackPage();
+    this.analytics.trackPage(this);
   }
 
   private showNext(event:any) {
@@ -57,8 +57,10 @@ export class SigninUrlPage extends BasePage {
         loading.dismiss();
         if (organizations && organizations.length > 0) {
           let organization:Organization = organizations[0];
-          this.showPage(SigninEmailPage, {
-            organization: organization
+          this.storage.setOrganization(organization).then((stored:boolean) => {
+            this.showPage(SigninEmailPage, {
+              organization: organization
+            });
           });
         }
         else {
@@ -75,17 +77,11 @@ export class SigninUrlPage extends BasePage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    if (this.platform.is("ios")) {
-      this.showUrl("https://app.tenfour.org/organization/email", "_system");
-      // this.showPage(SignupEmailPage, {});
-    }
-    else {
-      this.showPage(SignupEmailPage, {});
-    }
+    this.showPage(SignupEmailPage, {});
   }
 
   private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.hideKeyboard();
       this.showNext(event);
       return false;

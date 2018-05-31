@@ -464,11 +464,14 @@ export class HttpProvider {
       }
       else if (typeof error === 'string') {
         this.logger.error(this, "httpError", "String", error);
-        return error['error'];
+        return error['error'] || error;
       }
       else if (typeof error === 'object') {
         this.logger.error(this, "httpError", "Object", error);
-        if (error['message']) {
+        if (error['status'] == 409) {
+          return "Conflict";
+        }
+        else if (error['message']) {
           return error['message'];
         }
         else if (error['error']) {

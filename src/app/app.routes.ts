@@ -6,11 +6,12 @@ import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
-import { SignupUrlPage} from '../pages/signup-url/signup-url';
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
-import { SignupNamePage } from '../pages/signup-name/signup-name';
-import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
+import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
+import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
+import { SignupNamePage } from '../pages/signup-name/signup-name';
+import { SignupUrlPage} from '../pages/signup-url/signup-url';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPaymentPage } from '../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
@@ -54,16 +55,17 @@ export class TenFourRoutes {
 
     { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
     { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email', defaultHistory: ['SigninUrlPage'] },
-    { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },
 
-    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup' },
-    { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
+    { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:token', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage'] },
+    { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage'] },
+    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
+    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
+    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage', 'SignupPlanPage'] },
 
     { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 

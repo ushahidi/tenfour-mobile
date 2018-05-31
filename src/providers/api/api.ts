@@ -204,7 +204,7 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem registering email ${email}.`);
       });
     });
   }
@@ -221,7 +221,7 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem verifying email ${email}.`);
       });
     });
   }
@@ -237,7 +237,7 @@ export class ApiProvider extends HttpProvider {
         resolve(true);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem resetting password for ${email}.`);
       });
     });
   }

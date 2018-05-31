@@ -79,7 +79,7 @@ export class CheckinListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.analytics.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }

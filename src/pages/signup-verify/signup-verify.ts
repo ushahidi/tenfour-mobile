@@ -2,42 +2,33 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
-import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
-import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
-import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
+import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { Organization } from '../../models/organization';
-import { User } from '../../models/user';
-import { Person } from '../../models/person';
+import { Email } from '../../models/email';
 
 import { ApiProvider } from '../../providers/api/api';
+import { MailerProvider } from '../../providers/mailer/mailer';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'SettingsSizesPage',
-  segment: 'settings/sizes',
-  defaultHistory: ['SettingsListPage']
+  name: 'SignupCheckPage',
+  segment: 'signup-check',
+  defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
 })
 @Component({
-  selector: 'page-settings-sizes',
-  templateUrl: 'settings-sizes.html',
-  providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
+  selector: 'page-signup-verify',
+  templateUrl: 'signup-verify.html',
+  providers: [ ApiProvider, StorageProvider, MailerProvider ],
+  entryComponents:[ SignupOwnerPage ]
 })
-export class SettingsSizesPage extends BasePage {
+export class SignupVerifyPage extends BasePage  {
 
   organization:Organization = null;
-  user:User = null;
-  sizes:any = [
-    { name: 'Unspecified', key: "unspecified" },
-    { name: '1-10', key: "1-10" },
-    { name: '11-50', key: "11-50" },
-    { name: '51-100', key: "51-100" },
-    { name: '101-250', key: "101-250" },
-    { name: '251-500', key: "251-500" },
-    { name: '501-1000', key: "501-1000" },
-    { name: 'More than 1000', key: "More than 1000" }];
+  email:string = null;
+  token:string = null;
+  loading:boolean = false;
+  verified:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -51,8 +42,13 @@ export class SettingsSizesPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected mailer:MailerProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+  }
+
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
   }
 
   ionViewWillEnter() {
@@ -69,18 +65,16 @@ export class SettingsSizesPage extends BasePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    if (this.organization) {
-      this.analytics.trackPage(this, {
-        organization: this.organization.name
-      });
-    }
+    this.analytics.trackPage(this);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadEmail(); })
+      .then(() => { return this.loadToken(); })
+      .then(() => { return this.verifyEmail(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -109,48 +103,77 @@ export class SettingsSizesPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        },
+        (error:any) => {
+          this.organization = null;
+          resolve(null);
         });
       }
     });
   }
 
-  private loadUser(cache:boolean=true):Promise<User> {
+  private loadEmail():Promise<string> {
     return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
+      if (this.hasParameter("email")) {
+        this.email = this.getParameter<string>("email");
+        resolve(this.email);
       }
       else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
+        this.email = null;
+        resolve(null);
+      }
+    })
+  }
+
+  private loadToken():Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.hasParameter("token")){
+        this.token = this.getParameter<string>("token");
+        resolve(this.token);
+      }
+      else {
+        this.token = null;
+        resolve(null);
+      }
+    })
+  }
+
+  private verifyEmail() {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token);
+      if (this.email && this.email.length > 0 && this.token && this.token.length > 0) {
+        let loading = this.showLoading("Verifying...", true);
+        this.api.verifyEmail(this.email, this.token).then((_email:Email) => {
+          this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Verified");
+          loading.dismiss();
+          this.verified = true;
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Failed");
+          loading.dismiss();
+          this.verified = false;
+          resolve(false);
         });
+      }
+      else {
+        this.verified = false;
+        resolve(false);
       }
     });
   }
 
-  private cancelEdit(event:any) {
-    this.hideModal();
+  private showSignupOwner(event:any=null) {
+    let organization = new Organization({
+      email: this.email
+    });
+    this.showPage(SignupOwnerPage, {
+      organization: organization
+    });
   }
 
-  private doneEdit(event:any) {
-    this.logger.info(this, "doneEdit", "Size", this.organization.size)
-    let loading = this.showLoading("Updating...", true);
-    this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.storage.saveOrganization(organization).then(saved => {
-        loading.dismiss();
-        this.hideModal({
-          organization: organization
-        });
-      });
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Updating Organization", error);
-    });
+  private returnPrevious(event:any=null) {
+    this.closePage();
   }
 
 }

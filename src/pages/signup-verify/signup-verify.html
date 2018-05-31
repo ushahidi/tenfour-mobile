@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/dots.png"/>
+      <h2>Let's set up your new organization.</h2>
+      <p *ngIf="email && verified">Your invitation was sent to {{email}}. Is that the correct email address?</p>
+      <p *ngIf="email && loading">Verifying {{email}} address...</p>
+      <p *ngIf="loading == false && verified == false">There was a problem verifying your email address.</p>
+    </ion-item>
+    <ion-item no-lines class="action" *ngIf="organization && verified">
+      <div text-center>
+        <button ion-button color="primary" (click)="showSignupOwner($event)">Yes, that's the right address</button>
+      </div>
+      <div text-center>
+        <button ion-button color="secondary" (click)="returnPrevious($event)">No, switch to another address</button>
+      </div>
+    </ion-item>
+    <ion-item no-lines class="action" *ngIf="loading == false && verified == false">
+      <div text-center>
+        <button ion-button color="secondary" (click)="returnPrevious($event)">Use a different address</button>
+      </div>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info" *ngIf="organization && verified">
+      <p>If that’s not right, you can switch to a different email address.</p>
+      <p>We’ll send you a new invitation to that address.</p>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info" *ngIf="loading == false && verified == false">
+      <p>Looks like the verification code may have expired or has already been verified.</p>
+    </ion-item>
+  </ion-list>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+</ion-content>
