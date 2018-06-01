@@ -101,6 +101,6 @@ export class TenFourRoutes {
     { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
     { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
 
-    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:email/:token/:org_name' },
+    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' },
   ];
 }
