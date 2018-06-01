@@ -3,7 +3,7 @@
     <ion-buttons left>
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
-    <ion-title>Payments</ion-title>
+    <ion-title>Plan & Credits</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
     </ion-buttons>
@@ -12,7 +12,7 @@
 <ion-content color="white">
   <div padding *ngIf="mobile">
     <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
-    <button ion-button block color="primary" (click)="showUrl(url, '_blank', $event)">Visit Website</button>
+    <button ion-button color="primary" (click)="showUrl(url, '_blank', $event)">Visit Website</button>
   </div>
   <div *ngIf="website">
     <ion-list>

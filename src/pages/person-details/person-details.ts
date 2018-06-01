@@ -31,7 +31,7 @@ export class PersonDetailsPage extends BasePage {
   organization:Organization = null;
   user:User = null;
   person:Person = null;
-  title:string = null;
+  profile:boolean = false;
   loading:boolean = false;
   limit:number = 3;
   offset:number = 0;
@@ -56,7 +56,6 @@ export class PersonDetailsPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.title = this.getParameter<string>("title");
     this.modal = this.getParameter<boolean>("modal");
     this.loading = true;
     let loading = this.showLoading("Loading...");
@@ -213,6 +212,7 @@ export class PersonDetailsPage extends BasePage {
       user: this.user,
       person: this.person,
       person_id: this.person.id,
+      profile: this.profile,
       modal: true
     });
     modal.onDidDismiss((data:any) => {

@@ -1,4 +1,4 @@
-<ion-split-pane #splitPane [enabled]="organization && user && (tablet == true || mobile == false)">
+<ion-split-pane #splitPane [enabled]="organization && user && (tablet == true || website == true || desktop == true)">
   <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">

@@ -3,8 +3,9 @@
     <ion-buttons left>
       <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
-    <ion-title *ngIf="editing == true">Edit Person</ion-title>
-    <ion-title *ngIf="editing == false">Add Person</ion-title>
+    <ion-title *ngIf="profile == true">Edit Profile</ion-title>
+    <ion-title *ngIf="profile == false && editing == true">Edit Person</ion-title>
+    <ion-title *ngIf="profile == false && editing == false">Add Person</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" *ngIf="editing == true" (click)="savePersonAndContacts('Updating', $event)">Save</button>
       <button ion-button color="primary" *ngIf="editing == false" (click)="savePersonAndContacts('Creating', $event)">Create</button>

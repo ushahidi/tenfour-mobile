@@ -47,12 +47,12 @@ export class ApiProvider extends HttpProvider {
     super(platform, http, httpNative, file, transfer, logger);
   }
 
-  public saveToken(organization:Organization, token:Token) {
+  public saveToken(organization:Organization, token:Token):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveToken", token);
       let json = JSON.stringify(token);
       this.storage.set(organization.subdomain, json).then((data:any) => {
-        resolve(data);
+        resolve(true);
       },
       (error:any) => {
         this.logger.error(this, "saveToken", token, "Error", error);
@@ -101,7 +101,7 @@ export class ApiProvider extends HttpProvider {
         resolve(true);
       },
       (error:any) => {
-        reject(error);
+        resolve(false);
       });
     });
   }
@@ -490,6 +490,9 @@ export class ApiProvider extends HttpProvider {
         if (person.config_profile_reviewed) {
           params['config_profile_reviewed'] = true;
         }
+        if (person.config_people_invited) {
+          params['config_people_invited'] = true;
+        }
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
         }
@@ -558,25 +561,21 @@ export class ApiProvider extends HttpProvider {
 
   public acceptInvite(organization:Organization, person:Person, password:string, token:string):Promise<Person> {
     return new Promise((resolve, reject) => {
-      this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/invite/${person.organization_id}/accept/${person.id}`;
-        let params = {
-          password: password,
-          token: token,
-          terms_of_service: true
-        };
-        this.httpPost(url, params, token.access_token).then((data:any) => {
-          if (data && data.person) {
-            let person = new Person(data.person);
-            resolve(person);
-          }
-          else {
-            reject("Invitation Not Accepted");
-          }
-        },
-        (error:any) => {
-          reject(error);
-        });
+      let url = `${this.api}/invite/${organization.id}/accept/${person.id}`;
+      let params = {
+        password: password,
+        invite_token: token,
+        terms_of_service: true
+      };
+      this.httpPost(url, params, null).then((data:any) => {
+        this.logger.info(this, "acceptInvite", data);
+        if (data && data.person) {
+          let person = new Person(data.person);
+          resolve(person);
+        }
+        else {
+          reject("Invitation Not Accepted");
+        }
       },
       (error:any) => {
         reject(error);

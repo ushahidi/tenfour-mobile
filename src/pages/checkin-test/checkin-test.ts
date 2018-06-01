@@ -132,9 +132,9 @@ export class CheckinTestPage extends BasePage {
         user_id: this.user.id,
         user_initials: this.user.initials,
         user_picture: this.user.profile_picture,
-        message: "Did you receive this test Check-in?",
+        message: "Did you receive this test Check-In?",
         self_test_check_in: true,
-        send_via: ['app']
+        send_via: 'app'
       });
       this.checkin.answers = [];
       this.checkin.answers.push(new Answer({
@@ -159,22 +159,13 @@ export class CheckinTestPage extends BasePage {
   private sendCheckin(event:any) {
     let loading = this.showLoading("Sending...", true);
     this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-      if (this.mobile) {
-        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-          loading.dismiss();
-          this.showToast("Test Check-In sent");
-          this.hideModal({
-            checkin: checkin
-          });
-        });
-      }
-      else {
+      this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
         loading.dismiss();
         this.showToast("Test Check-In sent");
         this.hideModal({
           checkin: checkin
         });
-      }
+      });
     },
     (error:any) => {
       loading.dismiss();

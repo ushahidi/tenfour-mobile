@@ -61,12 +61,10 @@ export class CheckinListPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
-      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
       this.loadWaitingResponse(true, this.mobile);
     },
     (error:any) => {
-      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
       loading.dismiss();
     });
   }
@@ -122,6 +120,9 @@ export class CheckinListPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        },
+        (error:any) => {
+          reject("Problem loading organization");
         });
       }
     });
@@ -140,6 +141,9 @@ export class CheckinListPage extends BasePage {
         this.storage.getUser().then((user:User) => {
           this.user = user;
           resolve(this.user);
+        },
+        (error:any) => {
+          reject("Problem loading user");
         });
       }
     });
@@ -151,6 +155,7 @@ export class CheckinListPage extends BasePage {
       this.promiseFallback(cache,
         this.storage.getCheckins(this.organization, this.limit, this.offset),
         this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
+          this.logger.info(this, "loadCheckins", checkins.length);
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
               if (this.user && this.user.id == reply.user_id) {
@@ -165,6 +170,7 @@ export class CheckinListPage extends BasePage {
           });
         },
         (error:any) => {
+          this.logger.error(this, "loadCheckins", error);
           this.organization.checkins = [];
           this.checkins = [];
           reject(error);

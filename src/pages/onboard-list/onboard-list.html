@@ -1,25 +1,28 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title>TenFour</ion-title>
+    <button ion-button icon-only menuToggle color="primary">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title></ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content padding>
-  <div text-center margin-bottom *ngIf="organization && person">
-    <div *ngIf="(person.isOwnerOrAdmin() && person.config_people_invited == false) || person.config_profile_reviewed == false || person.config_self_test_sent == false">
+  <div text-center margin-bottom *ngIf="organization && user">
+    <div margin-top *ngIf="(user.isOwnerOrAdmin() && user.config_people_invited == false) || user.config_profile_reviewed == false || user.config_self_test_sent == false">
       <h3>Let's make sure {{organization.name}} is ready.</h3>
       <h5 *ngIf="loading == true">Loading your organization...</h5>
       <h5 *ngIf="loading == false">There's a few things we can do to ensure everything's in order:</h5>
     </div>
     <div *ngIf="loading == false">
-      <div text-center margin-bottom *ngIf="(person.isOwnerOrAdmin() == false || person.config_people_invited == true) && person.config_profile_reviewed == true && person.config_self_test_sent == true">
+      <div text-center margin-bottom margin-top *ngIf="(user.isOwnerOrAdmin() == false || user.config_people_invited == true) && user.config_profile_reviewed == true && user.config_self_test_sent == true">
         <h3>Good news, you're all set!</h3>
       </div>
-      <div *ngIf="person.isOwnerOrAdmin()">
-        <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="person.config_people_invited == true">
+      <div *ngIf="user.isOwnerOrAdmin()">
+        <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="user.config_people_invited == true">
           <ion-icon class="completed" color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
           <h5 no-margin>You added people to {{organization.name}}</h5>
         </div>
-        <ion-card tappable margin-top margin-bottom *ngIf="person.config_people_invited == false" (click)="taskAddPeople($event)">
+        <ion-card tappable margin-top margin-bottom *ngIf="user.config_people_invited == false" (click)="taskAddPeople($event)">
           <ion-card-content>
             <div class="icon-border">
               <ion-icon ios="ios-person-add" md="md-person-add"></ion-icon>
@@ -29,11 +32,11 @@
           </ion-card-content>
         </ion-card>
       </div>
-      <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="person.config_profile_reviewed == true">
+      <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="user.config_profile_reviewed == true">
         <ion-icon class="completed" color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
         <h5 no-margin>You reviewed your contact information</h5>
       </div>
-      <ion-card tappable margin-top margin-bottom [class.disabled]="person.isOwnerOrAdmin() && person.config_people_invited == false" *ngIf="person.config_profile_reviewed == false" (click)="taskReviewContact($event)">
+      <ion-card tappable margin-top margin-bottom [class.disabled]="user.isOwnerOrAdmin() && user.config_people_invited == false" *ngIf="user.config_profile_reviewed == false" (click)="taskReviewContact($event)">
         <ion-card-content>
           <div class="icon-border">
             <ion-icon ios="ios-person" md="md-person"></ion-icon>
@@ -42,11 +45,11 @@
           <h5>Make sure your information is complete and accurate, and that you have at least one phone number or email added for when it matters most.</h5>
         </ion-card-content>
       </ion-card>
-      <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="person.config_self_test_sent == true">
+      <div margin-top margin-bottom padding-left padding-right padding-bottom *ngIf="user.config_self_test_sent == true">
         <ion-icon class="completed" color="primary" ios="md-checkmark" md="md-checkmark"></ion-icon>
         <h5 no-margin>You sent a test Check-In to yourself</h5>
       </div>
-      <ion-card tappable margin-top margin-bottom [class.disabled]="person.config_profile_reviewed == false" *ngIf="person.config_self_test_sent == false" (click)="taskSendCheckin($event)">
+      <ion-card tappable margin-top margin-bottom [class.disabled]="user.config_profile_reviewed == false" *ngIf="user.config_self_test_sent == false" (click)="taskSendCheckin($event)">
         <ion-card-content>
           <div class="icon-border">
             <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
@@ -56,10 +59,10 @@
         </ion-card-content>
       </ion-card>
       <div padding-left padding-right padding-bottom>
-        <button ion-button block margin-top color="primary" tappable (click)="showCheckinList($event)"
-                *ngIf="(person.isOwnerOrAdmin() == false || person.config_people_invited == true) && person.config_profile_reviewed == true && person.config_self_test_sent == true">Ok, all finished</button>
+        <button ion-button margin-top color="primary" tappable (click)="showCheckinList($event)"
+                *ngIf="(user.isOwnerOrAdmin() == false || user.config_people_invited == true) && user.config_profile_reviewed == true && user.config_self_test_sent == true">Ok, all finished</button>
         <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
-                *ngIf="(person.isOwnerOrAdmin() && person.config_people_invited == false) || person.config_profile_reviewed == false || person.config_self_test_sent == false">Skip ahead, I'm ready to get started</button>
+                *ngIf="(user.isOwnerOrAdmin() && user.config_people_invited == false) || user.config_profile_reviewed == false || user.config_self_test_sent == false">Skip ahead, I'm ready to get started</button>
       </div>
     </div>
   </div>
