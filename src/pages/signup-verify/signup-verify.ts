@@ -24,7 +24,6 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class SignupVerifyPage extends BasePage  {
 
-  organization:Organization = null;
   email:string = null;
   token:string = null;
   loading:boolean = false;
@@ -42,8 +41,8 @@ export class SignupVerifyPage extends BasePage  {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected mailer:MailerProvider) {
+      protected mailer:MailerProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -69,8 +68,9 @@ export class SignupVerifyPage extends BasePage  {
 
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    this.verified = false;
     return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadEmail(); })
       .then(() => { return this.loadToken(); })
       .then(() => { return this.verifyEmail(); })
@@ -79,36 +79,17 @@ export class SignupVerifyPage extends BasePage  {
         if (event) {
           event.complete();
         }
+        this.loading = false;
+        this.verified = true;
       })
       .catch((error) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
-        this.showToast(error);
+        this.loading = false;
+        this.verified = false;
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        },
-        (error:any) => {
-          this.organization = null;
-          resolve(null);
-        });
-      }
-    });
   }
 
   private loadEmail():Promise<string> {
@@ -119,7 +100,7 @@ export class SignupVerifyPage extends BasePage  {
       }
       else {
         this.email = null;
-        resolve(null);
+        reject("Email not provided");
       }
     })
   }
@@ -132,7 +113,7 @@ export class SignupVerifyPage extends BasePage  {
       }
       else {
         this.token = null;
-        resolve(null);
+        reject("Token not provided");
       }
     })
   }
@@ -141,23 +122,17 @@ export class SignupVerifyPage extends BasePage  {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token);
       if (this.email && this.email.length > 0 && this.token && this.token.length > 0) {
-        let loading = this.showLoading("Verifying...", true);
         this.api.verifyEmail(this.email, this.token).then((_email:Email) => {
           this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Verified");
-          loading.dismiss();
-          this.verified = true;
           resolve(true);
         },
         (error:any) => {
           this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Failed");
-          loading.dismiss();
-          this.verified = false;
-          resolve(false);
+          reject(error);
         });
       }
       else {
-        this.verified = false;
-        resolve(false);
+        reject("Email and token not provided");
       }
     });
   }

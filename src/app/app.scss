@@ -135,7 +135,7 @@ ion-list {
       p {
         font-size: 1.0em;
         text-align: center;
-        margin-top: 15px;
+        margin-top: 10px;
       }
     }
     &.hint {
@@ -146,9 +146,13 @@ ion-list {
       }
     }
     &.action {
+      text-align: center;
       .item-button {
         padding: 1.4em;
         font-weight: 500;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
     &.other {

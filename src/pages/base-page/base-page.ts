@@ -74,9 +74,9 @@ export class BasePage {
       this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
-      this.phone = this.platform.is('ios') || this.platform.is('android');
-      this.website = this.platform.is('cordova') == false || this.platform.is('mobileweb');
       this.desktop = this.platform.is('core');
+      this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
+      this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
     })
   }
 

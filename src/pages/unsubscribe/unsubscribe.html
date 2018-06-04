@@ -13,9 +13,9 @@
       <h2>Are you sure you want to prevent {{organization}} from reaching you at {{email}}</h2>
       <p>If you choose to stop receiving Check-Ins at this address, your organization may have a hard time reaching you in an emergency.</p>
     </ion-item>
-    <ion-item no-lines class="action">
-      <button ion-button block color="danger" (click)="confirm($event)">Do not send Check-Ins to this address</button>
-      <button ion-button block color="primary" (click)="done($event)">Nevermind, I want to receive Check-Ins</button>
+    <ion-item no-lines text-center class="action">
+      <button ion-button margin-bottom [block]="phone" color="danger" (click)="confirm($event)">Do not send Check-Ins to this address</button>
+      <button ion-button margin-bottom [block]="phone" color="primary" (click)="done($event)">Nevermind, I want to receive Check-Ins</button>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -216,7 +216,7 @@ export class ApiProvider extends HttpProvider {
         address: email,
         token: token
       };
-      this.httpGet(url, params).then((data:any) => {
+      this.httpPost(url, params).then((data:any) => {
         let email = new Email(data);
         resolve(email);
       },
