@@ -21,18 +21,10 @@
   }
 }
 ion-toolbar {
-  button {
-    img {
-      height: 35px;
-      max-height: 100%;
-      &.dots {
-
-      }
-      &.logo {
-        border-radius: 50%;
-        -webkit-border-radius: 50%;
-      }
-    }
+  organization-logo {
+    margin-left: 5px;
+    height: 35px;
+    max-height: 100%;
   }
 }
 ion-item {

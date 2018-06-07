@@ -13,11 +13,11 @@ export class Notification extends Model {
       if (data.data.reply_from) {
         this.reply_from = data.data.reply_from;
       }
-      if (data.data.checkin_id) {
-        this.checkin_id = data.data.checkin_id;
+      if (data.data.check_in_id) {
+        this.checkin_id = data.data.check_in_id;
       }
-      if (data.data.checkin_message) {
-        this.checkin_message = data.data.checkin_message;
+      if (data.data.check_in_message) {
+        this.checkin_message = data.data.check_in_message;
       }
       if (data.data.person_id) {
         this.person_id = data.data.person_id;

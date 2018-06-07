@@ -105,6 +105,7 @@ import { CheckinDetailModule } from '../components/checkin-details/checkin-detai
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
 import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
+import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -139,6 +140,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     ReactiveFormsModule,
     SplashScreenModule,
     PersonAvatarModule,
+    OrganizationLogoModule,
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,

@@ -3,14 +3,9 @@
     <ion-header>
       <ion-toolbar color="navbar">
         <ion-buttons left>
-          <button ion-button clear color="primary" *ngIf="organization">
-            <img class="dots" [src]="defaultLogo" *ngIf="organization.profile_picture == null || organization.profile_picture.length == 0">
-            <img class="logo" [src]="organization.profile_picture" *ngIf="organization.profile_picture != null && organization.profile_picture.length > 0">
-          </button>
+          <organization-logo item-left [image]="organization.profile_picture" *ngIf="organization"></organization-logo>
         </ion-buttons>
-        <ion-title *ngIf="organization">
-          {{organization.name}}
-        </ion-title>
+        <ion-title *ngIf="organization">{{organization.name}}</ion-title>
       </ion-toolbar>
     </ion-header>
     <ion-content>
