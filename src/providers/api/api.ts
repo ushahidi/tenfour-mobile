@@ -211,11 +211,8 @@ export class ApiProvider extends HttpProvider {
 
   public verifyEmail(email:string, token:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email/`;
-      let params = {
-        address: email,
-        token: token
-      };
+      let url = `${this.api}/verification/email/?address=${email}&token=${token}`;
+      let params = {};
       this.httpGet(url, params).then((data:any) => {
         let email = new Email(data);
         resolve(email);

@@ -43,7 +43,7 @@
       <p>Passwords must be at least 6 characters and cannot be sequences, like 123456 or abcdef.</p>
     </ion-item>
     <ion-item text-center no-lines class="action">
-      <button ion-button color="primary" (click)="acceptInitation($event)">Ok, all finished</button>
+      <button ion-button [block]="phone" color="primary" (click)="acceptInitation($event)">Ok, all finished</button>
     </ion-item>
   </ion-list>
   <div text-center class="spinner" *ngIf="loading == true">

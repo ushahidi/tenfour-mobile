@@ -45,29 +45,29 @@ export class AnalyticsProvider {
 
   public trackIdentify(user:any, traits:any=null):Promise<any> {
     return this.segment.identify("" + user, traits).then(() => {
-      this.logger.info(this, "trackIdentify", user, traits, "Posted");
+      this.logger.info(this, "trackIdentify", user, traits|| "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackIdentify", user, traits, "Failed", error);
+      this.logger.error(this, "trackIdentify", user, traits|| "", "Failed", error);
     });
   }
 
   public trackPage(page:any, properties:any=null):Promise<any> {
     let name = this.pageName(page);
     return this.segment.page(name, properties).then(() => {
-      this.logger.info(this, "trackPage", name, properties, "Posted");
+      this.logger.info(this, "trackPage", name, properties || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackPage", name, properties, "Failed", error);
+      this.logger.error(this, "trackPage", name, properties|| "", "Failed", error);
     });
   }
 
   public trackEvent(event:string, properties:any=null):Promise<any> {
     return this.segment.track(event, properties).then(() => {
-      this.logger.info(this, "trackEvent", event, "Posted");
+      this.logger.info(this, "trackEvent", event, properties || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackPage", event, "Failed", error);
+      this.logger.error(this, "trackPage", event, properties || "", "Failed", error);
     });
   }
 
