@@ -86,7 +86,7 @@ export class HttpProvider {
           search: search });
         this.logger.info(this, "GET", url, params);
         this.http.get(url, options)
-          .timeout(12000)
+          .timeout(15000)
           .map(res => res.json())
           .catch((error:any) => {
             this.logger.error(this, "httpGet", error);
@@ -143,7 +143,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(12000)
+          .timeout(15000)
           .map(res => {
             if (res.status == 204) {
               return {}
@@ -206,7 +206,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PUT", url, params);
         this.http.put(url, params, options)
-          .timeout(12000)
+          .timeout(15000)
           .map(res => {
             if (res.status == 204) {
               return {}
@@ -269,7 +269,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PATCH", url, params);
         this.http.patch(url, params, options)
-          .timeout(12000)
+          .timeout(15000)
           .map(res => {
             if (res.status == 204) {
               return {}
@@ -332,7 +332,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "DELETE", url);
         this.http.delete(url, options)
-          .timeout(12000)
+          .timeout(15000)
           .map(res => {
             this.logger.info(this, "DELETE", url, res);
             if (res.status == 201) {

@@ -19,6 +19,8 @@
   </div>
   <ion-list *ngIf="show_groups && organization && organization.groups">
     <ion-list-header>
+      <button float-right ion-button clear tappable color="primary" *ngIf="organization.groups.length > 0" (click)="selectAllGroups(false)">Deselect All</button>
+      <button float-right ion-button clear tappable color="primary" *ngIf="organization.groups.length > 0" (click)="selectAllGroups(true)">Select All</button>
       <h2>Groups</h2>
     </ion-list-header>
     <ion-item color="white" *ngFor="let group of organization.groups">
@@ -29,6 +31,8 @@
   </ion-list>
   <ion-list *ngIf="show_people && organization && organization.people">
     <ion-list-header>
+      <button float-right ion-button clear tappable color="primary" *ngIf="organization.people.length > 0" (click)="selectAllPeople(false)">Deselect All</button>
+      <button float-right ion-button clear tappable color="primary" *ngIf="organization.people.length > 0" (click)="selectAllPeople(true)">Select All</button>
       <h2>People</h2>
     </ion-list-header>
     <ion-item color="white" *ngFor="let person of organization.people">
@@ -37,7 +41,4 @@
       <ion-checkbox item-right [(ngModel)]="person.selected"></ion-checkbox>
     </ion-item>
   </ion-list>
-  <ion-infinite-scroll (ionInfinite)="loadMore(true, $event)" *ngIf="show_people && organization && organization.people">
-    <ion-infinite-scroll-content></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
 </ion-content>
