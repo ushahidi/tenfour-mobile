@@ -716,15 +716,20 @@ export class StorageProvider {
     return new Promise((resolve, reject) => {
       let where = { id: id };
       this.provider.getModel<Checkin>(new Checkin(), where).then((checkin:Checkin) => {
-        Promise.all([
-          this.getAnswers(organization, checkin),
-          this.getReplies(organization, checkin),
-          this.getRecipients(organization, checkin)]).then((results:any[]) => {
-            checkin.answers = <Answer[]>results[0];
-            checkin.replies = <Reply[]>results[1];
-            checkin.recipients = <Recipient[]>results[2];
-            resolve(checkin);
-        });
+        if (checkin) {
+          Promise.all([
+            this.getAnswers(organization, checkin),
+            this.getReplies(organization, checkin),
+            this.getRecipients(organization, checkin)]).then((results:any[]) => {
+              checkin.answers = <Answer[]>results[0];
+              checkin.replies = <Reply[]>results[1];
+              checkin.recipients = <Recipient[]>results[2];
+              resolve(checkin);
+          });
+        }
+        else {
+          resolve(null);
+        }
       });
     });
   }

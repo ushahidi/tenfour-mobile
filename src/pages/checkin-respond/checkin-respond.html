@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelReply($event)">Cancel</button>
+      <button ion-button color="primary" *ngIf="modal" (click)="cancelReply($event)">Cancel</button>
     </ion-buttons>
     <ion-title *ngIf="checkins && checkins.length == 0"></ion-title>
     <ion-title *ngIf="checkins && checkins.length > 1">{{index + 1}} / {{checkins.length}}</ion-title>
@@ -18,10 +18,10 @@
         <ion-item text-wrap color="white">
           <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
           <h1 text-center>{{checkin.message}}</h1>
-          <p text-center>{{checkin.created_at | dateTime}} <strong> {{checkin.user_name}}</strong></p>
+          <p text-center>{{checkin.created_at | dateTime}} <strong>{{checkin.user_name}}</strong></p>
         </ion-item>
       </ion-list>
-      <div class="buttons" margin-top margin-bottom *ngIf="checkin && checkin.reply">
+      <div class="buttons" margin-top margin-bottom *ngIf="checkin && checkin.reply && checkin.answers">
         <div padding-left padding-right *ngFor="let answer of checkin.answers">
           <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
           <button ion-button block outline color="grey" *ngIf="answer.answer != checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>

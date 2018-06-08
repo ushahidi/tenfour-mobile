@@ -66,9 +66,9 @@ import { CheckinListModule } from '../pages/checkin-list/checkin-list.module';
 import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
-
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
+import { CheckinEmailModule } from '../pages/checkin-email/checkin-email.module';
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
@@ -144,6 +144,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     CheckinCardModule,
     CheckinReplyModule,
     CheckinDetailModule,
+    CheckinEmailModule,
     PersonRowModule,
     GroupRowModule,
     GroupListModule,

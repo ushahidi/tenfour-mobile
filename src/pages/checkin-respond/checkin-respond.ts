@@ -17,14 +17,14 @@ import { LocationProvider } from '../../providers/location/location';
 
 @IonicPage({
   name: 'CheckinRespondPage',
-  segment: 'checkins/respond',
+  segment: 'checkins/respond/:checkin_id',
   defaultHistory: ['CheckinListPage']
 })
 @Component({
   selector: 'page-checkin-respond',
   templateUrl: 'checkin-respond.html',
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class CheckinRespondPage extends BasePage {
 
@@ -33,6 +33,8 @@ export class CheckinRespondPage extends BasePage {
   index:number = 0;
   loading:boolean = false;
   locating:boolean = false;
+  token:string = null;
+  modal:boolean = false;
 
   organization:Organization = null;
   user:User = null;
@@ -60,6 +62,7 @@ export class CheckinRespondPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((finished:any) => {
       this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
@@ -86,7 +89,10 @@ export class CheckinRespondPage extends BasePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadToken(cache); })
+      .then(() => { return this.loadCheckin(cache); })
       .then(() => { return this.loadCheckins(cache); })
+      .then(() => { return this.loadAnswer(cache); })
       .then(() => { return this.loadLocation(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -118,6 +124,9 @@ export class CheckinRespondPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        },
+        (error:any) => {
+          reject("Problem loading organization");
         });
       }
     });
@@ -136,39 +145,124 @@ export class CheckinRespondPage extends BasePage {
         this.storage.getUser().then((user:User) => {
           this.user = user;
           resolve(this.user);
+        },
+        (error:any) => {
+          reject("Problem loading user");
         });
+      }
+    });
+  }
+
+  private loadToken(cache:boolean=true):Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.token) {
+        resolve(this.token);
+      }
+      else if (this.hasParameter("token")){
+        this.token = this.getParameter<string>("token");
+        resolve(this.token);
+      }
+      else {
+        this.token = null;
+        resolve(null);
+      }
+    })
+  }
+
+  private loadCheckin(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.checkin) {
+        resolve(true);
+      }
+      else if (this.hasParameter("checkin_id")){
+        let checkinId = this.getParameter<number>("checkin_id");
+        this.logger.info(this, "loadCheckins", "ID", checkinId);
+        this.promiseFallback(cache,
+          this.storage.getCheckin(this.organization, checkinId),
+          this.api.getCheckin(this.organization, checkinId)).then((checkin:Checkin) => {
+            this.logger.info(this, "loadCheckins", "Checkin", checkin);
+            this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+              checkin.reply = new Reply();
+              checkin.reply.organization_id = this.organization.id;
+              checkin.reply.checkin_id = checkin.id;
+              this.checkin = checkin;
+              resolve(true);
+            });
+          },
+          (error:any) => {
+            reject(error);
+          });
+      }
+      else if (this.hasParameter("checkin")){
+        this.checkin = this.getParameter<Checkin>("checkin");
+        resolve(true);
+      }
+      else {
+        reject("Checkin not provided");
       }
     });
   }
 
   private loadCheckins(cache:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.checkins = this.getParameter<Checkin[]>("checkins");
-      this.checkin = this.getParameter<Checkin>("checkin");
-      if (this.checkins && this.checkin) {
-        this.index = this.checkins.indexOf(this.checkin);
-        this.slides.lockSwipes(false);
+      if (cache && this.checkins) {
+        resolve(true);
       }
-      else if (this.checkins && this.checkins.length > 0) {
-        this.index = 0;
-        this.checkin = this.checkins[0];
-        this.slides.lockSwipes(false);
+      else if (this.hasParameter("checkins")){
+        this.checkins = this.getParameter<Checkin[]>("checkins");
+        if (this.checkins && this.checkin) {
+          this.index = this.checkins.indexOf(this.checkin);
+          this.slides.lockSwipes(false);
+        }
+        else if (this.checkins && this.checkins.length > 0) {
+          this.index = 0;
+          this.checkin = this.checkins[0];
+          this.slides.lockSwipes(false);
+        }
+        else {
+          this.index = 0;
+          this.checkins = [this.checkin];
+          this.checkin.reply = this.getParameter<Reply>("reply");
+          this.slides.lockSwipes(true);
+        }
+        for (let checkin of this.checkins) {
+          if (checkin.reply == null) {
+            checkin.reply = new Reply();
+            checkin.reply.organization_id = this.organization.id;
+            checkin.reply.checkin_id = this.checkin.id;
+          }
+        }
+        resolve(true);
       }
-      else {
+      else if (this.checkin) {
         this.index = 0;
         this.checkins = [this.checkin];
-        this.checkin.reply = this.getParameter<Reply>("reply");
         this.slides.lockSwipes(true);
+        resolve(true);
       }
-      for (let checkin of this.checkins) {
-        if (checkin.reply == null) {
-          checkin.reply = new Reply();
-          checkin.reply.organization_id = this.organization.id;
-          checkin.reply.checkin_id = this.checkin.id;
-        }
+      else {
+        reject("Checkins not provided");
       }
-      resolve(true);
     });
+  }
+
+  private loadAnswer(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.hasParameter("answer_id")) {
+        let answerId = this.getParameter("answer_id");
+        for (let index in this.checkin.answers) {
+          if (index == answerId) {
+            let answer = this.checkin.answers[index];
+            this.checkin.reply.answer = answer.answer;
+            break;
+          }
+        }
+        resolve(true);
+      }
+      else {
+        resolve(false);
+      }
+    })
   }
 
   private loadLocation(cache:boolean=true):Promise<Location> {

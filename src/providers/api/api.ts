@@ -908,6 +908,42 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public emailReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/api/v1/checkins/${checkin.id}/replies`;
+      let params = {
+        token: token,
+        answer: reply.answer
+      };
+      if (reply.message) {
+        params["message"] = reply.message;
+      }
+      if (reply.location_text) {
+        params["location_text"] = reply.location_text;
+      }
+      if (reply.latitude != null && reply.longitude != null) {
+        params["location_geo"] = {
+          location: {
+            lat: reply.latitude,
+            lng: reply.longitude
+          }
+        };
+      }
+      this.httpPost(url, params).then((data:any) => {
+        if (data && data.reply) {
+          let reply = new Reply(data.reply);
+          resolve(reply);
+        }
+        else {
+          reject("Reply Not Sent");
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getNotifications(organization:Organization, limit:number=20, offset:number=0):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
