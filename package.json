@@ -10,7 +10,9 @@
     "watch": "ionic-app-scripts watch",
     "lint": "ionic-app-scripts lint",
     "ionic:build": "ionic-app-scripts build",
-    "ionic:serve": "ionic-app-scripts serve",
+    "ionic:serve": "IONIC_ENV=prod ionic-app-scripts serve",
+    "ionic:serve:dev": "IONIC_ENV=dev ionic-app-scripts serve",
+    "ionic:serve:prod": "IONIC_ENV=prod ionic-app-scripts serve",
     "ionic:watch": "ionic-app-scripts watch",
     "test": "karma start ./test-config/karma.conf.js",
     "test-ci": "karma start ./test-config/karma.conf.js --single-run",
@@ -18,6 +20,9 @@
     "e2e": "npm run e2e-update && npm run e2e-test",
     "e2e-test": "protractor ./test-config/protractor.conf.js",
     "e2e-update": "webdriver-manager update --standalone false --gecko false"
+  },
+  "config": {
+    "ionic_webpack": "./webpack.config.js"
   },
   "dependencies": {
     "@angular/animations": "^5.0.3",
@@ -105,7 +110,7 @@
   },
   "devDependencies": {
     "@angular/cli": "^6.0.1",
-    "@ionic/app-scripts": "3.1.8",
+    "@ionic/app-scripts": "3.1.10",
     "@types/es6-promise": "^3.3.0",
     "@types/jasmine": "^2.8.7",
     "@types/node": "^8.0.45",

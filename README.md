@@ -60,8 +60,10 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
 ```
-ionic serve --livereload --consolelogs
-ionic serve --livereload --consolelogs --labs
+ENV=dev ionic serve --livereload --consolelogs
+ENV=sandbox ionic serve --livereload --consolelogs
+ENV=staging ionic serve --livereload --consolelogs
+ENV=prod ionic serve --livereload --consolelogs
 ```
 #### Release Apps
 ```
@@ -79,7 +81,7 @@ ionic cordova build android --device --prod --release --buildConfig=build.json
 ```
 #### Deploy PWA
 ```
-npm run ionic:build --prod --release
+ENV=prod npm run ionic:build --prod --release
 firebase deploy
 ```
 
