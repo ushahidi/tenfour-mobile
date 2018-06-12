@@ -1,16 +1,79 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
-    </ion-buttons>
-    <ion-title>Plan & Credits</ion-title>
-    <ion-buttons right>
-      <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
-    </ion-buttons>
+    <ion-title>Subscription Plans</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content color="white">
-  <div padding *ngIf="mobile">
+
+  <h1>Upgrade to TenFour Pro</h1>
+
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12 col-sm>
+
+        <ion-card>
+          <ion-card-header>
+            Free
+          </ion-card-header>
+          <ion-card-content>
+            <h2>Free!</h2>
+            <ion-list>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+            </ion-list>
+            <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="chooseFreePlan($event)">Switch to TenFour free</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+      <ion-col col-12 col-sm>
+
+        <ion-card>
+          <ion-card-header>
+            Pro
+          </ion-card-header>
+          <ion-card-content>
+            <h2>$3 USD per user, per month</h2>
+            <ion-list>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
+            </ion-list>
+          <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
+          <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="chooseProPlan($event)">Upgrade to TenFour Pro</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+      <ion-col col-12 col-sm>
+
+        <ion-card>
+          <ion-card-header>
+            Extra SMS Credits
+          </ion-card-header>
+          <ion-card-content>
+            <h2>$0.10 USD per credit per month</h2>
+            <ion-list>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Credits do not rollover</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
+            </ion-list>
+            <p>Add credits</p>
+            <ion-input type="number" placeholder="50"></ion-input>
+            <p>Cost: $5.00 USD per month</p>
+            <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
+            <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addSMSCredits($event)">Add SMS Credits</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- <div padding *ngIf="mobile">
     <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
     <button ion-button color="primary" (click)="showUrl(url, '_blank', $event)">Visit Website</button>
   </div>
@@ -40,5 +103,7 @@
         <h2 text-center>Note, only organization owners can edit payment information.</h2>
       </ion-item>
    </ion-list>
-  </div>
+  </div> -->
+
+
 </ion-content>

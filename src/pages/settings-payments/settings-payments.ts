@@ -72,7 +72,7 @@ export class SettingsPaymentsPage extends BasePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadPaymentForm(cache); })
+      // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -124,27 +124,22 @@ export class SettingsPaymentsPage extends BasePage {
     });
   }
 
-  private loadPaymentForm(cache:boolean=true) {
-    return new Promise((resolve, reject) => {
-      if (this.user && this.user.isOwner()) {
-        this.api.getPaymentUrl(this.organization).then((url:string) => {
-          this.logger.info(this, "ChargeBee", url);
-          this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        },
-        (error:any) => {
-          this.logger.error(this, "ChargeBee", error);
-        });
-      }
-      resolve(true);
-    });
-  }
+  // private loadPaymentForm(cache:boolean=true) {
+  //   return new Promise((resolve, reject) => {
+  //     if (this.user && this.user.isOwner()) {
+  //       this.api.getPaymentUrl(this.organization).then((url:string) => {
+  //         this.logger.info(this, "ChargeBee", url);
+  //         this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  //       },
+  //       (error:any) => {
+  //         this.logger.error(this, "ChargeBee", error);
+  //       });
+  //     }
+  //     resolve(true);
+  //   });
+  // }
 
-  private cancelEdit(event:any) {
-    this.hideModal();
-  }
-
-  private doneEdit(event:any) {
-    //TODO wire up credit card payments
+  private back(event:any) {
     this.hideModal();
   }
 

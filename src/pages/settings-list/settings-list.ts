@@ -168,7 +168,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.showModal(SettingsPaymentsPage, {
+    this.navController.push(SettingsPaymentsPage, {
       organization: this.organization,
       user: this.user
     });
