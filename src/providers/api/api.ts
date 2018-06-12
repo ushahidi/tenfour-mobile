@@ -385,11 +385,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
+  public getPeople(organization:Organization, limit:number=null, offset:number=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people`;
         let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let people = [];
           if (data && data.people) {
@@ -965,11 +971,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
+  public getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups`;
         let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
         this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.groups) {
             let groups = [];
