@@ -3,6 +3,7 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -20,14 +21,14 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ SettingsSwitchtofreePage ]
 })
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
   user:User = null;
-  url:string = "https://app.tenfour.org/settings/plan-and-credits";
-  iframe:SafeResourceUrl = null;
+  // url:string = "https://app.tenfour.org/settings/plan-and-credits";
+  // iframe:SafeResourceUrl = null;
 
   constructor(
       protected zone:NgZone,
@@ -141,6 +142,11 @@ export class SettingsPaymentsPage extends BasePage {
 
   private back(event:any) {
     this.hideModal();
+  }
+
+  private switchToFree(event:any) {
+    this.logger.info(this, "switchToFree");
+    let modal = this.showModal(SettingsSwitchtofreePage);
   }
 
 }

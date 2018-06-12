@@ -1116,6 +1116,24 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public deleteSubscription(organization:Organization):Promise<Subscription> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/1`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(new Subscription(data.subscription));
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getRegions(organization:Organization):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {

@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
+import { SettingsSwitchtofreePageModule } from '../../pages/settings-switchtofree/settings-switchtofree.module';
+
 import { SettingsPaymentsPage } from './settings-payments';
 
 @NgModule({
@@ -8,6 +10,7 @@ import { SettingsPaymentsPage } from './settings-payments';
     SettingsPaymentsPage,
   ],
   imports: [
+    SettingsSwitchtofreePageModule,
     IonicPageModule.forChild(SettingsPaymentsPage),
   ],
   exports: [

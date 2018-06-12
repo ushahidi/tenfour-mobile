@@ -21,7 +21,7 @@
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
             </ion-list>
             <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
-            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="chooseFreePlan($event)">Switch to TenFour free</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="switchToFree($event)">Switch to TenFour free</button>
           </ion-card-content>
         </ion-card>
 
