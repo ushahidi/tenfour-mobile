@@ -22,10 +22,18 @@
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
         <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
       </ion-list>
-      <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
-      <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>
+      <div *ngIf="organization && organization.hasFreePlan()">
+        <p text-center>You are using the free version of TenFour</p>
+        <p text-center *ngIf="user && user.isOwner()">
+          <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
+        </p>
+      </div>
+      <div *ngIf="organization && organization.hasProPlan()">
+        <p text-center *ngIf="organization.credits == 0">No credits remaining</p>
+        <p text-center *ngIf="organization.credits > 0">{{organization.credits}} text message credits</p>
+      </div>
       <p text-center *ngIf="user">
-        <button ion-button block clear color="primary"(click)="userLogout($event)">Log out</button>
+        <button ion-button block clear color="primary" (click)="userLogout($event)">Log out</button>
       </p>
     </ion-content>
   </ion-menu>
