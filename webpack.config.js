@@ -3,24 +3,22 @@ var path = require('path');
 var useDefaultConfig = require('@ionic/app-scripts/config/webpack.config.js');
 
 module.exports = function () {
-    var environment = process.env.ENV || process.env.IONIC_ENV || process.env.NODE_ENV || "dev";
-    var filePath = environmentPath(environment);
-    if (fs.existsSync(filePath)) {
-      consoleLog(environment, filePath);
-      useDefaultConfig.dev.resolve.alias = {
-        "@app/env": path.resolve(filePath)
-      };
-      useDefaultConfig.prod.resolve.alias = {
-        "@app/env": path.resolve(filePath)
-      };
-    }
-    else {
-      consoleError(environment, filePath);
-    }
+    var environment = process.env.ENV || process.env.IONIC_ENV || "dev";
+    var source = sourcePath(environment);
+    var target = targetPath(environment);
+    var data = fs.readFileSync(source, 'utf8');
+    fs.writeFileSync(target, data, 'utf8');
+    useDefaultConfig.dev.resolve.alias = {
+      "@app/env": path.resolve(target)
+    };
+    useDefaultConfig.prod.resolve.alias = {
+      "@app/env": path.resolve(target)
+    };
+    consoleLog(environment, source);
     return useDefaultConfig;
 }
 
-function environmentPath(env) {
+function sourcePath(env) {
   if (env == 'local' || env == 'sandbox') {
     return './src/environments/environment.sandbox.ts';
   }
@@ -36,21 +34,17 @@ function environmentPath(env) {
   else if (env == 'prod' || env == 'production') {
     return './src/environments/environment.production.ts';
   }
+  return './src/environments/environment.sandbox.ts';
+}
+
+function targetPath(env) {
   return './src/environments/environment.ts';
 }
 
 function consoleLog(env, path) {
   console.log("=============== ENVIRONMENT ===============");
   console.log("                                           ");
-  console.log("                 "+env+"                   ");
+  console.log("                  "+env.toUpperCase()+"    ");
   console.log("                                           ");
   console.log("===========================================");
-}
-
-function consoleError(env, path) {
-  console.error("=============== ENVIRONMENT ===============");
-  console.error("                                           ");
-  console.error("                 "+env+"                   ");
-  console.error("                                           ");
-  console.error("===========================================");
 }
