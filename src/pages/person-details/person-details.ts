@@ -5,13 +5,15 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+import { Reply } from '../../models/reply';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'PersonDetailsPage',
@@ -21,17 +23,16 @@ import { Checkin } from '../../models/checkin';
 @Component({
   selector: 'page-person-details',
   templateUrl: 'person-details.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, CheckinDetailsPage ]
 })
 export class PersonDetailsPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   person:Person = null;
-  user:Person = null;
-  title:string = null;
+  profile:boolean = false;
   loading:boolean = false;
-  checkins:Checkin[] = [];
   limit:number = 3;
   offset:number = 0;
   modal:boolean = false;
@@ -48,20 +49,22 @@ export class PersonDetailsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
+      protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.user = this.getParameter<Person>("user");
-    this.title = this.getParameter<string>("title");
     this.modal = this.getParameter<boolean>("modal");
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
+      this.loading = false;
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.loading = false;
       loading.dismiss();
     });
   }
@@ -69,124 +72,148 @@ export class PersonDetailsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.person) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name,
         person: this.person.name
       });
     }
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
-    this.loading = true;
-    return Promise.all([
-      this.loadPerson(cache),
-      this.loadCheckins(cache)]).then(
-      (loaded:any) =>{
+  protected loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadCheckins(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
-        this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
-        this.loading = false;
         this.showToast(error);
       });
   }
 
-  private loadPerson(cache:boolean=true):Promise<Person> {
+  protected loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getContacts(this.organization, this.person).then((contacts:Contact[]) => {
-          if (contacts && contacts.length > 0) {
-            this.person.contacts = contacts;
-            resolve(this.person);
-          }
-          else {
-            this.loadPerson(false).then((person:Person) => {
-              resolve(person);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadPerson(false).then((person:Person) => {
-            resolve(person);
-          });
-        });
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
       }
       else {
-        this.api.getPerson(this.organization, this.person.id).then((person:Person) => {
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then((saved:boolean) => {
-              this.person = person;
-              resolve(person);
-            });
-          }
-          else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  protected loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  protected loadPerson(cache:boolean=true):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.person) {
+        resolve(this.person);
+      }
+      else if (cache && this.hasParameter("person")){
+        this.person = this.getParameter<Person>("person");
+        resolve(this.person);
+      }
+      else if (this.hasParameter("person_id")) {
+        let personId = this.getParameter<number>("person_id");
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, personId),
+          this.api.getPerson(this.organization, personId)).then((person:Person) => {
             this.person = person;
-            this.checkins = person.checkins;
             resolve(person);
-          }
         },
         (error:any) => {
           resolve(null);
         });
       }
+      else {
+        reject("Person Not Provided");
+      }
     });
   }
 
-  private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
+  protected loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-          this.checkins = checkins;
-          resolve(this.checkins);
-        },
-        (error:any) => {
-          resolve([]);
-        });
+      if (this.person.groups == null || this.person.groups.length == 0 ||
+          this.person.checkins == null || this.person.checkins.length == 0) {
+        this.promiseFallback(cache,
+          this.storage.getPerson(this.organization, this.person.id),
+          this.api.getPerson(this.organization, this.person.id)).then((person:Person) => {
+            this.person.groups = person.groups;
+            this.person.checkins = person.checkins;
+            this.person.replies = person.replies;
+            resolve(this.person.checkins);
+          },
+          (error:any) => {
+            this.person.groups = [];
+            this.person.checkins = [];
+            resolve([]);
+          });
       }
       else {
-        this.checkins = this.person.checkins;
         resolve(this.person.checkins);
       }
     });
   }
 
-  private loadMore(event:any) {
+  protected loadMore(event:any) {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.offset = this.offset + this.limit;
-        this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-        this.database.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset).then((checkins:Checkin[]) => {
-          this.checkins = [...this.checkins, ...checkins];
-          if (event) {
-            event.complete();
-          }
-          resolve(this.checkins);
+      this.offset = this.offset + this.limit;
+      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
+      this.promiseFallback(true,
+        this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset),
+        this.api.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
+          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Checkins", checkins);
+          this.person.checkins = [...this.person.checkins, ...checkins];
+          resolve(this.person.checkins);
         },
         (error:any) => {
-          if (event) {
-            event.complete();
-          }
           resolve([]);
         });
-      }
-      else {
-        resolve([]);
-      }
     });
   }
 
-  private editPerson(event:any) {
+  protected editPerson(event:any) {
     this.logger.info(this, "editPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      person: this.person,
       user: this.user,
-      person_id: this.person.id
+      person: this.person,
+      person_id: this.person.id,
+      profile: this.profile,
+      modal: true
     });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);
@@ -213,12 +240,12 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private invitePerson(event:any) {
+  protected invitePerson(event:any) {
     this.logger.info(this, "invitePerson");
-    let loading = this.showLoading("Inviting...");
+    let loading = this.showLoading("Inviting...", true);
     this.api.invitePerson(this.organization, this.person).then((invited:Person) => {
       if (this.mobile) {
-        this.database.savePerson(this.organization, invited).then(saved => {
+        this.storage.savePerson(this.organization, invited).then(saved => {
           this.person = invited;
           loading.dismiss();
           if (this.person.name) {
@@ -246,43 +273,48 @@ export class PersonDetailsPage extends BasePage {
     });
   }
 
-  private phoneContact(contact:Contact) {
+  protected phoneContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
       window.open("tel:" + contact.contact, '_blank');
     }
   }
 
-  private emailContact(contact:Contact) {
+  protected emailContact(contact:Contact) {
     this.logger.info(this, "phoneContact", contact);
     if (contact && contact.contact) {
-      if (this.mobile) {
-        this.socialSharing.canShareViaEmail().then(() => {
-          this.socialSharing.shareViaEmail('', '', [contact.contact])
-          .then(() => {
-            this.logger.info(this, "emailContact", contact.contact, "Emailed");
-          })
-          .catch(() => {
-            this.logger.error(this, "emailContact", "Error");
-          });
-        }).catch(() => {
-          this.showToast("Email is not available...");
-        });
-      }
-      else {
-        window.open("mailto:" + contact.contact, '_blank');
-      }
+      this.sharing.sendEmail(contact.contact);
     }
   }
 
-  private showCheckinDetails(checkin:Checkin, event:any=null) {
+  protected showAddress(contact:Contact) {
+    if (contact && contact.contact && contact.contact.length > 0) {
+      let url = `https://www.google.com/maps/search/${contact.contact}`;
+      this.showUrl(url);
+    }
+  }
+
+  protected showCheckinDetails(checkin:Checkin, event:any=null) {
     this.logger.info(this, "showCheckinDetails", checkin);
-    this.showPage(CheckinDetailsPage, {
-      organization: this.organization,
-      person: this.person,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (this.platform.width() > this.WIDTH_LARGE) {
+      this.showModal(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id,
+        modal: true
+      });
+    }
+    else {
+      this.showPage(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.person,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
 }

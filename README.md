@@ -82,3 +82,16 @@ ionic cordova build android --device --prod --release --buildConfig=build.json
 npm run ionic:build --prod --release
 firebase deploy
 ```
+
+#### Commit Branch
+
+```
+ISSUE_NAME="123 Fixed A Bug"
+BRANCH_NAME=$(echo $ISSUE_NAME | tr '[:upper:]' '[:lower:]' | tr '/' '-' | tr ' ' '-')
+git checkout -b $BRANCH_NAME
+git add .
+git add -u
+git commit -m "Fixed a bug for #123"
+git push -u origin $BRANCH_NAME
+git checkout master
+```

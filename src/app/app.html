@@ -1,4 +1,4 @@
-<ion-split-pane #splitPane [enabled]="organization && person && (tablet == true || mobile == false)">
+<ion-split-pane #splitPane [enabled]="organization && user && (tablet == true || website == true || desktop == true)">
   <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">
@@ -14,22 +14,22 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <ion-list *ngIf="organization && person">
+      <ion-list *ngIf="organization && user">
         <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="showPersonList($event)">People</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="showNotificationList($event)">Notifications</ion-item>
-        <ion-item color="white" detail-push tappable *ngIf="person.isOwner() || person.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
-        <ion-item color="white" detail-push tappable (click)="showPersonDetails($event)">Profile</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showPersonList($event)">People</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showNotificationList($event)">Notifications</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
       </ion-list>
       <p text-center *ngIf="organization && organization.credits == 0">No credits remaining</p>
       <p text-center *ngIf="organization && organization.credits > 0">{{organization.credits}} text message credits</p>
-      <p text-center *ngIf="person">
+      <p text-center *ngIf="user">
         <button ion-button block clear color="primary"(click)="userLogout($event)">Log out</button>
       </p>
     </ion-content>
   </ion-menu>
-  <ion-menu #details [content]="content" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">
+  <ion-menu #details [content]="content" persistent="true" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">
     <ion-header>
       <ion-toolbar color="navbar">
         <ion-buttons left>
@@ -41,9 +41,9 @@
       </ion-toolbar>
     </ion-header>
     <ion-content>
-      <checkin-details [checkin]="checkin" [person]="person"
-                       [canRespond]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
-                       (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin"></checkin-details>
+      <checkin-details [checkin]="checkin" [user]="user"
+                       [canRespond]="checkin.canRespond(user)" [canResend]="checkin.canResend(user)"
+                       (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="user && checkin"></checkin-details>
     </ion-content>
   </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>

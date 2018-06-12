@@ -4,8 +4,8 @@
       <button ion-button color="primary" (click)="closeModal($event)">Close</button>
     </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons right *ngIf="person && mobile">
-      <button #create ion-button icon-only color="primary" *ngIf="person.isOwner() || person.isAdmin() || person.isAuthor() || person.isViewer()" (click)="shareCheckin($event)">
+    <ion-buttons right *ngIf="user && mobile">
+      <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="shareCheckin($event)">
         <ion-icon ios="ios-share-outline" md="md-share"></ion-icon>
       </button>
     </ion-buttons>
@@ -15,7 +15,7 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <checkin-details [checkin]="checkin" [person]="person"
-                   [canRespond]="checkin.canRespond(person)" [canResend]="checkin.canResend(person)"
-                   (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin && person"></checkin-details>
+  <checkin-details [checkin]="checkin" [user]="user"
+                   [canRespond]="checkin.canRespond(user)" [canResend]="checkin.canResend(user)"
+                   (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin && user"></checkin-details>
 </ion-content>

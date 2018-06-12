@@ -4,12 +4,13 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Group } from '../../models/group';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'GroupEditPage',
@@ -19,7 +20,7 @@ import { Group } from '../../models/group';
 @Component({
   selector: 'page-group-edit',
   templateUrl: 'group-edit.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class GroupEditPage extends BasePage {
@@ -42,7 +43,7 @@ export class GroupEditPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -66,7 +67,7 @@ export class GroupEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.group) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name,
         group: this.group.name
       });
@@ -76,8 +77,8 @@ export class GroupEditPage extends BasePage {
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     if (this.editing && this.mobile) {
-      let loading = this.showLoading("Canceling...");
-      this.database.getGroup(this.organization, this.group.id).then((group:Group) => {
+      let loading = this.showLoading("Canceling...", true);
+      this.storage.getGroup(this.organization, this.group.id).then((group:Group) => {
         this.group.name = group.name;
         this.group.description = group.description;
         this.group.member_count = group.member_count;
@@ -105,7 +106,8 @@ export class GroupEditPage extends BasePage {
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
       people: this.group.members,
-      show_groups: false
+      show_groups: false,
+      show_people: true
      });
     modal.onDidDismiss(data => {
        if (data && data.people) {
@@ -127,7 +129,7 @@ export class GroupEditPage extends BasePage {
       this.showAlert("Group People Required", "At least one person is required in a group.");
     }
     else {
-      let loading = this.showLoading("Creating...");
+      let loading = this.showLoading("Creating...", true);
       this.api.createGroup(this.organization, this.group).then((group:Group) => {
         if (this.group.members && this.group.members.length > 0) {
           group.member_count = this.group.members.length;
@@ -137,16 +139,10 @@ export class GroupEditPage extends BasePage {
           group.member_count = 0;
           group.member_ids = "";
         }
-        if (this.mobile) {
-          this.database.saveGroup(this.organization, group).then((saved:any) => {
-            loading.dismiss();
-            this.hideModal({ group: group });
-          });
-        }
-        else {
+        this.storage.saveGroup(this.organization, group).then((saved:any) => {
           loading.dismiss();
           this.hideModal({ group: group });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();
@@ -157,7 +153,7 @@ export class GroupEditPage extends BasePage {
 
   private updateGroup(event:any) {
     this.logger.info(this, "updateGroup", this.group.name, this.group.description);
-    let loading = this.showLoading("Saving...");
+    let loading = this.showLoading("Saving...", true);
     this.api.updateGroup(this.organization, this.group).then((group:Group) => {
       if (this.group.members && this.group.members.length > 0) {
         group.member_count = this.group.members.length;
@@ -167,16 +163,10 @@ export class GroupEditPage extends BasePage {
         group.member_count = 0;
         group.member_ids = "";
       }
-      if (this.mobile) {
-        this.database.saveGroup(this.organization, group).then((saved:any) => {
-          loading.dismiss();
-          this.hideModal({ group: group });
-        });
-      }
-      else {
+      this.storage.saveGroup(this.organization, group).then((saved:any) => {
         loading.dismiss();
         this.hideModal({ group: group });
-      }
+      });
     },
     (error:any) => {
       loading.dismiss();
@@ -190,20 +180,13 @@ export class GroupEditPage extends BasePage {
       {
         text: 'Delete',
         handler: () => {
-          let loading = this.showLoading("Removing...");
+          let loading = this.showLoading("Removing...", true);
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
-            if (this.mobile) {
-              this.database.removeGroup(this.organization, this.group).then((deleted:boolean) => {
-                loading.dismiss();
-                this.showToast("Group removed from organization");
-                this.hideModal({deleted: true});
-              });
-            }
-            else {
+            this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
               loading.dismiss();
               this.showToast("Group removed from organization");
               this.hideModal({deleted: true});
-            }
+            });
           },
           (error:any) => {
             loading.dismiss();
@@ -233,7 +216,7 @@ export class GroupEditPage extends BasePage {
   }
 
   private onKeyPress(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard();
       return false;

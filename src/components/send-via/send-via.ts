@@ -37,37 +37,23 @@ export class SendViaComponent {
       this.email_selected = values.indexOf('email') != -1;
       this.sms_selected = values.indexOf('sms') != -1;
       this.slack_selected = values.indexOf('slack') != -1;
-      this.app_selected = values.indexOf('apponly') != -1;
+      this.app_selected = values.indexOf('app') != -1;
     }
   }
 
   onAppSelected(event:any) {
-    if (this.app_selected) {
-      this.email_selected = false;
-      this.sms_selected = false;
-      this.slack_selected = false;
-    }
     this.onChanged();
   }
 
   onEmailChanged(event:any) {
-    if (this.email_selected) {
-      this.app_selected = false;
-    }
     this.onChanged();
   }
 
   onSmsChanged(event:any) {
-    if (this.sms_selected) {
-      this.app_selected = false;
-    }
     this.onChanged();
   }
 
   onSlackChanged(event:any) {
-    if (this.slack_selected) {
-      this.app_selected = false;
-    }
     this.onChanged();
   }
 
@@ -83,7 +69,7 @@ export class SendViaComponent {
       send_via.push('slack');
     }
     if (this.app_selected) {
-      send_via.push('apponly');
+      send_via.push('app');
     }
     this.params.get('on_changed')(send_via.join(','));
   }

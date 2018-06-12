@@ -5,10 +5,11 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SettingsPaymentsPage',
@@ -18,15 +19,15 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
-  website:string = "https://app.tenfour.org/settings/plan-and-credits";
-  url:SafeResourceUrl = null;
+  user:User = null;
+  url:string = "https://app.tenfour.org/settings/plan-and-credits";
+  iframe:SafeResourceUrl = null;
 
   constructor(
       protected zone:NgZone,
@@ -40,37 +41,102 @@ export class SettingsPaymentsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
+      protected storage:StorageProvider,
       protected sanitizer:DomSanitizer) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.loadPaymentForm();
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showToast(error);
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
   }
 
-  private loadPaymentForm() {
-    if (this.person.isOwner()) {
-      this.api.getPaymentUrl(this.organization).then((url:string) => {
-        this.logger.info(this, "ChargeBee", url);
-        this.url = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-      },
-      (error:any) => {
-        this.logger.error(this, "ChargeBee", error);
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPaymentForm(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
       });
-    }
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadPaymentForm(cache:boolean=true) {
+    return new Promise((resolve, reject) => {
+      if (this.user && this.user.isOwner()) {
+        this.api.getPaymentUrl(this.organization).then((url:string) => {
+          this.logger.info(this, "ChargeBee", url);
+          this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        },
+        (error:any) => {
+          this.logger.error(this, "ChargeBee", error);
+        });
+      }
+      resolve(true);
+    });
   }
 
   private cancelEdit(event:any) {

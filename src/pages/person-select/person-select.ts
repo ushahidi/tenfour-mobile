@@ -3,12 +3,13 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'PersonSelectPage',
@@ -17,17 +18,20 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-person-select',
   templateUrl: 'person-select.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class PersonSelectPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   people:Person[] = null;
   groups:Group[] = null;
   show_groups:boolean = true;
+  show_people:boolean = true;
   limit:number = 25;
   offset:number = 0;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -41,16 +45,14 @@ export class PersonSelectPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.groups = this.getParameter<Group[]>("groups");
-    this.people = this.getParameter<Person[]>("people");
     this.show_groups = this.getParameter<boolean>("show_groups");
+    this.show_people = this.getParameter<boolean>("show_people");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -60,94 +62,146 @@ export class PersonSelectPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
-    this.logger.info(this, "loadUpdates", cache);
-    this.offset = 0;
-    return Promise.all([
-      this.loadPeople(cache),
-      this.loadGroups(cache)]).then(
-      (loaded:any) =>{
-        this.logger.info(this, "loadUpdates", cache, "Done");
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPeople(cache); })
+      .then(() => { return this.loadGroups(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
-      },
-      (error:any) => {
-        this.logger.error(this, "loadUpdates", cache, error);
+        this.loading = false;
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
+        this.loading = false;
         this.showToast(error);
       });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadGroups(cache:boolean=true):Promise<any> {
+    this.logger.info(this, "loadGroups", cache);
+    return new Promise((resolve, reject) => {
+      this.groups = this.getParameter<Group[]>("groups");
+      this.promiseFallback(cache,
+        this.storage.getGroups(this.organization),
+        this.api.getGroups(this.organization), 1).then((groups:Group[]) => {
+          this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
+            this.updateGroups(groups);
+            resolve(groups);
+          });
+        },
+        (error:any) => {
+          this.updateGroups([]);
+          reject(error);
+        });
+    });
   }
 
   private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getPeople(this.organization, null, this.limit, this.offset).then((people:Person[]) => {
-          this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
-          if (people && people.length > 1) {
+      this.offset = 0;
+      this.people = this.getParameter<Person[]>("people");
+      this.promiseFallback(cache,
+        this.storage.getPeople(this.organization, null, this.limit, this.offset),
+        this.api.getPeople(this.organization, this.limit, this.offset), 2).then((people:Person[]) => {
+          this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.updatePeople(people);
             resolve(people);
-          }
-          else {
-            this.loadPeople(false).then((people:Person[]) => {
-              this.updatePeople(people);
-              resolve(people);
-            },
-            (error:any) => {
-              this.updatePeople([]);
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getPeople(this.organization, this.limit, this.offset).then((people:Person[]) => {
-          this.logger.info(this, "loadPeople", "Limit", this.limit, "Offset", this.offset, people);
-          if (this.mobile) {
-            this.database.savePeople(this.organization, people).then((saved:boolean) => {
-              this.updatePeople(people);
-              resolve(people);
-            });
-          }
-          else {
-            this.updatePeople(people);
-            resolve(people);
-          }
+          });
         },
         (error:any) => {
           this.updatePeople([]);
           reject(error);
         });
-      }
     });
   }
 
   private loadMore(cache:boolean=true, event:any=null) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.loadPeople(cache).then((people:Person[]) => {
-        if (event) {
-          event.complete();
-        }
-        resolve(people);
-      },
-      (error:any) => {
-        if (event) {
-          event.complete();
-        }
-        reject(error);
-      });
+      this.promiseFallback(cache,
+        this.storage.getPeople(this.organization, null, this.limit, this.offset),
+        this.api.getPeople(this.organization, this.limit, this.offset), 1).then((people:Person[]) => {
+          this.storage.savePeople(this.organization, people).then((saved:boolean) => {
+            this.updatePeople(people);
+            if (event) {
+              event.complete();
+            }
+            resolve(people);
+          });
+        },
+        (error:any) => {
+          this.updatePeople([]);
+          if (event) {
+            event.complete();
+          }
+          reject(error);
+        });
     });
+  }
+
+  private updateGroups(groups:Group[]) {
+    if (this.groups && this.groups.length > 0) {
+      for (let group of groups) {
+        let previous = this.groups.filter(_group => _group.id == group.id);
+        if (previous && previous.length > 0) {
+          group.selected = true;
+        }
+      }
+    }
+    this.organization.groups = groups;
   }
 
   private updatePeople(people:Person[]) {
@@ -163,71 +217,8 @@ export class PersonSelectPage extends BasePage {
       this.organization.people = people;
     }
     else {
-      this.organization.people = [...this.organization.people, ...people];;
+      this.organization.people = [...this.organization.people, ...people];
     }
-  }
-
-  private loadGroups(cache:boolean=true):Promise<any> {
-    this.logger.info(this, "loadGroups", cache);
-    return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getGroups(this.organization).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", "Database", groups);
-          if (groups && groups.length > 0) {
-            this.updateGroups(groups);
-            resolve(groups);
-          }
-          else {
-            this.loadGroups(false).then((groups:Group[]) => {
-              this.updateGroups(groups);
-              resolve(groups);
-            },
-            (error:any) => {
-              this.updateGroups([]);
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getGroups(this.organization).then((groups:Group[]) => {
-          this.logger.info(this, "loadGroups", "API", groups);
-          if (this.mobile) {
-            this.database.saveGroups(this.organization, groups).then((saved:boolean) => {
-              this.updateGroups(groups);
-              resolve(groups);
-            });
-          }
-          else {
-            this.updateGroups(groups);
-            resolve(groups);
-          }
-        },
-        (error:any) => {
-          this.updateGroups([]);
-          reject(error);
-        });
-      }
-    });
-  }
-
-  private updateGroups(groups:Group[]) {
-    if (this.groups && this.groups.length > 0) {
-      for (let group of groups) {
-        let previous = this.groups.filter(_group => _group.id == group.id);
-        if (previous && previous.length > 0) {
-          if (previous[0].selected == true) {
-            group.selected = true;
-            this.logger.error(this, "updateGroups", group.name, "Selected");
-          }
-          else {
-            group.selected = false;
-            this.logger.info(this, "updateGroups", group.name, "Not Selected");
-          }
-        }
-      }
-    }
-    this.organization.groups = groups;
   }
 
   private cancelSelect(event:any) {
@@ -238,7 +229,6 @@ export class PersonSelectPage extends BasePage {
 
   private doneSelect(event:any) {
     let people = [];
-    let groups = [];
     if (this.organization.people && this.organization.people.length > 0) {
       for (let person of this.organization.people) {
         if (person.selected == true) {
@@ -246,6 +236,7 @@ export class PersonSelectPage extends BasePage {
         }
       }
     }
+    let groups = [];
     if (this.organization.groups && this.organization.groups.length > 0) {
       for (let group of this.organization.groups) {
         if (group.selected == true) {

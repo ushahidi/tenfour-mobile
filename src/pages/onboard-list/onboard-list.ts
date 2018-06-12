@@ -8,11 +8,12 @@ import { PersonImportPage } from '../../pages/person-import/person-import';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'OnboardListPage',
@@ -21,13 +22,13 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-onboard-list',
   templateUrl: 'onboard-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
 export class OnboardListPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   loading:boolean = false;
 
   constructor(
@@ -42,80 +43,111 @@ export class OnboardListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.loading = true;
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
-    Promise.resolve()
-      .then(() => { return this.loadPerson(); })
-      .then(() => { return this.loadPeople(); })
-      .then(() => {
-        this.logger.info(this, "ionViewDidLoad", "Loaded");
-        this.zone.run(() => {
-          this.loading = false;
-        });
-        loading.dismiss();
-      })
-      .catch((error) => {
-        this.logger.info(this, "ionViewDidLoad", "Failed");
-        this.zone.run(() => {
-          this.loading = false;
-        });
-        loading.dismiss();
-        this.showToast(error);
-      });
+    this.loadUpdates(false).then((finished:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
   }
 
-  private loadPerson():Promise<any> {
-    return new Promise((resolve, reject) => {
-      this.api.getPerson(this.organization, "me").then((person:Person) => {
-        this.logger.info(this, "loadPerson", person);
-        if (this.mobile) {
-          this.database.savePerson(this.organization, person).then(saved => {
-            this.person = person;
-            resolve(person);
-          });
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPeople(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
         }
-        else {
-          this.person = person;
-          resolve(person);
+        this.loading = false;
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
         }
+        this.loading = false;
+        this.showToast(error);
       });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        },
+        (error:any) => {
+          reject("Problem loading organization");
+        });
+      }
     });
   }
 
-  private loadPeople():Promise<any> {
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        },
+        (error:any) => {
+          reject("Problem loading user");
+        });
+      }
+    });
+  }
+
+  private loadPeople(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPeople(this.organization).then((people:Person[]) => {
         if (people && people.length > 1) {
-          this.person.config_people_invited = true;
+          this.user.config_people_invited = true;
         }
         else {
-          this.person.config_people_invited = false;
+          this.user.config_people_invited = false;
         }
-        if (this.mobile) {
-          this.database.savePeople(this.organization, people).then((saved:boolean) => {
-            resolve();
-          });
-        }
-        else {
+        this.storage.savePeople(this.organization, people).then((saved:boolean) => {
           resolve();
-        }
+        });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
@@ -152,21 +184,19 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      user: this.person,
-      person_id: this.person.id
+      user: this.user,
+      person_id: this.user.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.user.config_people_invited = true;
+        }
+        else {
+          this.user.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -174,20 +204,18 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "invitePerson");
     let modal = this.showModal(PersonInvitePage, {
       organization: this.organization,
-      user: this.person
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.user.config_people_invited = true;
+        }
+        else {
+          this.user.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -195,20 +223,18 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "importPerson");
     let modal = this.showModal(PersonImportPage, {
       organization: this.organization,
-      user: this.person
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
-      if (this.mobile) {
-        this.database.getPeople(this.organization).then((people:Person[]) => {
-          if (people && people.length > 1) {
-            this.person.config_people_invited = true;
-          }
-          else {
-            this.person.config_people_invited = false;
-          }
-        });
-      }
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.user.config_people_invited = true;
+        }
+        else {
+          this.user.config_people_invited = false;
+        }
+      });
     });
   }
 
@@ -216,16 +242,17 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "taskReviewContact");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      person: this.person,
-      person_id: this.person.id
+      user: this.user,
+      person: this.user,
+      person_id: this.user.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "taskReviewContact", "Modal", data);
       if (data) {
-        this.person.config_profile_reviewed = true;
+        this.user.config_profile_reviewed = true;
       }
       else {
-        this.person.config_profile_reviewed = false;
+        this.user.config_profile_reviewed = false;
       }
    });
   }
@@ -234,14 +261,15 @@ export class OnboardListPage extends BasePage {
     this.logger.info(this, "taskSendCheckin");
     let modal = this.showModal(CheckinTestPage, {
       organization: this.organization,
-      person: this.person });
+      user: this.user
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "taskSendCheckin", "Modal", data);
       if (data) {
-        this.person.config_self_test_sent = true;
+        this.user.config_self_test_sent = true;
       }
       else {
-        this.person.config_self_test_sent = false;
+        this.user.config_self_test_sent = false;
       }
     });
   }
@@ -249,15 +277,19 @@ export class OnboardListPage extends BasePage {
   private showCheckinList(event:any) {
     this.logger.info(this, "showCheckinList");
     let loading = this.showLoading("Loading...");
-    this.api.updatePerson(this.organization, this.person).then((person:Person) => {
+    this.api.updatePerson(this.organization, this.user).then((person:Person) => {
       person.config_people_invited = true;
       person.config_profile_reviewed = true;
       person.config_self_test_sent = true;
-      this.database.savePerson(this.organization, this.person).then(saved => {
-        loading.dismiss();
-        this.showRootPage(CheckinListPage,{
-          organization: this.organization
-        });
+      Promise.all([
+        this.storage.setUser(person),
+        this.storage.savePerson(this.organization, person)])
+        .then(() => {
+          loading.dismiss();
+          this.showRootPage(CheckinListPage,{
+            organization: this.organization,
+            user: person
+          });
       });
     },
     (error:any) => {
@@ -270,7 +302,8 @@ export class OnboardListPage extends BasePage {
   private skipAhead(event:any) {
     this.logger.info(this, "skipAhead");
     this.showRootPage(CheckinListPage, {
-      organization: this.organization
+      organization: this.organization,
+      user: this.user
     });
   }
 

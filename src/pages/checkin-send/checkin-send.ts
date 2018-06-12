@@ -7,13 +7,14 @@ import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SendViaComponent } from '../../components/send-via/send-via';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -23,14 +24,14 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-checkin-send',
   templateUrl: 'checkin-send.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class CheckinSendPage extends BasePage {
 
   organization:Organization = null;
+  user:User = null;
   checkin:Checkin = null;
-  person:Person = null;
 
   @ViewChild('select')
   select:Select;
@@ -48,25 +49,95 @@ export class CheckinSendPage extends BasePage {
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.checkin = this.getParameter<Checkin>("checkin");
-    this.person = this.getParameter<Person>("person");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(false).then((finished:any) => {
+      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization && this.checkin) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name,
         checkin: this.checkin.message
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCheckin(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadCheckin(cache:boolean=true):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.checkin = this.getParameter<Checkin>("checkin");
+      resolve(this.checkin);
+    });
   }
 
   private cancelEdit(event:any) {
@@ -80,9 +151,12 @@ export class CheckinSendPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
+      user: this.user,
       groups: this.checkin.groups,
       people: this.checkin.recipients,
-      show_groups: true });
+      show_groups: true,
+      show_people: true
+    });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);
        if (data && data.people) {
@@ -97,6 +171,7 @@ export class CheckinSendPage extends BasePage {
        if (data && data.groups) {
          this.checkin.groups = data.groups;
        }
+       this.countRecipients();
      });
   }
 
@@ -108,6 +183,7 @@ export class CheckinSendPage extends BasePage {
         break;
       }
     }
+    this.countRecipients();
   }
 
   private removeGroup(group:Group) {
@@ -118,6 +194,7 @@ export class CheckinSendPage extends BasePage {
         break;
       }
     }
+    this.countRecipients();
   }
 
   private sendCheckin(event:any) {
@@ -125,25 +202,9 @@ export class CheckinSendPage extends BasePage {
       this.showToast("Please select how the Check-In will be sent");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-        if (this.mobile) {
-          this.database.saveCheckin(this.organization, checkin).then((saved:boolean) => {
-            loading.dismiss();
-            let recipients = this.checkin.recipientIds().length;
-            if (recipients == 1) {
-              this.showToast(`Check-In sent to 1 person`);
-            }
-            else {
-              this.showToast(`Check-In sent to ${recipients} people`);
-            }
-            let firstViewController = this.navController.first();
-            this.navController.popToRoot({ animate: false }).then(() => {
-              firstViewController.dismiss({ checkin: Checkin });
-            });
-          });
-        }
-        else {
+        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {
@@ -156,19 +217,13 @@ export class CheckinSendPage extends BasePage {
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
           });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();
         this.showAlert("Problem Creating Check-In", error);
       });
     }
-  }
-
-  private onAppOnly(event:any) {
-    this.logger.info(this, "onAppOnly", event);
-    this.checkin.send_via = 'apponly';
-    this.select.close();
   }
 
   private showPopover(event:any) {
@@ -189,6 +244,10 @@ export class CheckinSendPage extends BasePage {
     popover.present({
       ev: event
     });
+  }
+
+  private countRecipients() {
+    this.checkin.waiting_count = this.checkin.recipientIds().length;
   }
 
 }

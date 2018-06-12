@@ -1,15 +1,14 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { StatusBar } from '@ionic-native/status-bar';
-
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'PersonInvitePage',
@@ -19,7 +18,7 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class PersonInvitePage extends BasePage {
@@ -41,8 +40,7 @@ export class PersonInvitePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
-      protected statusBar:StatusBar) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -55,7 +53,7 @@ export class PersonInvitePage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
@@ -74,7 +72,7 @@ export class PersonInvitePage extends BasePage {
       }
     }
     if (invites.length > 0) {
-      let loading = this.showLoading("Inviting...");
+      let loading = this.showLoading("Inviting...", true);
       Promise.all(invites).then(invited => {
         loading.dismiss();
         this.showToast("Invites sent");
@@ -90,7 +88,7 @@ export class PersonInvitePage extends BasePage {
   private loadPeople(event:any, cache:boolean=true) {
     this.loading = true;
     if (cache && this.mobile) {
-      return this.database.getPeople(this.organization).then((people:Person[]) => {
+      return this.storage.getPeople(this.organization).then((people:Person[]) => {
         this.logger.info(this, "loadPeople", people);
         if (people && people.length > 0) {
           this.people = people.filter(person => person.needsInvite() == true);

@@ -4,6 +4,7 @@ import { Column } from '../decorators/column';
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Group } from '../models/group';
 import { Person } from '../models/person';
+import { User } from '../models/user';
 import { Recipient } from '../models/recipient';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
@@ -131,7 +132,7 @@ export class Checkin extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
-  public user:Person = null;
+  public user:User = null;
 
   public answers:Answer[] = [];
 
@@ -143,14 +144,38 @@ export class Checkin extends Model {
 
   public reply:Reply = null;
 
-  answerReplies(answer:Answer):Reply[] {
+  public answerReplies(answer:Answer):Reply[] {
     if (this.replies && this.replies.length > 0) {
       return this.replies.filter(reply => reply.answer == answer.answer);
     }
     return [];
   }
 
-  recipientsPending():Recipient[] {
+  public otherReplies():Reply[] {
+    if (!this.replies || !this.replies.length) {
+      return [];
+    }
+
+    let otherReplies = [];
+
+    for (let reply of this.replies) {
+      let otherAnswer = true;
+
+      for (let answer of this.answers) {
+        if (reply.answer === answer.answer) {
+          otherAnswer = false;
+        }
+      }
+
+      if (otherAnswer) {
+        otherReplies.push(reply);
+      }
+    }
+
+    return otherReplies;
+  }
+
+  public recipientsPending():Recipient[] {
     let _recipients = [];
     for (let recipient of this.recipients) {
       if (this.replies == null || this.replies.length == 0) {
@@ -163,7 +188,7 @@ export class Checkin extends Model {
     return _recipients;
   }
 
-  canRespond(person:Person):boolean {
+  public canRespond(person:Person):boolean {
     if (this.answers && this.answers.length == 0) {
       return false;
     }
@@ -178,14 +203,17 @@ export class Checkin extends Model {
     return false;
   }
 
-  canSend():boolean {
+  public canSend():boolean {
     if (this.send_via == null || this.send_via.length == 0) {
       return false;
     }
     return (this.recipients && this.recipients.length > 0) || (this.groups && this.groups.length > 0);
   }
 
-  canResend(person:Person):boolean {
+  public canResend(person:Person):boolean {
+    if (person == null) {
+      return false;
+    }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
       if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
         return true;
@@ -194,7 +222,7 @@ export class Checkin extends Model {
     return false;
   }
 
-  groupIds():number[] {
+  public groupIds():number[] {
     let ids = [];
     if (this.groups && this.groups.length > 0) {
       for (let group of this.groups) {
@@ -204,7 +232,7 @@ export class Checkin extends Model {
     return ids;
   }
 
-  recipientIds():number[] {
+  public recipientIds():number[] {
     let ids = [];
     if (this.recipients && this.recipients.length > 0) {
       for (let recipient of this.recipients) {
@@ -223,11 +251,35 @@ export class Checkin extends Model {
     return ids;
   }
 
-  sendVia() {
+  public sendVia() {
     if (this.send_via) {
       return this.send_via.split(",");
     }
     return [];
+  }
+
+  public hasBlankAnswers():boolean {
+    for (let answer of this.answers) {
+      if (answer.answer == null || answer.answer.length == 0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public hasDuplicateAnswers():boolean {
+    for (let index1 in this.answers) {
+      for (let index2 in this.answers) {
+        if (index1 != index2) {
+          let answer1 = this.answers[index1];
+          let answer2 = this.answers[index2];
+          if (answer1.answer.toLowerCase() === answer2.answer.toLowerCase()) {
+            return true;
+          }
+        }
+      }
+    }
+    return false;
   }
 
 }

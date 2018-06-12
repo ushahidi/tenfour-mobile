@@ -1,10 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { CountryProvider } from '../../providers/country/country';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsEditPage } from '../../pages/settings-edit/settings-edit';
 import { SettingsRolesPage } from '../../pages/settings-roles/settings-roles';
@@ -12,9 +8,14 @@ import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-pay
 import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Region } from '../../models/region';
 import { Country } from '../../models/country';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { CountriesProvider } from '../../providers/countries/countries';
 
 @IonicPage({
   name: 'SettingsRegionsPage',
@@ -24,13 +25,14 @@ import { Country } from '../../models/country';
 @Component({
   selector: 'page-settings-regions',
   templateUrl: 'settings-regions.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsEditPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
 })
 export class SettingsRegionsPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -44,20 +46,21 @@ export class SettingsRegionsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
-      protected countries:CountryProvider) {
+      protected storage:StorageProvider,
+      protected countries:CountriesProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
+    this.loading = true;
     let loading = this.showLoading("Loading...");
-    this.loadRegions(true).then((loaded:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
+      this.loading = false;
       loading.dismiss();
     },
     (error:any) => {
+      this.loading = false;
       loading.dismiss();
       this.showToast(error);
     });
@@ -66,17 +69,74 @@ export class SettingsRegionsPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
   }
 
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadRegions(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
   private loadRegions(cache:boolean=true, event:any=null):Promise<Region[]> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadRegions");
-      if (cache && this.mobile) {
-        this.database.getCountries(this.organization).then((countries:Country[]) => {
+      if (cache) {
+        this.storage.getCountries(this.organization).then((countries:Country[]) => {
           if (countries && countries.length > 0) {
             this.organization.countries = countries;
             if (event) {
@@ -106,29 +166,20 @@ export class SettingsRegionsPage extends BasePage {
         this.api.getRegions(this.organization).then((regions:Region[]) => {
           let codes = regions.map(region => region.code);
           this.countries.getCountries(codes).then((countries:Country[]) => {
-            if (this.mobile) {
-              this.database.saveCountries(this.organization, countries).then((saved:boolean) => {
-                this.organization.countries = countries;
-                if (event) {
-                  event.complete();
-                }
-                resolve(regions);
-              },
-              (error:any) => {
-                this.organization.countries = countries;
-                if (event) {
-                  event.complete();
-                }
-                resolve(regions);
-              });
-            }
-            else {
+            this.storage.saveCountries(this.organization, countries).then((saved:boolean) => {
               this.organization.countries = countries;
               if (event) {
                 event.complete();
               }
               resolve(regions);
-            }
+            },
+            (error:any) => {
+              this.organization.countries = countries;
+              if (event) {
+                event.complete();
+              }
+              resolve(regions);
+            });
           });
         },
         (error:any) => {
@@ -147,7 +198,7 @@ export class SettingsRegionsPage extends BasePage {
   }
 
   private doneEdit(event:any) {
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     let saves = [];
     let regions = [];
     let codes = [];
@@ -156,26 +207,18 @@ export class SettingsRegionsPage extends BasePage {
         codes.push(country.country_code);
         regions.push(country.code);
       }
-      saves.push(this.database.saveCountry(this.organization, country));
+      saves.push(this.storage.saveCountry(this.organization, country));
     }
     this.organization.codes = Array.from(new Set(codes)).sort().join(",");
     this.organization.regions = Array.from(new Set(regions)).sort().join(",");
     Promise.all(saves).then(saved => {
       this.api.updateOrganization(this.organization).then((organization:Organization) => {
-        if (this.mobile) {
-          this.database.saveOrganization(organization).then(saved => {
-            loading.dismiss();
-            this.hideModal({
-              organization: organization
-            });
-          });
-        }
-        else {
+        this.storage.saveOrganization(organization).then(saved => {
           loading.dismiss();
           this.hideModal({
             organization: organization
           });
-        }
+        });
       },
       (error:any) => {
         loading.dismiss();

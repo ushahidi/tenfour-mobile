@@ -1,20 +1,20 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, Events, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { Badge } from '@ionic-native/badge';
-
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Notification } from '../../models/notification';
+
+import { ApiProvider } from '../../providers/api/api';
+import { BadgeProvider } from '../../providers/badge/badge';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'CheckinListPage',
@@ -23,19 +23,20 @@ import { Notification } from '../../models/notification';
 @Component({
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider, BadgeProvider ],
   entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
 })
 export class CheckinListPage extends BasePage {
 
   filter:string = "all";
   organization:Organization = null;
+  user:User = null;
   checkins:Checkin[] = [];
   selected:Checkin = null;
-  person:Person = null;
   loading:boolean = false;
   limit:number = 5;
   offset:number = 0;
+  badgeNumber:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -49,25 +50,21 @@ export class CheckinListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected events:Events,
-      protected badge:Badge,
+      protected badge:BadgeProvider,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
     let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
     this.loadUpdates(false).then((finished:any) => {
-      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
-      this.loadWaitingResponse();
+      this.loadWaitingResponse(true, this.mobile);
     },
     (error:any) => {
-      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
       loading.dismiss();
     });
   }
@@ -80,7 +77,7 @@ export class CheckinListPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
@@ -90,18 +87,18 @@ export class CheckinListPage extends BasePage {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
-      .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      .then(() => { return this.loadBadgeNumber(); })
       .then(() => {
-        this.logger.info(this, "loadUpdates", "Done");
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
         this.loading = false;
       })
-      .catch((error) => {
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
@@ -110,80 +107,43 @@ export class CheckinListPage extends BasePage {
       });
   }
 
-  private loadPerson(cache:boolean=true):Promise<Person> {
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (cache && this.mobile) {
-        this.database.getPerson(this.organization, null, true).then((person:Person) => {
-          if (person) {
-            this.person = person;
-            resolve(person);
-          }
-          else {
-            this.loadPerson(false).then((person:Person) => {
-              resolve(person);
-            },
-            (error:any) => {
-              reject(error);
-            });
-          }
-        },
-        (error:any) => {
-          this.loadPerson(false).then((person:Person) => {
-            resolve(person);
-          },
-          (error:any) => {
-            reject(error);
-          });
-        });
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (cache && this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
       }
       else {
-        this.api.getPerson(this.organization, "me").then((person:Person) => {
-          if (this.mobile) {
-            this.database.savePerson(this.organization, person).then(saved => {
-              this.person = person;
-              resolve(person);
-            },
-            (error:any) => {
-              this.person = person;
-              resolve(person);
-            });
-          }
-          else {
-            this.person = person;
-            resolve(person);
-          }
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
         },
         (error:any) => {
-          reject(error);
+          reject("Problem loading organization");
         });
       }
     });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
+  private loadUser(cache:boolean=true):Promise<User> {
     return new Promise((resolve, reject) => {
-      if (cache) {
-        resolve(this.organization);
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (cache && this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
       }
       else {
-        this.api.getOrganization(this.organization).then((organization:Organization) => {
-          if (this.mobile) {
-            this.database.saveOrganization(this.organization).then(saved => {
-              this.organization = organization;
-              resolve(organization);
-            },
-            (error:any) => {
-              this.organization = organization;
-              resolve(organization);
-            });
-          }
-          else {
-            this.organization = organization;
-            resolve(organization);
-          }
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
         },
         (error:any) => {
-          reject(error);
+          reject("Problem loading user");
         });
       }
     });
@@ -192,61 +152,29 @@ export class CheckinListPage extends BasePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.mobile) {
-        this.database.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-          if (checkins && checkins.length > 0) {
-            this.organization.checkins = checkins;
-            this.checkins = this.filterCheckins(checkins);
-            resolve(this.checkins);
-          }
-          else {
-            this.loadCheckins(false).then((checkins:Checkin[]) => {
-              this.organization.checkins = checkins;
-              this.checkins = this.filterCheckins(checkins);
-              resolve(this.checkins);
-            },
-            (error:any) => {
-              this.organization.checkins = [];
-              this.checkins = [];
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
+      this.promiseFallback(cache,
+        this.storage.getCheckins(this.organization, this.limit, this.offset),
+        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
+          this.logger.info(this, "loadCheckins", checkins.length);
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
-              if (this.person && this.person.id == reply.user_id) {
+              if (this.user && this.user.id == reply.user_id) {
                 checkin.replied = true;
               }
             }
           }
-          if (this.mobile) {
-            this.database.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-              this.database.getCheckins(this.organization, this.limit, this.offset).then((_checkins:Checkin[]) => {
-                this.organization.checkins = _checkins;
-                this.checkins = this.filterCheckins(_checkins);
-                resolve(_checkins);
-              },
-              (error:any) => {
-                this.checkins = checkins;
-                resolve(checkins);
-              });
-            });
-          }
-          else {
+          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
             this.organization.checkins = checkins;
             this.checkins = this.filterCheckins(checkins);
-            resolve(checkins);
-          }
+            resolve(this.checkins);
+          });
         },
         (error:any) => {
+          this.logger.error(this, "loadCheckins", error);
           this.organization.checkins = [];
           this.checkins = [];
           reject(error);
         });
-      }
     });
   }
 
@@ -254,160 +182,113 @@ export class CheckinListPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.api.getCheckins(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
-        if (this.mobile) {
-          this.database.saveCheckins(this.organization, checkins).then((saved:boolean) => {
+      this.promiseFallback(true,
+        this.storage.getCheckins(this.organization, this.limit, this.offset),
+        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
+          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
             this.organization.checkins = [...this.organization.checkins, ...checkins];
             this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
             if (event) {
               event.complete();
             }
-            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
+            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Loaded", this.organization.checkins.length);
             resolve(this.checkins);
           });
-        }
-        else {
-          this.organization.checkins = [...this.organization.checkins, ...checkins];
-          this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
-          if (event) {
-            event.complete();
-          }
-          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Total", this.organization.checkins.length);
-          resolve(this.checkins);
-        }
-      });
+        },
+        (error:any) => {
+          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Failed", error);
+          reject(error);
+        });
     });
   }
 
-  private loadWaitingResponse() {
-    if (this.mobile) {
-      this.database.getCheckinsWaiting(this.organization, 25).then((waiting:Checkin[]) => {
-        this.logger.info(this, "loadWaitingResponse", waiting.length);
-        let checkins = [];
-        for (let checkin of waiting) {
-          if (checkin.canRespond(this.person)) {
-            checkins.push(checkin);
-          }
-        }
-        if (checkins.length > 0) {
-          let modal = this.showModal(CheckinRespondPage, {
-            organization: this.organization,
-            checkins: checkins
-          });
-          modal.onDidDismiss(data => {
-            if (data) {
-              this.loadCheckins(false).then((loaded:any) => {
-                this.loadBadgeNumber();
-              },
-              (error:any) => {
-
-              });
-            }
-          });
-        }
-      },
-      (error:any) => {
-        this.logger.error(this, "loadWaitingResponse", error);
-      });
-    }
-    else {
-
-    }
-  }
-
-  private loadBadgeNumber():Promise<number> {
+  private loadWaitingResponse(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        try {
-          let badgeNumber = 0;
-          if (this.organization && this.organization.checkins) {
-            for (let checkin of this.organization.checkins) {
-              if (checkin.canRespond(this.person)) {
-                badgeNumber = badgeNumber + 1;
-              }
+      this.logger.info(this, "loadWaitingResponse");
+      this.promiseFallback(cache,
+        this.storage.getCheckinsWaiting(this.organization, this.user, 25),
+        this.api.getCheckinsWaiting(this.organization, this.user, 25), 1).then((checkins:Checkin[]) => {
+          if (checkins && checkins.length > 0) {
+            this.logger.info(this, "loadWaitingResponse", checkins.length);
+            this.badgeNumber = checkins.length;
+            this.badge.setBadgeNumber(this.badgeNumber);
+            if (showPopup == true) {
+              let checkin = checkins[0];
+              this.showCheckinRespond(checkin, checkins);
             }
+            resolve(checkins);
           }
-          this.logger.info(this, "loadBadgeNumber", badgeNumber);
-          this.badge.requestPermission().then((permission:any) => {
-            this.logger.info(this, "loadBadgeNumber", badgeNumber, "Permission", permission);
-            if (badgeNumber > 0) {
-              this.badge.set(badgeNumber).then((result:any) => {
-                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Set", result);
-                resolve(badgeNumber);
-              },
-              (error:any) => {
-                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-                resolve(0);
-              });
-            }
-            else {
-              this.badge.clear().then((cleared:boolean) => {
-                this.logger.info(this, "loadBadgeNumber", badgeNumber, "Clear", cleared);
-                resolve(0);
-              },
-              (error:any) => {
-                this.logger.error(this, "loadBadgeNumber", badgeNumber, "Error", error);
-                resolve(0);
-              });
-            }
-          });
-        }
-        catch(error) {
-          this.logger.error(this, "loadBadgeNumber", "Error", error);
-          resolve(0);
-        }
-      }
-      else {
-        resolve(0);
-      }
+          else {
+            this.logger.info(this, "loadWaitingResponse", 0);
+            this.badgeNumber = 0;
+            this.badge.clearBadgeNumber();
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.logger.info(error, "loadWaitingResponse", error);
+          resolve([]);
+        });
     });
   }
 
-  private showCheckinDetails(checkin:Checkin, event:any=null) {
+  private showCheckinDetails(checkin:Checkin) {
     if (document.body.clientWidth > this.WIDTH_LARGE) {
-      // this.showModal(CheckinDetailsPage, {
-      //   organization: this.organization,
-      //   person: this.person,
-      //   checkin: checkin,
-      //   checkin_id: checkin.id,
-      //   modal: true
-      // });
-      // this.selected = checkin;
       this.events.publish('checkin:details', {
         checkin: checkin
+      });
+    }
+    else if (document.body.clientWidth > this.WIDTH_MEDIUM) {
+      this.showModal(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.user,
+        checkin: checkin,
+        checkin_id: checkin.id,
+        modal: true
       });
     }
     else {
       this.showPage(CheckinDetailsPage, {
         organization: this.organization,
-        person: this.person,
+        user: this.user,
+        person: this.user,
         checkin: checkin,
         checkin_id: checkin.id
       });
     }
   }
 
-  private sendReply(checkin:Checkin, event:any=null) {
+  private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {
+    this.logger.info(this, "showCheckinRespond", checkin);
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
-      checkins: [checkin],
-      checkin: checkin
+      user: this.user,
+      checkins: checkins || [checkin],
+      checkin: checkin,
+      modal: true
     });
     modal.onDidDismiss(data => {
-      this.logger.info(this, "sendReply", "Modal", data);
+      this.logger.info(this, "showCheckinRespond", "Modal", data);
       if (data) {
         if (data.canceled) {
-          this.logger.info(this, "sendReply", "Modal", "Canceled");
+          this.logger.info(this, "showCheckinRespond", "Modal", "Canceled");
         }
         else {
-          this.loadCheckins(false);
+          this.loadCheckins(false).then((loaded:any) => {
+            this.logger.info(this, "showCheckinRespond", "loadCheckins", "Loaded");
+            this.loadWaitingResponse(true, false);
+          },
+          (error:any) => {
+            this.logger.info(this, "showCheckinRespond", "loadCheckins", error);
+          });
         }
       }
    });
   }
 
-  private resendCheckin(checkin:Checkin, event:any=null) {
-    let loading = this.showLoading("Resending...");
+  private resendCheckin(checkin:Checkin) {
+    let loading = this.showLoading("Resending...", true);
     this.api.resendCheckin(this.organization, checkin).then((checkin:Checkin) => {
       loading.dismiss();
       this.showToast(`Check-In ${checkin.message} resent`);
@@ -421,7 +302,8 @@ export class CheckinListPage extends BasePage {
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user,
+      modal: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "createCheckin", "Modal", data);
@@ -430,7 +312,13 @@ export class CheckinListPage extends BasePage {
           this.logger.info(this, "createCheckin", "Modal", "Canceled");
         }
         else {
-          this.loadCheckins(false);
+          this.loadCheckins(false).then((loaded:any) => {
+            this.logger.info(this, "createCheckin", "loadCheckins", "Loaded");
+            this.loadWaitingResponse(true, false);
+          },
+          (error:any) => {
+            this.logger.error(this, "createCheckin", "loadCheckins", error);
+          });
         }
       }
     });
@@ -442,10 +330,19 @@ export class CheckinListPage extends BasePage {
     this.loading = true;
     this.offset = 0;
     this.checkins = [];
-    this.loadCheckins(true).then((filtered:any) => {
-      this.loading = false;
-      loading.dismiss();
-    });
+    if (this.filter === "all") {
+      this.loadCheckins(true).then((filtered:any) => {
+        this.loading = false;
+        loading.dismiss();
+      });
+    }
+    else if (this.filter === "waiting") {
+      this.loadWaitingResponse(true, false).then((checkins:Checkin[]) => {
+        this.checkins = this.filterCheckins(checkins);
+        this.loading = false;
+        loading.dismiss();
+      });
+    }
   }
 
   private filterCheckins(checkins:Checkin[]) {
@@ -455,7 +352,7 @@ export class CheckinListPage extends BasePage {
         filtered.push(checkin);
       }
       else if (this.filter === "waiting") {
-        if (checkin.canRespond(this.person)) {
+        if (checkin.canRespond(this.user)) {
           filtered.push(checkin);
         }
       }

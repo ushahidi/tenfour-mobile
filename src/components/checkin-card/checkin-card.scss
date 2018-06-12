@@ -1,3 +1,33 @@
 checkin-card {
-
+  ion-card {
+    &.selected {
+      background-color: #f6f6f6 !important;
+    }
+    ion-card-content {
+      border-bottom: 1px solid #ccc;
+      person-avatar {
+      }
+      h1 {
+      }
+      p {
+        color: #888 !important;
+        strong {
+          color: #444 !important;
+          font-weight: 500 !important;
+        }
+      }
+      ion-badge {
+        margin-top: 6px;
+        margin-right: 8px;
+        border-radius: 2px !important;
+      }
+    }
+    ion-row {
+      ion-col {
+        button {
+          font-weight: 500 !important;
+        }
+      }
+    }
+  }
 }

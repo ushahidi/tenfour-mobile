@@ -17,7 +17,15 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
-    <ion-list-header>Send To</ion-list-header>
+    <ion-item color="white">
+      <ion-label>Send via</ion-label>
+      <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
+    </ion-item>
+  </ion-list>
+  <ion-list *ngIf="checkin">
+    <ion-list-header>
+      <h2>Send To</h2>
+    </ion-list-header>
     <ion-item color="white" *ngFor="let recipient of checkin.recipients">
       <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
       <h2>{{recipient.name}}</h2>

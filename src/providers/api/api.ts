@@ -7,13 +7,9 @@ import { File } from '@ionic-native/file';
 import { Device } from '@ionic-native/device';
 import { FileTransfer } from '@ionic-native/file-transfer';
 
-import { HttpProvider } from '../../providers/http/http';
-import { LoggerProvider } from '../../providers/logger/logger';
-import { DatabaseProvider } from '../../providers/database/database';
-import { StorageProvider } from '../../providers/storage/storage';
-
 import { Token } from '../../models/token';
 import { Email } from '../../models/email';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Organization } from '../../models/organization';
@@ -25,6 +21,10 @@ import { Settings } from '../../models/settings';
 import { Region } from '../../models/region';
 import { Subscription } from '../../models/subscription';
 import { Notification } from '../../models/notification';
+
+import { HttpProvider } from '../../providers/http/http';
+import { LoggerProvider } from '../../providers/logger/logger';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -43,17 +43,16 @@ export class ApiProvider extends HttpProvider {
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerProvider,
-    protected database:DatabaseProvider,
     protected storage:StorageProvider) {
     super(platform, http, httpNative, file, transfer, logger);
   }
 
-  public saveToken(organization:Organization, token:Token) {
+  public saveToken(organization:Organization, token:Token):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveToken", token);
       let json = JSON.stringify(token);
       this.storage.set(organization.subdomain, json).then((data:any) => {
-        resolve(data);
+        resolve(true);
       },
       (error:any) => {
         this.logger.error(this, "saveToken", token, "Error", error);
@@ -102,7 +101,7 @@ export class ApiProvider extends HttpProvider {
         resolve(true);
       },
       (error:any) => {
-        reject(error);
+        resolve(false);
       });
     });
   }
@@ -205,24 +204,21 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem registering email ${email}.`);
       });
     });
   }
 
   public verifyEmail(email:string, token:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email/`;
-      let params = {
-        address: email,
-        token: token
-      };
+      let url = `${this.api}/verification/email/?address=${email}&token=${token}`;
+      let params = {};
       this.httpGet(url, params).then((data:any) => {
         let email = new Email(data);
         resolve(email);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem verifying email ${email}.`);
       });
     });
   }
@@ -238,7 +234,7 @@ export class ApiProvider extends HttpProvider {
         resolve(true);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem resetting password for ${email}.`);
       });
     });
   }
@@ -358,17 +354,6 @@ export class ApiProvider extends HttpProvider {
       if (organization.slack_webhook && organization.slack_webhook.length > 0) {
         settings['channels']['slack']['webhook_url'] = organization.slack_webhook;
       }
-      if (organization.countries && organization.countries.length > 0) {
-        let regions = [];
-        for (let country of organization.countries) {
-          if (country.selected == true) {
-            regions.push({
-              code: country.code,
-              country_code: country.country_code});
-          }
-        }
-        settings['channels']['sms']['regions'] = regions;
-      }
       let params = {
         id: organization.id,
         name: organization.name,
@@ -430,9 +415,11 @@ export class ApiProvider extends HttpProvider {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${id}`;
-        let params = { };
+        let params = {
+          history_offset: 0,
+          history_limit: 10
+        };
         this.httpGet(url, params, token.access_token).then((data:any) => {
-          this.logger.info(this, "getPerson", data);
           if (data && data.person) {
             let person = new Person(data.person);
             person.me = person.hasEmail(token.username);
@@ -460,7 +447,8 @@ export class ApiProvider extends HttpProvider {
           name: person.name,
           description: person.description || "",
           person_type: "user",
-          role: person.role || "responder"
+          role: person.role || "responder",
+          groups: person.groupIds()
         };
         if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
           params['_input_image'] = person.profile_picture;
@@ -490,15 +478,20 @@ export class ApiProvider extends HttpProvider {
         let params = {
           name: person.name,
           role: person.role,
-          description: person.description || ""};
-        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
-          params['_input_image'] = person.profile_picture;
-        }
+          description: person.description || "",
+          groups: person.groupIds()
+        };
         if (person.config_self_test_sent) {
           params['config_self_test_sent'] = true;
         }
         if (person.config_profile_reviewed) {
           params['config_profile_reviewed'] = true;
+        }
+        if (person.config_people_invited) {
+          params['config_people_invited'] = true;
+        }
+        if (person.profile_picture && person.profile_picture.startsWith("data:image")) {
+          params['_input_image'] = person.profile_picture;
         }
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.person) {
@@ -556,6 +549,30 @@ export class ApiProvider extends HttpProvider {
         (error:any) => {
           reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public acceptInvite(organization:Organization, person:Person, password:string, token:string):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/invite/${organization.id}/accept/${person.id}`;
+      let params = {
+        password: password,
+        invite_token: token,
+        terms_of_service: true
+      };
+      this.httpPost(url, params, null).then((data:any) => {
+        this.logger.info(this, "acceptInvite", data);
+        if (data && data.person) {
+          let person = new Person(data.person);
+          resolve(person);
+        }
+        else {
+          reject("Invitation Not Accepted");
+        }
       },
       (error:any) => {
         reject(error);
@@ -629,6 +646,68 @@ export class ApiProvider extends HttpProvider {
           if (data && data.checkins) {
             for (let _checkin of data.checkins) {
               let checkin = new Checkin(_checkin);
+              checkins.push(checkin);
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+
+  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let checkins = [];
+          if (data && data.checkins) {
+            for (let _checkin of data.checkins) {
+              let checkin = new Checkin(_checkin);
+              if (checkin.canRespond(user)) {
+                checkins.push(checkin);
+              }
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getCheckinsForPerson(organization:Organization, person:Person, limit:number=10, offset:number=0):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person.id}`;
+        let params = {
+          history_offset: offset,
+          history_limit: limit
+        };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          this.logger.info(this, "getCheckinsForPerson", data);
+          let checkins = [];
+          if (data && data.person && data.person.checkins) {
+            this.logger.info(this, "getCheckinsForPerson", "Checkins", data.person.checkins);
+            for (let _checkin of data.person.checkins) {
+              let checkin = new Checkin(_checkin);
+              checkin.user_id = person.id;
+              checkin.user_name = person.name;
+              checkin.user_initials = person.initials;
+              checkin.user_picture = person.profile_picture;
               checkins.push(checkin);
             }
           }
@@ -829,7 +908,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getNotifications(organization:Organization):Promise<Notification[]> {
+  public getNotifications(organization:Organization, limit:number=20, offset:number=0):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/me`;
@@ -1093,6 +1172,47 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getReplies(organization:Organization, checkin:Checkin):Promise<Reply[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.checkin && data.checkin.replies) {
+            let checkin = new Checkin(data.checkin);
+            resolve(checkin.replies);
+          }
+          else {
+            reject("Checkin Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public unsubscribeEmail(email:string, token:string):Promise<void> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/unsubscribe`;
+        let params = {
+          email: email,
+          token: token
+        };
+        this.logger.info(this, "unsubscribeEmail", url);
+        this.httpPost(url, params).then((data:any) => {
+          resolve();
+        },
+        (error:any) => {
+          reject(error);
+        });
+    });
+  }
+
   public postResetPassword(subdomain:string, email:string, token:string):Promise<boolean> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/login/reset-password/?token=${token}&email=${email}&subdomain=${subdomain}`;
@@ -1111,6 +1231,4 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
-
-
 }

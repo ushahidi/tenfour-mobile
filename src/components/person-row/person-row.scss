@@ -1,3 +1,10 @@
 person-row {
-
+  ion-item {
+    .dots {
+      margin-left: 5px;
+      width: 18px;
+      height: 18px;
+      vertical-align: middle;
+    }
+  }
 }

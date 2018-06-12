@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Platform } from 'ionic-angular';
 
 import { Observable } from 'rxjs/Observable';
@@ -12,7 +12,6 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/observable/throw';
 
 import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
-import { GoogleMapsAPIWrapper } from 'angular2-google-maps/core';
 
 import { Geolocation } from '@ionic-native/geolocation';
 import { NativeGeocoder, NativeGeocoderReverseResult } from '@ionic-native/native-geocoder';
@@ -23,6 +22,8 @@ import { LoggerProvider } from '../../providers/logger/logger';
 
 @Injectable()
 export class LocationProvider {
+
+  private key:string = "AIzaSyCLSlgNz3MtA4DlWenAAbc6UPFEZW4G2Po";
 
   constructor(
     private platform:Platform,
@@ -105,14 +106,18 @@ export class LocationProvider {
         });
       }
       else {
-        //TODO use NPM module instead
-        let key = "AIzaSyCLSlgNz3MtA4DlWenAAbc6UPFEZW4G2Po";
         let latitude = location.latitude;
         let longitude = location.longitude;
-        let url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${key}`;
+        let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
+        let url = `${host}/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${this.key}`;
+        this.logger.info(this, "loadAddress", url);
         this.http.get(url, {})
           .timeout(12000)
           .map(res => res.json())
+          .catch((error:any) => {
+            this.logger.error(this, "loadAddress", error);
+            return Observable.throw(error );
+          })
           .subscribe((data:any) => {
             this.logger.info(this, "loadAddress", url, data);
             if (data && data.results) {
@@ -127,8 +132,86 @@ export class LocationProvider {
             this.logger.error(this, "loadAddress", url, error);
             reject(error);
           });
+      }
+    });
+  }
 
+  public searchAddress(address:string, limit:number=5, latitude:number=null, longitude:number=null):Promise<Location[]> {
+    return new Promise((resolve, reject) => {
+      let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
+      let url = `${host}/maps/api/place/autocomplete/json?input=${address}&types=geocode&key=${this.key}`;
+      if (latitude && longitude) {
+        url = url + `&location=${latitude},${longitude}`;
+      }
+      this.logger.info(this, "searchAddress", url);
+      this.http.get(url, {})
+        .timeout(12000)
+        .map((response:any) => {
+          return response.json();
+        })
+        .catch((error:any) => {
+          return Observable.throw(error);
+        })
+        .subscribe((data:any) => {
+          this.logger.info(this, "searchAddress", url, data);
+          if (data && data.predictions) {
+            let locations = [];
+            for (let prediction of data.predictions.slice(0, limit)) {
+              let location = <Location> {
+                place: prediction.place_id,
+                address: prediction.description
+              };
+              locations.push(location);
+            }
+            resolve(locations);
+          }
+          else {
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "searchAddress", url, error);
+          resolve([]);
+        });
+    });
+  }
 
+  public placeDetails(location:Location):Promise<Location> {
+    return new Promise((resolve, reject) => {
+      if (location && location.place && location.place.length > 0) {
+        let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
+        let url = `${host}/maps/api/place/details/json?placeid=${location.place}&key=${this.key}`;
+        this.logger.info(this, "placeDetails", url);
+        this.http.get(url, {})
+          .timeout(12000)
+          .map((response:any) => {
+            return response.json();
+          })
+          .catch((error:any) => {
+            return Observable.throw(error);
+          })
+          .subscribe((data:any) => {
+            this.logger.info(this, "placeDetails", url, data);
+            if (data && data.result) {
+              let location = <Location>{
+                place: data.result.place_id,
+                address: data.result.formatted_address,
+                latitude: data.result.geometry.location.lat,
+                longitude: data.result.geometry.location.lng
+              };
+              resolve(location);
+            }
+            else {
+              resolve(null);
+            }
+          },
+          (error:any) => {
+            this.logger.error(this, "placeDetails", url, error);
+            resolve(null);
+          });
+      }
+      else {
+        resolve(null);
       }
     });
   }

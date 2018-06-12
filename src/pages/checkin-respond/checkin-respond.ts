@@ -3,16 +3,17 @@ import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-import { LocationProvider } from '../../providers/location/location';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Person } from '../../models/person';
 import { Location } from '../../models/location';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
+import { LocationProvider } from '../../providers/location/location';
 
 @IonicPage({
   name: 'CheckinRespondPage',
@@ -22,7 +23,7 @@ import { Location } from '../../models/location';
 @Component({
   selector: 'page-checkin-respond',
   templateUrl: 'checkin-respond.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[  ]
 })
 export class CheckinRespondPage extends BasePage {
@@ -31,10 +32,14 @@ export class CheckinRespondPage extends BasePage {
   slides:Slides;
   index:number = 0;
   loading:boolean = false;
+  locating:boolean = false;
 
   organization:Organization = null;
+  user:User = null;
   checkins:Checkin[] = [];
   checkin:Checkin = null;
+  locations:Location[] = [];
+  timer:any = null;
 
   constructor(
     protected zone:NgZone,
@@ -48,78 +53,158 @@ export class CheckinRespondPage extends BasePage {
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController,
     protected api:ApiProvider,
-    protected database:DatabaseProvider,
+    protected storage:StorageProvider,
     protected location:LocationProvider) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.checkins = this.getParameter<Checkin[]>("checkins");
-    this.checkin = this.getParameter<Checkin>("checkin");
-    if (this.checkins && this.checkin) {
-      this.index = this.checkins.indexOf(this.checkin);
-    }
-    else if (this.checkins) {
-      this.index = 0;
-      this.checkin = this.checkins[0];
-    }
-    else {
-      this.index = 0;
-      this.checkins = [this.checkin];
-      this.checkin.reply = this.getParameter<Reply>("reply");
-    }
-    for (let checkin of this.checkins) {
-      if (checkin.reply == null) {
-        checkin.reply = new Reply();
-        checkin.reply.organization_id = this.organization.id;
-        checkin.reply.checkin_id = this.checkin.id;
-      }
-    }
-    this.loadLocation().then((location:Location) => {
-      this.logger.info(this, "Location", location);
-      if (location) {
-        for (let checkin of this.checkins) {
-          if (checkin.reply.location_text == null) {
-            checkin.reply.latitude = location.latitude;
-            checkin.reply.longitude = location.longitude;
-            checkin.reply.location_text = location.address;
-          }
-        }
-      }
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(false).then((finished:any) => {
+      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
+      loading.dismiss();
     },
     (error:any) => {
-      this.logger.error(this, "Location", error);
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
+      loading.dismiss();
     });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
   }
 
-  private loadLocation():Promise<Location> {
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCheckins(cache); })
+      .then(() => { return this.loadLocation(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadCheckins(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.checkins = this.getParameter<Checkin[]>("checkins");
+      this.checkin = this.getParameter<Checkin>("checkin");
+      if (this.checkins && this.checkin) {
+        this.index = this.checkins.indexOf(this.checkin);
+        this.slides.lockSwipes(false);
+      }
+      else if (this.checkins && this.checkins.length > 0) {
+        this.index = 0;
+        this.checkin = this.checkins[0];
+        this.slides.lockSwipes(false);
+      }
+      else {
+        this.index = 0;
+        this.checkins = [this.checkin];
+        this.checkin.reply = this.getParameter<Reply>("reply");
+        this.slides.lockSwipes(true);
+      }
+      for (let checkin of this.checkins) {
+        if (checkin.reply == null) {
+          checkin.reply = new Reply();
+          checkin.reply.organization_id = this.organization.id;
+          checkin.reply.checkin_id = this.checkin.id;
+        }
+      }
+      resolve(true);
+    });
+  }
+
+  private loadLocation(cache:boolean=true):Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadLocation");
+      this.locating = true;
       this.location.detectLocation().then((location:Location) => {
         this.logger.info(this, "loadLocation", location);
         this.location.lookupAddress(location).then((address:string) => {
           this.logger.info(this, "loadLocation", address);
           location.address = address;
+          for (let checkin of this.checkins) {
+            if (checkin.reply.location_text == null) {
+              checkin.reply.latitude = location.latitude;
+              checkin.reply.longitude = location.longitude;
+              checkin.reply.location_text = location.address;
+            }
+          }
+          this.locating = false;
           resolve(location);
         },
         (error:any) => {
           this.logger.error(this, "loadLocation", error);
+          for (let checkin of this.checkins) {
+            if (checkin.reply.location_text == null) {
+              checkin.reply.latitude = location.latitude;
+              checkin.reply.longitude = location.longitude;
+            }
+          }
+          this.locating = false;
           resolve(location);
         });
       },
       (error:any) => {
         this.logger.error(this, "loadLocation", error);
+        this.locating = false;
         reject(error);
       });
     });
@@ -145,7 +230,7 @@ export class CheckinRespondPage extends BasePage {
   private cancelReply(event:any) {
     this.logger.info(this, "cancelReply");
     if (this.checkin && this.checkin.reply && this.checkin.reply.id) {
-      this.database.getReply(this.organization, this.checkin.reply.id).then((reply:Reply) => {
+      this.storage.getReply(this.organization, this.checkin.reply.id).then((reply:Reply) => {
         this.checkin.reply.answer = reply.answer;
         this.checkin.reply.message = reply.message;
         this.checkin.reply.location_text = reply.location_text;
@@ -172,17 +257,17 @@ export class CheckinRespondPage extends BasePage {
       this.showToast("Answer is required, please select your response");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.sendReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "sendReply", "Reply", replied);
         if (this.mobile) {
-          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
+          this.storage.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "sendReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(this.organization, checkin, replied).then(saved => {
+            this.storage.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });
@@ -206,17 +291,17 @@ export class CheckinRespondPage extends BasePage {
       this.showToast("Answer is required, please select your response");
     }
     else {
-      let loading = this.showLoading("Sending...");
+      let loading = this.showLoading("Sending...", true);
       this.api.updateReply(this.organization, checkin, reply).then((replied:Reply) => {
         this.logger.info(this, "saveReply", "Reply", replied);
         if (this.mobile) {
-          this.database.getPerson(this.organization, replied.user_id).then((person:Person) => {
+          this.storage.getPerson(this.organization, replied.user_id).then((person:Person) => {
             this.logger.info(this, "saveReply", "Person", person);
             replied.user_name = person.name;
             replied.user_description = person.description;
             replied.user_initials = person.initials;
             replied.user_picture = person.profile_picture;
-            this.database.saveReply(this.organization, checkin, replied).then(saved => {
+            this.storage.saveReply(this.organization, checkin, replied).then(saved => {
               loading.dismiss();
               this.hideCheckin(checkin, replied);
             });
@@ -263,10 +348,11 @@ export class CheckinRespondPage extends BasePage {
     reply.location_text = null;
     reply.latitude = null;
     reply.longitude = null;
+    this.locations = [];
   }
 
   private onKeyPress(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard();
       return false;
@@ -274,6 +360,47 @@ export class CheckinRespondPage extends BasePage {
     else {
       return true;
     }
+  }
+
+  private searchAddress() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout((address:string, latitude:number, longitude:number) => {
+      if (address && address.length > 0) {
+        this.logger.info(this, "searchAddress", address);
+        this.location.searchAddress(address, 5, latitude, longitude).then((locations:Location[]) => {
+          this.logger.info(this, "searchAddress", address, locations);
+          this.zone.run(() => {
+            this.locations = locations;
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "searchAddress", address, error);
+          this.zone.run(() => {
+            this.locations = [];
+          });
+        });
+      }
+      else {
+        this.zone.run(() => {
+          this.locations = [];
+        });
+      }
+    }, 900, this.checkin.reply.location_text, this.checkin.reply.latitude, this.checkin.reply.longitude);
+  }
+
+  private selectLocation(location:Location) {
+    this.logger.info(this, "selectLocation", location);
+    this.location.placeDetails(location).then((_location:Location) => {
+      this.logger.info(this, "selectLocation", location, "placeDetails", _location);
+      if (_location && _location.latitude && _location.longitude) {
+        this.checkin.reply.latitude = _location.latitude;
+        this.checkin.reply.longitude = _location.longitude;
+      }
+    });
+    this.zone.run(() => {
+      this.checkin.reply.location_text = location.address;
+      this.locations = [];
+    });
   }
 
 }

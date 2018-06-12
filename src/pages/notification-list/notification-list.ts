@@ -4,11 +4,12 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Notification } from '../../models/notification';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'NotificationListPage',
@@ -17,13 +18,13 @@ import { DatabaseProvider } from '../../providers/database/database';
 @Component({
   selector: 'page-notification-list',
   templateUrl: 'notification-list.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
 export class NotificationListPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   notifications:Notification[] = [];
   loading:boolean = false;
   limit:number = 20;
@@ -42,29 +43,29 @@ export class NotificationListPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.notifications = this.getParameter<Notification[]>("notifications");
     this.modal = this.getParameter<boolean>("modal");
+    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then(updated => {
       loading.dismiss();
+      this.loading = false;
     },
     (error:any) => {
       loading.dismiss();
+      this.loading = false;
     });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
@@ -75,115 +76,129 @@ export class NotificationListPage extends BasePage {
     this.viewNotifications();
   }
 
-  private close(event:any) {
-    this.hideModal();
-  }
-
   private loadUpdates(cache:boolean=true, event:any=null) {
-    this.loading = true;
-    return Promise.all([this.loadNotifications(cache)]).then(
-      (loaded:any) =>{
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadNotifications(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
           event.complete();
         }
-        this.loading = false;
-      },
-      (error:any) => {
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
-        this.loading = false;
         this.showToast(error);
       });
   }
 
-  private loadMore(event:any) {
-    this.logger.info(this, "loadMore");
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.offset = this.offset + this.limit;
-        this.logger.info(this, "loadMore", this.offset);
-        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-          this.notifications = [...this.notifications, ...notifications];
-          if (event) {
-            event.complete();
-          }
-          resolve(this.notifications);
-        },
-        (error:any) => {
-          if (event) {
-            event.complete();
-          }
-          reject(error);
-          this.showToast(error);
-        });
+      if (cache && this.organization) {
+        resolve(this.organization);
       }
-      else if (event) {
-        event.complete();
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
       }
     });
   }
 
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+  
   private loadNotifications(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
-      if (cache && this.mobile) {
-        this.database.getNotifications(this.organization, this.limit, this.offset).then((notifications:Notification[]) => {
-          if (notifications && notifications.length > 0) {
+      this.promiseFallback(cache,
+        this.storage.getNotifications(this.organization, this.limit, this.offset),
+        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
             this.notifications = notifications;
             resolve(notifications);
-          }
-          else {
-            this.loadNotifications(false).then((_notifications:Notification[]) => {
-              this.notifications = _notifications;
-              resolve(_notifications);
-            },
-            (error:any) => {
-              this.notifications = [];
-              reject(error);
-            });
-          }
-        });
-      }
-      else {
-        this.api.getNotifications(this.organization).then((notifications:Notification[]) => {
-          if (this.mobile) {
-            this.database.saveNotifications(this.organization, notifications).then((saved:boolean) => {
-              this.database.getNotifications(this.organization, this.limit, this.offset).then((_notifications:Notification[]) => {
-                this.notifications = _notifications;
-                resolve(_notifications);
-              },
-              (error:any) => {
-                resolve(notifications);
-              });
-            });
-          }
-          else {
+          },
+          (error:any) => {
             this.notifications = notifications;
-            resolve(notifications);
-          }
+            reject(error);
+          });
         },
         (error:any) => {
           this.notifications = [];
           reject(error);
         });
-      }
+    });
+  }
+
+  private loadMore(event:any):Promise<Notification[]> {
+    this.logger.info(this, "loadMore");
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      this.promiseFallback(true,
+        this.storage.getNotifications(this.organization, this.limit, this.offset),
+        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+          this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
+            this.notifications = notifications;
+            if (event) {
+              event.complete();
+            }
+            resolve(notifications);
+          },
+          (error:any) => {
+            this.notifications = notifications;
+            if (event) {
+              event.complete();
+            }
+            reject(error);
+          });
+        },
+        (error:any) => {
+          if (event) {
+            event.complete();
+          }
+          this.showToast(error);
+          reject(error);
+        });
     });
   }
 
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
-    if (this.mobile) {
-      for (let notification of this.notifications) {
-        notification.viewed_at = new Date();
-      }
-      this.database.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
-        this.logger.info(this, "viewNotifications", "Saved", saved);
-      });
+    for (let notification of this.notifications) {
+      notification.viewed_at = new Date();
     }
-    else {
+    this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
+      this.logger.info(this, "viewNotifications", "Saved", saved);
+    });
+  }
 
-    }
+  private close(event:any) {
+    this.hideModal();
   }
 
 }

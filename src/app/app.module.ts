@@ -41,13 +41,15 @@ import { SplashScreenModule } from '../pages/splash-screen/splash-screen.module'
 
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
+import { SigninInviteModule } from '../pages/signin-invite/signin-invite.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
-import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
-import { SignupNameModule } from '../pages/signup-name/signup-name.module';
-import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
+import { SignupVerifyModule } from '../pages/signup-verify/signup-verify.module';
+import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
+import { SignupNameModule } from '../pages/signup-name/signup-name.module';
+import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
 import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
 import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.module';
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
@@ -55,6 +57,7 @@ import { SignupPasswordModule } from '../pages/signup-password/signup-password.m
 import { PersonListModule } from '../pages/person-list/person-list.module';
 import { PersonEditModule } from '../pages/person-edit/person-edit.module';
 import { PersonDetailsModule } from '../pages/person-details/person-details.module';
+import { PersonProfileModule } from '../pages/person-profile/person-profile.module';
 import { PersonInviteModule } from '../pages/person-invite/person-invite.module';
 import { PersonImportModule } from '../pages/person-import/person-import.module';
 import { PersonSelectModule } from '../pages/person-select/person-select.module';
@@ -86,6 +89,8 @@ import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.modu
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
 
+import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
+
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
 import { TitleizeModule } from '../pipes/titleize/titleize.module';
@@ -101,14 +106,29 @@ import { CheckinCardModule } from '../components/checkin-card/checkin-card.modul
 import { CheckinDetailModule } from '../components/checkin-details/checkin-details.module';
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
+import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
+import { WebstoreProvider } from '../providers/webstore/webstore';
 import { DatabaseProvider } from '../providers/database/database';
-import { CountryProvider } from '../providers/country/country';
+import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
+import { BadgeProvider } from '../providers/badge/badge';
+import { AnalyticsProvider } from '../providers/analytics/analytics';
+import { BrowserProvider } from '../providers/browser/browser';
+import { NetworkProvider } from '../providers/network/network';
+import { KeyboardProvider } from '../providers/keyboard/keyboard';
+import { OrientationProvider } from '../providers/orientation/orientation';
+import { SharingProvider } from '../providers/sharing/sharing';
+import { StatusBarProvider } from '../providers/status-bar/status-bar';
+import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
+import { FirebaseProvider } from '../providers/firebase/firebase';
+import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
+import { ContactsProvider } from '../providers/contacts/contacts';
+import { MailerProvider } from '../providers/mailer/mailer';
 
 @NgModule({
   declarations: [
@@ -124,6 +144,7 @@ import { CameraProvider } from '../providers/camera/camera';
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,
+    CheckinReplyModule,
     CheckinDetailModule,
     PersonRowModule,
     GroupRowModule,
@@ -133,12 +154,14 @@ import { CameraProvider } from '../providers/camera/camera';
     SigninUrlModule,
     SigninEmailModule,
     SigninUrlModule,
+    SigninInviteModule,
     SigninPasswordModule,
     SignupUrlModule,
     SignupEmailModule,
     SignupNameModule,
     SignupOwnerModule,
     SignupCheckModule,
+    SignupVerifyModule,
     SignupPlanModule,
     SignupPaymentModule,
     SignupPasswordModule,
@@ -154,6 +177,7 @@ import { CameraProvider } from '../providers/camera/camera';
     PersonListModule,
     PersonEditModule,
     PersonDetailsModule,
+    PersonProfileModule,
     PersonInviteModule,
     PersonImportModule,
     PersonSelectModule,
@@ -165,6 +189,7 @@ import { CameraProvider } from '../providers/camera/camera';
     SettingsChannelsModule,
     SettingsSizesModule,
     SettingsRegionsModule,
+    UnsubscribePageModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,
@@ -220,11 +245,25 @@ import { CameraProvider } from '../providers/camera/camera';
     { provide: Firebase, useClass: Firebase },
     { provide: ApiProvider, useClass: ApiProvider },
     { provide: LoggerProvider, useClass: LoggerProvider },
-    { provide: CountryProvider, useClass: CountryProvider },
-    { provide: DatabaseProvider, useClass: DatabaseProvider },
+    { provide: CountriesProvider, useClass: CountriesProvider },
     { provide: StorageProvider, useClass: StorageProvider },
+    { provide: DatabaseProvider, useClass: DatabaseProvider },
+    { provide: WebstoreProvider, useClass: WebstoreProvider },
     { provide: LocationProvider, useClass: LocationProvider },
+    { provide: AnalyticsProvider, useClass: AnalyticsProvider },
+    { provide: BrowserProvider, useClass: BrowserProvider },
     { provide: CameraProvider, useClass: CameraProvider },
+    { provide: NetworkProvider, useClass: NetworkProvider },
+    { provide: KeyboardProvider, useClass: KeyboardProvider },
+    { provide: OrientationProvider, useClass: OrientationProvider },
+    { provide: SharingProvider, useClass: SharingProvider },
+    { provide: StatusBarProvider, useClass: StatusBarProvider },
+    { provide: SplashScreenProvider, useClass: SplashScreenProvider },
+    { provide: FirebaseProvider, useClass: FirebaseProvider },
+    { provide: DeeplinksProvider, useClass: DeeplinksProvider },
+    { provide: ContactsProvider, useClass: ContactsProvider },
+    { provide: MailerProvider, useClass: MailerProvider },
+    { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

@@ -4,13 +4,14 @@ import { App, IonicPage, Platform, NavParams, NavController, ViewController, Mod
 import { BasePage } from '../../pages/base-page/base-page';
 import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Answer } from '../../models/answer';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 import { ColorPickerComponent } from '../../components/color-picker/color-picker';
 
@@ -22,13 +23,13 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
 @Component({
   selector: 'page-checkin-edit',
   templateUrl: 'checkin-edit.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinSendPage ]
 })
 export class CheckinEditPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   checkin:Checkin = null;
 
   constructor(
@@ -45,46 +46,116 @@ export class CheckinEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected popoverController:PopoverController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.checkin = this.getParameter<Checkin>("checkin");
-    if (this.checkin == null) {
-      if (this.person) {
-        this.initCheckin();
-      }
-      else {
-        this.database.getPerson(this.organization, null, true).then((person:Person) => {
-          this.person = person;
-          this.initCheckin();
-        });
-      }
-    }
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(false).then((finished:any) => {
+      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    if (this.checkin) {
-      this.trackPage({
+    if (this.organization && this.checkin) {
+      this.analytics.trackPage(this, {
+        organization: this.organization.name,
         checkin: this.checkin.id
       });
     }
   }
 
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCheckin(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadCheckin(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.checkin == null) {
+        if (this.user) {
+          this.initCheckin();
+        }
+        else if (this.mobile) {
+          this.storage.getPerson(this.organization, null, true).then((person:Person) => {
+            this.user = person;
+            this.initCheckin();
+          });
+        }
+      }
+      resolve(true);
+    });
+  }
+
   private initCheckin() {
     this.checkin = new Checkin({
       organization_id: this.organization.id,
-      user_id: this.person.id,
-      user_initials: this.person.initials,
-      user_picture: this.person.profile_picture
+      user_id: this.user.id,
+      user_initials: this.user.initials,
+      user_picture: this.user.profile_picture
     });
     if (this.organization.app_enabled) {
-      this.checkin.send_via = 'apponly';
+      this.checkin.send_via = 'app';
     }
     this.addDefaults();
   }
@@ -97,17 +168,23 @@ export class CheckinEditPage extends BasePage {
   }
 
   private showNext() {
-    if (this.tablet || this.browser) {
+    if (this.checkin.hasBlankAnswers()) {
+      this.showAlert("Blank Answers", "Answers must have a value.");
+    }
+    else if (this.checkin.hasDuplicateAnswers()) {
+      this.showAlert("Duplicate Answers", "Answers must be unique.");
+    }
+    else if (this.tablet || this.website) {
       this.showModal(CheckinSendPage, {
         organization: this.organization,
-        person: this.person,
+        user: this.user,
         checkin: this.checkin
       });
     }
     else {
       this.showPage(CheckinSendPage, {
         organization: this.organization,
-        person: this.person,
+        user: this.user,
         checkin: this.checkin
       });
     }
@@ -174,7 +251,7 @@ export class CheckinEditPage extends BasePage {
   }
 
   private onKeyPress(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard();
       return false;

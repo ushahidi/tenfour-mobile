@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="organization">
+    <ion-item class="heading">
+      <person-avatar item-center [image]="logo" [large]="true" *ngIf="organization.profile_picture == null"></person-avatar>
+      <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization.profile_picture != null"></person-avatar>
+      <h2>Choose your password.</h2>
+      <p>Welcome to {{organization.name}}, let's get you setup.</p>
+    </ion-item>
+    <ion-item class="input password">
+      <ion-label fixed>Password</ion-label>
+      <ion-input #password type="password" autocorrect="off" placeholder="Your password" (keypress)="acceptInitationOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item class="input confirm">
+      <ion-label fixed>Confirm</ion-label>
+      <ion-input #confirm type="password" autocorrect="off" placeholder="Confirm password" (keypress)="acceptInitationOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item text-wrap class="terms">
+      <ion-row no-padding no-margin>
+        <ion-col col-1 no-padding no-margin>
+          <ion-item no-padding no-margin no-lines>
+            <ion-checkbox item-left color="primary" [(ngModel)]="accepted"></ion-checkbox>
+          </ion-item>
+        </ion-col>
+        <ion-col col-11 no-padding no-margin>
+          <ion-item no-padding no-margin no-lines>
+            I have read and I accept the
+            <a href="#" target="_blank" title="Terms of Service" (click)="showUrl(termsOfService, '_blank', $event)">Terms of Service</a>
+            and
+            <a href="#" target="_blank" title="Privacy Policy" (click)="showUrl(privacyPolicy, '_blank', $event)">Privacy Policy</a>.
+          </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info">
+      <p>You'll use the email <strong>{{email}}</strong> and the password you choose to sign in to TenFour.</p>
+    </ion-item>
+    <ion-item text-wrap no-lines class="hint">
+      <p>Passwords must be at least 6 characters and cannot be sequences, like 123456 or abcdef.</p>
+    </ion-item>
+    <ion-item text-center no-lines class="action">
+      <button ion-button [block]="phone" color="primary" (click)="acceptInitation($event)">Ok, all finished</button>
+    </ion-item>
+  </ion-list>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+</ion-content>

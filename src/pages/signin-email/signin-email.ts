@@ -4,9 +4,10 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePage } from '../../pages/base-page/base-page';
 import { SigninPasswordPage } from '../../pages/signin-password/signin-password';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SigninEmailPage',
@@ -16,7 +17,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signin-email',
   templateUrl: 'signin-email.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SigninPasswordPage ]
 })
 export class SigninEmailPage extends BasePage {
@@ -37,18 +38,63 @@ export class SigninEmailPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiProvider) {
+      protected api:ApiProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage(this);
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.closePage();
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        },
+        (error:any) => {
+          this.organization = null;
+          reject("No organization provided");
+        });
+      }
+    });
   }
 
   private showNext(event:any) {
@@ -63,7 +109,7 @@ export class SigninEmailPage extends BasePage {
   }
 
   private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.hideKeyboard();
       this.showNext(event);
       return false;

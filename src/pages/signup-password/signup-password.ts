@@ -4,12 +4,12 @@ import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewC
 import { BasePage } from '../../pages/base-page/base-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { Organization } from '../../models/organization';
 import { Person } from '../../models/person';
 import { Token } from '../../models/token';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupPasswordPage',
@@ -19,7 +19,7 @@ import { Token } from '../../models/token';
 @Component({
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
 export class SignupPasswordPage extends BasePage {
@@ -32,6 +32,7 @@ export class SignupPasswordPage extends BasePage {
 
   organization:Organization;
 
+  loading:boolean = false;
   accepted:boolean = false;
   termsOfService:string = "https://www.tenfour.org/terms-of-service";
   privacyPolicy:string = "https://www.tenfour.org/privacy-policy";
@@ -49,33 +50,94 @@ export class SignupPasswordPage extends BasePage {
       protected actionController:ActionSheetController,
       protected events:Events,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showToast(error);
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage(this);
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        },
+        (error:any) => {
+          this.organization = null;
+          resolve(null);
+        });
+      }
+    });
   }
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    if (this.password.value.length < 6) {
-      this.showToast("Password is too short");
+    if (this.password.value === "") {
+      this.showToast("Please enter a password");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
     }
-    else if (this.password.value != this.confirm.value) {
+    else if (this.password.value.length < 6) {
+      this.showToast("Password is too short");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
+    }
+    else if (this.password.value !== this.confirm.value) {
       this.showToast("Password and confirm do not match");
+      setTimeout(() => {
+        this.confirm.setFocus();
+      }, 500);
     }
     else if (this.accepted == false) {
-      this.showAlert("Terms of Service", "You must accept the Terms of Service before you can continue.");
+      this.showAlert("Terms of Service", "You must accept the Terms of Service and Privacy Policy before you can continue.");
     }
     else {
-      let loading = this.showLoading("Creating...");
+      this.loading = true;
+      let loading = this.showLoading("Signing up...", true);
       this.organization.password = this.password.value;
       this.api.createOrganization(this.organization).then((organization:Organization) => {
         this.logger.info(this, "createOrganization", "Organization", organization);
@@ -89,13 +151,16 @@ export class SignupPasswordPage extends BasePage {
               organization.user_name = person.name;
               organization.password = this.password.value;
               let saves = [
-                this.database.saveOrganization(organization),
-                this.database.savePerson(organization, person)
+                this.storage.setOrganization(organization),
+                this.storage.setUser(person),
+                this.storage.saveOrganization(organization),
+                this.storage.savePerson(organization, person)
               ];
               Promise.all(saves).then(saved => {
-                this.trackLogin(organization, person);
+                this.analytics.trackLogin(organization, person);
                 this.events.publish('user:login');
                 loading.dismiss();
+                this.loading = false;
                 if (person.name && person.name.length > 0) {
                   this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
                 }
@@ -111,31 +176,35 @@ export class SignupPasswordPage extends BasePage {
             (error:any) => {
               this.logger.error(this, "createOrganization", error);
               loading.dismiss();
+              this.loading = false;
               this.showAlert("Problem Creating Organization", error);
             });
           },
           (error:any) => {
             this.logger.error(this, "createOrganization", error);
             loading.dismiss();
+            this.loading = false;
             this.showAlert("Problem Creating Account", error);
           });
         },
         (error:any) => {
           this.logger.error(this, "createOrganization", error);
           loading.dismiss();
+          this.loading = false;
           this.showAlert("Problem Logging In", error);
         });
       },
       (error:any) => {
         this.logger.error(this, "createOrganization", error);
         loading.dismiss();
+        this.loading = false;
         this.showAlert("Problem Creating Organization", error);
       });
     }
   }
 
   private createOrganizationOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       if (this.password.value.length == 0) {
         this.password.setFocus();
       }

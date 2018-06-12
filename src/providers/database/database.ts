@@ -1,1269 +1,501 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
-import { SQLite } from '@ionic-native/sqlite';
 
-import { SqlProvider } from '../../providers/sql/sql';
+import { SQLite, SQLiteObject } from '@ionic-native/sqlite';
+
+import { Model, TEXT, INTEGER, DOUBLE, BOOLEAN } from '../../models/model';
+
 import { LoggerProvider } from '../../providers/logger/logger';
 
-import { Email } from '../../models/email';
-import { Person } from '../../models/person';
-import { Contact } from '../../models/contact';
-import { Checkin } from '../../models/checkin';
-import { Organization } from '../../models/organization';
-import { Answer } from '../../models/answer';
-import { Reply } from '../../models/reply';
-import { Recipient } from '../../models/recipient';
-import { Group } from '../../models/group';
-import { Settings } from '../../models/settings';
-import { Country } from '../../models/country';
-import { Subscription } from '../../models/subscription';
-import { Notification } from '../../models/notification';
-
 @Injectable()
-export class DatabaseProvider extends SqlProvider {
+export class DatabaseProvider {
+
+  protected database:SQLiteObject = null;
+  protected name:string = 'tenfour.db';
+  protected location:string = 'default';
 
   constructor(
     protected sqlite:SQLite,
     protected platform:Platform,
     protected logger:LoggerProvider) {
-    super(sqlite, platform, logger);
   }
 
-  // ########## ORGANIZATION ##########
-
-  public saveOrganization(organization:Organization):Promise<boolean> {
+  public initialize(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      this.saveModel(organization).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getOrganizations(where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<Organization[]> {
-    return new Promise((resolve, reject) => {
-      this.getModels<Organization>(new Organization(), where, order, limit, offset).then((organizations:Organization[]) => {
-        resolve(organizations);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getOrganization(id:number):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      let where = { id: id };
-      this.getModel<Organization>(new Organization(), where).then((organization:Organization) => {
-        resolve(organization);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeOrganization(organization:Organization):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { id: organization.id };
-      this.removeModel<Organization>(new Organization(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeOrganizations():Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      this.removeModel<Organization>(new Organization(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## PERSON ##########
-
-  public savePeople(organization:Organization, people:Person[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let person of people) {
-        saves.push(this.savePerson(organization, person));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public savePerson(organization:Organization, person:Person):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      person.organization_id = organization.id;
-      this.saveModel(person).then((saved:any) => {
-        let saves = [];
-        for (let contact of person.contacts) {
-          saves.push(this.saveContact(organization, person, contact));
-        }
-        Promise.all(saves).then(saved => {
-          resolve(true);
-        },
-        (error:any) => {
-          resolve(false);
-        });
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where["organization_id"] = organization.id;
-      }
-      if (ids) {
-        where["id"] = ids;
-      }
-      let order = { name: "ASC" };
-      this.getModels<Person>(new Person(), where, order, limit, offset).then((people:Person[]) => {
-        let people_ids = people.map((people:Person) => people.id);
-        this.getContacts(organization, null, people_ids).then((contacts:Contact[]) => {
-          for (let person of people) {
-            person.contacts = contacts.filter(contact => contact.person_id == person.id);
+      this.logger.info(this, "initialize");
+      this.createTables(models).then((created:any) => {
+        this.logger.info(this, "initialize", "Created", created);
+        this.createIndexes(models).then((indexed:any) => {
+          this.logger.info(this, "initialize", "Indexed", indexed);
+          let tests = [];
+          for (let model of models) {
+            tests.push(this.testModel(model));
           }
-          resolve(people);
-        },
-        (error:any) => {
-          reject(error);
-        });
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getPerson(organization:Organization, id:number, me:boolean=false):Promise<Person> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (id) {
-        where["id"] = id;
-      }
-      if (me) {
-        where["me"] = true;
-      }
-      this.getModel<Person>(new Person(), where).then((person:Person) => {
-        this.getContacts(organization, person).then((contacts:Contact[]) => {
-          person.contacts = contacts;
-          resolve(person);
-        },
-        (error:any) => {
-          reject(error);
-        });
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removePerson(organization:Organization, person:Person):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: person.id
-      };
-      this.removeModel<Person>(new Person(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removePeople(organization:Organization=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Person>(new Person(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## CONTACT ##########
-
-  public saveContacts(organization:Organization, person:Person, contacts:Contact[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let contact of contacts) {
-        saves.push(this.saveContact(organization, person, contact));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveContact(organization:Organization, person:Person, contact:Contact):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      contact.organization_id = organization.id;
-      contact.person_id = person.id;
-      this.saveModel(contact).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getContacts(organization:Organization, person:Person, people_ids:number[]=null, limit:number=null, offset:number=null):Promise<Contact[]> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (person) {
-        where['id'] = person.id;
-      }
-      if (people_ids) {
-        where['person_id'] = people_ids;
-      }
-      let order = { };
-      this.getModels<Contact>(new Contact(), where, order, limit, offset).then((contacts:Contact[]) => {
-        resolve(contacts);
-      },
-      (error:any) => {
-        reject(error);
-      })
-    });
-  }
-
-  public getContact(organization:Organization, id:number):Promise<Contact> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Contact>(new Contact(), where).then((contact:Contact) => {
-        resolve(contact);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeContact(organization:Organization, contact:Contact):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id : organization.id,
-        id: contact.id
-      };
-      this.removeModel<Contact>(new Contact(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeContacts(organization:Organization=null, person:Person=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (person) {
-        where['person_id'] = person.id;
-      }
-      this.removeModel<Contact>(new Contact(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## CHECKIN ##########
-
-  public saveCheckins(organization:Organization, checkins:Checkin[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let checkin of checkins) {
-        saves.push(this.saveCheckin(organization, checkin));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveCheckin(organization:Organization, checkin:Checkin):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      checkin.organization_id = organization.id;
-      this.saveModel(checkin).then((saved:any) => {
-        let saves = [];
-        for (let answer of checkin.answers) {
-          saves.push(this.saveAnswer(organization, checkin, answer));
-        }
-        for (let recipient of checkin.recipients) {
-          saves.push(this.saveRecipient(organization, checkin, recipient));
-        }
-        for (let reply of checkin.replies) {
-          saves.push(this.saveReply(organization, checkin, reply));
-        }
-        saves.push(this.saveCheckin(organization, checkin));
-        Promise.all(saves).then((saved:any) => {
-          resolve(true);
-        },
-        (error:any) => {
-          resolve(false);
-        });
-      },
-      (error:any) => {
-        reject(false);
-      });
-    });
-  }
-
-  public getCheckins(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { created_at: "DESC" };
-      this.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
-        let checkin_ids = checkins.map((checkin:Checkin) => checkin.id);
-        this.logger.info(this, "getCheckins", "IDs", checkin_ids);
-        Promise.all([
-          this.getAnswers(organization, null, checkin_ids),
-          this.getReplies(organization, null, checkin_ids),
-          this.getRecipients(organization, null, checkin_ids)]).then((results:any[]) => {
-            let answers = <Answer[]>results[0];
-            let replies = <Reply[]>results[1];
-            let recipients = <Recipient[]>results[2];
-            for (let checkin of checkins) {
-              checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
-              checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
-              checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
-            }
-            resolve(checkins);
-        },
-        (error:any) => {
-          reject(error);
-        });
-      });
-    });
-  }
-
-  public getCheckinsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Checkin[]> {
-    return new Promise((resolve, reject) => {
-      let order = { created_at: "DESC" };
-      this.getModels<Reply>(new Reply(), { organization_id: organization.id, user_id: person.id }, order).then((replies:Reply[]) => {
-        let checkin_ids = replies.map((reply) => reply.checkin_id);
-        this.getModels<Checkin>(new Checkin(), { organization_id: organization.id, id: checkin_ids }, order, limit, offset).then((checkins:Checkin[]) => {
-          Promise.all([
-            this.getAnswers(organization, null, checkin_ids),
-            this.getReplies(organization, null, checkin_ids),
-            this.getRecipients(organization, null, checkin_ids)]).then((results:any[]) => {
-              let answers = <Answer[]>results[0];
-              let replies = <Reply[]>results[1];
-              let recipients = <Recipient[]>results[2];
-              for (let checkin of checkins) {
-                checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
-                checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
-                checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
-              }
-              resolve(checkins);
+          Promise.all(tests).then((tested:any) => {
+            this.logger.info(this, "initialize", "Tested", tested);
+            resolve(true);
           },
           (error:any) => {
+            this.logger.error(this, "initialize", "Failed", error);
             reject(error);
           });
         },
         (error:any) => {
+          this.logger.error(this, "initialize", "Failed", error);
           reject(error);
         });
       },
       (error:any) => {
+        this.logger.error(this, "initialize", "Failed", error);
         reject(error);
       });
     });
   }
 
-  public getCheckinsWaiting(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
+  public reset():Promise<boolean> {
+    this.logger.info(this, "reset");
     return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        waiting_count: "> 0"
+      let config = {
+        name: this.name,
+        location: this.location
       };
-      let order = { created_at: "DESC" };
-      this.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
-        let checkin_ids = checkins.map((checkin:Checkin) => checkin.id);
-        this.logger.info(this, "getCheckins", "IDs", checkin_ids);
-        Promise.all([
-          this.getAnswers(organization, null, checkin_ids),
-          this.getReplies(organization, null, checkin_ids),
-          this.getRecipients(organization, null, checkin_ids)]).then((results:any[]) => {
-            let answers = <Answer[]>results[0];
-            let replies = <Reply[]>results[1];
-            let recipients = <Recipient[]>results[2];
-            for (let checkin of checkins) {
-              checkin.answers = answers.filter(answer => answer.checkin_id == checkin.id);
-              checkin.replies = replies.filter(reply => reply.checkin_id == checkin.id);
-              checkin.recipients = recipients.filter(recipient => recipient.checkin_id == checkin.id);
-            }
-            resolve(checkins);
+      this.sqlite.deleteDatabase(config).then((deleted:any) => {
+        this.database = null;
+        this.logger.info(this, "reset", "Deleted");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "reset", "Failed", error);
+        reject(error);
+      });
+    });
+  }
+
+  private testDatabase():boolean {
+    return this.platform.is('cordova');
+  }
+
+  private openDatabase():Promise<SQLiteObject> {
+    return new Promise((resolve, reject) => {
+      if (this.database) {
+        resolve(this.database);
+      }
+      else if (this.testDatabase()) {
+        let config = {
+          name: this.name,
+          location: this.location
+        };
+        this.sqlite.create(config).then((database:SQLiteObject) => {
+          this.logger.info(this, "openDatabase", "Opened", database);
+          this.database = database;
+          resolve(database);
         },
         (error:any) => {
-          resolve(checkins);
+          this.logger.error(this, "openDatabase", "Failed", error);
+          reject(JSON.stringify(error));
         });
-      },
-      (error:any) => {
-        resolve([]);
-      });
-    });
-  }
-
-  public getCheckin(organization:Organization, id:number):Promise<Checkin> {
-    return new Promise((resolve, reject) => {
-      let where = { id: id };
-      this.getModel<Checkin>(new Checkin(), where).then((checkin:Checkin) => {
-        Promise.all([
-          this.getAnswers(organization, checkin),
-          this.getReplies(organization, checkin),
-          this.getRecipients(organization, checkin)]).then((results:any[]) => {
-            checkin.answers = <Answer[]>results[0];
-            checkin.replies = <Reply[]>results[1];
-            checkin.recipients = <Recipient[]>results[2];
-            resolve(checkin);
-        });
-      });
-    });
-  }
-
-  public removeCheckin(organization:Organization, checkin:Checkin):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: checkin.id
-      };
-      this.removeModel<Checkin>(new Checkin(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeCheckins(organization:Organization=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
       }
-      this.removeModel<Checkin>(new Checkin(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
+      else {
+        this.logger.error(this, "openDatabase", "Failed", "Cordova Not Available");
+        reject(`Error Opening Database`);
+      }
     });
   }
 
-  // ########## ANSWER ##########
-
-  public saveAnswers(organization:Organization, checkin:Checkin, answers:Answer[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let answer of answers) {
-        saves.push(this.saveAnswer(organization, checkin, answer));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
+  private createTables(models:Model[]):Promise<any> {
+    let creates = [];
+    for (let model of models) {
+      creates.push(this.createTable(model));
+    }
+    return Promise.all(creates);
   }
 
-  public saveAnswer(organization:Organization, checkin:Checkin, answer:Answer):Promise<boolean> {
+  private createTable<M extends Model>(model:M):Promise<any> {
     return new Promise((resolve, reject) => {
-      answer.organization_id = organization.id;
-      answer.checkin_id = checkin.id;
-      this.saveModel(answer).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getAnswers(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Answer[]> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      if (checkin_ids) {
-        where['checkin_id'] = checkin_ids;
-      }
-      let order = { };
-      this.getModels<Answer>(new Answer(), where, order, limit, offset).then((answers:Answer[]) => {
-        resolve(answers);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getAnswer(organization:Organization, id:number):Promise<Answer> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Answer>(new Answer(), where).then((answer:Answer) => {
-        resolve(answer);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeAnswer(organization:Organization, answer:Answer):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: answer.id
-      };
-      this.removeModel<Answer>(new Answer(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeAnswers(organization:Organization=null, checkin:Checkin=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      this.removeModel<Answer>(new Answer(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## REPLY ##########
-
-  public saveReplies(organization:Organization, checkin:Checkin, replies:Reply[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let reply of replies) {
-        saves.push(this.saveReply(organization, checkin, reply));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveReply(organization:Organization, checkin:Checkin, reply:Reply):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      reply.organization_id = organization.id;
-      reply.checkin_id = checkin.id;
-      this.saveModel(reply).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getReplies(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Reply[]> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      if (checkin_ids) {
-        where['checkin_id'] = checkin_ids;
-      }
-      let order = {  created_at: "DESC" };
-      this.getModels<Reply>(new Reply(), where, order, limit, offset).then((replies:Reply[]) => {
-        let user_ids = replies.map((reply) => reply.user_id);
-        this.getPeople(organization, user_ids).then((people:Person[]) => {
-          for (let reply of replies) {
-            let user = people.find(user => user.id == reply.user_id);
-            if (user) {
-              reply.user_id = user.id;
-              reply.user_name = user.name;
-              reply.user_description = user.description;
-              reply.user_initials = user.initials;
-              reply.user_picture = user.profile_picture;
-            }
+      this.openDatabase().then((database:SQLiteObject) => {
+        let table:string = model.getTable();
+        let columns:any[] = model.getColumns();
+        this.logger.info(this, "createTable", table, columns);
+        let keys:string[] = [];
+        let values:string[] = [];
+        for (let column of columns) {
+          values.push(column.name + ' ' + column.type);
+          if (column.key == true) {
+            keys.push(column.name);
           }
-          resolve(replies);
-        },
-        (error:any) => {
-          reject(error);
-        });
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getReply(organization:Organization, id:number):Promise<Reply> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Reply>(new Reply(), where).then((reply:Reply) => {
-        resolve(reply);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeReply(organization:Organization, reply:Reply):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: reply.id
-      };
-      this.removeModel<Reply>(new Reply(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeReplies(organization:Organization=null, checkin:Checkin=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      this.removeModel<Reply>(new Reply(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## RECIPIENT ##########
-
-  public saveRecipients(organization:Organization, checkin:Checkin, recipients:Recipient[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let recipient of recipients) {
-        saves.push(this.saveRecipient(organization, checkin, recipient));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveRecipient(organization:Organization, checkin:Checkin, recipient:Recipient):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      recipient.checkin_id = checkin.id;
-      recipient.organization_id = organization.id;
-      this.saveModel(recipient).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getRecipients(organization:Organization, checkin:Checkin, checkin_ids:number[]=null, limit:number=null, offset:number=null):Promise<Recipient[]> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      if (checkin_ids) {
-        where['checkin_id'] = checkin_ids;
-      }
-      let order = { };
-      this.getModels<Recipient>(new Recipient(), where, order, limit, offset).then((recipients:Recipient[]) => {
-        resolve(recipients);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getRecipient(organization:Organization, id:number):Promise<Recipient> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Recipient>(new Recipient(), where).then((recipient:Recipient) => {
-        resolve(recipient);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeRecipient(organization:Organization, recipient:Recipient):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: recipient.id
-      };
-      this.removeModel<Recipient>(new Recipient(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeRecipients(organization:Organization=null, checkin:Checkin=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      if (checkin) {
-        where['checkin_id'] = checkin.id;
-      }
-      this.removeModel<Recipient>(new Recipient(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## EMAIL ##########
-
-  public saveEmails(organization:Organization, emails:Email[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let email of emails) {
-        saves.push(this.saveEmail(organization, email));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveEmail(organization:Organization, email:Email):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      email.organization_id = organization.id;
-      this.saveModel(email).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getEmails(organization:Organization, limit:number=null, offset:number=null):Promise<Email[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { };
-      this.getModels<Email>(new Email(), where, order, limit, offset).then((emails:Email[]) => {
-        resolve(emails);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getEmail(organization:Organization, id:number):Promise<Email> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Email>(new Email(), where).then((email:Email) => {
-        resolve(email);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeEmail(organization:Organization, email:Email):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: email.id
-      };
-      this.removeModel<Email>(new Email(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeEmails(organization:Organization=null):Promise<boolean>{
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Email>(new Email(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## NOTIFICATION ##########
-
-  public saveNotifications(organization:Organization, notifications:Notification[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let notification of notifications) {
-        saves.push(this.saveNotification(organization, notification));
-      }
-      Promise.all(saves).then(saved => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public saveNotification(organization:Organization, notification:Notification):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      notification.organization_id = organization.id;
-      this.saveModel(notification, false).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getNotifications(organization:Organization, limit:number=null, offset:number=null):Promise<Notification[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { created_at: "DESC" };
-      this.getModels<Notification>(new Notification(), where, order, limit, offset).then((notifications:Notification[]) => {
-        resolve(notifications);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getNotification(organization:Organization, id:number):Promise<Notification> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Notification>(new Notification(), where).then((notification:Notification) => {
-        resolve(notification);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeNotification(organization:Organization, notification:Notification):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: notification.id
-      };
-      this.removeModel<Notification>(new Notification(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeNotifications(organization:Organization=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Notification>(new Notification(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## GROUP ##########
-
-  public saveGroups(organization:Organization, groups:Group[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let group of groups) {
-        saves.push(this.saveGroup(organization, group));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      })
-    });
-  }
-
-  public saveGroup(organization:Organization, group:Group):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      group.organization_id = organization.id;
-      this.saveModel(group).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { name: "ASC" };
-      Promise.all([
-        this.getModels<Group>(new Group(), where, order, limit, offset),
-        this.getPeople(organization)]).then((results:any[]) => {
-          let groups = <Group[]>results[0];
-          let people = <Person[]>results[1];
-          for(let group of groups) {
-            group.loadMembers(people);
-          }
-          resolve(groups);
-        },
-        (error:any) => {
-          resolve([]);
-        });
-    });
-  }
-
-  public getGroup(organization:Organization, id:number):Promise<Group> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id };
-      this.getModel<Group>(new Group(), where).then((group:Group) => {
-        if (group.member_ids) {
-          let member_ids = group.member_ids.split(",").map(id => Number(id));
-          this.getPeople(organization, member_ids).then((people:Person[]) => {
-            group.members = people;
-          });
         }
-        resolve(group);
-      });
+        let key = "";
+        if (keys.length > 0) {
+          key = `, PRIMARY KEY (${keys.join(", ")})`;
+        }
+        let sql = `CREATE TABLE IF NOT EXISTS ${table} (${values.join(", ")}${key})`;
+        this.logger.info(this, "createTable", "Creating", sql);
+        database.executeSql(sql, []).then((data:any) => {
+          this.logger.info(this, "createTable", "Created", sql, data);
+          resolve(data);
+        },
+        (error:any) => {
+          this.logger.error(this, "createTable", "Failed", sql, error);
+          reject(JSON.stringify(error));
+        });
+    },
+    (error:any) => {
+      this.logger.error(this, "createTable", "Failed", error);
+      reject(`Error Creating Database Tables`);
+    });
     });
   }
 
-  public removeGroup(organization:Organization, group:Group):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: group.id
-      };
-      this.removeModel<Group>(new Group(), where);
-    });
+  private createIndexes(models:Model[]):Promise<any> {
+    let indexes = [];
+    for (let model of models) {
+      indexes.push(this.createIndex(model));
+    }
+    return Promise.all(indexes);
   }
 
-  public removeGroups(organization:Organization=null):Promise<boolean> {
+  private createIndex<M extends Model>(model:M):Promise<any> {
     return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Group>(new Group(), where).then((removed:any) => {
-        resolve(true);
+      this.openDatabase().then((database:SQLiteObject) => {
+        let table:string = model.getTable();
+        let columns:any[] = model.getColumns();
+        this.logger.info(this, "createIndex", table, columns);
+        let keys:string[] = [];
+        for (let column of columns) {
+          if (column.key == true) {
+            keys.push(column.name);
+          }
+        }
+        let sql = `CREATE UNIQUE INDEX IF NOT EXISTS idx_${table} ON ${table} (${keys.join(", ")});`;
+        this.logger.info(this, "createIndex", "Creating", sql);
+        database.executeSql(sql, []).then((data:any) => {
+          this.logger.info(this, "createIndex", "Created", sql, data);
+          resolve(data);
+        },
+        (error:any) => {
+          this.logger.error(this, "createIndex", "Failed", sql, error);
+          reject(JSON.stringify(error));
+        });
       },
       (error:any) => {
-        resolve(false);
+        this.logger.error(this, "createIndex", "Failed", error);
+        reject(`Error Creating Database Indexes`);
       });
     });
   }
 
-  // ########## SETTINGS ##########
-
-  public saveSettings(organization:Organization, settings:Settings):Promise<boolean> {
+  private executeFirst(table:string, where:{}=null, order:{}=null):Promise<any[]> {
     return new Promise((resolve, reject) => {
-      settings.organization_id = organization.id;
-      this.saveModel(settings).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getSettings(organization:Organization):Promise<Settings[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { key: "ASC" };
-      this.getModels<Settings>(new Settings(), where, order).then((settings:Settings[]) => {
-        resolve(settings);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getSetting(organization:Organization, id:number):Promise<Settings> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Settings>(new Settings(), where).then((settings:Settings) => {
-        resolve(settings);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeSetting(organization:Organization, settings:Settings):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: settings.id
-      };
-      this.removeModel<Settings>(new Settings(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeSettings(organization:Organization=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Settings>(new Settings(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## SUBSCRIPTIONS ##########
-
-  public saveSubscription(organization:Organization, subscription:Subscription):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      subscription.organization_id = organization.id;
-      this.saveModel(subscription).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
-    return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { created_at: "ASC" };
-      this.getModels<Subscription>(new Subscription(), where, order, limit, offset).then((subscriptions:Subscription[]) => {
-        resolve(subscriptions);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public getSubscription(organization:Organization, id:number):Promise<Subscription> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Subscription>(new Subscription(), where).then((subscription:Subscription) => {
-        resolve(subscription);
-      },
-      (error:any) => {
-        reject(error);
-      });
-    });
-  }
-
-  public removeSubscription(organization:Organization, subscription:Subscription):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: subscription.id
-      };
-      this.removeModel<Subscription>(new Subscription(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  public removeSubscriptions(organization:Organization=null):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
-      }
-      this.removeModel<Subscription>(new Subscription(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      });
-    });
-  }
-
-  // ########## COUNTRIES ##########
-
-  public saveCountries(organization:Organization, countries:Country[]):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let saves = [];
-      for (let country of countries) {
-        if (organization.regions) {
-          let codes = organization.regions.split(",");
-          country.selected = codes.indexOf(country.code) != -1;
+      this.executeSelect(table, where, order, 1, 0).then((rows:any) => {
+        let results = <any[]>rows;
+        if (results && results.length > 0) {
+          resolve(results[0]);
         }
         else {
-          country.selected = false;
+          reject("No Results");
         }
-        saves.push(this.saveCountry(organization, country));
-      }
-      Promise.all(saves).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
-      })
-    });
-  }
-
-  public saveCountry(organization:Organization, country:Country):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      country.organization_id = organization.id;
-      this.saveModel(country).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
       });
     });
   }
 
-  public getCountries(organization:Organization, limit:number=null, offset:number=null):Promise<Country[]> {
+  private executeTest(table:string, columns:any):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
-      let order = { created_at: "ASC" };
-      this.getModels<Country>(new Country(), where, order, limit, offset).then((countries:Country[]) => {
-        resolve(countries);
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = this.testStatement(table, columns);
+        let parameters = [];
+        this.logger.info(this, "executeTest", "Testing", statement);
+        database.executeSql(statement, parameters).then((data:any) => {
+          this.logger.info(this, "executeTest", "Tested", statement);
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeTest", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "executeSelect", "Failed", error);
+        reject(error);
+      });
+    });
+  }
+
+  private executeSelect(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<any[]> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = this.selectStatement(table, where, order, limit, offset);
+        let parameters = this.selectParameters(table, where, order);
+        this.logger.info(this, "executeSelect", "Selecting", statement, parameters);
+        database.executeSql(statement, parameters).then((data:any) => {
+          let results = [];
+          if (data.rows && data.rows.length > 0) {
+            for (let i = 0; i < data.rows.length; i++) {
+              let row = data.rows.item(i);
+              this.logger.info(this, "executeSelect", table, row);
+              results.push(row);
+            }
+          }
+          this.logger.info(this, "executeSelect", "Selected", statement, results);
+          resolve(results);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeSelect", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "executeSelect", "Failed", error);
+        reject(error);
+      });
+    });
+  }
+
+  private executeInsert(table:string, columns:any, values:{}):Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = this.insertStatement(table, columns, values);
+        let parameters = this.insertParameters(table, columns, values);
+        this.logger.info(this, "executeInsert", "Inserting", statement, parameters);
+        database.executeSql(statement, parameters).then((results:any) => {
+          this.logger.info(this, "executeInsert", "Inserted", statement, parameters, results);
+          resolve(results['insertId']);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeInsert", "Failed", statement, parameters, error);
+          reject(JSON.stringify(error));
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "executeInsert", "Failed", error);
+        reject(JSON.stringify(error));
+      });
+    });
+  }
+
+  private executeUpdate(table:string, columns:any[], values:{}, nulls:boolean=true):Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = this.updateStatement(table, columns, values, nulls);
+        let parameters = this.updateParameters(table, columns, values, nulls);
+        this.logger.info(this, "executeUpdate", "Updating", statement, parameters);
+        database.executeSql(statement, parameters).then((results:any) => {
+          this.logger.info(this, "executeUpdate", "Updated", statement, parameters, results);
+          resolve(results['rowsAffected']);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeUpdate", "Failed", statement, parameters, error);
+          reject(JSON.stringify(error));
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "executeUpdate", "Failed", error);
+        reject(JSON.stringify(error));
+      });
+    });
+  }
+
+  private executeDelete(table:string, where:{}):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = this.deleteStatement(table, where);
+        this.logger.info(this, "executeDelete", "Deleting", statement);
+        database.executeSql(statement, []).then((results:any) => {
+          this.logger.info(this, "executeDelete", "Deleted", statement, results);
+          resolve(results['rowsAffected'] > 0);
+        },
+        (error:any) => {
+          this.logger.error(this, "executeDelete", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "executeDelete", "Failed", error);
+        reject(JSON.stringify(error));
+      });
+    });
+  }
+
+  private testStatement(table:string, columns:any[]):string {
+    let query = [`SELECT`];
+    let names = [];
+    for (let column of columns) {
+      names.push(column.name);
+    }
+    query.push(names.join(", "));
+    query.push(`FROM ${table}`);
+    query.push(`LIMIT 0`);
+    return query.join(" ");
+  }
+
+  private selectStatement(table:string, where:{}=null, order:{}=null, limit:number=null, offset:number=null) {
+    let query = [`SELECT * FROM ${table}`];
+    if (where != null && Object.keys(where).length > 0) {
+      let clause = [];
+      for (let column in where) {
+        let parameter = where[column];
+        if (Array.isArray(parameter)) {
+          let inClause = [];
+          for (let i = 0; i < parameter.length; i++) {
+            inClause.push("?");
+          }
+          clause.push(`${column} IN (${inClause.join(', ')})`);
+        }
+        else if (parameter && parameter.toString().indexOf("%") != -1){
+          clause.push(`${column} LIKE ?`);
+        }
+        else if (parameter && parameter.toString().indexOf(">") != -1){
+          clause.push(`${column} > ?`);
+        }
+        else if (parameter && parameter.toString().indexOf(">=") != -1){
+          clause.push(`${column} >= ?`);
+        }
+        else if (parameter && parameter.toString().indexOf("<") != -1){
+          clause.push(`${column} < ?`);
+        }
+        else if (parameter && parameter.toString().indexOf("<=") != -1){
+          clause.push(`${column} <= ?`);
+        }
+        else {
+          clause.push(`${column} = ?`);
+        }
+      }
+      query.push(`WHERE ${clause.join(' AND ')}`);
+    }
+    if (order != null && Object.keys(order).length > 0) {
+      let sort = [];
+      for (let column in order) {
+        sort.push(`${column} ${order[column]}`);
+      }
+      query.push(`ORDER BY ${sort.join(', ')}`);
+    }
+    if (limit != null) {
+      query.push(`LIMIT ${limit}`);
+    }
+    if (offset != null) {
+      query.push(`OFFSET ${offset}`);
+    }
+    return query.join(" ");
+  }
+
+  private selectParameters(table:string, where:{}=null, order:{}=null): any[] {
+    let parameters = [];
+    if (where != null && Object.keys(where).length > 0) {
+      for (let column in where) {
+        let parameter = where[column];
+        if (Array.isArray(parameter)) {
+          for (let param of parameter) {
+            parameters.push(param);
+          }
+        }
+        else if (parameter && parameter.toString().indexOf(">") != -1){
+          let components = parameter.split(">");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf(">=") != -1){
+          let components = parameter.split(">=");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf("<") != -1){
+          let components = parameter.split("<");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else if (parameter && parameter.toString().indexOf("<=") != -1){
+          let components = parameter.split("<=");
+          let number = Number(components[1].trim());
+          parameters.push(number);
+        }
+        else {
+          parameters.push(parameter);
+        }
+      }
+    }
+    return parameters;
+  }
+
+  private insertStatement(table:string, columns:any[], values:{}):string {
+    let names = [];
+    let params = [];
+    for (let column of columns) {
+      let value = values[column.name];
+      if (value != null) {
+        names.push(column.name);
+        params.push("?");
+      }
+    }
+    return `INSERT INTO ${table} (${names.join(", ")}) VALUES (${params.join(", ")})`;
+  }
+
+  private insertParameters(table:string, columns:any[], values:{}):any {
+    let params:any[] = [];
+    for (let column of columns) {
+      let value = values[column.name];
+      if (value != null) {
+        params.push(value);
+      }
+    }
+    return params;
+  }
+
+  private updateStatement(table:string, columns:any[], values:{}, nulls:boolean=true):string {
+    let params:any[] = [];
+    let clause = [];
+    for (let column of columns) {
+      if (column.key == true) {
+        clause.push(`${column.name} = ?`);
+      }
+      else if (column.property in values) {
+        let value = values[column.name];
+        if (nulls) {
+          params.push(`${column.name} = ?`);
+        }
+        else if (value != null) {
+          params.push(`${column.name} = ?`);
+        }
+      }
+    }
+    return `UPDATE ${table} SET ${params.join(", ")} WHERE ${clause.join(" AND ")}`;
+  }
+
+  private updateParameters(table:string, columns:any[], values:{}, nulls:boolean=true):any {
+    let params:any[] = [];
+    let clause = [];
+    for (let column of columns) {
+      let value = values[column.property];
+      if (column.key == true) {
+        clause.push(value);
+      }
+      else if (column.property in values) {
+        if (nulls) {
+          params.push(value);
+        }
+        else if (value != null) {
+          params.push(value);
+        }
+      }
+    }
+    return params.concat(clause);
+  }
+
+  private deleteStatement(table:string, where:{}):string {
+    let clause = [];
+    if (where && Object.keys(where).length > 0) {
+      for (let column in where) {
+        clause.push(`${column} = '${where[column]}'`);
+      }
+    }
+    else {
+      clause.push("id IS NOT NULL");
+    }
+    return `DELETE FROM ${table} WHERE ${clause.join(' AND ')}`;
+  }
+
+  public testModel<M extends Model>(type:M):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.executeTest(type.getTable(), type.getColumns()).then((rows:any) => {
+        resolve(true);
       },
       (error:any) => {
         reject(error);
@@ -1271,14 +503,46 @@ export class DatabaseProvider extends SqlProvider {
     });
   }
 
-  public getCountry(organization:Organization, id:number):Promise<Country> {
+  public getModels<M extends Model>(type:M, where:{}=null, order:{}=null, limit:number=null, offset:number=null):Promise<M[]> {
     return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.getModel<Country>(new Country(), where).then((country:Country) => {
-        resolve(country);
+      this.executeSelect(type.getTable(), where, order, limit, offset).then((rows:any) => {
+        let models = [];
+        let columns = type.getColumns();
+        for (let i = 0; i < rows.length; i++) {
+          let row = rows[i];
+          let values = {};
+          for (let column of columns) {
+            if (column.type == INTEGER) {
+              values[column.property] = row[column.name];
+            }
+            else if (column.type == DOUBLE) {
+              values[column.property] = row[column.name];
+            }
+            else if (column.type == BOOLEAN) {
+              if (row[column.name] == 'true') {
+                values[column.property] = true;
+              }
+              else if (row[column.name] == "1") {
+                values[column.property] = true;
+              }
+              else if (row[column.name] == 1) {
+                values[column.property] = true;
+              }
+              else {
+                values[column.property] = false;
+              }
+            }
+            else if (column.type == TEXT) {
+              values[column.property] = row[column.name];
+            }
+            else {
+              values[column.property] = row[column.name];
+            }
+          }
+          let model = type.newInstance<M>(values);
+          models.push(model);
+        }
+        resolve(models);
       },
       (error:any) => {
         reject(error);
@@ -1286,32 +550,126 @@ export class DatabaseProvider extends SqlProvider {
     });
   }
 
-  public removeCountry(organization:Organization, region:Country):Promise<boolean> {
+  public getModel<M extends Model>(type:M, where:{}=null, order:{}=null):Promise<M> {
     return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: region.id
-      };
-      this.removeModel<Country>(new Country(), where).then((removed:any) => {
-        resolve(true);
+      this.executeFirst(type.getTable(), where, order).then((row:any) => {
+        let columns = type.getColumns();
+        let values = {};
+        for (let column of columns) {
+          if (column.type == INTEGER) {
+            values[column.property] = row[column.name];
+          }
+          else if (column.type == DOUBLE) {
+            values[column.property] = row[column.name];
+          }
+          else if (column.type == BOOLEAN) {
+            if (row[column.name] == 'true') {
+              values[column.property] = true;
+            }
+            else if (row[column.name] == "1") {
+              values[column.property] = true;
+            }
+            else if (row[column.name] == 1) {
+              values[column.property] = true;
+            }
+            else {
+              values[column.property] = false;
+            }
+          }
+          else if (column.type == TEXT) {
+            values[column.property] = row[column.name];
+          }
+          else {
+            values[column.property] = row[column.name];
+          }
+        }
+        let model = type.newInstance<M>(values);
+        resolve(model);
       },
       (error:any) => {
-        resolve(false);
+        reject(error);
       });
     });
   }
 
-  public removeCountries(organization:Organization=null):Promise<boolean> {
+  public saveModel<M extends Model>(model:M, nulls:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      let where = { };
-      if (organization) {
-        where['organization_id'] = organization.id;
+      let table:string = model.getTable();
+      let columns:any[] = model.getColumns();
+      let values:any[] = model.getValues();
+      if (model.hasKeys()) {
+        this.executeUpdate(table, columns, values, nulls).then((updated:number) => {
+          if (updated > 0) {
+            this.logger.info(this, "saveModel", table, "Updated", updated);
+            resolve(updated > 0);
+          }
+          else {
+            this.executeInsert(table, columns, values).then((inserted:number) => {
+              this.logger.info(this, "saveModel", table, "Inserted", inserted);
+              if (model.id == null) {
+                model.id = inserted;
+              }
+              resolve(inserted != null);
+            },
+            (_error:any) => {
+              this.logger.error(this, "saveModel", table, "Inserted", _error);
+              reject(_error);
+            });
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "saveModel", table, "Updated", error);
+          this.executeInsert(table, columns, values).then((inserted:number) => {
+            this.logger.info(this, "saveModel", table, "Inserted", inserted);
+            if (model.id == null) {
+              model.id = inserted;
+            }
+            resolve(inserted != null);
+          },
+          (_error:any) => {
+            this.logger.error(this, "saveModel", table, "Inserted", _error);
+            reject(_error);
+          });
+        });
       }
-      this.removeModel<Country>(new Country(), where).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        resolve(false);
+      else {
+        this.executeInsert(table, columns, values).then((inserted:number) => {
+          this.logger.info(this, "saveModel", table, "Inserted", inserted);
+          if (model.id == null) {
+            model.id = inserted;
+          }
+          resolve(inserted != null);
+        },
+        (error:any) => {
+          this.logger.error(this, "saveModel", table, "Inserted", error);
+          reject(error);
+        });
+      }
+    });
+  }
+
+  public removeModel<M extends Model>(model:M, where:any):Promise<boolean> {
+    return this.executeDelete(model.getTable(), where);
+  }
+
+  public getMinium<M extends Model>(type:M, column:string):Promise<number> {
+    return new Promise((resolve, reject) => {
+      this.openDatabase().then((database:SQLiteObject) => {
+        let statement = `SELECT MIN(${column}) as value FROM ${type.getTable()}`;
+        database.executeSql(statement, []).then((data:any) => {
+          this.logger.info(this, "getMinium", type.getTable(), column, data);
+          if (data.rows && data.rows.length > 0) {
+            let row = data.rows.item(0);
+            resolve(row.value);
+          }
+          else {
+            resolve(0);
+          }
+        },
+        (error:any) => {
+          this.logger.error(this, "executeSelect", "Failed", statement, error);
+          reject(JSON.stringify(error));
+        });
       });
     });
   }

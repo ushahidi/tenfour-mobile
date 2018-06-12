@@ -23,15 +23,30 @@
 ion-toolbar {
   button {
     img {
-      width: 35px;
       height: 35px;
+      max-height: 100%;
       &.dots {
-        
+
       }
       &.logo {
         border-radius: 50%;
         -webkit-border-radius: 50%;
       }
+    }
+  }
+}
+ion-item {
+  ion-icon {
+    color: #888888;
+  }
+  ion-label {
+    ion-icon {
+      color: #888888;
+    }
+  }
+  &.item-input {
+    ion-label {
+      color: #333333 !important;
     }
   }
 }
@@ -57,6 +72,12 @@ ion-menu {
   }
 }
 ion-list {
+  ion-list-header {
+    margin-bottom: 0px !important;
+    h2 {
+      margin-bottom: 0px !important;
+    }
+  }
   ion-item {
     h1 {
       color: #000000;
@@ -102,7 +123,7 @@ ion-list {
       }
       p {
         color: #888;
-        font-size: 0.9em;
+        font-size: 1.0em;
         padding-bottom: 10px;
       }
     }
@@ -112,23 +133,26 @@ ion-list {
     }
     &.info {
       p {
-        font-size: 0.9em;
+        font-size: 1.0em;
         text-align: center;
-        margin-top: 15px;
-        margin-bottom: 15px;
+        margin-top: 10px;
       }
     }
     &.hint {
       p {
-        font-size: 0.7em;
+        font-size: 0.9em;
         text-align: center;
         margin-bottom: 20px;
       }
     }
     &.action {
+      text-align: center;
       .item-button {
         padding: 1.4em;
         font-weight: 500;
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
       }
     }
     &.other {
@@ -145,7 +169,7 @@ ion-list {
 }
 .spinner {
   ion-spinner {
-    margin-top: 100px;
+    margin-top: 75px;
   }
 }
 .truncate {

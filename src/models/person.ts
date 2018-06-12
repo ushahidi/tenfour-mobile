@@ -4,6 +4,7 @@ import { Column } from '../decorators/column';
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 import { Contact } from '../models/contact';
 import { Checkin } from '../models/checkin';
+import { Reply } from '../models/reply';
 import { Group } from '../models/group';
 import { Notification } from '../models/notification';
 
@@ -35,12 +36,22 @@ export class Person extends Model {
         this.checkins = [];
         for (let _checkin of data.checkins) {
           let checkin = new Checkin(_checkin);
-          //TODO verify this is correct logic to re-use person attributes
           checkin.user_id = this.id;
           checkin.user_name = this.name;
           checkin.user_initials = this.initials;
           checkin.user_picture = this.profile_picture;
           this.checkins.push(checkin);
+        }
+      }
+      if (data.replies && data.replies.length > 0) {
+        this.replies = [];
+        for (let _reply of data.replies) {
+          let reply = new Reply(_reply);
+          reply.user_id = this.id;
+          reply.user_name = this.name;
+          reply.user_initials = this.initials;
+          reply.user_picture = this.profile_picture;
+          this.replies.push(reply);
         }
       }
       if (data.groups && data.groups.length > 0) {
@@ -128,6 +139,8 @@ export class Person extends Model {
 
   public checkins:Checkin[] = [];
 
+  public replies:Reply[] = [];
+
   public notifications:Notification[] = [];
 
   public isMe():boolean {
@@ -170,6 +183,12 @@ export class Person extends Model {
     });
   }
 
+  public getAddresses():Contact[] {
+    return this.contacts.filter(function(contact) {
+      return contact.type == 'address';
+    });
+  }
+
   public hasEmails():boolean {
     let emails = this.getEmails();
     return emails && emails.length > 0;
@@ -205,6 +224,16 @@ export class Person extends Model {
       return groupNames.join(separator);
     }
     return "";
+  }
+
+  public groupIds():number[] {
+    let ids = [];
+    if (this.groups && this.groups.length > 0) {
+      for (let group of this.groups) {
+        ids.push({id: group.id});
+      }
+    }
+    return ids;
   }
 
 }

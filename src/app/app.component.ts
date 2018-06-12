@@ -1,24 +1,17 @@
 import { Component, Injector, ViewChild, NgZone } from '@angular/core';
 import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal, Loading, LoadingController, Toast, ToastController, Alert, AlertController, MenuController } from 'ionic-angular';
 
-import { Badge } from '@ionic-native/badge';
-import { Device } from '@ionic-native/device';
-import { SegmentService } from 'ngx-segment-analytics';
-import { ScreenOrientation } from '@ionic-native/screen-orientation';
-import { Firebase } from '@ionic-native/firebase';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SplashScreen } from '@ionic-native/splash-screen';
-import { Deeplinks } from '@ionic-native/deeplinks';
-
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 
+import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
-import { SignupPasswordPage } from '../pages/signup-password/signup-password';
+import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
+import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
@@ -29,18 +22,13 @@ import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
-import { PersonDetailsPage } from '../pages/person-details/person-details';
+import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 
-import { ApiProvider } from '../providers/api/api';
-import { LoggerProvider } from '../providers/logger/logger';
-import { DatabaseProvider } from '../providers/database/database';
-import { InjectorProvider } from '../providers/injector/injector';
-import { StorageProvider } from '../providers/storage/storage';
-
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
+import { User } from '../models/user';
 import { Email } from '../models/email';
 import { Person } from '../models/person';
 import { Contact } from '../models/contact';
@@ -53,6 +41,20 @@ import { Notification } from '../models/notification';
 import { Settings } from '../models/settings';
 import { Country } from '../models/country';
 import { Subscription } from '../models/subscription';
+import { Deeplink } from '../models/deeplink';
+
+import { ApiProvider } from '../providers/api/api';
+import { BadgeProvider } from '../providers/badge/badge';
+import { LoggerProvider } from '../providers/logger/logger';
+import { StorageProvider } from '../providers/storage/storage';
+import { InjectorProvider } from '../providers/injector/injector';
+import { AnalyticsProvider } from '../providers/analytics/analytics';
+import { NetworkProvider } from '../providers/network/network';
+import { OrientationProvider } from '../providers/orientation/orientation';
+import { StatusBarProvider } from '../providers/status-bar/status-bar';
+import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
+import { FirebaseProvider } from '../providers/firebase/firebase';
+import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 
 @Component({
   templateUrl: 'app.html'
@@ -62,13 +64,13 @@ export class TenFourApp {
   zone:NgZone = null;
   rootPage:any = SplashScreenPage;
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   tablet:boolean = false;
   mobile:boolean = false;
   phone:boolean = false;
   android:boolean = false;
   ios:boolean = false;
-  browser:boolean = false;
+  website:boolean = false;
   desktop:boolean = false;
 
   defaultLogo:string = "assets/images/dots.png";
@@ -89,23 +91,22 @@ export class TenFourApp {
     protected platform:Platform,
     protected events:Events,
     protected injector:Injector,
-    protected statusBar:StatusBar,
-    protected splashScreen:SplashScreen,
     protected api:ApiProvider,
     protected storage:StorageProvider,
-    protected database:DatabaseProvider,
     protected logger:LoggerProvider,
+    protected badge:BadgeProvider,
+    protected analytics:AnalyticsProvider,
+    protected network:NetworkProvider,
+    protected statusBar:StatusBarProvider,
+    protected splashScreen:SplashScreenProvider,
+    protected orientation:OrientationProvider,
     protected modalController:ModalController,
     protected toastController:ToastController,
     protected loadingController:LoadingController,
     protected alertController:AlertController,
     protected menuController:MenuController,
-    protected deeplinks:Deeplinks,
-    protected segment:SegmentService,
-    protected device:Device,
-    protected badge:Badge,
-    protected firebase:Firebase,
-    protected screenOrientation:ScreenOrientation) {
+    protected deeplinks:DeeplinksProvider,
+    protected firebase:FirebaseProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
     this.platform.ready().then((ready) => {
@@ -114,9 +115,9 @@ export class TenFourApp {
           .then(() => this.loadPlatforms())
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
-          .then(() => this.loadDeepLinks())
           .then(() => this.loadAnalytics())
           .then(() => this.loadEvents())
+          .then(() => this.loadDeepLinks())
           .then(() => this.loadNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),
@@ -151,25 +152,18 @@ export class TenFourApp {
       this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
-      this.phone = this.platform.is('ios') || this.platform.is('android');
-      this.browser = this.platform.is('core');
       this.desktop = this.platform.is('core');
+      this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
+      this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
       resolve(true);
     });
   }
 
   private loadOrientation():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadOrientation", this.screenOrientation.type);
-        this.screenOrientation.unlock();
-        this.screenOrientation.onChange().subscribe(() => {
-          this.logger.info(this, "Orientation", this.screenOrientation.type);
-        });
-      }
-      else {
-        this.logger.info(this, "loadOrientation", "Ignored");
-      }
+      this.orientation.onChanged().subscribe((type:string) => {
+        this.logger.info(this, "Orientation", type);
+      });
       resolve(true);
     });
   }
@@ -178,15 +172,15 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       if (this.ios) {
         this.logger.info(this, "loadStatusBar", "iOS");
-        this.statusBar.styleDefault();
-        this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#f5f5f1");
+        this.statusBar.setStyle(false);
+        this.statusBar.setOverlaysWebView(false);
+        this.statusBar.setColor("#F5F5F1");
       }
       else if (this.android) {
         this.logger.info(this, "loadStatusBar", "Android");
-        this.statusBar.styleLightContent();
-        this.statusBar.overlaysWebView(false);
-        this.statusBar.backgroundColorByHexString("#000000");
+        this.statusBar.setStyle(true);
+        this.statusBar.setOverlaysWebView(false);
+        this.statusBar.setColor("#000000");
       }
       resolve(true);
     });
@@ -194,51 +188,40 @@ export class TenFourApp {
 
   private loadAnalytics():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
+      this.analytics.initialize().then((loaded:any) => {
         this.logger.info(this, "loadAnalytics", "Loaded");
-        this.segment.ready().then((ready:SegmentService) => {
-          this.logger.info(this, "loadAnalytics", "Ready");
-          this.segment.debug(this.device.isVirtual);
-          resolve(true);
-        });
-      }
-      else {
-        this.logger.info(this, "loadAnalytics", "Ignored");
-        resolve(true);
-      }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadAnalytics", "Failed", error);
+      });
+      resolve(true);
     });
   }
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadDeepLinks", "Loaded");
-        this.deeplinks.routeWithNavController(this.navController, {}).subscribe(
-          (match:any) => {
-            let path = match['$link']['path'];
-            let query = match['$link']['queryString'];
-            let parameters = this.getParameters(query);
-            this.logger.info(this, "loadDeepLinks", "Match", path, query, parameters);
-            if (path === '/organization/email/confirmation/') {
-              this.verifyEmail(parameters['email'], parameters['token']);
-            }
-            else if (path === '/login/email') {
-               //SigninEmailPage
-            }
-            else if (path === '/login/password') {
-               //SigninPasswordPage
-            }
-            else if (path === '/login/invite') {
-               //SignupPasswordPage
-            }
-          },
-          (nomatch:any) => {
-            this.logger.info(this, "loadDeepLinks", "No Match", nomatch);
-          });
-      }
-      else {
-        this.logger.info(this, "loadDeepLinks", "Ignored");
-      }
+      this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
+        this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
+        if (deeplink) {
+          if (deeplink.path === '/organization/email/confirmation/') {
+            let email = deeplink.parameters['email'];
+            let token = deeplink.parameters['token'];
+            this.showSignupVerify(email, token);
+          }
+          else if (deeplink.path === '/login/email') {
+             //SigninEmailPage
+          }
+          else if (deeplink.path === '/login/password') {
+             //SigninPasswordPage
+          }
+          else if (deeplink.path === '/login/invite') {
+             //SignupPasswordPage
+          }
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "loadDeepLinks", "onMatch", error);
+      });
       resolve(true);
     });
   }
@@ -261,52 +244,15 @@ export class TenFourApp {
 
   private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
+      this.firebase.initialize().then((loaded:boolean) => {
         this.logger.info(this, "loadNotifications", "Loaded");
-        this.firebase.getToken().then((token:string) => {
-          this.logger.info(this, "loadNotifications", "getToken", token);
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "loadNotifications", "getToken", error);
-        });
-        this.firebase.subscribe("test").then((data:any) => {
-          this.logger.info(this, "loadNotifications", "subscribe", data);
-        })
-        .catch((error:any) => {
-          this.logger.error(this, "loadNotifications", "subscribe", error);
-        });
-        this.firebase.onNotificationOpen().subscribe((data:any) => {
-          this.logger.info(this, "loadNotifications", "onNotificationOpen", data);
-        },
-        (error:any) => {
-          this.logger.info(this, "loadNotifications", "onNotificationOpen", error);
-        })
-      }
-      else {
-        this.logger.info(this, "loadNotifications", "Ignored");
-      }
-      resolve(true);
-    });
-  }
-
-  private verifyEmail(email:string, token:string) {
-    this.logger.info(this, "verifyEmail", "Email", email, "Token", token);
-    if (email && email.length > 0 && token && token.length > 0) {
-      let loading = this.showLoading("Verifying...");
-      this.api.verifyEmail(email, token).then((_email:Email) => {
-        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Verified");
-        loading.dismiss();
-        this.showToast(`Email address ${email} verified`);
-        let organization = new Organization({});
-        organization.email = email;
-        this.showSignupOwner(organization);
+        resolve(true);
       },
       (error:any) => {
-        this.logger.info(this, "verifyEmail", "Email", email, "Token", token, "Failed");
-        loading.dismiss();
-        this.showToast(`Unable to verify email ${email}`);
+        this.logger.error(this, "loadNotifications", "Failed", error);
+        resolve(false);
       });
-    }
+    });
   }
 
   private loadWebApp() {
@@ -315,48 +261,36 @@ export class TenFourApp {
       this.storage.getOrganization().then((organization:Organization) => {
         this.logger.info(this, "loadWebApp", "Organization", organization);
         this.organization = organization;
-        this.storage.getPerson().then((person:Person) => {
-          this.logger.info(this, "loadWebApp", "Person", person);
-          if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-            this.person = person;
+        this.storage.getUser().then((user:User) => {
+          this.logger.info(this, "loadWebApp", "User", user);
+          this.user = user;
+          if (user && user.config_profile_reviewed && user.config_self_test_sent) {
             this.logger.info(this, "loadWebApp", "Location", location.hash);
-            if (location.hash == "#/checkins") {
-              this.showCheckinList();
-            }
-            else if (location.hash === "#/groups") {
-              this.showGroupList();
-            }
-            else if (location.hash === "#/people") {
-              this.showPersonList();
-            }
-            else if (location.hash === "#/notifications") {
-              this.showNotificationList();
-            }
-            else if (location.hash === "#/settings") {
-              this.showSettingsList();
-            }
-            else if (location.hash === "#/profile") {
-              this.showPersonDetails();
-            }
-            else {
+            if (location.hash == '') {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            this.showOnboardList(person);
+            if (location.hash == '') {
+              this.showOnboardList(user);
+            }
             resolve(true);
           }
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", "Person", "None");
-          this.showSigninUrl();
+          if (location.hash == '') {
+            this.showSigninUrl();
+          }
           resolve(false);
         });
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", "Organization", "None");
-        this.showSigninUrl();
+        if (location.hash == '') {
+          this.showSigninUrl();
+        }
         resolve(false);
       });
     });
@@ -365,27 +299,27 @@ export class TenFourApp {
   private loadMobileApp(models:Model[]):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadMobileApp");
-      this.loadDatabase(models).then((loaded:any) => {
+      this.loadDatastore(models).then((loaded:any) => {
         this.logger.info(this, "loadMobileApp", "Database", loaded);
         this.storage.getOrganization().then((organization:Organization) => {
+          this.logger.info(this, "loadMobileApp", "Organization", this.organization);
           if (organization) {
             this.organization = organization;
-            this.logger.info(this, "loadMobileApp", "Organization", this.organization);
-            this.storage.getPerson().then((person:Person) => {
-              this.logger.info(this, "loadMobileApp", "Person", person);
-              if (person && person.config_profile_reviewed && person.config_self_test_sent) {
-                this.person = person;
+            this.storage.getUser().then((user:User) => {
+              this.logger.info(this, "loadMobileApp", "User", user);
+              if (user && user.config_profile_reviewed && user.config_self_test_sent) {
+                this.user = user;
                 this.showCheckinList();
                 resolve(true);
               }
               else {
-                this.logger.info(this, "loadMobileApp", "Person", "None");
-                this.showOnboardList(person);
+                this.logger.info(this, "loadMobileApp", "User", "None");
+                this.showOnboardList(user);
                 resolve(true);
               }
             },
             (error:any) => {
-              this.logger.info(this, "loadMobileApp", "Person", "None");
+              this.logger.info(this, "loadMobileApp", "User", "None");
               this.showOnboardList();
               resolve(true);
             });
@@ -395,10 +329,15 @@ export class TenFourApp {
             this.showSigninUrl();
             resolve(true);
           }
+        },
+        (error:any) => {
+          this.logger.info(this, "loadMobileApp", "Organization", "None");
+          this.showSigninUrl();
+          resolve(true);
         });
       },
       (error:any) => {
-        this.logger.error(this, "loadMobileApp", "loadDatabase", error);
+        this.logger.error(this, "loadMobileApp", "loadDatastore", error);
         this.hideSplashScreen();
         this.databaseChanged(models);
         resolve(false);
@@ -410,9 +349,9 @@ export class TenFourApp {
     this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
       text: 'Reset Database',
       handler: (clicked) => {
-        let loading = this.showLoading("Resetting...");
-        this.resetDatabase().then((reset:any) => {
-          this.loadDatabase(models).then((created:any) => {
+        let loading = this.showLoading("Resetting...", true);
+        this.resetDatastore().then((reset:any) => {
+          this.loadDatastore(models).then((created:any) => {
             loading.dismiss();
             this.showSigninUrl();
           },
@@ -431,38 +370,27 @@ export class TenFourApp {
     }]);
   }
 
-  private loadDatabase(models:Model[]):Promise<any> {
+  private loadDatastore(models:Model[]):Promise<any> {
     return new Promise((resolve, reject) => {
-      if (this.mobile) {
-        this.logger.info(this, "loadDatabase", "Cordova");
-        this.database.loadDatabase(models).then((loaded:any) => {
-          resolve(loaded);
-        },
-        (error:any) => {
-          reject(error);
-        })
-      }
-      else {
-        this.logger.info(this, "loadDatabase", "Web");
-        resolve([]);
-      }
+      this.logger.info(this, "loadDatastore", "Cordova");
+      this.storage.initialize(models).then((loaded:any) => {
+        resolve(loaded);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
-  private resetDatabase():Promise<any> {
+  private resetDatastore():Promise<any> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "resetDatabase");
-      if (this.mobile) {
-        this.database.deleteDatabase().then((deleted:any) => {
-          resolve(deleted);
-        },
-        (error:any) => {
-          reject(error);
-        })
-      }
-      else {
-        resolve();
-      }
+      this.logger.info(this, "resetDatastore");
+      this.storage.reset().then((reset:any) => {
+        resolve(reset);
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 
@@ -470,12 +398,12 @@ export class TenFourApp {
     this.logger.info(this, "loadMenu");
     Promise.all([
       this.loadOrganization(),
-      this.loadPerson()]).then(
+      this.loadUser()]).then(
       (loaded:any) => {
         this.logger.info(this, "loadMenu", "Loaded");
       },
       (error:any) => {
-        this.logger.error(this, "loadMenu", error);
+        this.logger.error(this, "loadMenu", "Failed", error);
       });
   }
 
@@ -496,18 +424,18 @@ export class TenFourApp {
     });
   }
 
-  private loadPerson():Promise<Person> {
+  private loadUser():Promise<User> {
     return new Promise((resolve, reject) => {
-      this.storage.getPerson().then((person:Person) => {
-        this.logger.info(this, "loadPerson", person);
+      this.storage.getUser().then((user:User) => {
+        this.logger.info(this, "loadUser", user);
         this.zone.run(() => {
-          this.person = person;
+          this.user = user;
         });
-        resolve(person);
+        resolve(user);
       },
       (error:any) => {
-        this.logger.error(this, "loadPerson", error);
-        this.person = null;
+        this.logger.error(this, "loadUser", error);
+        this.user = null;
         resolve(null);
       });
     });
@@ -525,14 +453,29 @@ export class TenFourApp {
     });
   }
 
-  private showOnboardList(person:Person=null) {
+  private showSignupVerify(email:string, token:string) {
+    let organization = new Organization({email: email});
+    return Promise.resolve()
+      .then(() => { return this.nav.setRoot(SigninUrlPage, {}); })
+      .then(() => { return this.nav.push(SignupEmailPage, {}); })
+      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, token:token }); })
+      .then((loaded:any) => {
+        this.logger.info(this, "showSignupVerify", "Loaded");
+        this.hideSideMenu();
+        this.hideSplashScreen();
+      },
+      (error:any) => {
+        this.logger.error(this, "showSignupVerify", error);
+      });
+  }
+
+  private showOnboardList(user:User=null) {
     this.logger.info(this, "showOnboardList");
     this.nav.setRoot(OnboardListPage, {
       organization: this.organization,
-      person: person
+      user: user
     }).then((loaded:any) => {
       this.logger.info(this, "showOnboardList", "Loaded");
-      this.hideSideMenu();
       this.hideSplashScreen();
     },
     (error:any) => {
@@ -540,11 +483,11 @@ export class TenFourApp {
     });
   }
 
-  private showCheckinList() {
+  private showCheckinList(event:any=null) {
     this.logger.info(this, "showCheckinList");
     this.nav.setRoot(CheckinListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showCheckinList", "Loaded");
       this.hideSideMenu();
@@ -555,11 +498,11 @@ export class TenFourApp {
     });
   }
 
-  private showGroupList() {
+  private showGroupList(event:any=null) {
     this.logger.info(this, "showGroupList");
     this.nav.setRoot(GroupListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showGroupList", "Loaded");
       this.hideSideMenu();
@@ -570,12 +513,12 @@ export class TenFourApp {
     });
   }
 
-  private showNotificationList() {
+  private showNotificationList(event:any=null) {
     this.logger.info(this, "showNotificationList");
     this.nav.setRoot(NotificationListPage, {
       organization: this.organization,
-      person: this.person,
-      notifications: this.person.notifications,
+      user: this.user,
+      notifications: this.user.notifications,
     }).then((loaded:any) => {
       this.logger.info(this, "showNotificationList", "Loaded");
       this.hideSideMenu();
@@ -586,11 +529,11 @@ export class TenFourApp {
     });
   }
 
-  private showPersonList() {
+  private showPersonList(event:any=null) {
     this.logger.info(this, "showPersonList");
     this.nav.setRoot(PersonListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showPersonList", "Loaded");
       this.hideSideMenu();
@@ -601,11 +544,29 @@ export class TenFourApp {
     });
   }
 
-  private showSettingsList() {
+  private showPersonProfile(event:any=null) {
+    this.logger.info(this, "showPersonProfile");
+    this.nav.setRoot(PersonProfilePage, {
+      organization: this.organization,
+      user: this.user,
+      person: this.user,
+      person_id: this.user.id,
+      profile: true
+    }).then((loaded:any) => {
+      this.logger.info(this, "showPersonProfile", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showPersonProfile", error);
+    });
+  }
+
+  private showSettingsList(event:any=null) {
     this.logger.info(this, "showSettingsList");
     this.nav.setRoot(SettingsListPage, {
       organization: this.organization,
-      person: this.person
+      user: this.user
     }).then((loaded:any) => {
       this.logger.info(this, "showSettingsList", "Loaded");
       this.hideSideMenu();
@@ -613,25 +574,6 @@ export class TenFourApp {
     },
     (error:any) => {
       this.logger.error(this, "showSettingsList", error);
-    });
-  }
-
-  private showPersonDetails() {
-    this.logger.info(this, "showPersonDetails");
-    this.nav.setRoot(PersonDetailsPage, {
-      organization: this.organization,
-      person: this.person,
-      user: this.person,
-      profile: true,
-      title: "Profile",
-      person_id: this.person.id
-    }).then((loaded:any) => {
-      this.logger.info(this, "showPersonDetails", "Loaded");
-      this.hideSideMenu();
-      this.hideSplashScreen();
-    },
-    (error:any) => {
-      this.logger.error(this, "showPersonDetails", error);
     });
   }
 
@@ -644,28 +586,27 @@ export class TenFourApp {
 
   private userLogout(event:any=null) {
     this.logger.info(this, "userLogout");
-    let loading = this.showLoading("Logging out...");
+    let loading = this.showLoading("Logging out...", true);
     let removes = [
-      this.storage.removePerson(),
-      this.storage.removeOrganization()
+      this.api.removeToken(this.organization),
+      this.storage.removeFirebase(),
+      this.storage.removeOrganization(),
+      this.storage.removeUser(),
+      this.storage.removeOrganizations(),
+      this.storage.removeSubscriptions(),
+      this.storage.removeNotifications(),
+      this.storage.removeCheckins(),
+      this.storage.removeAnswers(),
+      this.storage.removeReplies(),
+      this.storage.removeRecipients(),
+      this.storage.removeGroups(),
+      this.storage.removeEmails(),
+      this.storage.removePeople(),
+      this.storage.removeContacts()
     ];
-    if (this.mobile) {
-      removes.push(
-        this.database.removeOrganizations(),
-        this.database.removeSubscriptions(),
-        this.database.removeNotifications(),
-        this.database.removeCheckins(),
-        this.database.removeAnswers(),
-        this.database.removeReplies(),
-        this.database.removeRecipients(),
-        this.database.removeGroups(),
-        this.database.removeEmails(),
-        this.database.removePeople(),
-        this.database.removeContacts());
-    }
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
-      this.person = null;
+      this.user = null;
       this.clearBadgeCount();
       this.events.publish('user:logout');
       loading.dismiss();
@@ -673,11 +614,13 @@ export class TenFourApp {
     });
   }
 
-  private showLoading(message:string):Loading {
+  private showLoading(message:string, important:boolean=false):Loading {
     let loading = this.loadingController.create({
       content: message
     });
-    loading.present();
+    if (important || this.mobile) {
+      loading.present();
+    }
     return loading;
   }
 
@@ -706,46 +649,23 @@ export class TenFourApp {
     return modal;
   }
 
-  private trackEvent(event:string, properties:any=null) {
-    return this.segment.track(event, properties).then(() => {
-      this.logger.info(this, "Segment", "trackEvent", event);
-    });
-  }
-
-  private getParameters(query:string) {
-    let parameters = {};
-    if (query && query.length > 0) {
-      query.split("&").forEach((parts) => {
-        let items = parts.split("=");
-        if (items && items.length >= 2) {
-          parameters[items[0]] = decodeURIComponent(items[1]);
-        }
-      });
-    }
-    return parameters;
-  }
-
   private hideSplashScreen() {
-    if (this.mobile) {
-      this.splashScreen.hide();
-    }
+    this.splashScreen.hide();
   }
 
   private hideSideMenu() {
-    if (this.tablet == false || this.browser == false) {
+    if (this.tablet == false || this.website == false) {
       this.menuController.close();
     }
   }
 
   private clearBadgeCount() {
-    if (this.mobile) {
-      this.badge.clear().then((cleared:any) => {
-        this.logger.info(this, "badge", "Cleared", cleared);
-      },
-      (error:any) => {
-        this.logger.error(this, "badge", "Clear Failed", error);
-      });
-    }
+    this.badge.clearBadgeNumber().then((cleared:any) => {
+      this.logger.info(this, "badge", "Cleared", cleared);
+    },
+    (error:any) => {
+      this.logger.error(this, "badge", "Clear Failed", error);
+    });
   }
 
   private showCheckinDetails(checkin:Checkin) {
@@ -763,12 +683,13 @@ export class TenFourApp {
 
   private editReply(reply:Reply, event:any) {
     this.logger.info(this, "editReply");
-    if (reply.user_id == this.person.id) {
+    if (reply.user_id == this.user.id) {
       let modal = this.showModal(CheckinRespondPage, {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply
+        reply: reply,
+        modal: true
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
@@ -789,7 +710,8 @@ export class TenFourApp {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin
+      checkin: this.checkin,
+      modal: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
@@ -806,7 +728,7 @@ export class TenFourApp {
 
   private resendCheckin(event:any) {
     this.logger.info(this, "resendCheckin");
-    let loading = this.showLoading("Resending...");
+    let loading = this.showLoading("Resending...", true);
     this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
       loading.dismiss();
       this.showToast(`Check-In ${this.checkin.message} resent`);

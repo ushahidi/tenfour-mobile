@@ -4,11 +4,15 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
-
+import { User } from '../../models/user';
+import { Location } from '../../models/location';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
 import { CameraProvider } from '../../providers/camera/camera';
+import { StorageProvider } from '../../providers/storage/storage';
+import { LocationProvider } from '../../providers/location/location';
+
+import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
 
 @IonicPage({
   name: 'SettingsEditPage',
@@ -18,19 +22,22 @@ import { CameraProvider } from '../../providers/camera/camera';
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
 export class SettingsEditPage extends BasePage {
 
   organization:Organization = null;
   logo:string = "assets/images/dots.png";
-  location:string = null;
 
   @ViewChild("fileInput")
   fileInput:any = null;
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
+  search:string = null;
+
+  locations:Location[] = [];
+  timer:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -44,8 +51,9 @@ export class SettingsEditPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider,
-      protected camera:CameraProvider) {
+      protected storage:StorageProvider,
+      protected camera:CameraProvider,
+      protected location:LocationProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -62,7 +70,7 @@ export class SettingsEditPage extends BasePage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
@@ -73,22 +81,14 @@ export class SettingsEditPage extends BasePage {
   }
 
   private doneEdit(event:any) {
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      if (this.mobile) {
-        this.database.saveOrganization(organization).then(saved => {
-          loading.dismiss();
-          this.hideModal({
-            organization: organization
-          });
-        });
-      }
-      else {
+      this.storage.saveOrganization(organization).then(saved => {
         loading.dismiss();
         this.hideModal({
           organization: organization
         });
-      }
+      });
     },
     (error:any) => {
       loading.dismiss();
@@ -171,14 +171,49 @@ export class SettingsEditPage extends BasePage {
   }
 
   private onKeyPress(event:any) {
-    if (event.keyCode == 13) {
+    this.logger.info(this, "onKeyPress", event.keyCode);
+    if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
-      this.hideKeyboard();
+      this.hideKeyboard(event);
       return false;
     }
     else {
       return true;
     }
+  }
+
+  private searchAddress() {
+    clearTimeout(this.timer);
+    this.timer = setTimeout((address:string) => {
+      if (address && address.length > 0) {
+        this.logger.info(this, "searchAddress", address);
+        this.location.searchAddress(address, 5).then((locations:Location[]) => {
+          this.logger.info(this, "searchAddress", address, locations);
+          this.zone.run(() => {
+            this.locations = locations;
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "searchAddress", address, error);
+          this.zone.run(() => {
+            this.locations = [];
+          });
+        });
+      }
+      else {
+        this.zone.run(() => {
+          this.locations = [];
+        });
+      }
+    }, 900, this.organization.location);
+  }
+
+  private selectLocation(location:Location) {
+    this.logger.info(this, "selectLocation", location);
+    this.zone.run(() => {
+      this.organization.location = location.address;
+      this.locations = [];
+    });
   }
 
 }

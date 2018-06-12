@@ -1,21 +1,14 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
-import { Device } from '@ionic-native/device';
-import { AppVersion } from '@ionic-native/app-version';
-import { SegmentService } from 'ngx-segment-analytics';
-
-import { Network } from '@ionic-native/network';
-import { Keyboard } from '@ionic-native/keyboard';
-import { StatusBar } from '@ionic-native/status-bar';
-import { SocialSharing } from '@ionic-native/social-sharing';
-import { ThemeableBrowser, ThemeableBrowserOptions, ThemeableBrowserObject } from '@ionic-native/themeable-browser';
-
 import { LoggerProvider } from '../../providers/logger/logger';
+import { BrowserProvider } from '../../providers/browser/browser';
+import { NetworkProvider } from '../../providers/network/network';
+import { SharingProvider } from '../../providers/sharing/sharing';
+import { KeyboardProvider } from '../../providers/keyboard/keyboard';
 import { InjectorProvider } from '../../providers/injector/injector';
-
-import { Organization } from '../../models/organization';
-import { Person } from '../../models/person';
+import { AnalyticsProvider } from '../../providers/analytics/analytics';
+import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 
 @Component({
   selector: 'base-page',
@@ -29,27 +22,26 @@ export class BasePage {
   protected WIDTH_LARGE:number = 960;
   protected WIDTH_EXTRA_LARGE:number = 1140;
 
+  protected KEYCODE_RETURN:number = 13;
+
   protected offline:boolean = false;
   protected tablet:boolean = false;
   protected mobile:boolean = false;
+  protected phone:boolean = false;
   protected android:boolean = false;
   protected ios:boolean = false;
-  protected browser:boolean = false;
+  protected website:boolean = false;
   protected desktop:boolean = false;
 
-  protected connection:any = null;
-  protected disconnection:any = null;
-
   protected zone:NgZone;
+
+  protected statusBar:StatusBarProvider;
+  protected keyboard:KeyboardProvider;
   protected logger:LoggerProvider;
-  protected network:Network;
-  protected keyboard:Keyboard;
-  protected statusBar:StatusBar;
-  protected themeableBrowser:ThemeableBrowser;
-  protected socialSharing:SocialSharing;
-  protected segment:SegmentService;
-  protected device:Device;
-  protected appVersion:AppVersion;
+  protected network:NetworkProvider;
+  protected analytics:AnalyticsProvider;
+  protected browser:BrowserProvider;
+  protected sharing:SharingProvider;
 
   @ViewChild(Content)
   content:Content;
@@ -67,14 +59,12 @@ export class BasePage {
     protected actionController:ActionSheetController) {
     this.zone = _zone;
     this.logger = InjectorProvider.injector.get(LoggerProvider);
-    this.network = InjectorProvider.injector.get(Network);
-    this.keyboard = InjectorProvider.injector.get(Keyboard);
-    this.statusBar = InjectorProvider.injector.get(StatusBar);
-    this.themeableBrowser = InjectorProvider.injector.get(ThemeableBrowser);
-    this.socialSharing = InjectorProvider.injector.get(SocialSharing);
-    this.segment = InjectorProvider.injector.get(SegmentService);
-    this.device = InjectorProvider.injector.get(Device);
-    this.appVersion = InjectorProvider.injector.get(AppVersion)
+    this.network = InjectorProvider.injector.get(NetworkProvider);
+    this.keyboard = InjectorProvider.injector.get(KeyboardProvider);
+    this.statusBar = InjectorProvider.injector.get(StatusBarProvider);
+    this.analytics = InjectorProvider.injector.get(AnalyticsProvider);
+    this.browser = InjectorProvider.injector.get(BrowserProvider);
+    this.sharing = InjectorProvider.injector.get(SharingProvider);
   }
 
   ionViewDidLoad() {
@@ -84,14 +74,17 @@ export class BasePage {
       this.android = this.platform.is('android');
       this.tablet = this.platform.is('tablet');
       this.mobile = this.platform.is('cordova');
-      this.browser = this.platform.is('core');
       this.desktop = this.platform.is('core');
+      this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
+      this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
     })
   }
 
   ionViewWillEnter() {
     this.logger.info(this, "ionViewWillEnter");
-    this.subscribeNetwork();
+    this.network.onChanged().subscribe((connected:boolean) => {
+      this.offline = connected == false;
+    });
   }
 
   ionViewDidEnter() {
@@ -100,7 +93,6 @@ export class BasePage {
 
   ionViewWillLeave() {
     this.logger.info(this, "ionViewWillLeave");
-    this.unsubscribeNetwork();
   }
 
   ionViewDidLeave() {
@@ -111,85 +103,40 @@ export class BasePage {
     this.logger.info(this, "ionViewWillUnload");
   }
 
-  protected subscribeNetwork() {
-    if (this.mobile) {
-      this.logger.info(this, "subscribeNetwork", "Network", this.network.type);
-      if (this.network.type == 'none') {
-        this.zone.run(() => {
-          this.offline = true;
-          this.resizeContent();
-        });
-      }
-      else {
-        this.zone.run(() => {
-          this.offline = false;
-        });
-      }
-      this.connection = this.network.onConnect().subscribe(() => {
-        this.logger.info(this, "subscribeNetwork", "Network Connected", this.network.type);
-        this.zone.run(() => {
-          this.offline = false;
-          this.resizeContent();
-        });
-      });
-      this.disconnection = this.network.onDisconnect().subscribe(() => {
-        this.logger.info(this, "subscribeNetwork", "Network Disconnected", this.network.type);
-        this.zone.run(() => {
-          this.offline = true;
-          this.resizeContent();
-        });
-      });
-    }
-    else {
-      //TODO handle subscribe network on web
-    }
-  }
-
-  protected unsubscribeNetwork() {
-    if (this.mobile) {
-      this.logger.info(this, "unsubscribeNetwork", "Network", this.network.type);
-      if (this.connection) {
-        this.connection.unsubscribe();
-        this.connection = null;
-      }
-      if (this.disconnection) {
-        this.disconnection.unsubscribe();
-        this.disconnection = null;
-      }
-    }
-    else {
-      //TODO handle unsubscribe network on web
-    }
-  }
-
   protected loadStatusBar(lightContent:boolean=true) {
     this.platform.ready().then(() => {
-      if (this.mobile) {
-        if (lightContent) {
-          this.statusBar.styleLightContent();
-          this.statusBar.backgroundColorByHexString('#3f4751');
-        }
-        else {
-          this.statusBar.styleDefault();
-          this.statusBar.backgroundColorByHexString('#f9f9f8');
-        }
+      if (lightContent) {
+        this.statusBar.setStyle(true);
+        this.statusBar.setColor('#3F4751');
+      }
+      else {
+        this.statusBar.setStyle(false);
+        this.statusBar.setColor('#F9F9F8');
       }
     });
+  }
+
+  protected hasParameter(param:string):boolean {
+    if (this.platform.getQueryParam(param) != null) {
+      return true;
+    }
+    return this.navParams.get(param) != null;
   }
 
   protected getParameter<T extends Object>(param:string):T {
+    this.platform.getQueryParam(param)
+    if (this.platform.getQueryParam(param) != null) {
+      return <T>this.platform.getQueryParam(param);
+    }
     return <T>this.navParams.get(param);
   }
 
-  protected showLoading(message:string):Loading {
+  protected showLoading(message:string="Loading...", important:boolean=false):Loading {
     let loading = this.loadingController.create({
       content: message
     });
-    if (this.mobile) {
+    if (important || this.mobile) {
       loading.present();
-    }
-    else {
-
     }
     return loading;
   }
@@ -238,80 +185,43 @@ export class BasePage {
     return modal;
   }
 
-  protected hideModal(data:any=null, options:any={}) {
+  protected hideModal(data:any=null, options:any={}):Promise<any> {
     return this.viewController.dismiss(data, options);
   }
 
-  protected showPage(page:any, params:any={}, options:any={}) {
+  protected showPage(page:any, params:any={}, options:any={}):Promise<any> {
     return this.navController.push(page, params, options);
   }
 
-  protected showRootPage(page:any, params:any={}, options:any={}) {
+  protected showRootPage(page:any, params:any={}, options:any={}):Promise<any> {
     return this.navController.setRoot(page, params, options);
   }
 
-  protected closePage(data:any=null, options:any={}) {
-    return this.viewController.dismiss(data, options);
+  protected closePage(data:any=null, options:any={}):Promise<any> {
+    if (this.navController.getViews().length > 1) {
+      return this.viewController.dismiss(data, options);
+    }
+    return Promise.resolve();
   }
 
-  protected showShare(subject:string, message:string=null, file:string=null, url:string=null) {
-    return this.socialSharing.share(message, subject, file, url);
+  protected showShare(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
+    return this.sharing.share(message, subject, file, url);
+  }
+
+  protected showOfflineAlert():Alert {
+    return this.showAlert("Internet Offline", "There currently is no internet connection available.")
   }
 
   protected showUrl(url:string, target:string="_blank", event:any=null):any {
-    this.logger.info(this, "showUrl", url, target);
-    if (this.mobile) {
-      let options:ThemeableBrowserOptions = {
-        statusbar: {
-          color: "f5f5f1"
-        },
-          toolbar: {
-          height: 44,
-          color: "f5f5f1"
-        },
-          title: {
-          color: '#000000',
-          showPageTitle: true
-        },
-        backButton: {
-          wwwImage: 'assets/images/back.png',
-          wwwImageDensity: 2,
-          align: 'right',
-          event: 'backPressed'
-        },
-        forwardButton: {
-          wwwImage: 'assets/images/forward.png',
-          wwwImageDensity: 2,
-          align: 'right',
-          event: 'forwardPressed'
-        },
-        closeButton: {
-          wwwImage: 'assets/images/close.png',
-          wwwImageDensity: 2,
-          align: 'left',
-          event: 'closePressed'
-        },
-        backButtonCanClose: true
-      };
-      let browser = this.themeableBrowser.create(url, target, options);
-      if (this.platform.is("ios")) {
-        browser.show();
-      }
-      if (event) {
-        event.stopPropagation();
-      }
-      return browser;
-    }
-    else {
-      if (event) {
-        event.stopPropagation();
-      }
-      return window.open(url, target);
-    }
+    this.browser.open(url, target, event);
   }
 
-  protected showOfflineAlert() {
-    this.showAlert("Internet Offline", "There currently is no internet connection available.")
+  protected showKeyboard(event:any=null) {
+    this.keyboard.show();
+  }
+
+  protected hideKeyboard(event:any=null) {
+    this.keyboard.hide();
   }
 
   protected resizeContent(delay:number=100) {
@@ -326,88 +236,47 @@ export class BasePage {
     }, delay);
   }
 
-  protected showKeyboard() {
-    if (this.mobile) {
-      this.keyboard.show();
-    }
-  }
-
-  protected hideKeyboard() {
-    if (this.mobile) {
-      this.keyboard.close();
-    }
-  }
-
-  protected trackLogin(organization:Organization, person:Person) {
-    if (organization && person) {
-      this.trackIdentify(person.id, {
-        app: this.appName(),
-        device: this.deviceName(),
-        organization: organization.name,
-        person: person.name,
-        email: organization.email
-      });
-    }
-  }
-
-  protected trackIdentify(user:any, traits:any=null) {
-    return this.segment.identify("" + user, traits).then(() => {
-      this.logger.info(this, "Segment", "trackIdentify", user, traits);
+  protected promiseFallback(cache:boolean, promise1:Promise<any>, promise2:Promise<any>, minimum:number=null):Promise<any> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.mobile) {
+        promise1.then((results1:any) => {
+          if (results1 && (minimum == null || results1.length >= minimum)) {
+            resolve(results1);
+          }
+          else {
+            promise2.then((results2:any) => {
+              resolve(results2);
+            },
+            (error2:any) => {
+              reject(error2);
+            });
+          }
+        },
+        (error1:any) => {
+          promise2.then((results2:any) => {
+            resolve(results2);
+          },
+          (error2:any) => {
+            reject(error2);
+          });
+        });
+      }
+      else {
+        promise2.then((results2:any) => {
+          resolve(results2);
+        },
+        (error2:any) => {
+          reject(error2);
+        });
+      }
     });
   }
 
-  protected trackPage(properties:any=null) {
-    let name = this.pageName();
-    return this.segment.page(name, properties).then(() => {
-      this.logger.info(this, "Segment", "trackPage", name, properties);
-    });
-  }
-
-  protected trackEvent(event:string, properties:any=null) {
-    return this.segment.track(event, properties).then(() => {
-      this.logger.info(this, "Segment", "trackEvent", event);
-    });
-  }
-
-  protected appName():string {
-    if (this.mobile) {
-      return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
+  protected isKeyReturn(event:any):boolean {
+    if (event && event.keyCode && event.keyCode == 13) {
+      return true;
     }
-    return "TenFour";
-  }
-
-  protected deviceName():string {
-    let name = [];
-    if (this.mobile) {
-      if (this.device.manufacturer) {
-        name.push(this.device.manufacturer);
-      }
-      if (this.device.platform) {
-        name.push(this.device.platform);
-      }
-      if (this.device.version) {
-        name.push(this.device.version);
-      }
-      if (this.device.model) {
-        name.push(this.device.model);
-      }
-    }
-    else {
-      name.push(navigator.appVersion);
-    }
-    return name.join(" ");
-  }
-
-  protected pageName():string {
-    return this.constructor.name
-      .replace('Page', '')
-      .replace(/([A-Z])/g, function(match) {
-        return " " + match;
-      })
-      .replace(/^./, function(match) {
-        return match.toUpperCase();
-      })
-      .trim();
+    return false;
   }
 
 }

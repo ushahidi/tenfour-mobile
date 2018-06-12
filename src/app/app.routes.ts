@@ -5,12 +5,14 @@ import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninInvitePage } from '../pages/signin-invite/signin-invite';
 
-import { SignupUrlPage} from '../pages/signup-url/signup-url';
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
-import { SignupNamePage } from '../pages/signup-name/signup-name';
-import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
+import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
+import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
+import { SignupNamePage } from '../pages/signup-name/signup-name';
+import { SignupUrlPage} from '../pages/signup-url/signup-url';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPaymentPage } from '../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
@@ -18,6 +20,7 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonEditPage } from '../pages/person-edit/person-edit';
 import { PersonDetailsPage } from '../pages/person-details/person-details';
+import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { PersonInvitePage } from '../pages/person-invite/person-invite';
 import { PersonImportPage } from '../pages/person-import/person-import';
 import { PersonSelectPage } from '../pages/person-select/person-select';
@@ -44,6 +47,8 @@ import { SettingsRolesPage } from '../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../pages/settings-channels/settings-channels';
 
+import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
+
 export class TenFourRoutes {
 
   static readonly ROUTES = [
@@ -51,16 +56,18 @@ export class TenFourRoutes {
 
     { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
     { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email', defaultHistory: ['SigninUrlPage'] },
-    { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },
 
-    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup' },
-    { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SignupEmailPage'] },
-    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SignupEmailPage'] },
+    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
+    { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:token', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage'] },
+    { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage'] },
+    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
+    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
+    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage', 'SignupPlanPage'] },
 
     { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 
@@ -69,6 +76,8 @@ export class TenFourRoutes {
     { component: CheckinSendPage, name: 'CheckinSendPage', segment: 'checkins/send', defaultHistory: ['CheckinListPage'] },
     { component: CheckinRespondPage, name: 'CheckinRespondPage', segment: 'checkins/respond', defaultHistory: ['CheckinListPage'] },
     { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
+
+    { component: PersonProfilePage, name: 'PersonProfilePage', segment: 'profile' },
 
     { component: PersonListPage, name: 'PersonListPage', segment: 'people' },
     { component: PersonEditPage, name: 'PersonEditPage', segment: 'people/edit', defaultHistory: ['PersonListPage'] },
@@ -90,6 +99,8 @@ export class TenFourRoutes {
     { component: SettingsRolesPage, name: 'SettingsRolesPage', segment: 'settings/roles', defaultHistory: ['SettingsListPage'] },
     { component: SettingsSizesPage, name: 'SettingsSizesPage', segment: 'settings/sizes', defaultHistory: ['SettingsListPage'] },
     { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
-    { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] }
+    { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
+
+    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' },
   ];
 }

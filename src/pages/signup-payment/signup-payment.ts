@@ -5,9 +5,11 @@ import { IonicPage, TextInput,
 import { BasePage } from '../../pages/base-page/base-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupPaymentPage',
@@ -17,7 +19,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signup-payment',
   templateUrl: 'signup-payment.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SignupPasswordPage ]
 })
 export class SignupPaymentPage extends BasePage {
@@ -40,18 +42,68 @@ export class SignupPaymentPage extends BasePage {
       protected toastController:ToastController,
       protected alertController:AlertController,
       protected loadingController:LoadingController,
-      protected actionController:ActionSheetController) {
+      protected actionController:ActionSheetController,
+      protected api:ApiProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showToast(error);
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage(this);
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        },
+        (error:any) => {
+          this.organization = null;
+          resolve(null);
+        });
+      }
+    });
   }
 
   private showNext(event:any) {
@@ -62,7 +114,7 @@ export class SignupPaymentPage extends BasePage {
   }
 
   private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       if (this.number.value.length == 0) {
         this.number.setFocus();
       }

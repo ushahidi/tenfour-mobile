@@ -5,9 +5,11 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
-import { ApiProvider } from '../../providers/api/api';
-
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SigninUrlPage',
@@ -16,7 +18,7 @@ import { Organization } from '../../models/organization';
 @Component({
   selector: 'page-signin-url',
   templateUrl: 'signin-url.html',
-  providers: [ ApiProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SigninEmailPage, SignupEmailPage ]
 })
 export class SigninUrlPage extends BasePage {
@@ -35,27 +37,30 @@ export class SigninUrlPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiProvider) {
+      protected api:ApiProvider,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    this.trackPage();
+    this.analytics.trackPage(this);
   }
 
   private showNext(event:any) {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
-      let loading = this.showLoading("Searching...");
+      let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
         this.logger.info(this, "showNext", organizations);
         loading.dismiss();
         if (organizations && organizations.length > 0) {
           let organization:Organization = organizations[0];
-          this.showPage(SigninEmailPage, {
-            organization: organization
+          this.storage.setOrganization(organization).then((stored:boolean) => {
+            this.showPage(SigninEmailPage, {
+              organization: organization
+            });
           });
         }
         else {
@@ -72,17 +77,11 @@ export class SigninUrlPage extends BasePage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    if (this.platform.is("ios")) {
-      this.showUrl("https://app.tenfour.org/organization/email", "_system");
-      // this.showPage(SignupEmailPage, {});
-    }
-    else {
-      this.showPage(SignupEmailPage, {});
-    }
+    this.showPage(SignupEmailPage, {});
   }
 
   private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
+    if (this.isKeyReturn(event)) {
       this.hideKeyboard();
       this.showNext(event);
       return false;

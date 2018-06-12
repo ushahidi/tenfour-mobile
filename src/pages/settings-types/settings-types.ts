@@ -1,13 +1,14 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
-
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
+
+import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SettingsTypesPage',
@@ -17,13 +18,13 @@ import { Person } from '../../models/person';
 @Component({
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',
-  providers: [ ApiProvider, DatabaseProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class SettingsTypesPage extends BasePage {
 
   organization:Organization = null;
-  person:Person = null;
+  user:User = null;
   types:any = [
     { name: 'Advocacy', key: "advocacy", selected: false },
     { name: 'Anti-Corruption & Transparency', key: "anticorruption", selected: false },
@@ -55,29 +56,97 @@ export class SettingsTypesPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    if (this.organization.types) {
-      let selected:string[] = this.organization.types.split(",");
-      for (let type of this.types) {
-        type.selected = selected.indexOf(type.key) > -1;
-      }
-    }
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((finished:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     if (this.organization) {
-      this.trackPage({
+      this.analytics.trackPage(this, {
         organization: this.organization.name
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadTypes(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
+    });
+  }
+
+  private loadTypes(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.organization.types) {
+        let selected:string[] = this.organization.types.split(",");
+        for (let type of this.types) {
+          type.selected = selected.indexOf(type.key) > -1;
+        }
+      }
+      resolve(true);
+    });
   }
 
   private cancelEdit(event:any) {
@@ -92,10 +161,10 @@ export class SettingsTypesPage extends BasePage {
       }
     }
     this.organization.types = selected.join(",");
-    let loading = this.showLoading("Updating...");
+    let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       if (this.mobile) {
-        this.database.saveOrganization(organization).then(saved => {
+        this.storage.saveOrganization(organization).then(saved => {
           loading.dismiss();
           this.hideModal({
             organization: organization

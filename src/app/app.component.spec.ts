@@ -38,7 +38,7 @@ import { TenFourApp } from './app.component';
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
 import { DatabaseProvider } from '../providers/database/database';
-import { CountryProvider } from '../providers/country/country';
+import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 
@@ -89,7 +89,7 @@ describe('TenFourApp Component', () => {
         { provide: Firebase, useClass: Firebase },
         { provide: ApiProvider, useClass: ApiProvider },
         { provide: LoggerProvider, useClass: LoggerProvider },
-        { provide: CountryProvider, useClass: CountryProvider },
+        { provide: CountriesProvider, useClass: CountriesProvider },
         { provide: DatabaseProvider, useClass: DatabaseProvider },
         { provide: StorageProvider, useClass: StorageProvider },
         { provide: LocationProvider, useClass: LocationProvider }
