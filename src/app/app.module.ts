@@ -69,6 +69,8 @@ import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.m
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
+import { PasswordResetModule } from '../pages/password-reset/password-reset.module';
+
 import { GroupListModule } from '../pages/group-list/group-list.module';
 import { GroupEditModule } from '../pages/group-edit/group-edit.module';
 import { GroupDetailsModule } from '../pages/group-details/group-details.module';
@@ -141,6 +143,7 @@ import { CameraProvider } from '../providers/camera/camera';
     SignupPaymentModule,
     SignupPasswordModule,
     OnboardListModule,
+    PasswordResetModule,
     CheckinListModule,
     CheckinEditModule,
     CheckinSendModule,

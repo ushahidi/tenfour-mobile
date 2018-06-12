@@ -1093,4 +1093,24 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public postResetPassword(subdomain:string, email:string, token:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/login/reset-password/?token=${token}&email=${email}&subdomain=${subdomain}`;
+      let params = {
+        subdomain: subdomain,
+        password: newPassword,
+        password_confirmation: confirmPassword,
+        username: email,
+        token: token
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+
 }
