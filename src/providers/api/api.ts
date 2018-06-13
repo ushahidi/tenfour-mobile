@@ -1116,10 +1116,10 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public deleteSubscription(organization:Organization):Promise<Subscription> {
+  public deleteSubscription(organization:Organization, subscription:Subscription):Promise<Subscription> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/1`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}`;
         let params = { };
         this.httpDelete(url, params, token.access_token).then((data:any) => {
           resolve(new Subscription(data.subscription));
@@ -1162,16 +1162,18 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getPaymentUrl(organization:Organization):Promise<string> {
+  public getPaymentUrl(organization:Organization, subscription:Subscription):Promise<string> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/hostedpage`;
+        let callback = encodeURIComponent(window.location.toString());
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}/hostedpage?callback=${callback}`;
         let params = {
-          callback: `https://${organization.subdomain}.tenfour.org/settings/plan-and-credits/add-payment-method`,
-          organization_id: organization.id
+          // callback: `https://${organization.subdomain}.tenfour.org/settings/plan-and-credits/add-payment-method`,
+          // callback: window.location.toString(),
+          // organization_id: organization.id
         };
         this.logger.info(this, "getPaymentUrl", url);
-        this.httpPost(url, params, token.access_token).then((data:any) => {
+        this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.url) {
             this.logger.info(this, "getPaymentUrl", url, data.url);
             resolve(data.url);

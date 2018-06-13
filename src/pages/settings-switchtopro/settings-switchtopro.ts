@@ -1,32 +1,25 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
-import { SettingsSwitchtoproPage } from '../settings-switchtopro/settings-switchtopro';
 
+import { Subscription } from '../../models/subscription';
 import { Organization } from '../../models/organization';
-import { User } from '../../models/user';
-import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-@IonicPage({
-  name: 'SettingsPaymentsPage',
-  segment: 'settings/payments',
-  defaultHistory: ['SettingsListPage']
-})
+@IonicPage()
 @Component({
-  selector: 'page-settings-payments',
-  templateUrl: 'settings-payments.html',
-  providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage ]
+  selector: 'page-settings-switchtopro',
+  templateUrl: 'settings-switchtopro.html',
 })
-export class SettingsPaymentsPage extends BasePage {
+export class SettingsSwitchtoproPage extends BasePage {
 
   organization:Organization = null;
-  user:User = null;
+  subscription:Subscription = null;
+  iframe:SafeResourceUrl = null;
 
   constructor(
       protected zone:NgZone,
@@ -40,19 +33,19 @@ export class SettingsPaymentsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected sanitizer:DomSanitizer) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewWillEnter() {
+  ionViewWillLoad() {
     super.ionViewWillEnter();
-    let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((loaded:any) => {
+    let loading = this.showLoading("Checking your plan...", true);
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     },
     (error:any) => {
       loading.dismiss();
-      this.showToast(error);
     });
   }
 
@@ -69,8 +62,8 @@ export class SettingsPaymentsPage extends BasePage {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadUser(cache); })
-      // .then(() => { return this.loadPaymentForm(cache); })
+      .then(() => { return this.loadSubscription(cache); })
+      .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -82,7 +75,8 @@ export class SettingsPaymentsPage extends BasePage {
         if (event) {
           event.complete();
         }
-        this.showToast(error);
+        this.showAlert("Problem Switching to Pro Plan", error);
+        this.hideModal();
       });
   }
 
@@ -104,35 +98,41 @@ export class SettingsPaymentsPage extends BasePage {
     });
   }
 
-  private loadUser(cache:boolean=true):Promise<User> {
+  private loadSubscription(cache:boolean=true):Promise<Subscription> {
     return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
+      if (cache && this.subscription) {
+        resolve(this.subscription);
       }
       else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
+        this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
+          if (subscriptions.length !== 1) {
+            return reject("Current plan was not found");
+          }
+          if (subscriptions[0].plan_id === 'pro-plan') {
+            return reject("You are already on the pro plan");
+          }
+          this.subscription = subscriptions[0];
+          resolve(this.subscription);
         });
       }
     });
   }
 
-  private back(event:any) {
+  private loadPaymentForm(cache:boolean=true) {
+    return new Promise((resolve, reject) => {
+      this.api.getPaymentUrl(this.organization, this.subscription).then((url:string) => {
+        this.logger.info(this, "ChargeBee", url);
+        this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "ChargeBee", error);
+        reject(error);
+      });
+    });
+  }
+
+  private closeModal(event:any) {
     this.hideModal();
-  }
-
-  private switchToFree(event:any) {
-    this.logger.info(this, "switchToFree");
-    let modal = this.showModal(SettingsSwitchtofreePage);
-  }
-
-  private switchToPro(event:any) {
-    this.logger.info(this, "switchToPro");
-    let modal = this.showModal(SettingsSwitchtoproPage);
   }
 }

@@ -41,7 +41,7 @@
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
             </ion-list>
           <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
-          <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="chooseProPlan($event)">Upgrade to TenFour Pro</button>
+          <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="switchToPro($event)">Upgrade to TenFour Pro</button>
           </ion-card-content>
         </ion-card>
 
@@ -72,38 +72,5 @@
       </ion-col>
     </ion-row>
   </ion-grid>
-
-  <!-- <div padding *ngIf="mobile">
-    <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
-    <button ion-button color="primary" (click)="showUrl(url, '_blank', $event)">Visit Website</button>
-  </div>
-  <div *ngIf="website">
-    <ion-list>
-      <ion-item text-wrap no-lines text-center color="white">
-        <ion-grid>
-          <ion-row>
-            <ion-col>
-              <h1 text-right no-padding no-margin>$3</h1>
-            </ion-col>
-            <ion-col>
-              <p text-left no-padding no-margin>per user,<br>per month</p>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-        <p>Unlimited in-app messages</p>
-        <p>Unlimited email messages</p>
-        <p>Unlimited Slack messages</p>
-        <p>5 text messages (SMS) credits per user, per month</p>
-      </ion-item>
-      <ion-item text-wrap text-center no-lines color="white" *ngIf="person && person.isOwner() == true">
-        <ion-spinner name="ios" *ngIf="iframe == null"></ion-spinner>
-        <iframe [src]="iframe" frameborder="0" *ngIf="iframe"></iframe>
-      </ion-item>
-      <ion-item text-wrap no-lines color="white" *ngIf="person && person.isOwner() == false">
-        <h2 text-center>Note, only organization owners can edit payment information.</h2>
-      </ion-item>
-   </ion-list>
-  </div> -->
-
 
 </ion-content>
