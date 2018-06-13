@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -31,7 +31,8 @@ export class SettingsSwitchtofreePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -99,6 +100,8 @@ export class SettingsSwitchtofreePage extends BasePage {
             return reject("You are already on the free plan");
           }
           this.subscription = subscriptions[0];
+
+
           resolve(this.subscription);
         });
       }
@@ -122,8 +125,12 @@ export class SettingsSwitchtofreePage extends BasePage {
     this.logger.info(this, "switchToFree");
     let loading = this.showLoading("Switching to Free Plan...", true);
     this.api.deleteSubscription(this.organization, this.subscription).then((subscription:Subscription) => {
-      loading.dismiss();
-      this.hideModal();
+      return this.api.getOrganization(this.organization).then((organization:Organization) => {
+        this.storage.setOrganization(organization),
+        this.events.publish('subscription:changed', subscription, Date.now());
+        loading.dismiss();
+        this.hideModal();
+      });
     },
     (error:any) => {
       loading.dismiss();

@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
@@ -40,19 +40,24 @@ export class SettingsPaymentsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((loaded:any) => {
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     },
     (error:any) => {
       loading.dismiss();
       this.showToast(error);
+    });
+
+    this.events.subscribe('subscription:changed', (subscription, time) => {
+      this.loadUpdates(false);
     });
   }
 

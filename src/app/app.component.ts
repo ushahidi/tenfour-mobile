@@ -237,6 +237,9 @@ export class TenFourApp {
       this.events.subscribe('checkin:details', (data:any) => {
         this.showCheckinDetails(data.checkin);
       });
+      this.events.subscribe('subscription:changed', (subscription, time) => {
+        this.loadOrganization();
+      });
       resolve(true);
     })
   }
