@@ -4,8 +4,10 @@ import { IonicPage, Events, Platform, NavParams, NavController, ViewController, 
 import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
 import { SettingsSwitchtoproPage } from '../settings-switchtopro/settings-switchtopro';
+import { SettingsWelcometoproPage } from '../settings-welcometopro/settings-welcometopro';
 
 import { Organization } from '../../models/organization';
+import { Subscription } from '../../models/subscription';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
 
@@ -21,12 +23,14 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage ]
+  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage, SettingsWelcometoproPage ]
 })
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
   user:User = null;
+  hashChangeFn = null;
+  switchToProModal = null;
 
   constructor(
       protected zone:NgZone,
@@ -68,6 +72,77 @@ export class SettingsPaymentsPage extends BasePage {
         organization: this.organization.name
       });
     }
+
+    this.hashChangeFn = this.hashChange.bind(this);
+    window.addEventListener("hashchange", this.hashChangeFn, false);
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    window.removeEventListener("hashchange", this.hashChangeFn, false);
+  }
+
+  private hashChange() {
+    this.logger.info(this, "hashChange");
+    this.extractQueryParams();
+
+    if (this.queryParams['id'] && this.queryParams['state']) {
+      if (this.queryParams['state'] === 'succeeded') {
+        this.completeSwitchToPro();
+      }
+    }
+  }
+
+  private completeSwitchToPro() {
+    this.switchToProModal.dismiss();
+    let loading = this.showLoading("Switching to TenFour Pro...", true);
+    let retryCount = 0;
+
+    let checkSubscription = () => {
+      return new Promise((resolve, reject) => {
+        this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
+          if (subscriptions.length < 1) {
+            return reject("Current plan was not found");
+          }
+
+          if (subscriptions[0].plan_id === 'pro-plan') {
+            let subscription = subscriptions[0];
+
+            return this.api.getOrganization(this.organization).then((organization:Organization) => {
+              this.storage.setOrganization(organization)
+                .then(()=>{return this.storage.saveSubscription(organization, subscription)})
+                .then(()=>{
+                  this.events.publish('subscription:changed', subscription, Date.now());
+                  resolve(subscription);
+                });
+            });
+          }
+
+          if (retryCount++ > 5) {
+            reject('Could not switch to Pro plan');
+          }
+
+          setTimeout(() => {
+            checkSubscription().then((subscription:Subscription) => {
+              resolve(subscription);
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }, 5000);
+        });
+      });
+    };
+
+    checkSubscription()
+      .then(() => {
+        this.showModal(SettingsWelcometoproPage);
+        loading.dismiss();
+      })
+      .catch((e) => {
+        this.showAlert("Problem Switching to Pro Plan", e);
+        loading.dismiss();
+      });
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -138,6 +213,6 @@ export class SettingsPaymentsPage extends BasePage {
 
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
-    let modal = this.showModal(SettingsSwitchtoproPage);
+    this.switchToProModal = this.showModal(SettingsSwitchtoproPage);
   }
 }

@@ -1,6 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -12,14 +11,14 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage()
 @Component({
-  selector: 'page-settings-switchtopro',
-  templateUrl: 'settings-switchtopro.html',
+  selector: 'page-settings-welcometopro',
+  templateUrl: 'settings-welcometopro.html',
 })
-export class SettingsSwitchtoproPage extends BasePage {
+export class SettingsWelcometoproPage extends BasePage {
 
   organization:Organization = null;
   subscription:Subscription = null;
-  iframe:SafeResourceUrl = null;
+  retryCount:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -34,14 +33,14 @@ export class SettingsSwitchtoproPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      protected sanitizer:DomSanitizer) {
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewDidLoad() {
-    super.ionViewWillEnter();
+  ionViewWillLoad() {
+    super.ionViewDidEnter();
     let loading = this.showLoading("Checking your plan...", true);
-    this.loadUpdates(false).then((loaded:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
     },
     (error:any) => {
@@ -49,21 +48,11 @@ export class SettingsSwitchtoproPage extends BasePage {
     });
   }
 
-  ionViewDidEnter() {
-    super.ionViewDidEnter();
-    if (this.organization) {
-      this.analytics.trackPage(this, {
-        organization: this.organization.name
-      });
-    }
-  }
-
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadSubscription(cache); })
-      .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -108,27 +97,16 @@ export class SettingsSwitchtoproPage extends BasePage {
           if (subscriptions.length !== 1) {
             return reject("Current plan was not found");
           }
-          if (subscriptions[0].plan_id === 'pro-plan') {
-            return reject("You are already on the pro plan");
+          if (subscriptions[0].plan_id !== 'pro-plan') {
+            return reject("There was a problem changing to Pro plan");
           }
+
           this.subscription = subscriptions[0];
+          this.events.publish('subscription:changed', this.subscription, Date.now());
+
           resolve(this.subscription);
         });
       }
-    });
-  }
-
-  private loadPaymentForm(cache:boolean=true) {
-    return new Promise((resolve, reject) => {
-      this.api.getPaymentUrl(this.organization, this.subscription).then((url:string) => {
-        this.logger.info(this, "ChargeBee", url);
-        this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
-        resolve(true);
-      },
-      (error:any) => {
-        this.logger.error(this, "ChargeBee", error);
-        reject(error);
-      });
     });
   }
 

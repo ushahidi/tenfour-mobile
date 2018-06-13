@@ -101,7 +101,6 @@ export class SettingsSwitchtofreePage extends BasePage {
           }
           this.subscription = subscriptions[0];
 
-
           resolve(this.subscription);
         });
       }
@@ -124,18 +123,19 @@ export class SettingsSwitchtofreePage extends BasePage {
   private switchToFree(event:any) {
     this.logger.info(this, "switchToFree");
     let loading = this.showLoading("Switching to Free Plan...", true);
-    this.api.deleteSubscription(this.organization, this.subscription).then((subscription:Subscription) => {
-      return this.api.getOrganization(this.organization).then((organization:Organization) => {
-        this.storage.setOrganization(organization),
-        this.events.publish('subscription:changed', subscription, Date.now());
+    this.api.deleteSubscription(this.organization, this.subscription)
+      .then((subscription:Subscription) => {this.subscription = subscription; return this.api.getOrganization(this.organization)})
+      .then((organization:Organization) => {return this.storage.setOrganization(organization)})
+      .then(()=>{return this.storage.saveSubscription(this.organization, this.subscription)})
+      .then(()=>{
+        this.events.publish('subscription:changed', this.subscription, Date.now());
         loading.dismiss();
         this.hideModal();
+      })
+      .catch((error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Switching to Free Plan", error);
       });
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Switching to Free Plan", error);
-    });
   }
 
 }
