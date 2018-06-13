@@ -129,6 +129,7 @@ import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { ContactsProvider } from '../providers/contacts/contacts';
 import { MailerProvider } from '../providers/mailer/mailer';
+import { EnvironmentProvider } from '../providers/environment/environment';
 
 @NgModule({
   declarations: [
@@ -264,6 +265,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     { provide: ContactsProvider, useClass: ContactsProvider },
     { provide: MailerProvider, useClass: MailerProvider },
     { provide: BadgeProvider, useClass: BadgeProvider },
+    { provide: EnvironmentProvider, useClass: EnvironmentProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

@@ -25,15 +25,15 @@ import { Notification } from '../../models/notification';
 import { HttpProvider } from '../../providers/http/http';
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
 
-  clientId:string = "1";
-  clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
-
+  clientId:string = null;
+  clientSecret:string = null;
+  api:string = null;
   scope:string = "user";
-  api:string = "https://api.tenfour.org";
 
   constructor(
     protected device:Device,
@@ -43,8 +43,12 @@ export class ApiProvider extends HttpProvider {
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerProvider,
-    protected storage:StorageProvider) {
+    protected storage:StorageProvider,
+    protected environment:EnvironmentProvider) {
     super(platform, http, httpNative, file, transfer, logger);
+    this.api = this.environment.getApiEndpoint();
+    this.clientId = this.environment.getClientId();
+    this.clientSecret = this.environment.getClientSecret();
   }
 
   public saveToken(organization:Organization, token:Token):Promise<boolean> {
