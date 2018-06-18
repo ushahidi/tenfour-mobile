@@ -25,6 +25,24 @@ export class Notification extends Model {
       if (data.data.person_name) {
         this.person_name = data.data.person_name;
       }
+      if (data.data.message) {
+        this.message = data.data.message;
+      }
+      if (data.data.contact) {
+        this.contact = data.data.contact;
+      }
+      if (data.data.contact_type) {
+        this.contact_type = data.data.contact_type;
+      }
+      if (data.data.card_type) {
+        this.card_type = data.data.card_type;
+      }
+      if (data.data.last_four) {
+        this.card_last_four = data.data.last_four;
+      }
+      if (data.data.adjustment) {
+        this.card_adjustment = data.data.adjustment;
+      }
       if (data.data.initials) {
         this.person_initials = data.data.initials;
       }
@@ -47,14 +65,11 @@ export class Notification extends Model {
   @Column("notifiable_id", INTEGER)
   public notifiable_id:number = null;
 
-  @Column("checkin_id", INTEGER)
-  public checkin_id:number = null;
-
-  @Column("person_id", INTEGER)
-  public person_id:number = null;
-
   @Column("type", TEXT)
   public type:string = null;
+
+  @Column("message", TEXT)
+  public message:string = null;
 
   @Column("notifiable_type", TEXT)
   public notifiable_type:string = null;
@@ -62,8 +77,14 @@ export class Notification extends Model {
   @Column("reply_from", TEXT)
   public reply_from:string = null;
 
+  @Column("checkin_id", INTEGER)
+  public checkin_id:number = null;
+  
   @Column("checkin_message", TEXT)
   public checkin_message:string = null;
+
+  @Column("person_id", INTEGER)
+  public person_id:number = null;
 
   @Column("person_name", TEXT)
   public person_name:string = null;
@@ -73,6 +94,27 @@ export class Notification extends Model {
 
   @Column("person_picture", TEXT)
   public person_picture:string = null;
+
+  @Column("contact", TEXT)
+  public contact:string = null;
+
+  @Column("contact_type", TEXT)
+  public contact_type:string = null;
+
+  @Column("card_type", TEXT)
+  public card_type:string = null;
+
+  @Column("card_last_four", INTEGER)
+  public card_last_four:number = null;
+
+  @Column("card_adjustment", TEXT)
+  public card_adjustment:string = null;
+
+  @Column("import_count", INTEGER)
+  public import_count:number = null;
+
+  @Column("import_dupe_count", INTEGER)
+  public import_dupe_count:number = null;
 
   @Column("read_at", TEXT)
   public read_at:Date = null;
