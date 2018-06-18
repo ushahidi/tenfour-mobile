@@ -95,5 +95,5 @@ git add .
 git add -u
 git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
-git checkout master
+git checkout develop
 ```

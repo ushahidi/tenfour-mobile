@@ -46,7 +46,7 @@ import {
   PlatformMock,
   StatusBarMock,
   SplashScreenMock
-} from '../../test-config/mocks-ionic';
+} from '../../config/mocks-ionic';
 
 describe('TenFourApp Component', () => {
   let fixture;
