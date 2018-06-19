@@ -1,13 +1,19 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component,  NgZone, ViewChild } from '@angular/core';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+
+import { Email } from '../../models/email';
 
 import { ApiProvider } from '../../providers/api/api';
 import { DatabaseProvider } from '../../providers/database/database';
 import { StorageProvider } from '../../providers/storage/storage';
 
-@IonicPage()
+@IonicPage({
+  name: 'PasswordResetPage',
+  segment: 'login/reset-password/:token/:email/:subdomain',
+  defaultHistory: ['SigninUrlPage']
+})
 @Component({
   selector: 'page-password-reset',
   templateUrl: 'password-reset.html',
@@ -16,10 +22,14 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class PasswordResetPage extends BasePage {
 
   @ViewChild('password')
-  password:TextInput;
+  newpassword:TextInput;
 
   @ViewChild('confirm')
   confirm:TextInput;
+
+  email:string = null;
+  token:string = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -32,45 +42,96 @@ export class PasswordResetPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected database:DatabaseProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone,platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad PasswordResetPage');
+    super.ionViewDidLoad();
   }
 
-  private showNext(event:any) {
-    this.logger.info(this, "ResetPassword");
-    if (this.password.value.length < 6) {
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadEmail(); })
+      .then(() => { return this.loadToken(); })
+      .then(() => { return this.passwordReset(); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      });
+  }
+
+  private loadEmail():Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.hasParameter("email")) {
+        this.email = this.getParameter<string>("email");
+        resolve(this.email);
+      }
+      else {
+        this.email = null;
+        reject("Email not provided");
+      }
+    })
+  }
+
+  private loadToken():Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.hasParameter("token")){
+        this.token = this.getParameter<string>("token");
+        resolve(this.token);
+      }
+      else {
+        this.token = null;
+        reject("Token not provided");
+      }
+    })
+  }
+
+  private passwordReset() {
+    this.logger.info(this, "PasswordReset");
+    if (this.newpassword.value.length < 6) {
       this.showToast("Password is too short");
     }
-    else if (this.password.value != this.confirm.value) {
+    else if (this.newpassword.value != this.confirm.value) {
       this.showToast("Passwords do not match");
     }
     else {
       let loading = this.showLoading("Reseting...");
-      let password = this.password.value;
-      this.api.postResetPassword(this.token, this.email, this.subdomain, password).then(_password: Password) => {
-        this.logger.info(this, "postResetPassword", "Password", password);
+      let password = this.newpassword.value;
+      this.api.postResetPassword(this.token, this.email, password).then((_email:Email) => {
+        this.logger.info(this, "passwordReset", "Email", this.email);
         resolve(true);
       },
       (error:any) => {
-        this.logger.error(this, "postResetPassword", error);
+        this.logger.error(this, "passwordReset", error);
         loading.dismiss();
         this.showAlert("Problem Reseting password", error);
       });
     }
   }
 
-  private showNextOnReturn(event:any) {
-    if (event.keyCode == 13) {
-      this.hideKeyboard();
-      this.showNext(event);
-      return false;
-    }
-    return true;
-  }
 }

@@ -1218,8 +1218,8 @@ export class ApiProvider extends HttpProvider {
       let url = `${this.api}/login/reset-password/?token=${token}&email=${email}&subdomain=${subdomain}`;
       let params = {
         subdomain: subdomain,
-        password: newPassword,
-        password_confirmation: confirmPassword,
+        password: newpassword,
+        password_confirmation: confirm,
         username: email,
         token: token
       };
