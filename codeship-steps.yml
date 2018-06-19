@@ -1,10 +1,46 @@
-- type: serial
+- type: parallel
   tag: master
   steps:
   - name: "deploy .wellknown to production"
     service: awscli
     command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-production-client/.well-known/
 
+  - type: serial
+    steps:
+    - name: "build PWA client (production)"
+      service: builder
+      command: ENV=prod npm run ionic:build --prod --release
+
+    - name: "deploy PWA client (production)"
+      service: awscli
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-production-client-pwa/
+
+
+- type: parallel
+  tag: staging
+  steps:
   - name: "deploy .wellknown to staging"
     service: awscli
     command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client/.well-known/
+
+  - type: serial
+    steps:
+    - name: "build PWA client (staging)"
+      service: builder
+      command: ENV=staging npm run ionic:build --prod --release
+
+    - name: "deploy PWA client (staging)"
+      service: awscli
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client-pwa/
+
+
+- type: serial
+  tag: develop
+  steps:
+  - name: "build PWA client (dev)"
+    service: builder
+    command: ENV=dev npm run ionic:build --prod --release
+
+  - name: "deploy PWA client (dev)"
+    service: awscli
+    command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client-pwa/

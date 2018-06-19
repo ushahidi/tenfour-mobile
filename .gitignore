@@ -58,4 +58,4 @@ xcuserdata/
 
 codeship.aes
 deployment.env
-
+tmp/*
