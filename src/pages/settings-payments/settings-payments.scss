@@ -1,5 +1,47 @@
 page-settings-payments {
   background-color: #FFFFFF;
+
+  .extra-sms-credits {
+    opacity: .7;
+
+    &.enabled {
+      opacity: 1;
+    }
+  }
+
+  h2 {
+    text-align: center;
+    color: #5a5a5a;
+
+    &.activated {
+      color: color($colors, primary);
+    }
+  }
+
+  ion-card.card {
+    background-color: white;
+    // border: 1px solid #5a5a5a;
+    border-top: 5px solid #5a5a5a;
+
+    &.activated {
+      border-top-color: color($colors, primary);
+    }
+
+    ion-item {
+      background-color: white;
+    }
+
+    ion-card-header {
+      font-weight: bold;
+    }
+  }
+
+  ion-list.features {
+    ion-item {
+      // border-bottom: 1px solid #5a5a5a;
+    }
+  }
+
   ion-list {
     ion-item {
       h1 {

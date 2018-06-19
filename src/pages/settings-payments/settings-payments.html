@@ -5,19 +5,19 @@
 </ion-header>
 <ion-content color="white">
 
-  <h1>Upgrade to TenFour Pro</h1>
+  <!-- <h1>Upgrade to TenFour Pro</h1> -->
 
   <ion-grid>
     <ion-row>
       <ion-col col-12 col-sm>
 
-        <ion-card>
+        <h2 [ngClass]="{'activated' : organization && organization.hasFreePlan()}">Free</h2>
+        <ion-card [ngClass]="{'activated' : organization && organization.hasFreePlan()}">
           <ion-card-header>
-            Free
+            Free!
           </ion-card-header>
           <ion-card-content>
-            <h2>Free!</h2>
-            <ion-list>
+            <ion-list class="features">
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
             </ion-list>
             <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
@@ -28,13 +28,13 @@
       </ion-col>
       <ion-col col-12 col-sm>
 
-        <ion-card>
+        <h2 [ngClass]="{'activated' : organization && organization.hasProPlan()}">Pro</h2>
+        <ion-card [ngClass]="{'activated' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            Pro
+            $3 USD per user, per month
           </ion-card-header>
           <ion-card-content>
-            <h2>$3 USD per user, per month</h2>
-            <ion-list>
+            <ion-list class="features">
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
@@ -58,22 +58,27 @@
       </ion-col>
       <ion-col col-12 col-sm>
 
-        <ion-card>
+        <h2 class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">Extra SMS Credits</h2>
+        <ion-card class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            Extra SMS Credits
+            $0.10 USD per credit per month
           </ion-card-header>
           <ion-card-content>
-            <h2>$0.10 USD per credit per month</h2>
-            <ion-list>
+
+            <ion-list class="features">
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Credits do not rollover</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
             </ion-list>
-            <p>Add credits</p>
-            <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
-            <p>Cost: {{updatedCreditsCost | currency}} per month</p>
+
+            <div *ngIf="organization && organization.hasProPlan()">
+              <p>Add credits</p>
+              <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
+              <p>Cost: {{updatedCreditsCost | currency}} per month</p>
+            </div>
+
             <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
             <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>
           </ion-card-content>
