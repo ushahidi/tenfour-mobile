@@ -28,9 +28,11 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class SettingsPaymentsPage extends BasePage {
 
   organization:Organization = null;
+  subscription:Subscription = null;
   user:User = null;
   hashChangeFn = null;
   switchToProModal = null;
+  billingEstimate:string = '';
 
   constructor(
       protected zone:NgZone,
@@ -106,20 +108,20 @@ export class SettingsPaymentsPage extends BasePage {
           }
 
           if (subscriptions[0].plan_id === 'pro-plan') {
-            let subscription = subscriptions[0];
+            this.subscription = subscriptions[0];
 
             return this.api.getOrganization(this.organization).then((organization:Organization) => {
               this.storage.setOrganization(organization)
-                .then(()=>{return this.storage.saveSubscription(organization, subscription)})
+                .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
                 .then(()=>{
-                  this.events.publish('subscription:changed', subscription, Date.now());
-                  resolve(subscription);
+                  this.events.publish('subscription:changed', this.subscription, Date.now());
+                  resolve(this.subscription);
                 });
             });
           }
 
           if (retryCount++ > 5) {
-            reject('Could not switch to Pro plan');
+            reject('Could not switch plans. Try logging out of your account.');
           }
 
           setTimeout(() => {
@@ -137,6 +139,7 @@ export class SettingsPaymentsPage extends BasePage {
     checkSubscription()
       .then(() => {
         this.showModal(SettingsWelcometoproPage);
+        this.updateBillingEstimate();
         loading.dismiss();
       })
       .catch((e) => {
@@ -149,10 +152,12 @@ export class SettingsPaymentsPage extends BasePage {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadSubscription(cache); })
       .then(() => { return this.loadUser(cache); })
       // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
+        this.updateBillingEstimate();
         if (event) {
           event.complete();
         }
@@ -179,6 +184,21 @@ export class SettingsPaymentsPage extends BasePage {
         this.storage.getOrganization().then((organization:Organization) => {
           this.organization = organization;
           resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadSubscription(cache:boolean=true):Promise<Subscription> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.subscription) {
+        resolve(this.subscription);
+      }
+      else {
+        this.storage.getSubscription().then((subscription:Subscription) => {
+          console.log(subscription);
+          this.subscription = subscription;
+          resolve(this.subscription);
         });
       }
     });
@@ -214,5 +234,9 @@ export class SettingsPaymentsPage extends BasePage {
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
     this.switchToProModal = this.showModal(SettingsSwitchtoproPage);
+  }
+
+  private updateBillingEstimate() {
+    this.billingEstimate = '$' + (this.organization.user_count * 3) + '.00';
   }
 }

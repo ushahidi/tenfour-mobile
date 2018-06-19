@@ -167,6 +167,9 @@ export class Organization extends Model {
   @Column("subscription_plan", TEXT)
   public subscription_plan:string = null;
 
+  @Column("user_count", INTEGER)
+  public user_count:number = null;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 

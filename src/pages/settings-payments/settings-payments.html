@@ -40,8 +40,14 @@
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
             </ion-list>
-          <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
-          <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="switchToPro($event)">Upgrade to TenFour Pro</button>
+            <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
+              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate}} per month for {{organization.user_count}} people. (Estimate)</ion-item>
+              <ion-item><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
+              <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
+              <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
+            </ion-list>
+            <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="switchToPro($event)">Upgrade to TenFour Pro</button>
           </ion-card-content>
         </ion-card>
 

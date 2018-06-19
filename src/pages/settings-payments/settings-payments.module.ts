@@ -7,11 +7,14 @@ import { SettingsWelcometoproPageModule } from '../../pages/settings-welcometopr
 
 import { SettingsPaymentsPage } from './settings-payments';
 
+import { DayOfMonthModule } from '../../pipes/day-of-month/day-of-month.module';
+
 @NgModule({
   declarations: [
     SettingsPaymentsPage,
   ],
   imports: [
+    DayOfMonthModule,
     SettingsSwitchtofreePageModule,
     SettingsSwitchtoproPageModule,
     SettingsWelcometoproPageModule,
