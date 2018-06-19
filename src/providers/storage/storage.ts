@@ -1423,6 +1423,19 @@ export class StorageProvider {
     });
   }
 
+  public setSubscription(subscription:Subscription):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.set("subscription", JSON.stringify(subscription)).then((saved:any) => {
+        this.logger.info(this, "setSubscription", subscription, "Stored");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.error(this, "setSubscription", subscription, "Failed", error);
+        resolve(false);
+      });
+    });
+  }
+
   public getSubscriptions(organization:Organization, limit:number=null, offset:number=null):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       let where = { organization_id: organization.id };
@@ -1436,17 +1449,34 @@ export class StorageProvider {
     });
   }
 
-  public getSubscription(organization:Organization, id:number):Promise<Subscription> {
+  // public getSubscription(organization:Organization, id:number):Promise<Subscription> {
+  //   return new Promise((resolve, reject) => {
+  //     let where = {
+  //       organization_id: organization.id,
+  //       id: id
+  //     };
+  //     this.provider.getModel<Subscription>(new Subscription(), where).then((subscription:Subscription) => {
+  //       resolve(subscription);
+  //     },
+  //     (error:any) => {
+  //       reject(error);
+  //     });
+  //   });
+  // }
+
+  public getSubscription():Promise<Subscription> {
     return new Promise((resolve, reject) => {
-      let where = {
-        organization_id: organization.id,
-        id: id
-      };
-      this.provider.getModel<Subscription>(new Subscription(), where).then((subscription:Subscription) => {
-        resolve(subscription);
+      this.get("subscription").then((data:any) => {
+        if (data) {
+          let subscription = new Subscription(JSON.parse(data));
+          resolve(subscription);
+        }
+        else {
+          reject("No Subscription");
+        }
       },
       (error:any) => {
-        reject(error);
+        reject("No Subscription");
       });
     });
   }
