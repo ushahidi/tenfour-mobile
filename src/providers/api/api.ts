@@ -1162,15 +1162,12 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getPaymentUrl(organization:Organization, subscription:Subscription):Promise<string> {
+  public getPaymentUrl(organization:Organization, subscription:Subscription, action:string):Promise<string> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let callback = encodeURIComponent(window.location.toString());
-        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}/hostedpage?callback=${callback}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}/hostedpage/${action}?callback=${callback}`;
         let params = {
-          // callback: `https://${organization.subdomain}.tenfour.org/settings/plan-and-credits/add-payment-method`,
-          // callback: window.location.toString(),
-          // organization_id: organization.id
         };
         this.logger.info(this, "getPaymentUrl", url);
         this.httpGet(url, params, token.access_token).then((data:any) => {

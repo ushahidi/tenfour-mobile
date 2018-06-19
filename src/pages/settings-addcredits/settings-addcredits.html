@@ -1,0 +1,17 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Add {{credits}} credits per month</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+  <p>Your account will be billed {{ billingEstimate | currency}} per month. (Estimate)</p>
+
+  <p>Your current payment method will be used.</p>
+
+  <button ion-button outline color="primary" (click)="closeModal($event)">Cancel</button>
+
+  <button ion-button color="primary" (click)="addCredits($event)">Agree - Change</button>
+
+</ion-content>

@@ -5,6 +5,7 @@ import { BasePage } from '../../pages/base-page/base-page';
 import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
 import { SettingsSwitchtoproPage } from '../settings-switchtopro/settings-switchtopro';
 import { SettingsWelcometoproPage } from '../settings-welcometopro/settings-welcometopro';
+import { SettingsAddcreditsPage } from '../settings-addcredits/settings-addcredits';
 
 import { Organization } from '../../models/organization';
 import { Subscription } from '../../models/subscription';
@@ -23,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage, SettingsWelcometoproPage ]
+  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage, SettingsWelcometoproPage, SettingsAddcreditsPage ]
 })
 export class SettingsPaymentsPage extends BasePage {
 
@@ -33,6 +34,8 @@ export class SettingsPaymentsPage extends BasePage {
   hashChangeFn = null;
   switchToProModal = null;
   billingEstimate:string = '';
+  updatedCredits:number = 0;
+  updatedCreditsCost:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -93,7 +96,7 @@ export class SettingsPaymentsPage extends BasePage {
       // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
-        this.updateBillingEstimate();
+        this.billingEstimate = this.calcBillingEstimate();
         if (event) {
           event.complete();
         }
@@ -222,7 +225,7 @@ export class SettingsPaymentsPage extends BasePage {
     checkSubscription()
       .then(() => {
         this.showModal(SettingsWelcometoproPage);
-        this.updateBillingEstimate();
+        this.billingEstimate = this.calcBillingEstimate();
         loading.dismiss();
       })
       .catch((e) => {
@@ -269,7 +272,26 @@ export class SettingsPaymentsPage extends BasePage {
     });
   }
 
-  private updateBillingEstimate() {
-    this.billingEstimate = '$' + (this.organization.user_count * 3) + '.00';
+  private calcBillingEstimate(extraCredits?:number):number {
+    let estimate = this.organization.user_count * 3;
+
+    if (extraCredits) {
+      estimate += extraCredits * .1;
+    }
+
+    return estimate
+  }
+
+  private onCreditsChange() {
+    this.logger.info(this, "onExtraCreditsChange");
+    this.updatedCreditsCost = (this.updatedCredits * .1);
+  }
+
+  private addCredits(event:any) {
+    this.logger.info(this, "addCredits");
+    let modal = this.showModal(SettingsAddcreditsPage, {
+      credits: this.updatedCredits,
+      billingEstimate: this.calcBillingEstimate(this.updatedCredits)
+    });
   }
 }
