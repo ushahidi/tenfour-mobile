@@ -39,6 +39,7 @@
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
+              <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
             </ion-list>
             <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
               <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}} people. (Estimate)</ion-item>
@@ -71,7 +72,7 @@
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
             </ion-list>
             <p>Add credits</p>
-            <ion-input type="number" placeholder="50" (keypress)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
+            <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
             <p>Cost: {{updatedCreditsCost | currency}} per month</p>
             <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
             <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>

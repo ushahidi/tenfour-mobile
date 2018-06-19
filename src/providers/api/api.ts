@@ -344,6 +344,9 @@ export class ApiProvider extends HttpProvider {
 		    location: {
           name: organization.location
 		    },
+        plan_and_credits: {
+          monthlyCreditsExtra: organization.credits_extra
+        }
 		  };
       if (organization.types) {
         settings['organization_types'] = organization.types.split(",");

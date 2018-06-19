@@ -33,7 +33,7 @@ export class SettingsPaymentsPage extends BasePage {
   user:User = null;
   hashChangeFn = null;
   switchToProModal = null;
-  billingEstimate:string = '';
+  billingEstimate:number = 0;
   updatedCredits:number = 0;
   updatedCreditsCost:number = 0;
 
@@ -96,7 +96,9 @@ export class SettingsPaymentsPage extends BasePage {
       // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
+        this.updatedCredits = this.organization.credits_extra;
         this.billingEstimate = this.calcBillingEstimate();
+        this.onCreditsChange();
         if (event) {
           event.complete();
         }
@@ -275,9 +277,11 @@ export class SettingsPaymentsPage extends BasePage {
   private calcBillingEstimate(extraCredits?:number):number {
     let estimate = this.organization.user_count * 3;
 
-    if (extraCredits) {
-      estimate += extraCredits * .1;
+    if (!extraCredits) {
+      extraCredits = this.organization.credits_extra;
     }
+
+    estimate += extraCredits * .1;
 
     return estimate
   }
@@ -291,7 +295,18 @@ export class SettingsPaymentsPage extends BasePage {
     this.logger.info(this, "addCredits");
     let modal = this.showModal(SettingsAddcreditsPage, {
       credits: this.updatedCredits,
-      billingEstimate: this.calcBillingEstimate(this.updatedCredits)
+      billingEstimate: this.calcBillingEstimate(this.updatedCredits),
+      organization: this.organization
     });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "addCredits", "Modal", data);
+      if (data) {
+        if (data.organization) {
+          this.logger.info(this, "addCredits", "Modal", data.organization);
+          this.organization = data.organization;
+          this.billingEstimate = this.calcBillingEstimate();
+        }
+      }
+   });
   }
 }

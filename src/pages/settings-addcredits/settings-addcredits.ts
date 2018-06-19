@@ -9,7 +9,6 @@ import { Organization } from '../../models/organization';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-
 @IonicPage()
 @Component({
   selector: 'page-settings-addcredits',
@@ -17,6 +16,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class SettingsAddcreditsPage  extends BasePage {
 
+  organization:Organization = null;
   credits:number = 0;
   billingEstimate:number = 0;
 
@@ -38,21 +38,41 @@ export class SettingsAddcreditsPage  extends BasePage {
   }
 
   ionViewWillEnter() {
+    super.ionViewWillEnter();
     this.credits = this.getParameter<number>("credits");
     this.billingEstimate = this.getParameter<number>("billingEstimate");
+    this.organization = this.getParameter<Organization>("organization");
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-    // if (this.organization) {
-    //   this.analytics.trackPage(this, {
-    //     organization: this.organization.name
-    //   });
-    // }
+    if (this.organization) {
+      this.analytics.trackPage(this, {
+        organization: this.organization.name
+      });
+    }
   }
 
   private closeModal(event:any) {
     this.hideModal();
+  }
+
+  private doneAdd(event:any) {
+    let loading = this.showLoading("Updating...", true);
+    this.organization.credits_extra = this.credits;
+    this.api.updateOrganization(this.organization).then((organization:Organization) => {
+      this.storage.saveOrganization(organization).then(saved => {
+        loading.dismiss();
+        this.showToast(this.credits + ' extra credits have been added to your plan');
+        this.hideModal({
+          organization: organization
+        });
+      });
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem adding credits", error);
+    });
   }
 
 }
