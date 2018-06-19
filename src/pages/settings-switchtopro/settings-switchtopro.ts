@@ -20,6 +20,7 @@ export class SettingsSwitchtoproPage extends BasePage {
   organization:Organization = null;
   subscription:Subscription = null;
   iframe:SafeResourceUrl = null;
+  action:string = null;
 
   constructor(
       protected zone:NgZone,
@@ -41,6 +42,8 @@ export class SettingsSwitchtoproPage extends BasePage {
   ionViewDidLoad() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Checking your plan...", true);
+    this.action = this.hasParameter("action") ? this.getParameter<string>("action") : 'switchtopro';
+
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     },
@@ -75,7 +78,7 @@ export class SettingsSwitchtoproPage extends BasePage {
         if (event) {
           event.complete();
         }
-        this.showAlert("Problem Switching to Pro Plan", error);
+        this.showAlert(this.action === 'switchtopro' ? "Problem Switching to Pro Plan" : "Problem updating your billing info", error);
         this.hideModal();
       });
   }
@@ -108,8 +111,11 @@ export class SettingsSwitchtoproPage extends BasePage {
           if (subscriptions.length !== 1) {
             return reject("Current plan was not found");
           }
-          if (subscriptions[0].plan_id === 'pro-plan') {
+          if (this.action === 'switchtopro' && subscriptions[0].plan_id === 'pro-plan') {
             return reject("You are already on the pro plan");
+          }
+          if (this.action === 'update' && subscriptions[0].plan_id !== 'pro-plan' ) {
+            return reject("You cannot update your billing info on your current plan");
           }
           this.subscription = subscriptions[0];
           resolve(this.subscription);
@@ -120,7 +126,7 @@ export class SettingsSwitchtoproPage extends BasePage {
 
   private loadPaymentForm(cache:boolean=true) {
     return new Promise((resolve, reject) => {
-      this.api.getPaymentUrl(this.organization, this.subscription).then((url:string) => {
+      this.api.getPaymentUrl(this.organization, this.subscription, this.action).then((url:string) => {
         this.logger.info(this, "ChargeBee", url);
         this.iframe = this.sanitizer.bypassSecurityTrustResourceUrl(url);
         resolve(true);

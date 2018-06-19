@@ -46,6 +46,9 @@
               <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
               <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
             </ion-list>
+            <p text-center *ngIf="organization && organization.hasProPlan()">
+              <button ion-button block clear color="secondary" (click)="updateBillingInfo($event)">Update your billing info</button>
+            </p>
             <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
             <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="switchToPro($event)">Upgrade to TenFour Pro</button>
           </ion-card-content>

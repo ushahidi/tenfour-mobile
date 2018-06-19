@@ -74,78 +74,14 @@ export class SettingsPaymentsPage extends BasePage {
         organization: this.organization.name
       });
     }
-
-    this.hashChangeFn = this.hashChange.bind(this);
-    window.addEventListener("hashchange", this.hashChangeFn, false);
   }
 
   ionViewWillLeave() {
     super.ionViewWillLeave();
-    window.removeEventListener("hashchange", this.hashChangeFn, false);
-  }
 
-  private hashChange() {
-    this.logger.info(this, "hashChange");
-    this.extractQueryParams();
-
-    if (this.queryParams['id'] && this.queryParams['state']) {
-      if (this.queryParams['state'] === 'succeeded') {
-        this.completeSwitchToPro();
-      }
+    if (this.hashChangeFn) {
+      window.removeEventListener("hashchange", this.hashChangeFn, false);
     }
-  }
-
-  private completeSwitchToPro() {
-    this.switchToProModal.dismiss();
-    let loading = this.showLoading("Switching to TenFour Pro...", true);
-    let retryCount = 0;
-
-    let checkSubscription = () => {
-      return new Promise((resolve, reject) => {
-        this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
-          if (subscriptions.length < 1) {
-            return reject("Current plan was not found");
-          }
-
-          if (subscriptions[0].plan_id === 'pro-plan') {
-            this.subscription = subscriptions[0];
-
-            return this.api.getOrganization(this.organization).then((organization:Organization) => {
-              this.storage.setOrganization(organization)
-                .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
-                .then(()=>{
-                  this.events.publish('subscription:changed', this.subscription, Date.now());
-                  resolve(this.subscription);
-                });
-            });
-          }
-
-          if (retryCount++ > 5) {
-            reject('Could not switch plans. Try logging out of your account.');
-          }
-
-          setTimeout(() => {
-            checkSubscription().then((subscription:Subscription) => {
-              resolve(subscription);
-            },
-            (error:any) => {
-              reject(error);
-            });
-          }, 5000);
-        });
-      });
-    };
-
-    checkSubscription()
-      .then(() => {
-        this.showModal(SettingsWelcometoproPage);
-        this.updateBillingEstimate();
-        loading.dismiss();
-      })
-      .catch((e) => {
-        this.showAlert("Problem Switching to Pro Plan", e);
-        loading.dismiss();
-      });
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -231,9 +167,106 @@ export class SettingsPaymentsPage extends BasePage {
     let modal = this.showModal(SettingsSwitchtofreePage);
   }
 
+  private hashChangeSwitchToPro() {
+    this.logger.info(this, "hashChangeSwitchToPro");
+    this.extractQueryParams();
+
+    if (this.queryParams['id'] && this.queryParams['state']) {
+      if (this.queryParams['state'] === 'succeeded') {
+        this.completeSwitchToPro();
+      }
+    }
+  }
+
+  private completeSwitchToPro() {
+    this.switchToProModal.dismiss();
+    let loading = this.showLoading("Switching to TenFour Pro...", true);
+    let retryCount = 0;
+
+    let checkSubscription = () => {
+      return new Promise((resolve, reject) => {
+        this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
+          if (subscriptions.length < 1) {
+            return reject("Current plan was not found");
+          }
+
+          if (subscriptions[0].plan_id === 'pro-plan') {
+            this.subscription = subscriptions[0];
+
+            return this.api.getOrganization(this.organization).then((organization:Organization) => {
+              this.storage.setOrganization(organization)
+                .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
+                .then(()=>{
+                  this.events.publish('subscription:changed', this.subscription, Date.now());
+                  resolve(this.subscription);
+                });
+            });
+          }
+
+          if (retryCount++ > 5) {
+            reject('Could not switch plans. Try logging out of your account.');
+          }
+
+          setTimeout(() => {
+            checkSubscription().then((subscription:Subscription) => {
+              resolve(subscription);
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }, 5000);
+        });
+      });
+    };
+
+    checkSubscription()
+      .then(() => {
+        this.showModal(SettingsWelcometoproPage);
+        this.updateBillingEstimate();
+        loading.dismiss();
+      })
+      .catch((e) => {
+        this.showAlert("Problem Switching to Pro Plan", e);
+        loading.dismiss();
+      });
+  }
+
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
-    this.switchToProModal = this.showModal(SettingsSwitchtoproPage);
+
+    if (!this.hashChangeFn) {
+      this.hashChangeFn = this.hashChangeSwitchToPro.bind(this);
+      window.addEventListener("hashchange", this.hashChangeFn, false);
+    }
+
+    this.switchToProModal = this.showModal(SettingsSwitchtoproPage, {
+      action: 'switchtopro'
+    });
+  }
+
+  private hashChangeUpdateBillingInfo() {
+    this.logger.info(this, "hashChangeUpdateBillingInfo");
+    this.extractQueryParams();
+
+    if (this.queryParams['id'] && this.queryParams['state']) {
+      if (this.queryParams['state'] === 'succeeded') {
+        this.switchToProModal.dismiss();
+        this.showToast("Your billing info has been updated");
+      }
+    }
+  }
+
+  private updateBillingInfo(event:any) {
+    this.logger.info(this, "updateBillingInfo");
+
+    if (!this.hashChangeFn) {
+      this.hashChangeFn = this.hashChangeUpdateBillingInfo.bind(this);
+      window.addEventListener("hashchange", this.hashChangeFn, false);
+    }
+
+    this.switchToProModal = this.showModal(SettingsSwitchtoproPage, {
+      action: 'update'
+    });
   }
 
   private updateBillingEstimate() {
