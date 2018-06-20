@@ -15,21 +15,14 @@
     "types": [
       "node",
       "jasmine"
-    ],
-    "baseUrl" : "src",
-    "paths" : {
-      "@app/env" : [
-        "environments/environment.ts"
-      ]
-    }
+    ]
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
     "node_modules",
-    "src/**/*.spec.ts",
-    "src/environments/environment.*.ts"
+    "src/**/*.spec.ts"
   ],
   "compileOnSave": false,
   "atom": {

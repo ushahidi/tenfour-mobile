@@ -9,12 +9,6 @@ module.exports = function () {
     var sourceFile = fs.readFileSync(sourcePath, 'utf8');
     fs.writeFileSync(targetPath, sourceFile, 'utf8');
     var targetFile = fs.readFileSync(targetPath, 'utf8');
-    useDefaultConfig.dev.resolve.alias = {
-      "@app/env": path.resolve(targetPath)
-    };
-    useDefaultConfig.prod.resolve.alias = {
-      "@app/env": path.resolve(targetPath)
-    };
     consoleLog(environment, sourcePath, sourceFile, targetPath, targetFile);
     return useDefaultConfig;
 }
@@ -56,6 +50,7 @@ function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("===========================================");
   if (fs.existsSync(targetPath)) {
     console.log(`Environment ${targetPath} Exists`);
+    console.log(targetFile);
   }
   else {
     console.error(`Environment ${targetPath} Does Not Exist`);
