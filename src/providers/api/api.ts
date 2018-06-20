@@ -227,22 +227,6 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public resetPassword(subdomain:string, email:string):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let url = `${this.api}/password/email`;
-      let params = {
-        subdomain: subdomain,
-        username: email
-      };
-      this.httpPost(url, params).then((data:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        reject(`There was a problem resetting password for ${email}.`);
-      });
-    });
-  }
-
   public getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
     return new Promise((resolve, reject) => {
       let params = {};
@@ -1229,13 +1213,29 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public postResetPassword(subdomain:string, email:string, token:string):Promise<boolean> {
+  public resetPassword(subdomain:string, email:string):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/login/reset-password/?token=${token}&email=${email}&subdomain=${subdomain}`;
+      let url = `${this.api}/password/email`;
       let params = {
         subdomain: subdomain,
-        password: newPassword,
-        password_confirmation: confirmPassword,
+        username: email
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(`There was a problem resetting password for ${email}.`);
+      });
+    });
+  }
+
+  public updatePassword(subdomain:string, token:string, email:string, password:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/password/reset`;
+      let params = {
+        subdomain: subdomain,
+        password: password,
+        password_confirmation: password,
         username: email,
         token: token
       };
@@ -1243,7 +1243,7 @@ export class ApiProvider extends HttpProvider {
         resolve(true);
       },
       (error:any) => {
-        reject(error);
+        reject(`There was a problem resetting password for ${email}.`);
       });
     });
   }
