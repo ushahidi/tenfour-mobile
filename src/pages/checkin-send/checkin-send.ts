@@ -258,6 +258,11 @@ export class CheckinSendPage extends BasePage {
 
   private upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
+
+    if (this.ios) {
+      return;
+    }
+
     this.navController.push(SettingsPaymentsPage);
   }
 

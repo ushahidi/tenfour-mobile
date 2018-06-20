@@ -50,7 +50,7 @@
 
   <div *ngIf="organization && !organization.hasProPlan()">
     <p text-center>This is a Pro feature</p>
-    <p text-center *ngIf="user && user.isOwner()">
+    <p text-center *ngIf="user && user.isOwner() && !ios">
       <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
     </p>
   </div>
