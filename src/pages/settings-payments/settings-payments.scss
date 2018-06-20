@@ -1,5 +1,5 @@
 page-settings-payments {
-  background-color: #FFFFFF;
+  background-color: color($colors, white);
 
   .extra-sms-credits {
     opacity: .7;
@@ -11,7 +11,7 @@ page-settings-payments {
 
   h2 {
     text-align: center;
-    color: #5a5a5a;
+    color: color($colors, grey);
 
     &.activated {
       color: color($colors, primary);
@@ -19,16 +19,15 @@ page-settings-payments {
   }
 
   ion-card.card {
-    background-color: white;
-    // border: 1px solid #5a5a5a;
-    border-top: 5px solid #5a5a5a;
+    background-color: color($colors, white);
+    border-top: 5px solid color($colors, grey);
 
     &.activated {
       border-top-color: color($colors, primary);
     }
 
     ion-item {
-      background-color: white;
+      background-color: color($colors, white);
     }
 
     ion-card-header {
@@ -38,7 +37,7 @@ page-settings-payments {
 
   ion-list.features {
     ion-item {
-      // border-bottom: 1px solid #5a5a5a;
+      // border-bottom: 1px solid color($colors, grey);
     }
   }
 
