@@ -19,7 +19,7 @@
     "baseUrl" : "./src",
     "paths" : {
       "@app/env" : [
-        "environments/environment"
+        "environments/environment.ts"
       ]
     }
   },
