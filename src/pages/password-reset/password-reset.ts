@@ -1,34 +1,38 @@
 import { Component,  NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, Alert } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
-import { Email } from '../../models/email';
+import { Organization } from '../../models/organization';
+
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
 import { ApiProvider } from '../../providers/api/api';
-import { DatabaseProvider } from '../../providers/database/database';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'PasswordResetPage',
-  segment: 'login/reset-password/:token/:email/:subdomain',
+  segment: 'signin/password/reset/:subdomain/:email/:token',
   defaultHistory: ['SigninUrlPage']
 })
 @Component({
   selector: 'page-password-reset',
   templateUrl: 'password-reset.html',
-  providers: [ ApiProvider, DatabaseProvider, StorageProvider ],
+  providers: [ ApiProvider, StorageProvider ],
+  entryComponents:[ SigninUrlPage ]
 })
 export class PasswordResetPage extends BasePage {
 
   @ViewChild('password')
-  newpassword:TextInput;
+  password:TextInput;
 
   @ViewChild('confirm')
   confirm:TextInput;
 
+  subdomain:string = null;
   email:string = null;
   token:string = null;
+
   loading:boolean = false;
 
   constructor(
@@ -43,7 +47,7 @@ export class PasswordResetPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected database:DatabaseProvider) {
+      protected storage:StorageProvider) {
       super(zone,platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
@@ -66,9 +70,9 @@ export class PasswordResetPage extends BasePage {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
+      .then(() => { return this.loadSubdomain(); })
       .then(() => { return this.loadEmail(); })
       .then(() => { return this.loadToken(); })
-      .then(() => { return this.passwordReset(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -85,6 +89,19 @@ export class PasswordResetPage extends BasePage {
       });
   }
 
+  private loadSubdomain():Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.hasParameter("subdomain")) {
+        this.subdomain = this.getParameter<string>("subdomain");
+        resolve(this.subdomain);
+      }
+      else {
+        this.subdomain = null;
+        reject("Subdomain not provided");
+      }
+    });
+  }
+
   private loadEmail():Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.hasParameter("email")) {
@@ -95,7 +112,7 @@ export class PasswordResetPage extends BasePage {
         this.email = null;
         reject("Email not provided");
       }
-    })
+    });
   }
 
   private loadToken():Promise<string> {
@@ -108,30 +125,57 @@ export class PasswordResetPage extends BasePage {
         this.token = null;
         reject("Token not provided");
       }
-    })
+    });
   }
 
   private passwordReset() {
-    this.logger.info(this, "PasswordReset");
-    if (this.newpassword.value.length < 6) {
+    this.logger.info(this, "passwordReset");
+    if (this.password.value.length < 6) {
       this.showToast("Password is too short");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
     }
-    else if (this.newpassword.value != this.confirm.value) {
+    else if (this.password.value !== this.confirm.value) {
       this.showToast("Passwords do not match");
+      setTimeout(() => {
+        this.confirm.setFocus();
+      }, 500);
     }
     else {
-      let loading = this.showLoading("Reseting...");
-      let password = this.newpassword.value;
-      this.api.postResetPassword(this.token, this.email, password).then((_email:Email) => {
-        this.logger.info(this, "passwordReset", "Email", this.email);
-        resolve(true);
+      let loading = this.showLoading("Resetting...");
+      let password = this.password.value;
+      this.api.updatePassword(this.subdomain, this.token, this.email, password).then((updated:boolean) => {
+        this.logger.info(this, "passwordReset", updated);
+        loading.dismiss();
+        let alert = this.showAlert("Password Reset", "Your password has been reset.");
+        alert.onDidDismiss((data:any) => {
+          this.showRootPage(SigninUrlPage);
+        });
       },
       (error:any) => {
         this.logger.error(this, "passwordReset", error);
         loading.dismiss();
-        this.showAlert("Problem Reseting password", error);
+        this.showAlert("Problem Resetting Password", error);
       });
     }
+  }
+
+  private nextOnReturn(event:any) {
+    if (this.isKeyReturn(event)) {
+      if (this.password.value.length == 0) {
+        this.password.setFocus();
+      }
+      else if (this.confirm.value.length == 0) {
+        this.confirm.setFocus();
+      }
+      else {
+        this.hideKeyboard();
+        this.passwordReset();
+      }
+      return false;
+    }
+    return true;
   }
 
 }

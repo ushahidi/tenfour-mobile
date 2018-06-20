@@ -83,25 +83,25 @@ export class HttpProvider {
         let headers = new Headers(this.httpHeaders(token));
         let options = new RequestOptions({
           headers: headers,
-          search: search });
+          search: search
+        });
         this.logger.info(this, "GET", url, params);
         this.http.get(url, options)
           .timeout(12000)
-          .map(res => res.json())
+          .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             this.logger.error(this, "httpGet", error);
             let message = this.httpError(error);
             return Observable.throw(message || 'Request Error');
           })
-          .subscribe(
-            (items) => {
-              this.logger.info(this, "GET", url, items);
-              resolve(items);
-            },
-            (error) => {
-              this.logger.error(this, "GET", url, error);
-              reject(this.httpError(error));
-            });
+          .subscribe((items) => {
+            this.logger.info(this, "GET", url, items);
+            resolve(items);
+          },
+          (error) => {
+            this.logger.error(this, "GET", url, error);
+            reject(this.httpError(error));
+          });
       }
     });
   }
@@ -144,28 +144,19 @@ export class HttpProvider {
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
           .timeout(12000)
-          .map(res => {
-            if (res.status == 204) {
-              return {}
-            }
-            else {
-              return res.json();
-            }
-          })
+          .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             let message = this.httpError(error);
             return Observable.throw(message || 'Request Error');
           })
-          .subscribe(
-            (json) => {
-              this.logger.info(this, "POST", url, json);
-              resolve(json);
-            },
-            (error) => {
-              this.logger.error(this, "POST", url, error);
-              reject(this.httpError(error));
-            }
-          );
+          .subscribe((json) => {
+            this.logger.info(this, "POST", url, json);
+            resolve(json);
+          },
+          (error) => {
+            this.logger.error(this, "POST", url, error);
+            reject(this.httpError(error));
+          });
       }
     });
   }
@@ -207,28 +198,19 @@ export class HttpProvider {
         this.logger.info(this, "PUT", url, params);
         this.http.put(url, params, options)
           .timeout(12000)
-          .map(res => {
-            if (res.status == 204) {
-              return {}
-            }
-            else {
-              return res.json();
-            }
-          })
+          .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             let message = this.httpError(error);
             return Observable.throw(message || 'Request Error');
           })
-          .subscribe(
-            (json) => {
-              this.logger.info(this, "PUT", url, json);
-              resolve(json);
-            },
-            (error) => {
-              this.logger.error(this, "PUT", url, error);
-              reject(this.httpError(error));
-            }
-          );
+          .subscribe((json) => {
+            this.logger.info(this, "PUT", url, json);
+            resolve(json);
+          },
+          (error) => {
+            this.logger.error(this, "PUT", url, error);
+            reject(this.httpError(error));
+          });
       }
     });
   }
@@ -270,28 +252,19 @@ export class HttpProvider {
         this.logger.info(this, "PATCH", url, params);
         this.http.patch(url, params, options)
           .timeout(12000)
-          .map(res => {
-            if (res.status == 204) {
-              return {}
-            }
-            else {
-              return res.json();
-            }
-          })
+          .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             let message = this.httpError(error);
             return Observable.throw(message || 'Request Error');
           })
-          .subscribe(
-            (json) => {
-              this.logger.info(this, "PATCH", url, json);
-              resolve(json);
-            },
-            (error) => {
-              this.logger.error(this, "PATCH", url, error);
-              reject(this.httpError(error));
-            }
-          );
+          .subscribe((json) => {
+            this.logger.info(this, "PATCH", url, json);
+            resolve(json);
+          },
+          (error) => {
+            this.logger.error(this, "PATCH", url, error);
+            reject(this.httpError(error));
+          });
       }
     });
   }
@@ -349,15 +322,14 @@ export class HttpProvider {
             let message = this.httpError(error);
             return Observable.throw(message || 'Request Error');
           })
-          .subscribe(
-            (items) => {
-              this.logger.info(this, "DELETE", url, items);
-              resolve(items);
-            },
-            (error) => {
-              this.logger.error(this, "DELETE", url, error);
-              reject(this.httpError(error));
-            });
+          .subscribe((items) => {
+            this.logger.info(this, "DELETE", url, items);
+            resolve(items);
+          },
+          (error) => {
+            this.logger.error(this, "DELETE", url, error);
+            reject(this.httpError(error));
+          });
       }
     });
   }
@@ -456,22 +428,28 @@ export class HttpProvider {
     });
   }
 
+  private httpResponse(res:any):any {
+    if (res.status == 204) {
+      return {}
+    }
+    try {
+      return res.json();
+    }
+    catch (err) {
+      return {};
+    }
+  }
+  
   private httpError(error:any):string {
     try {
       if (error == null) {
-        this.logger.error(this, "httpError", "Unknown", error);
-        return "Unknown error";
+        return "Unknown Error";
       }
       else if (typeof error === 'string') {
-        this.logger.error(this, "httpError", "String", error);
         return error['error'] || error;
       }
       else if (typeof error === 'object') {
-        this.logger.error(this, "httpError", "Object", error);
-        if (error['status'] == 409) {
-          return "Conflict";
-        }
-        else if (error['message']) {
+        if (error['message']) {
           return error['message'];
         }
         else if (error['error']) {
@@ -503,6 +481,39 @@ export class HttpProvider {
           }
           return JSON.stringify(error['error']);
         }
+      }
+      else if (error['status'] == 401) {
+        return "Unauthorized";
+      }
+      else if (error['status'] == 403) {
+        return "Forbidden";
+      }
+      else if (error['status'] == 404) {
+        return "Not Found";
+      }
+      else if (error['status'] == 405) {
+        return "Method Not Allowed";
+      }
+      else if (error['status'] == 406) {
+        return "Not Acceptable";
+      }
+      else if (error['status'] == 408) {
+        return "Request Timeout";
+      }
+      else if (error['status'] == 409) {
+        return "Conflict";
+      }
+      else if (error['status'] == 500) {
+        return "Internal Server Error";
+      }
+      else if (error['status'] == 501) {
+        return "Not Implemented";
+      }
+      else if (error['status'] == 502) {
+        return "Bad Gateway";
+      }
+      else if (error['status'] == 503) {
+        return "Service Unavailable";
       }
     }
     catch (err) {
