@@ -24,4 +24,4 @@ function removeEnvironmentFile() {
   }
 }
 
-removeEnvironmentFile();
+// removeEnvironmentFile();

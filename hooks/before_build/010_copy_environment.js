@@ -39,4 +39,4 @@ function getTargetPath(env) {
   return path.join(root, 'src', 'environments', 'environment.ts');
 }
 
-copyEnvironmentFile();
+// copyEnvironmentFile();

@@ -16,10 +16,10 @@
       "node",
       "jasmine"
     ],
-    "baseUrl" : "src",
+    "baseUrl" : "./src",
     "paths" : {
       "@app/env" : [
-        "environments/environment.ts"
+        "environments/environment"
       ]
     }
   },
@@ -28,8 +28,7 @@
   ],
   "exclude": [
     "node_modules",
-    "src/**/*.spec.ts",
-    "src/environments/environment.*.ts"
+    "src/**/*.spec.ts"
   ],
   "compileOnSave": false,
   "atom": {
