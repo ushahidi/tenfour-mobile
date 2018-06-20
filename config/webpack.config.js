@@ -54,4 +54,10 @@ function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("                  "+env.toUpperCase()+"    ");
   console.log("                                           ");
   console.log("===========================================");
+  if (fs.existsSync(targetPath)) {
+    console.log(`Environment ${targetPath} Exists`);
+  }
+  else {
+    console.error(`Environment ${targetPath} Does Not Exist`);
+  }
 }

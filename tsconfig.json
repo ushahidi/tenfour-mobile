@@ -16,7 +16,7 @@
       "node",
       "jasmine"
     ],
-    "baseUrl" : "./src",
+    "baseUrl" : "src",
     "paths" : {
       "@app/env" : [
         "environments/environment.ts"
