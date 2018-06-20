@@ -1449,21 +1449,6 @@ export class StorageProvider {
     });
   }
 
-  // public getSubscription(organization:Organization, id:number):Promise<Subscription> {
-  //   return new Promise((resolve, reject) => {
-  //     let where = {
-  //       organization_id: organization.id,
-  //       id: id
-  //     };
-  //     this.provider.getModel<Subscription>(new Subscription(), where).then((subscription:Subscription) => {
-  //       resolve(subscription);
-  //     },
-  //     (error:any) => {
-  //       reject(error);
-  //     });
-  //   });
-  // }
-
   public getSubscription():Promise<Subscription> {
     return new Promise((resolve, reject) => {
       this.get("subscription").then((data:any) => {
