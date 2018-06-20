@@ -46,10 +46,10 @@ cordova plugin add cordova-plugin-nativestorage@2.2.2
 #### Debug Apps
 ```
 cordova run ios --list
-ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE"
-ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus"
-ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 11.3"
-ionic cordova run ios --livereload --consolelogs --device --debug
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 11.3"
+ENV=prod ionic cordova run ios --livereload --consolelogs --device --debug
 ```
 ```
 cordova run android --list
@@ -60,26 +60,28 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
 ```
-ionic serve --livereload --consolelogs
-ionic serve --livereload --consolelogs --labs
+ENV=dev ionic serve --livereload --consolelogs
+ENV=sandbox ionic serve --livereload --consolelogs
+ENV=staging ionic serve --livereload --consolelogs
+ENV=prod ionic serve --livereload --consolelogs
 ```
 #### Release Apps
 ```
 rvm use system
-ionic cordova prepare ios --debug --buildConfig=build.json
-ionic cordova prepare ios --prod --release --buildConfig=build.json
+ENV=dev ionic cordova prepare ios --debug --buildConfig=build.json
+ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
 ```
 ```
-ionic cordova build ios --debug --buildConfig=build.json
-ionic cordova build ios --prod --release --buildConfig=build.json
+ENV=dev ionic cordova build ios --debug --buildConfig=build.json
+ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 ```
-ionic cordova prepare android --buildConfig=build.json
-ionic cordova build android --device --prod --release --buildConfig=build.json
+ENV=prod ionic cordova prepare android --buildConfig=build.json
+ENV=prod ionic cordova build android --device --prod --release --buildConfig=build.json
 ```
 #### Deploy PWA
 ```
-npm run ionic:build --prod --release
+ENV=prod npm run ionic:build --prod --release
 firebase deploy
 ```
 
@@ -93,5 +95,5 @@ git add .
 git add -u
 git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
-git checkout master
+git checkout develop
 ```

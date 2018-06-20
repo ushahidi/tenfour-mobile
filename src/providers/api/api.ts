@@ -25,15 +25,15 @@ import { Notification } from '../../models/notification';
 import { HttpProvider } from '../../providers/http/http';
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
 
-  clientId:string = "1";
-  clientSecret:string = "T7913s89oGgJ478J73MRHoO2gcRRLQ";
-
+  clientId:string = null;
+  clientSecret:string = null;
+  api:string = null;
   scope:string = "user";
-  api:string = "https://api.tenfour.org";
 
   constructor(
     protected device:Device,
@@ -43,8 +43,12 @@ export class ApiProvider extends HttpProvider {
     protected file:File,
     protected transfer:FileTransfer,
     protected logger:LoggerProvider,
-    protected storage:StorageProvider) {
+    protected storage:StorageProvider,
+    protected environment:EnvironmentProvider) {
     super(platform, http, httpNative, file, transfer, logger);
+    this.api = this.environment.getApiEndpoint();
+    this.clientId = this.environment.getClientId();
+    this.clientSecret = this.environment.getClientSecret();
   }
 
   public saveToken(organization:Organization, token:Token):Promise<boolean> {
@@ -223,22 +227,6 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public resetPassword(subdomain:string, email:string):Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      let url = `${this.api}/password/email`;
-      let params = {
-        subdomain: subdomain,
-        username: email
-      };
-      this.httpPost(url, params).then((data:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        reject(`There was a problem resetting password for ${email}.`);
-      });
-    });
-  }
-
   public getOrganizations(subdomain:string=null, name:string=null):Promise<Organization[]> {
     return new Promise((resolve, reject) => {
       let params = {};
@@ -385,11 +373,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getPeople(organization:Organization, limit:number=20, offset:number=0):Promise<Person[]> {
+  public getPeople(organization:Organization, limit:number=null, offset:number=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/people/?limit=${limit}&offset=${offset}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people`;
         let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let people = [];
           if (data && data.people) {
@@ -965,11 +959,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getGroups(organization:Organization, limit:number=20, offset:number=0):Promise<Group[]> {
+  public getGroups(organization:Organization, limit:number=null, offset:number=null):Promise<Group[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/?limit=${limit}&offset=${offset}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups`;
         let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
         this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.groups) {
             let groups = [];
@@ -1213,4 +1213,38 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public resetPassword(subdomain:string, email:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/password/email`;
+      let params = {
+        subdomain: subdomain,
+        username: email
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(`There was a problem resetting password for ${email}.`);
+      });
+    });
+  }
+
+  public updatePassword(subdomain:string, token:string, email:string, password:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/password/reset`;
+      let params = {
+        subdomain: subdomain,
+        password: password,
+        password_confirmation: password,
+        username: email,
+        token: token
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(`There was a problem resetting password for ${email}.`);
+      });
+    });
+  }
 }

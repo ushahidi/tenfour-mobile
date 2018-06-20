@@ -72,6 +72,8 @@ import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.m
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
+import { PasswordResetModule } from '../pages/password-reset/password-reset.module';
+
 import { GroupListModule } from '../pages/group-list/group-list.module';
 import { GroupEditModule } from '../pages/group-edit/group-edit.module';
 import { GroupDetailsModule } from '../pages/group-details/group-details.module';
@@ -105,6 +107,7 @@ import { CheckinDetailModule } from '../components/checkin-details/checkin-detai
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
 import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
+import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -127,6 +130,7 @@ import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { ContactsProvider } from '../providers/contacts/contacts';
 import { MailerProvider } from '../providers/mailer/mailer';
+import { EnvironmentProvider } from '../providers/environment/environment';
 
 @NgModule({
   declarations: [
@@ -139,6 +143,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     ReactiveFormsModule,
     SplashScreenModule,
     PersonAvatarModule,
+    OrganizationLogoModule,
     ColorPickerModule,
     SendViaModule,
     CheckinCardModule,
@@ -164,6 +169,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     SignupPaymentModule,
     SignupPasswordModule,
     OnboardListModule,
+    PasswordResetModule,
     CheckinListModule,
     CheckinEditModule,
     CheckinSendModule,
@@ -261,6 +267,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
     { provide: ContactsProvider, useClass: ContactsProvider },
     { provide: MailerProvider, useClass: MailerProvider },
     { provide: BadgeProvider, useClass: BadgeProvider },
+    { provide: EnvironmentProvider, useClass: EnvironmentProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

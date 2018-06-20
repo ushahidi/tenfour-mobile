@@ -8,7 +8,7 @@ module.exports = function(config) {
 
     files: [
       {
-        pattern: './test-config/karma-test-shim.js',
+        pattern: './config/karma-test-shim.js',
         watched: true
       },
       {
@@ -25,7 +25,7 @@ module.exports = function(config) {
     },
 
     preprocessors: {
-      './test-config/karma-test-shim.js': ['webpack', 'sourcemap']
+      './config/karma-test-shim.js': ['webpack', 'sourcemap']
     },
 
     webpack: webpackConfig,
