@@ -4,21 +4,22 @@ var useDefaultConfig = require('@ionic/app-scripts/config/webpack.config.js');
 
 module.exports = function () {
     var environment = process.env.ENV || process.env.IONIC_ENV || "dev";
-    var source = sourcePath(environment);
-    var target = targetPath(environment);
-    var data = fs.readFileSync(source, 'utf8');
-    fs.writeFileSync(target, data, 'utf8');
+    var sourcePath = getSourcePath(environment);
+    var targetPath = getTargetPath(environment);
+    var sourceFile = fs.readFileSync(sourcePath, 'utf8');
+    fs.writeFileSync(targetPath, sourceFile, 'utf8');
+    var targetFile = fs.readFileSync(targetPath, 'utf8');
     useDefaultConfig.dev.resolve.alias = {
-      "@app/env": path.resolve(target)
+      "@app/env": path.resolve(targetPath)
     };
     useDefaultConfig.prod.resolve.alias = {
-      "@app/env": path.resolve(target)
+      "@app/env": path.resolve(targetPath)
     };
-    consoleLog(environment, source);
+    consoleLog(environment, sourcePath, sourceFile, targetPath, targetFile);
     return useDefaultConfig;
 }
 
-function sourcePath(env) {
+function getSourcePath(env) {
   if (env == 'local' || env == 'sandbox') {
     return './src/environments/environment.sandbox.ts';
   }
@@ -37,11 +38,11 @@ function sourcePath(env) {
   return './src/environments/environment.sandbox.ts';
 }
 
-function targetPath(env) {
+function getTargetPath(env) {
   return './src/environments/environment.ts';
 }
 
-function consoleLog(env, path) {
+function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("=============== ENVIRONMENT ===============");
   console.log("                                           ");
   console.log("                  "+env.toUpperCase()+"    ");
