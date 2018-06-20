@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 
-import { Environment } from "../../environments/environment";
+import { Environment } from "@app/env";
 
 import { LoggerProvider } from '../../providers/logger/logger';
 
