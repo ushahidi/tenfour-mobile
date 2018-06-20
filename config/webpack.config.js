@@ -19,27 +19,33 @@ module.exports = function () {
     return useDefaultConfig;
 }
 
+function getRootPath() {
+  return __dirname.replace("config", "");
+}
+
 function getSourcePath(env) {
+  let rootPath = getRootPath();
   if (env == 'local' || env == 'sandbox') {
-    return './src/environments/environment.sandbox.ts';
+    return rootPath + 'src/environments/environment.sandbox.ts';
   }
   else if (env == 'dev' || env == 'develop' || env == 'development') {
-    return './src/environments/environment.development.ts';
+    return rootPath + 'src/environments/environment.development.ts';
   }
   else if (env == 'stage' || env == 'staging') {
-    return './src/environments/environment.staging.ts';
+    return rootPath + 'src/environments/environment.staging.ts';
   }
   else if (env == 'test' || env == 'testing') {
-    return './src/environments/environment.testing.ts';
+    return rootPath + 'src/environments/environment.testing.ts';
   }
   else if (env == 'prod' || env == 'production') {
-    return './src/environments/environment.production.ts';
+    return rootPath + 'src/environments/environment.production.ts';
   }
-  return './src/environments/environment.sandbox.ts';
+  return rootPath + 'src/environments/environment.sandbox.ts';
 }
 
 function getTargetPath(env) {
-  return './src/environments/environment.ts';
+  let rootPath = getRootPath();
+  return rootPath + 'src/environments/environment.ts';
 }
 
 function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
@@ -48,7 +54,4 @@ function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("                  "+env.toUpperCase()+"    ");
   console.log("                                           ");
   console.log("===========================================");
-  console.log("__dirname " + __dirname);
-  console.log("sourcePath " + sourcePath);
-  console.log("targetPath " + targetPath);
 }
