@@ -1,4 +1,3 @@
-var fs = require("fs-extra");
 var path = require('path');
 var useDefaultConfig = require('@ionic/app-scripts/config/webpack.config.js');
 
