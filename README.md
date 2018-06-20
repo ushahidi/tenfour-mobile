@@ -68,16 +68,16 @@ ENV=prod ionic serve --livereload --consolelogs
 #### Release Apps
 ```
 rvm use system
-ionic cordova prepare ios --debug --buildConfig=build.json
-ionic cordova prepare ios --prod --release --buildConfig=build.json
+ENV=dev ionic cordova prepare ios --debug --buildConfig=build.json
+ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
 ```
 ```
-ionic cordova build ios --debug --buildConfig=build.json
-ionic cordova build ios --prod --release --buildConfig=build.json
+ENV=dev ionic cordova build ios --debug --buildConfig=build.json
+ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 ```
-ionic cordova prepare android --buildConfig=build.json
-ionic cordova build android --device --prod --release --buildConfig=build.json
+ENV=prod ionic cordova prepare android --buildConfig=build.json
+ENV=prod ionic cordova build android --device --prod --release --buildConfig=build.json
 ```
 #### Deploy PWA
 ```

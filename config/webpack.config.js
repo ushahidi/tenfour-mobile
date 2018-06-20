@@ -48,4 +48,7 @@ function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("                  "+env.toUpperCase()+"    ");
   console.log("                                           ");
   console.log("===========================================");
+  console.log("__dirname " + __dirname);
+  console.log("sourcePath " + sourcePath);
+  console.log("targetPath " + targetPath);
 }
