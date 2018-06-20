@@ -10,6 +10,8 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
+
 @IonicPage({
   name: 'SettingsChannelsPage',
   segment: 'settings/channels',
@@ -140,4 +142,8 @@ export class SettingsChannelsPage extends BasePage {
     });
   }
 
+  private upgradeToPro(event:any) {
+    this.logger.info(this, "upgradeToPro");
+    this.navController.push(SettingsPaymentsPage);
+  }
 }
