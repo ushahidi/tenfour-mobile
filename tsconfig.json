@@ -15,7 +15,13 @@
     "types": [
       "node",
       "jasmine"
-    ]
+    ],
+    "baseUrl" : "src",
+    "paths" : {
+      "@app/env" : [
+        "environments/environment.ts"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts"

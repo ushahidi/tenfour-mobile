@@ -20,7 +20,8 @@
     "e2e-update": "webdriver-manager update --standalone false --gecko false"
   },
   "config": {
-    "ionic_copy": "./config/pwa.config.js"
+    "ionic_copy": "./config/pwa.config.js",
+    "ionic_webpack": "./config/webpack.config.js"
   },
   "dependencies": {
     "@angular/animations": "^5.0.3",

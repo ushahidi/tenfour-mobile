@@ -1,4 +1,4 @@
-var fs = require('fs');
+var fs = require("fs-extra");
 var path = require('path');
 var useDefaultConfig = require('@ionic/app-scripts/config/webpack.config.js');
 
@@ -6,10 +6,14 @@ module.exports = function () {
     var environment = process.env.ENV || process.env.IONIC_ENV || "dev";
     var sourcePath = getSourcePath(environment);
     var targetPath = getTargetPath(environment);
-    var sourceFile = fs.readFileSync(sourcePath, 'utf8');
-    fs.writeFileSync(targetPath, sourceFile, 'utf8');
-    var targetFile = fs.readFileSync(targetPath, 'utf8');
-    consoleLog(environment, sourcePath, sourceFile, targetPath, targetFile);
+    fs.copySync(sourcePath, targetPath);
+    consoleLog(environment, sourcePath, targetPath);
+    useDefaultConfig.dev.resolve.alias = {
+      "@app/env": path.resolve(targetPath)
+    };
+    useDefaultConfig.prod.resolve.alias = {
+      "@app/env": path.resolve(targetPath)
+    };
     return useDefaultConfig;
 }
 
@@ -42,7 +46,7 @@ function getTargetPath(env) {
   return rootPath + 'src/environments/environment.ts';
 }
 
-function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
+function consoleLog(env, sourcePath, targetPath) {
   console.log("=============== ENVIRONMENT ===============");
   console.log("                                           ");
   console.log("                  "+env.toUpperCase()+"    ");
@@ -50,9 +54,8 @@ function consoleLog(env, sourcePath, sourceFile, targetPath, targetFile) {
   console.log("===========================================");
   if (fs.existsSync(targetPath)) {
     console.log(`Environment ${targetPath} Exists`);
-    console.log(targetFile);
   }
   else {
-    console.error(`Environment ${targetPath} Does Not Exist`);
+    console.log(`Environment ${targetPath} Does Not Exist`);
   }
 }
