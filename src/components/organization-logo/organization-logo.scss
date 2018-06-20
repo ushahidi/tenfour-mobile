@@ -1,0 +1,12 @@
+organization-logo {
+  img {
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    &.logo {
+      max-width: 35px;
+    }
+    &.image {
+      max-width: 35px;
+    }
+  }
+}

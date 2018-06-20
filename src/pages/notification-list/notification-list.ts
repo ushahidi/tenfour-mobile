@@ -30,6 +30,7 @@ export class NotificationListPage extends BasePage {
   limit:number = 20;
   offset:number = 0;
   modal:boolean = true;
+  defaultLogo:string = "assets/images/dots.png";
 
   constructor(
       protected zone:NgZone,
@@ -132,7 +133,7 @@ export class NotificationListPage extends BasePage {
       }
     });
   }
-  
+
   private loadNotifications(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
