@@ -168,7 +168,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.navController.push(SettingsPaymentsPage);
+    this.showPage(SettingsPaymentsPage);
   }
 
   private settingsCheckins(event:any) {

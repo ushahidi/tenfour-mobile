@@ -144,6 +144,6 @@ export class SettingsChannelsPage extends BasePage {
 
   private upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
-    this.navController.push(SettingsPaymentsPage);
+    this.showPage(SettingsPaymentsPage);
   }
 }
