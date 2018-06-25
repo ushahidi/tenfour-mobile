@@ -81,8 +81,9 @@ ENV=prod ionic cordova build android --device --prod --release --buildConfig=bui
 ```
 #### Deploy PWA
 ```
+ENV=develop npm run ionic:build --prod --release
+ENV=staging npm run ionic:build --prod --release
 ENV=prod npm run ionic:build --prod --release
-firebase deploy
 ```
 
 #### Commit Branch
