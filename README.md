@@ -98,3 +98,13 @@ git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
 git checkout develop
 ```
+```
+git checkout develop
+git merge origin/master
+git push origin develop
+```
+```
+git checkout staging
+git merge origin/master
+git push origin staging
+```
