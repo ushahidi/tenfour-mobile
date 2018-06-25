@@ -82,23 +82,29 @@ export class LocationProvider {
     return new Promise((resolve, reject) => {
         this.logger.info(this, "loadAddress");
       if (this.platform.is("cordova")) {
-        this.geocoder.reverseGeocode(location.latitude, location.longitude).then((result:NativeGeocoderReverseResult) => {
-          this.logger.info(this, "loadAddress", location, result);
-          let address:any[] = [];
-          if (result.thoroughfare) {
-            address.push(result.thoroughfare);
+        this.geocoder.reverseGeocode(location.latitude, location.longitude).then((results:NativeGeocoderReverseResult[]) => {
+          this.logger.info(this, "loadAddress", location, results);
+          if (results && results.length > 0) {
+            let result = results[0];
+            let address:any[] = [];
+            if (result.thoroughfare) {
+              address.push(result.thoroughfare);
+            }
+            if (result.locality) {
+              address.push(result.locality);
+            }
+            if (result.administrativeArea) {
+              address.push(result.administrativeArea);
+            }
+            if (result.countryName) {
+              address.push(result.countryName);
+            }
+            this.logger.info(this, "loadAddress", location, address);
+            resolve(address.join(", "));
           }
-          if (result.locality) {
-            address.push(result.locality);
+          else {
+            reject("Address Not Found");
           }
-          if (result.administrativeArea) {
-            address.push(result.administrativeArea);
-          }
-          if (result.countryName) {
-            address.push(result.countryName);
-          }
-          this.logger.info(this, "loadAddress", location, address);
-          resolve(address.join(", "));
         })
         .catch((error:any) => {
           this.logger.error(this, "loadAddress", location, error);
