@@ -87,7 +87,6 @@ ENV=prod npm run ionic:build --prod --release
 ```
 
 #### Commit Branch
-
 ```
 ISSUE_NAME="123 Fixed A Bug"
 BRANCH_NAME=$(echo $ISSUE_NAME | tr '[:upper:]' '[:lower:]' | tr '/' '-' | tr ' ' '-')
