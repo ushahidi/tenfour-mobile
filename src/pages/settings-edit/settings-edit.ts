@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -25,9 +25,8 @@ import { LocationSuggestComponent } from '../../components/location-suggest/loca
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
-export class SettingsEditPage extends BasePage {
+export class SettingsEditPage extends BasePrivatePage {
 
-  organization:Organization = null;
   logo:string = "assets/images/dots.png";
 
   @ViewChild("fileInput")
@@ -54,7 +53,7 @@ export class SettingsEditPage extends BasePage {
       protected storage:StorageProvider,
       protected camera:CameraProvider,
       protected location:LocationProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
@@ -64,7 +63,13 @@ export class SettingsEditPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((finished:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
@@ -74,6 +79,26 @@ export class SettingsEditPage extends BasePage {
         organization: this.organization.name
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
   }
 
   private cancelEdit(event:any) {

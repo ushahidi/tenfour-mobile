@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
@@ -23,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
-export class SigninInvitePage extends BasePage {
+export class SigninInvitePage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
@@ -56,7 +56,7 @@ export class SigninInvitePage extends BasePage {
       protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {

@@ -1,7 +1,6 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';

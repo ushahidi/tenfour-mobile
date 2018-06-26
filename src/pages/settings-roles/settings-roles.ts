@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -21,7 +21,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
-export class SettingsRolesPage extends BasePage {
+export class SettingsRolesPage extends BasePrivatePage {
 
   organization:Organization = null;
   user:User = null;
@@ -39,7 +39,7 @@ export class SettingsRolesPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -81,42 +81,6 @@ export class SettingsRolesPage extends BasePage {
         }
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
-    });
   }
 
 }

@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -26,7 +26,7 @@ import { LocationProvider } from '../../providers/location/location';
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[  ]
 })
-export class CheckinRespondPage extends BasePage {
+export class CheckinRespondPage extends BasePrivatePage {
 
   @ViewChild(Slides)
   slides:Slides;
@@ -34,8 +34,6 @@ export class CheckinRespondPage extends BasePage {
   loading:boolean = false;
   locating:boolean = false;
 
-  organization:Organization = null;
-  user:User = null;
   checkins:Checkin[] = [];
   checkin:Checkin = null;
   locations:Location[] = [];
@@ -55,7 +53,7 @@ export class CheckinRespondPage extends BasePage {
     protected api:ApiProvider,
     protected storage:StorageProvider,
     protected location:LocationProvider) {
-    super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+    super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -103,42 +101,6 @@ export class CheckinRespondPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
-    });
   }
 
   private loadCheckins(cache:boolean=true):Promise<boolean> {

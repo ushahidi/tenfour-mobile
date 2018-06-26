@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { Organization } from '../../models/organization';
@@ -22,7 +22,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SignupPasswordPage ]
 })
-export class SignupPaymentPage extends BasePage {
+export class SignupPaymentPage extends BasePublicPage {
 
   organization:Organization;
 
@@ -45,7 +45,7 @@ export class SignupPaymentPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {

@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, Loading, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -24,9 +24,8 @@ import { CountriesProvider } from '../../providers/countries/countries';
   templateUrl: 'person-import.html',
   providers: [ ApiProvider, StorageProvider, CountriesProvider, ContactsProvider ]
 })
-export class PersonImportPage extends BasePage {
+export class PersonImportPage extends BasePrivatePage {
 
-  organization:Organization = null;
   imports:any[] = [];
   invite:boolean = true;
   invitation:string = "email";
@@ -47,14 +46,15 @@ export class PersonImportPage extends BasePage {
       protected storage:StorageProvider,
       protected countries:CountriesProvider,
       protected contacts:ContactsProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
     let loading = this.showLoading("Loading...");
     Promise.resolve()
+      .then(() => { return this.loadOrganization(true); })
+      .then(() => { return this.loadUser(true); })
       .then(() => { return this.loadCountries(loading); })
       .then(() => { return this.loadContacts(loading); })
       .then(() => {

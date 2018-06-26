@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupVerifyPage } from '../../pages/signup-verify/signup-verify';
 
 import { Organization } from '../../models/organization';
@@ -22,7 +22,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
   entryComponents:[ SignupVerifyPage ]
 })
-export class SignupCheckPage extends BasePage {
+export class SignupCheckPage extends BasePublicPage {
 
   canOpenEmail:boolean = true;
   organization:Organization = null;
@@ -41,7 +41,7 @@ export class SignupCheckPage extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected mailer:MailerProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {

@@ -1,10 +1,11 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SigninUrlPage } from '../signin-url/signin-url';
 
-import { BasePage } from '../../pages/base-page/base-page';
 import { ApiProvider } from '../../providers/api/api';
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'UnsubscribePage',
@@ -16,7 +17,7 @@ import { ApiProvider } from '../../providers/api/api';
   templateUrl: 'unsubscribe.html',
   providers: [ ApiProvider ]
 })
-export class UnsubscribePage extends BasePage {
+export class UnsubscribePage extends BasePublicPage {
 
   organization:string = null;
   token:string = null;
@@ -33,8 +34,9 @@ export class UnsubscribePage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected api:ApiProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      protected api:ApiProvider,
+      protected storage:StorageProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {

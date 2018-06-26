@@ -12,8 +12,8 @@ import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 
 @Component({
   selector: 'base-page',
-  templateUrl: 'base-page.html',
-  providers: [ LoggerProvider ],
+  template: "<ion-header></ion-header><ion-content></ion-content>",
+  providers: [ LoggerProvider ]
 })
 export class BasePage {
 
