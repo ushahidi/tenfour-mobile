@@ -27,7 +27,4 @@ export class SplashScreenPage extends BasePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
   }
 
-  ionViewDidLoad() {
-  }
-
 }

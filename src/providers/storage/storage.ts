@@ -179,6 +179,22 @@ export class StorageProvider {
 
   // ########## USER ##########
 
+  public hasUser():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.get("user").then((data:any) => {
+        if (data) {
+          resolve(true);
+        }
+        else {
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
+
   public getUser():Promise<User> {
     return new Promise((resolve, reject) => {
       this.get("user").then((data:any) => {
@@ -221,6 +237,22 @@ export class StorageProvider {
   }
 
   // ########## ORGANIZATION ##########
+
+  public hasOrganization():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.get("organization").then((data:any) => {
+        if (data) {
+          resolve(true);
+        }
+        else {
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
 
   public getOrganization():Promise<Organization> {
     return new Promise((resolve, reject) => {

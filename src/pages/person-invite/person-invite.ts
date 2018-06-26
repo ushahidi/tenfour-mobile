@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -18,13 +18,10 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',
-  providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  providers: [ ApiProvider, StorageProvider ]
 })
-export class PersonInvitePage extends BasePage {
+export class PersonInvitePage extends BasePrivatePage {
 
-  organization:Organization = null;
-  person:Person = null;
   people:Person[] = null;
   loading:boolean = false;
 
@@ -41,13 +38,18 @@ export class PersonInvitePage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
-    this.loadPeople(null, true);
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
@@ -57,6 +59,30 @@ export class PersonInvitePage extends BasePage {
         organization: this.organization.name
       });
     }
+  }
+
+  protected loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadPeople(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        this.loading = false;
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        this.loading = false;
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
   }
 
   private cancelInvite(event:any) {
@@ -85,40 +111,34 @@ export class PersonInvitePage extends BasePage {
     }
   }
 
-  private loadPeople(event:any, cache:boolean=true) {
-    this.loading = true;
-    if (cache && this.mobile) {
-      return this.storage.getPeople(this.organization).then((people:Person[]) => {
-        this.logger.info(this, "loadPeople", people);
-        if (people && people.length > 0) {
-          this.people = people.filter(person => person.needsInvite() == true);
-          this.logger.info(this, "loadPeople", this.people);
-          if (event) {
-            event.complete();
+  private loadPeople(cache:boolean=true) {
+    return new Promise((resolve, reject) => {
+      if (cache) {
+        this.storage.getPeople(this.organization).then((people:Person[]) => {
+          if (people && people.length > 0) {
+            this.people = people.filter(person => person.needsInvite() == true);
+            resolve(people);
           }
-          this.loading = false;
-        }
-        else {
-          this.loadPeople(event, false);
-        }
-      });
-    }
-    else {
-      return this.api.getPeople(this.organization).then((people:Person[]) => {
-        this.people = people.filter(person => person.needsInvite() == true);
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      },
-      (error:any) => {
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
-    }
+          else {
+            this.loadPeople(false).then((people:Person[]) => {
+              resolve(people);
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }
+        });
+      }
+      else {
+        this.api.getPeople(this.organization).then((people:Person[]) => {
+          this.people = people.filter(person => person.needsInvite() == true);
+          resolve(people);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+    });
   }
 
   private invitePerson(person:Person):Promise<Person> {

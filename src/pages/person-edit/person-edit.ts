@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { Organization } from '../../models/organization';
@@ -26,10 +26,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, CameraProvider ],
   entryComponents:[ PersonSelectPage ]
 })
-export class PersonEditPage extends BasePage {
+export class PersonEditPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
   person:Person = null;
   editing:boolean = true;
   profile:boolean = false;
@@ -68,7 +66,7 @@ export class PersonEditPage extends BasePage {
       protected camera:CameraProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
@@ -105,8 +103,8 @@ export class PersonEditPage extends BasePage {
     this.loading = true;
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadRegions(); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadRegions(); })
       .then(() => { return this.loadPerson(cache); })
       .then(() => { return this.loadCamera(); })
       .then(() => {
@@ -124,24 +122,6 @@ export class PersonEditPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
   }
 
   private loadRegions(cache:boolean=true):Promise<boolean> {
@@ -165,24 +145,6 @@ export class PersonEditPage extends BasePage {
             .map(region => region.country_code)
             .filter((v, i, a) => a.indexOf(v) === i);
           resolve();
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
         });
       }
     });

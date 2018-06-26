@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { Organization } from '../../models/organization';
@@ -22,7 +22,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
   entryComponents:[ SignupOwnerPage ]
 })
-export class SignupVerifyPage extends BasePage  {
+export class SignupVerifyPage extends BasePublicPage  {
 
   email:string = null;
   token:string = null;
@@ -43,7 +43,7 @@ export class SignupVerifyPage extends BasePage  {
       protected api:ApiProvider,
       protected mailer:MailerProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {

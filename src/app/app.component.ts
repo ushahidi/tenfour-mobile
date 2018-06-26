@@ -15,7 +15,7 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
-import { PasswordResetPage } from '../pages/password-reset/password-reset'; 
+import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
@@ -265,14 +265,14 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            this.logger.info(this, "loadWebApp", "Location", location.hash);
-            if (location.hash == '') {
+            this.logger.info(this, "loadWebApp", "Location", this.locationHash());
+            if (this.hasLocationHash()) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (location.hash == '') {
+            if (this.hasLocationHash()) {
               this.showOnboardList(user);
             }
             resolve(true);
@@ -280,7 +280,7 @@ export class TenFourApp {
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", "Person", "None");
-          if (location.hash == '') {
+          if (this.hasLocationHash()) {
             this.showSigninUrl();
           }
           resolve(false);
@@ -288,7 +288,7 @@ export class TenFourApp {
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", "Organization", "None");
-        if (location.hash == '') {
+        if (this.hasLocationHash()) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -737,6 +737,20 @@ export class TenFourApp {
       loading.dismiss();
       this.showAlert("Problem Resending Check-In", error);
     });
+  }
+
+  private locationHash():string {
+    if (location && location.hash) {
+        return location.hash;
+    }
+    return "";
+  }
+
+  private hasLocationHash():boolean {
+    if (location && location.hash) {
+        return location.hash.length > 0;
+    }
+    return false;
   }
 
 }
