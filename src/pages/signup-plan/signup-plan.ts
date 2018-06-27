@@ -3,7 +3,8 @@ import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupPlanPage } from '../../pages/signup-plan/signup-plan';
+import { SignupPaymentPage } from '../../pages/signup-payment/signup-payment';
+import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -12,21 +13,19 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'SignupUrlPage',
-  segment: 'signup/url',
-  defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage']
+  name: 'SignupPlanPage',
+  segment: 'signup/plan',
+  defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage']
 })
 @Component({
-  selector: 'page-signup-url',
-  templateUrl: 'signup-url.html',
+  selector: 'page-signup-plan',
+  templateUrl: 'signup-plan.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SignupPlanPage ]
+  entryComponents:[ SignupPaymentPage, SignupPasswordPage ]
 })
-export class SignupUrlPage extends BasePage {
+export class SignupPlanPage extends BasePage {
 
-  @ViewChild('subdomain')
-  subdomain:TextInput;
-
+  trial:boolean = false;
   organization:Organization;
 
   constructor(
@@ -104,37 +103,32 @@ export class SignupUrlPage extends BasePage {
   }
 
   private showNext(event:any) {
-    this.logger.info(this, "showNext");
-    let loading = this.showLoading("Checking...", true);
-    this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
-      this.logger.error(this, "showNext", organizations);
-      loading.dismiss();
-      if (organizations && organizations.length > 0) {
-        this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
-      }
-      else {
-        this.organization.subdomain = this.subdomain.value;
-        this.storage.setOrganization(this.organization).then((stored:boolean) => {
-          this.showPage(SignupPlanPage, {
-            organization: this.organization
-          });
-        });
-      }
-    },
-    (error:any) => {
-      this.logger.info(this, "showNext", error);
-      loading.dismiss();
-      this.showAlert("Organization URL", error);
-    });
+    if (this.trial) {
+      this.logger.info(this, "showNext", "SignupPasswordPage");
+      this.showPage(SignupPasswordPage, {
+        organization: this.organization
+      });
+    }
+    else {
+      this.logger.info(this, "showNext", "SignupPaymentPage");
+      this.showPage(SignupPaymentPage, {
+        organization: this.organization
+      });
+    }
   }
 
-  private showNextOnReturn(event:any) {
-    if (this.isKeyReturn(event)) {
-      this.hideKeyboard();
-      this.showNext(event);
-      return false;
-    }
-    return true;
+  private startPlan(event:any) {
+    this.logger.info(this, "startPlan");
+    this.trial = false;
+  }
+
+  private startTrial(event:any) {
+    this.logger.info(this, "startTrial");
+    this.trial = true;
+  }
+
+  private needMore(event:any) {
+    this.logger.info(this, "needMore");
   }
 
 }

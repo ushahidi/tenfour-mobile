@@ -16,9 +16,11 @@
   * [SignupOwnerPage](/src/pages/signup-owner/signup-owner.ts) ([html](/src/pages/signup-owner/signup-owner.html), [scss](/src/pages/signup-owner/signup-owner.scss))
     * [SignupNamePage](/src/pages/signup-name/signup-name.ts) ([html](/src/pages/signup-name/signup-name.html), [scss](/src/pages/signup-name/signup-name.scss))
       * [SignupUrlPage](/src/pages/signup-url/signup-url.ts) ([html](/src/pages/signup-url/signup-url.html), [scss](/src/pages/signup-url/signup-url.scss))
-        * [SignupPasswordPage](/src/pages/signup-password/signup-password.ts) ([html](/src/pages/signup-password/signup-password.html), [scss](/src/pages/signup-password/signup-password.scss))
-          * [OnboardListPage](/src/pages/onboard-list/onboard-list.ts) ([html](/src/pages/onboard-list/onboard-list.html), [scss](/src/pages/onboard-list/onboard-list.scss))
-          * [CheckinListPage](/src/pages/checkin-list/checkin-list.ts) ([html](/src/pages/checkin-list/checkin-list.html), [scss](/src/pages/checkin-list/checkin-list.scss))
+        * [SignupPlanPage](/src/pages/signup-plan/signup-plan.ts) ([html](/src/pages/signup-plan/signup-plan.html), [scss](/src/pages/signup-plan/signup-plan.scss))
+          * [SignupPaymentPage](/src/pages/signup-payment/signup-payment.ts) ([html](/src/pages/signup-payment/signup-payment.html), [scss](/src/pages/signup-payment/signup-payment.scss))
+          * [SignupPasswordPage](/src/pages/signup-password/signup-password.ts) ([html](/src/pages/signup-password/signup-password.html), [scss](/src/pages/signup-password/signup-password.scss))
+            * [OnboardListPage](/src/pages/onboard-list/onboard-list.ts) ([html](/src/pages/onboard-list/onboard-list.html), [scss](/src/pages/onboard-list/onboard-list.scss))
+            * [CheckinListPage](/src/pages/checkin-list/checkin-list.ts) ([html](/src/pages/checkin-list/checkin-list.html), [scss](/src/pages/checkin-list/checkin-list.scss))
 
 ---
 [OnboardListPage](/src/pages/onboard-list/onboard-list.ts) ([html](/src/pages/onboard-list/onboard-list.html), [scss](/src/pages/onboard-list/onboard-list.scss))

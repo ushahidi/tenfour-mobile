@@ -50,6 +50,8 @@ import { SignupVerifyModule } from '../pages/signup-verify/signup-verify.module'
 import { SignupOwnerModule } from '../pages/signup-owner/signup-owner.module';
 import { SignupNameModule } from '../pages/signup-name/signup-name.module';
 import { SignupUrlModule } from '../pages/signup-url/signup-url.module';
+import { SignupPlanModule } from '../pages/signup-plan/signup-plan.module';
+import { SignupPaymentModule } from '../pages/signup-payment/signup-payment.module';
 import { SignupPasswordModule } from '../pages/signup-password/signup-password.module';
 
 import { PersonListModule } from '../pages/person-list/person-list.module';
@@ -163,6 +165,8 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     SignupOwnerModule,
     SignupCheckModule,
     SignupVerifyModule,
+    SignupPlanModule,
+    SignupPaymentModule,
     SignupPasswordModule,
     OnboardListModule,
     PasswordResetModule,
