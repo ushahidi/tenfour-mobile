@@ -3,6 +3,7 @@ import { IonicPage, Select, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
+import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 
 import { SendViaComponent } from '../../components/send-via/send-via';
 
@@ -228,6 +229,11 @@ export class CheckinSendPage extends BasePage {
 
   private showPopover(event:any) {
     this.logger.info(this, "showPopover", event, this.checkin.send_via);
+
+    if (this.organization.hasFreePlan()) {
+      return this.upgradeToPro(event);
+    }
+
     let popover = this.popoverController.create(SendViaComponent,
       { send_via: this.checkin.send_via,
         app_enabled: this.organization.app_enabled,
@@ -248,6 +254,16 @@ export class CheckinSendPage extends BasePage {
 
   private countRecipients() {
     this.checkin.waiting_count = this.checkin.recipientIds().length;
+  }
+
+  private upgradeToPro(event:any) {
+    this.logger.info(this, "upgradeToPro");
+
+    if (this.ios) {
+      return;
+    }
+
+    this.navController.push(SettingsPaymentsPage);
   }
 
 }

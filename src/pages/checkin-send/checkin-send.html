@@ -24,6 +24,9 @@
       <ion-label>Send via</ion-label>
       <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
     </ion-item>
+    <ion-item tappable (click)="upgradeToPro($event)" *ngIf="organization && organization.hasFreePlan()">
+      <h2 ion-text color="primary">Upgrade to TenFour Pro for SMS and email check-ins</h2>
+    </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
     <ion-list-header>

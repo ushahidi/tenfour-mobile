@@ -168,10 +168,7 @@ export class SettingsListPage extends BasePage {
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.showModal(SettingsPaymentsPage, {
-      organization: this.organization,
-      user: this.user
-    });
+    this.showPage(SettingsPaymentsPage);
   }
 
   private settingsCheckins(event:any) {

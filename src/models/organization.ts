@@ -164,6 +164,12 @@ export class Organization extends Model {
   @Column("subscription_status", TEXT)
   public subscription_status:string = null;
 
+  @Column("subscription_plan", TEXT)
+  public subscription_plan:string = null;
+
+  @Column("user_count", INTEGER)
+  public user_count:number = null;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 
@@ -192,6 +198,14 @@ export class Organization extends Model {
       return this.codes.split(",");
     }
     return [];
+  }
+
+  public hasFreePlan():boolean {
+    return (this.subscription_plan === 'free-plan');
+  }
+
+  public hasProPlan():boolean {
+    return (this.subscription_plan === 'pro-plan');
   }
 
 }

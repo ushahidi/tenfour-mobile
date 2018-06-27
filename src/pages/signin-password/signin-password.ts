@@ -7,6 +7,7 @@ import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { Subscription } from '../../models/subscription';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
 
@@ -130,55 +131,61 @@ export class SigninPasswordPage extends BasePage {
           this.logger.info(this, "showNext", "Person", person);
           this.api.getOrganization(this.organization).then((organization:Organization) => {
             this.logger.info(this, "showNext", "Organization", organization);
-            organization.user_id = person.id;
-            organization.user_name = person.name;
-            organization.email = this.email;
-            organization.password = password;
-            let saves = [
-              this.storage.setOrganization(organization),
-              this.storage.setUser(person)
-            ];
-            if (this.mobile) {
-              saves.push(this.storage.saveOrganization(organization));
-              saves.push(this.storage.savePerson(organization, person));
-            }
-            Promise.all(saves).then(saved => {
-              this.analytics.trackLogin(organization, person);
-              this.events.publish('user:login');
-              loading.dismiss();
-              this.loading = false;
-              if (person.name && person.name.length > 0) {
-                this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
+            this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
+              let subscription = subscriptions[0];
+              this.logger.info(this, "showNext", "Subscription", subscription);
+              organization.user_id = person.id;
+              organization.user_name = person.name;
+              organization.email = this.email;
+              organization.password = password;
+              let saves = [
+                this.storage.setOrganization(organization),
+                this.storage.setSubscription(subscription),
+                this.storage.setUser(person)
+              ];
+              if (this.mobile) {
+                saves.push(this.storage.saveOrganization(organization));
+                saves.push(this.storage.saveSubscription(organization, subscription));
+                saves.push(this.storage.savePerson(organization, person));
               }
-              else {
-                this.showToast(`Welcome to ${organization.name}`);
-              }
-              if (person.config_profile_reviewed && person.config_self_test_sent) {
-                this.showRootPage(CheckinListPage, {
-                  organization: organization
-                });
-              }
-              else {
-                this.showRootPage(OnboardListPage, {
-                  organization: organization,
-                  person: person
-                });
-              }
-            },
-            (error:any) => {
-              this.logger.error(this, "showNext", error);
-              this.loading = false;
-              if (person.config_profile_reviewed && person.config_self_test_sent) {
-                this.showRootPage(CheckinListPage, {
-                  organization: organization
-                });
-              }
-              else {
-                this.showRootPage(OnboardListPage, {
-                  organization: organization,
-                  person: person
-                });
-              }
+              Promise.all(saves).then(saved => {
+                this.analytics.trackLogin(organization, person);
+                this.events.publish('user:login');
+                loading.dismiss();
+                this.loading = false;
+                if (person.name && person.name.length > 0) {
+                  this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
+                }
+                else {
+                  this.showToast(`Welcome to ${organization.name}`);
+                }
+                if (person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRootPage(CheckinListPage, {
+                    organization: organization
+                  });
+                }
+                else {
+                  this.showRootPage(OnboardListPage, {
+                    organization: organization,
+                    person: person
+                  });
+                }
+              },
+              (error:any) => {
+                this.logger.error(this, "showNext", error);
+                this.loading = false;
+                if (person.config_profile_reviewed && person.config_self_test_sent) {
+                  this.showRootPage(CheckinListPage, {
+                    organization: organization
+                  });
+                }
+                else {
+                  this.showRootPage(OnboardListPage, {
+                    organization: organization,
+                    person: person
+                  });
+                }
+              });
             });
           });
         });
