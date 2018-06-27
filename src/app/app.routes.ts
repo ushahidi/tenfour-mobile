@@ -65,7 +65,7 @@ export class TenFourRoutes {
 
     { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
     { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
-    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:token', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:code', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage'] },
     { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage'] },

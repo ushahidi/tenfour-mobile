@@ -13,7 +13,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SignupVerifyPage',
-  segment: 'signup/verify/:email/:token',
+  segment: 'signup/verify/:email/:code',
   defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
 })
 @Component({
@@ -25,7 +25,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class SignupVerifyPage extends BasePage  {
 
   email:string = null;
-  token:string = null;
+  code:string = null;
   loading:boolean = false;
   verified:boolean = false;
 
@@ -72,7 +72,7 @@ export class SignupVerifyPage extends BasePage  {
     this.verified = false;
     return Promise.resolve()
       .then(() => { return this.loadEmail(); })
-      .then(() => { return this.loadToken(); })
+      .then(() => { return this.loadCode(); })
       .then(() => { return this.verifyEmail(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -105,34 +105,34 @@ export class SignupVerifyPage extends BasePage  {
     })
   }
 
-  private loadToken():Promise<string> {
+  private loadCode():Promise<string> {
     return new Promise((resolve, reject) => {
-      if (this.hasParameter("token")){
-        this.token = this.getParameter<string>("token");
-        resolve(this.token);
+      if (this.hasParameter("code")){
+        this.code = this.getParameter<string>("code");
+        resolve(this.code);
       }
       else {
-        this.token = null;
-        reject("Token not provided");
+        this.code = null;
+        reject("Code not provided");
       }
     })
   }
 
   private verifyEmail() {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token);
-      if (this.email && this.email.length > 0 && this.token && this.token.length > 0) {
-        this.api.verifyEmail(this.email, this.token).then((_email:Email) => {
-          this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Verified");
+      this.logger.info(this, "verifyEmail", "Email", this.email, "Code", this.code);
+      if (this.email && this.email.length > 0 && this.code && this.code.length > 0) {
+        this.api.verifyEmail(this.email, this.code).then((_email:Email) => {
+          this.logger.info(this, "verifyEmail", "Email", this.email, "Code", this.code, "Verified");
           resolve(true);
         },
         (error:any) => {
-          this.logger.info(this, "verifyEmail", "Email", this.email, "Token", this.token, "Failed");
+          this.logger.info(this, "verifyEmail", "Email", this.email, "Code", this.code, "Failed");
           reject(error);
         });
       }
       else {
-        reject("Email and token not provided");
+        reject("Email and code not provided");
       }
     });
   }

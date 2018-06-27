@@ -15,7 +15,7 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
-import { PasswordResetPage } from '../pages/password-reset/password-reset'; 
+import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
@@ -206,8 +206,8 @@ export class TenFourApp {
         if (deeplink) {
           if (deeplink.path === '/organization/email/confirmation/') {
             let email = deeplink.parameters['email'];
-            let token = deeplink.parameters['token'];
-            this.showSignupVerify(email, token);
+            let code = deeplink.parameters['code'];
+            this.showSignupVerify(email, code);
           }
           else if (deeplink.path === '/login/email') {
              //SigninEmailPage
@@ -457,12 +457,12 @@ export class TenFourApp {
     });
   }
 
-  private showSignupVerify(email:string, token:string) {
+  private showSignupVerify(email:string, code:string) {
     let organization = new Organization({email: email});
     return Promise.resolve()
       .then(() => { return this.nav.setRoot(SigninUrlPage, {}); })
       .then(() => { return this.nav.push(SignupEmailPage, {}); })
-      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, token:token }); })
+      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, code:code }); })
       .then((loaded:any) => {
         this.logger.info(this, "showSignupVerify", "Loaded");
         this.hideSideMenu();
