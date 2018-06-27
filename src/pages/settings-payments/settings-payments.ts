@@ -2,10 +2,10 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SettingsSwitchtofreePage } from '../settings-switchtofree/settings-switchtofree';
-import { SettingsSwitchtoproPage } from '../settings-switchtopro/settings-switchtopro';
-import { SettingsWelcometoproPage } from '../settings-welcometopro/settings-welcometopro';
-import { SettingsAddcreditsPage } from '../settings-addcredits/settings-addcredits';
+import { SettingsPlanFreePage } from '../settings-plan-free/settings-plan-free';
+import { SettingsPlanProPage } from '../settings-plan-pro/settings-plan-pro';
+import { SettingsPlanProWelcomePage } from '../settings-plan-pro-welcome/settings-plan-pro-welcome';
+import { SettingsCreditsPage } from '../settings-credits/settings-credits';
 
 import { Organization } from '../../models/organization';
 import { Subscription } from '../../models/subscription';
@@ -24,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-payments',
   templateUrl: 'settings-payments.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsSwitchtofreePage, SettingsSwitchtoproPage, SettingsWelcometoproPage, SettingsAddcreditsPage ]
+  entryComponents:[ SettingsPlanFreePage, SettingsPlanProPage, SettingsPlanProWelcomePage, SettingsCreditsPage ]
 })
 export class SettingsPaymentsPage extends BasePage {
 
@@ -169,7 +169,7 @@ export class SettingsPaymentsPage extends BasePage {
 
   private switchToFree(event:any) {
     this.logger.info(this, "switchToFree");
-    let modal = this.showModal(SettingsSwitchtofreePage);
+    let modal = this.showModal(SettingsPlanFreePage);
   }
 
   private hashChangeSwitchToPro() {
@@ -226,7 +226,7 @@ export class SettingsPaymentsPage extends BasePage {
 
     checkSubscription()
       .then(() => {
-        this.showModal(SettingsWelcometoproPage);
+        this.showModal(SettingsPlanProWelcomePage);
         this.billingEstimate = this.calcBillingEstimate();
         loading.dismiss();
       })
@@ -244,7 +244,7 @@ export class SettingsPaymentsPage extends BasePage {
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
 
-    this.switchToProModal = this.showModal(SettingsSwitchtoproPage, {
+    this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'switchtopro'
     });
   }
@@ -269,7 +269,7 @@ export class SettingsPaymentsPage extends BasePage {
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
 
-    this.switchToProModal = this.showModal(SettingsSwitchtoproPage, {
+    this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'update'
     });
   }
@@ -293,7 +293,7 @@ export class SettingsPaymentsPage extends BasePage {
 
   private addCredits(event:any) {
     this.logger.info(this, "addCredits");
-    let modal = this.showModal(SettingsAddcreditsPage, {
+    let modal = this.showModal(SettingsCreditsPage, {
       credits: this.updatedCredits,
       billingEstimate: this.calcBillingEstimate(this.updatedCredits),
       organization: this.organization

@@ -11,10 +11,10 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage()
 @Component({
-  selector: 'page-settings-addcredits',
-  templateUrl: 'settings-addcredits.html',
+  selector: 'page-settings-credits',
+  templateUrl: 'settings-credits.html',
 })
-export class SettingsAddcreditsPage  extends BasePage {
+export class SettingsCreditsPage  extends BasePage {
 
   organization:Organization = null;
   credits:number = 0;

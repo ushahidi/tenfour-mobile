@@ -11,14 +11,13 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage()
 @Component({
-  selector: 'page-settings-welcometopro',
-  templateUrl: 'settings-welcometopro.html',
+  selector: 'page-settings-plan-free',
+  templateUrl: 'settings-plan-free.html',
 })
-export class SettingsWelcometoproPage extends BasePage {
+export class SettingsPlanFreePage extends BasePage {
 
   organization:Organization = null;
   subscription:Subscription = null;
-  retryCount:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -40,7 +39,7 @@ export class SettingsWelcometoproPage extends BasePage {
   ionViewWillLoad() {
     super.ionViewDidEnter();
     let loading = this.showLoading("Checking your plan...", true);
-    this.loadUpdates(true).then((loaded:any) => {
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     },
     (error:any) => {
@@ -64,7 +63,7 @@ export class SettingsWelcometoproPage extends BasePage {
         if (event) {
           event.complete();
         }
-        this.showAlert("Problem Switching to Pro Plan", error);
+        this.showAlert("Problem Switching to Free Plan", error);
         this.hideModal();
       });
   }
@@ -97,12 +96,10 @@ export class SettingsWelcometoproPage extends BasePage {
           if (subscriptions.length !== 1) {
             return reject("Current plan was not found");
           }
-          if (subscriptions[0].plan_id !== 'pro-plan') {
-            return reject("There was a problem changing to Pro plan");
+          if (subscriptions[0].plan_id === 'free-plan') {
+            return reject("You are already on the free plan");
           }
-
           this.subscription = subscriptions[0];
-          this.events.publish('subscription:changed', this.subscription, Date.now());
 
           resolve(this.subscription);
         });
@@ -110,7 +107,35 @@ export class SettingsWelcometoproPage extends BasePage {
     });
   }
 
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    if (this.organization) {
+      this.analytics.trackPage(this, {
+        organization: this.organization.name
+      });
+    }
+  }
+
   private closeModal(event:any) {
     this.hideModal();
   }
+
+  private switchToFree(event:any) {
+    this.logger.info(this, "switchToFree");
+    let loading = this.showLoading("Switching to Free Plan...", true);
+    this.api.deleteSubscription(this.organization, this.subscription)
+      .then((subscription:Subscription) => {this.subscription = subscription; return this.api.getOrganization(this.organization)})
+      .then((organization:Organization) => {return this.storage.setOrganization(organization)})
+      .then(()=>{return this.storage.saveSubscription(this.organization, this.subscription)})
+      .then(()=>{
+        this.events.publish('subscription:changed', this.subscription, Date.now());
+        loading.dismiss();
+        this.hideModal();
+      })
+      .catch((error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Switching to Free Plan", error);
+      });
+  }
+
 }

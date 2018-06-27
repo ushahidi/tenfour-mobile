@@ -12,10 +12,10 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage()
 @Component({
-  selector: 'page-settings-switchtopro',
-  templateUrl: 'settings-switchtopro.html',
+  selector: 'page-settings-plan-pro',
+  templateUrl: 'settings-plan-pro.html',
 })
-export class SettingsSwitchtoproPage extends BasePage {
+export class SettingsPlanProPage extends BasePage {
 
   organization:Organization = null;
   subscription:Subscription = null;

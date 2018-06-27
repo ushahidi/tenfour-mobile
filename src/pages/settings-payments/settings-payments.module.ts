@@ -1,10 +1,10 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
-import { SettingsSwitchtofreePageModule } from '../../pages/settings-switchtofree/settings-switchtofree.module';
-import { SettingsSwitchtoproPageModule } from '../../pages/settings-switchtopro/settings-switchtopro.module';
-import { SettingsWelcometoproPageModule } from '../../pages/settings-welcometopro/settings-welcometopro.module';
-import { SettingsAddcreditsPageModule } from '../../pages/settings-addcredits/settings-addcredits.module';
+import { SettingsPlanFreePageModule } from '../../pages/settings-plan-free/settings-plan-free.module';
+import { SettingsPlanProPageModule } from '../../pages/settings-plan-pro/settings-plan-pro.module';
+import { SettingsPlanProWelcomePageModule } from '../../pages/settings-plan-pro-welcome/settings-plan-pro-welcome.module';
+import { SettingsCreditsPageModule } from '../../pages/settings-credits/settings-credits.module';
 
 import { SettingsPaymentsPage } from './settings-payments';
 
@@ -16,10 +16,10 @@ import { DayOfMonthModule } from '../../pipes/day-of-month/day-of-month.module';
   ],
   imports: [
     DayOfMonthModule,
-    SettingsSwitchtofreePageModule,
-    SettingsSwitchtoproPageModule,
-    SettingsWelcometoproPageModule,
-    SettingsAddcreditsPageModule,
+    SettingsPlanFreePageModule,
+    SettingsPlanProPageModule,
+    SettingsPlanProWelcomePageModule,
+    SettingsCreditsPageModule,
     IonicPageModule.forChild(SettingsPaymentsPage),
   ],
   exports: [
