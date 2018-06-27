@@ -15,8 +15,6 @@ import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupNamePage } from '../pages/signup-name/signup-name';
 import { SignupUrlPage} from '../pages/signup-url/signup-url';
-import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
-import { SignupPaymentPage } from '../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { PersonListPage } from '../pages/person-list/person-list';
@@ -69,9 +67,7 @@ export class TenFourRoutes {
     { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage'] },
     { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage'] },
-    { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
-    { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
-    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage', 'SignupPlanPage'] },
+    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
 
     { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 

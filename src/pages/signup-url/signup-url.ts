@@ -3,7 +3,7 @@ import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
-import { SignupPlanPage } from '../../pages/signup-plan/signup-plan';
+import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -20,7 +20,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-signup-url',
   templateUrl: 'signup-url.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SignupPlanPage ]
+  entryComponents:[ SignupPasswordPage ]
 })
 export class SignupUrlPage extends BasePage {
 
@@ -115,7 +115,7 @@ export class SignupUrlPage extends BasePage {
       else {
         this.organization.subdomain = this.subdomain.value;
         this.storage.setOrganization(this.organization).then((stored:boolean) => {
-          this.showPage(SignupPlanPage, {
+          this.showPage(SignupPasswordPage, {
             organization: this.organization
           });
         });
