@@ -216,4 +216,34 @@ export class SettingsEditPage extends BasePage {
     });
   }
 
+  private deleteAccount(event:any) {
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          this.api.deleteOrganization(this.organization).then((deleted:any) => {
+            loading.dismiss();
+            this.showToast("Your account has been deleted");
+            this.hideModal({
+              deleted: true
+            });
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Deleting Acount", error);
+          });
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteAccount", "Cancelled");
+        }
+      }
+    ];
+    this.showConfirm("Delete Account", "Are you sure you want to delete your account?", buttons);
+  }
+
 }
