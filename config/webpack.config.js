@@ -16,7 +16,7 @@ module.exports = function () {
 
 function getSourcePath(env) {
   if (env == 'local' || env == 'sandbox') {
-    return './src/environments/environment.sandbox.ts';
+    return './src/environments/environment.local.ts';
   }
   else if (env == 'dev' || env == 'develop' || env == 'development') {
     return './src/environments/environment.development.ts';
