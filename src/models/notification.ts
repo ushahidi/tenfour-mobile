@@ -49,6 +49,12 @@ export class Notification extends Model {
       if (data.data.profile_picture && data.data.profile_picture.toString().indexOf("http") != -1) {
         this.person_picture = data.data.profile_picture;
       }
+      if (data.data.count) {
+        this.import_count = data.data.count;
+      }
+      if (data.data.dupe_count) {
+        this.import_dupe_count = data.data.dupe_count;
+      }
     }
   }
 
