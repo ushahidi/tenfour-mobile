@@ -6,6 +6,7 @@ import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
+import { Subscription } from '../../models/subscription';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
 
@@ -200,6 +201,8 @@ export class SigninInvitePage extends BasePage {
         .then((person:Person) => { return this.storage.setUser(person); })
         .then((stored:boolean) => { return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { return this.storage.setOrganization(organization); })
+        .then((stored:boolean) => { return this.api.getSubscriptions(this.organization); })
+        .then((subscriptions:Subscription[]) => { return this.storage.setSubscription(subscriptions[0]); })
         .then((stored:boolean) => {
           this.logger.info(this, "acceptInitation", "Accepted");
           this.events.publish('user:login');

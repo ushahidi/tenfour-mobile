@@ -25,6 +25,7 @@ import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
+import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
@@ -237,6 +238,9 @@ export class TenFourApp {
       });
       this.events.subscribe('checkin:details', (data:any) => {
         this.showCheckinDetails(data.checkin);
+      });
+      this.events.subscribe('subscription:changed', (subscription, time) => {
+        this.loadOrganization();
       });
       resolve(true);
     })
@@ -737,6 +741,11 @@ export class TenFourApp {
       loading.dismiss();
       this.showAlert("Problem Resending Check-In", error);
     });
+  }
+
+  private upgradeToPro(event:any) {
+    this.logger.info(this, "upgradeToPro");
+    this.navController.push(SettingsPaymentsPage);
   }
 
 }

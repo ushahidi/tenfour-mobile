@@ -1,5 +1,46 @@
 page-settings-payments {
-  background-color: #FFFFFF;
+  background-color: color($colors, white);
+
+  .extra-sms-credits {
+    opacity: .7;
+
+    &.enabled {
+      opacity: 1;
+    }
+  }
+
+  h2 {
+    text-align: center;
+    color: color($colors, grey);
+
+    &.activated {
+      color: color($colors, primary);
+    }
+  }
+
+  ion-card.card {
+    background-color: color($colors, white);
+    border-top: 5px solid color($colors, grey);
+
+    &.activated {
+      border-top-color: color($colors, primary);
+    }
+
+    ion-item {
+      background-color: color($colors, white);
+    }
+
+    ion-card-header {
+      font-weight: bold;
+    }
+  }
+
+  ion-list.features {
+    ion-item {
+      // border-bottom: 1px solid color($colors, grey);
+    }
+  }
+
   ion-list {
     ion-item {
       h1 {
@@ -22,11 +63,5 @@ page-settings-payments {
         margin-bottom: 100px;
       }
     }
-  }
-  iframe {
-    border: none;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 700px;
   }
 }

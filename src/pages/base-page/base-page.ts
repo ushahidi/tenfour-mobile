@@ -43,6 +43,8 @@ export class BasePage {
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
 
+  protected queryParams:string[] = [];
+
   @ViewChild(Content)
   content:Content;
 
@@ -277,6 +279,19 @@ export class BasePage {
       return true;
     }
     return false;
+  }
+
+  protected extractQueryParams() {
+    let matches = location.hash.match(/(.*)\?(.*)/);
+
+    if (matches && matches.length > 1) {
+      let params = matches[2].split(/&/);
+
+      for (let param of params) {
+        let keyValue = param.match(/(.*)=(.*)/);
+        this.queryParams[decodeURIComponent(keyValue[1])] = decodeURIComponent(keyValue[2]);
+      }
+    }
   }
 
 }
