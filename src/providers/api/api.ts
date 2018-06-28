@@ -1270,4 +1270,22 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
+
+  public deleteOrganization(organization:Organization):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
 }

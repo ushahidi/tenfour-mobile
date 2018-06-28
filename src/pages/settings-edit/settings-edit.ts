@@ -2,10 +2,13 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
+
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Location } from '../../models/location';
+import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
@@ -25,11 +28,14 @@ import { LocationSuggestComponent } from '../../components/location-suggest/loca
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
+
 export class SettingsEditPage extends BasePrivatePage {
 
   @ViewChild("fileInput")
   fileInput:any = null;
 
+  organization:Organization = null;
+  user:User = null;
   logo:string = "assets/images/dots.png";
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
@@ -60,6 +66,10 @@ export class SettingsEditPage extends BasePrivatePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showToast(error);
     });
   }
 
@@ -93,6 +103,40 @@ export class SettingsEditPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
+
+  private loadOrganization(cache:boolean=true):Promise<Organization> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.organization) {
+        resolve(this.organization);
+      }
+      else if (this.hasParameter("organization")){
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      }
+      else {
+        this.storage.getOrganization().then((organization:Organization) => {
+          this.organization = organization;
+          resolve(this.organization);
+        });
+      }
+    });
+  }
+
+  private loadUser(cache:boolean=true):Promise<User> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.user) {
+        resolve(this.user);
+      }
+      else if (this.hasParameter("user")){
+        this.user = this.getParameter<User>("user");
+        resolve(this.user);
+      }
+      else {
+        this.storage.getUser().then((user:User) => {
+          this.user = user;
+          resolve(this.user);
+        });
+      }
 
   private loadCamera():Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -241,6 +285,41 @@ export class SettingsEditPage extends BasePrivatePage {
       this.organization.location = location.address;
       this.locations = [];
     });
+  }
+
+  private deleteOrganizationAccount(event:any) {
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          if (this.user && this.user.isOwner()) {
+            this.api.deleteOrganization(this.organization).then((deleted:any) => {
+              this.events.publish('account:deleted');
+              loading.dismiss();
+              this.showToast("Your Organization Account has been deleted");
+              this.hideModal({
+                deleted: true
+              });
+              this.showPage(SigninUrlPage, {});
+              this.showRootPage(SigninUrlPage, {});
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.showAlert("Problem Deleting Organization Acount", error);
+            });
+          }
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteOrganizationAccount", "Cancelled");
+        }
+      }
+    ];
+    this.showConfirm("Delete Organization Account", "Are you sure you want to delete your organization account?", buttons);
   }
 
 }
