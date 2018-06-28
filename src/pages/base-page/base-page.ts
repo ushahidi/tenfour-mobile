@@ -43,8 +43,6 @@ export class BasePage {
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
 
-  protected queryParams:string[] = [];
-
   @ViewChild(Content)
   content:Content;
 
