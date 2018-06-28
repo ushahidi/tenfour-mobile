@@ -1,10 +1,11 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Organization } from '../../models/organization';
+import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Token } from '../../models/token';
 
@@ -22,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
-export class SignupPasswordPage extends BasePage {
+export class SignupPasswordPage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
@@ -31,6 +32,8 @@ export class SignupPasswordPage extends BasePage {
   confirm:TextInput;
 
   organization:Organization;
+  person:Person;
+  token:Token;
 
   loading:boolean = false;
   accepted:boolean = false;
@@ -51,7 +54,7 @@ export class SignupPasswordPage extends BasePage {
       protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -59,10 +62,6 @@ export class SignupPasswordPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showToast(error);
     });
   }
 
@@ -139,68 +138,48 @@ export class SignupPasswordPage extends BasePage {
       this.loading = true;
       let loading = this.showLoading("Signing up...", true);
       this.organization.password = this.password.value;
-      this.api.createOrganization(this.organization).then((organization:Organization) => {
-        this.logger.info(this, "createOrganization", "Organization", organization);
-        this.api.userLogin(organization, organization.email, this.password.value).then((token:Token) => {
-          this.logger.info(this, "createOrganization", "Token", token);
-          this.api.getPerson(organization, "me").then((person:Person) => {
-            this.logger.info(this, "createOrganization", "Person", person);
-            this.api.getOrganization(organization).then((organization:Organization) => {
-              this.logger.info(this, "createOrganization", "Organization", organization);
-              organization.user_id = person.id;
-              organization.user_name = person.name;
-              organization.password = this.password.value;
-              let saves = [
-                this.storage.setOrganization(organization),
-                this.storage.setUser(person),
-                this.storage.saveOrganization(organization),
-                this.storage.savePerson(organization, person)
-              ];
-              Promise.all(saves).then(saved => {
-                this.analytics.trackLogin(organization, person);
-                this.events.publish('user:login');
-                loading.dismiss();
-                this.loading = false;
-                if (person.name && person.name.length > 0) {
-                  this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
-                }
-                else {
-                  this.showToast(`Welcome to ${organization.name}`);
-                }
-                this.showRootPage(OnboardListPage, {
-                  organization: organization,
-                  person: person
-                });
-              });
-            },
-            (error:any) => {
-              this.logger.error(this, "createOrganization", error);
-              loading.dismiss();
-              this.loading = false;
-              this.showAlert("Problem Creating Organization", error);
-            });
-          },
-          (error:any) => {
-            this.logger.error(this, "createOrganization", error);
-            loading.dismiss();
-            this.loading = false;
-            this.showAlert("Problem Creating Account", error);
-          });
-        },
-        (error:any) => {
-          this.logger.error(this, "createOrganization", error);
+      Promise.resolve()
+        .then(() => { return this.api.createOrganization(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.api.userLogin(organization, organization.email, this.password.value); })
+        .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
+        .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
+        .then(() => {
+          this.analytics.trackLogin(this.organization, this.person);
+          this.events.publish('user:login');
           loading.dismiss();
           this.loading = false;
-          this.showAlert("Problem Logging In", error);
+          if (this.person.name && this.person.name.length > 0) {
+            this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
+          }
+          else {
+            this.showToast(`Welcome to ${this.organization.name}`);
+          }
+          this.showRootPage(OnboardListPage, {
+            organization: this.organization,
+            user: this.person
+          });
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "createOrganization", error);
+          this.loading = false;
+          loading.dismiss();
+          this.showAlert("Problem Creating Organization", error);
         });
-      },
-      (error:any) => {
-        this.logger.error(this, "createOrganization", error);
-        loading.dismiss();
-        this.loading = false;
-        this.showAlert("Problem Creating Organization", error);
-      });
-    }
+      }
+  }
+
+  private saveChanges(organization:Organization, person:Person) {
+    organization.user_id = person.id;
+    organization.user_name = person.name;
+    organization.password = this.password.value;
+    let saves = [
+      this.storage.setOrganization(organization),
+      this.storage.setUser(person),
+      this.storage.saveOrganization(organization),
+      this.storage.savePerson(organization, person)
+    ];
+    return Promise.all(saves);
   }
 
   private createOrganizationOnReturn(event:any) {

@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SettingsPlanFreePage } from '../settings-plan-free/settings-plan-free';
 import { SettingsPlanProPage } from '../settings-plan-pro/settings-plan-pro';
 import { SettingsPlanProWelcomePage } from '../settings-plan-pro-welcome/settings-plan-pro-welcome';
@@ -26,11 +26,9 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsPlanFreePage, SettingsPlanProPage, SettingsPlanProWelcomePage, SettingsCreditsPage ]
 })
-export class SettingsPaymentsPage extends BasePage {
+export class SettingsPaymentsPage extends BasePrivatePage {
 
-  organization:Organization = null;
   subscription:Subscription = null;
-  user:User = null;
   hashChangeFn = null;
   switchToProModal = null;
   billingEstimate:number = 0;
@@ -51,7 +49,7 @@ export class SettingsPaymentsPage extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -59,12 +57,7 @@ export class SettingsPaymentsPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showToast(error);
     });
-
     this.events.subscribe('subscription:changed', (subscription, time) => {
       this.loadUpdates(false);
     });
@@ -93,7 +86,6 @@ export class SettingsPaymentsPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadSubscription(cache); })
       .then(() => { return this.loadUser(cache); })
-      // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         this.updatedCredits = this.organization.credits_extra;
@@ -112,24 +104,6 @@ export class SettingsPaymentsPage extends BasePage {
       });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
   private loadSubscription(cache:boolean=true):Promise<Subscription> {
     return new Promise((resolve, reject) => {
       if (cache && this.subscription) {
@@ -140,24 +114,6 @@ export class SettingsPaymentsPage extends BasePage {
           console.log(subscription);
           this.subscription = subscription;
           resolve(this.subscription);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
         });
       }
     });
@@ -174,10 +130,8 @@ export class SettingsPaymentsPage extends BasePage {
 
   private hashChangeSwitchToPro() {
     this.logger.info(this, "hashChangeSwitchToPro");
-    this.extractQueryParams();
-
-    if (this.queryParams['id'] && this.queryParams['state']) {
-      if (this.queryParams['state'] === 'succeeded') {
+    if (this.hasParameter('id') && this.hasParameter('state')) {
+      if (this.getParameter('state') === 'succeeded') {
         this.completeSwitchToPro();
       }
     }
@@ -187,17 +141,14 @@ export class SettingsPaymentsPage extends BasePage {
     this.switchToProModal.dismiss();
     let loading = this.showLoading("Switching to TenFour Pro...", true);
     let retryCount = 0;
-
     let checkSubscription = () => {
       return new Promise((resolve, reject) => {
         this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
           if (subscriptions.length < 1) {
             return reject("Current plan was not found");
           }
-
           if (subscriptions[0].plan_id === 'pro-plan') {
             this.subscription = subscriptions[0];
-
             return this.api.getOrganization(this.organization).then((organization:Organization) => {
               this.storage.setOrganization(organization)
                 .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
@@ -207,11 +158,9 @@ export class SettingsPaymentsPage extends BasePage {
                 });
             });
           }
-
           if (retryCount++ > 5) {
             reject('Could not switch plans. Try logging out of your account.');
           }
-
           setTimeout(() => {
             checkSubscription().then((subscription:Subscription) => {
               resolve(subscription);
@@ -238,12 +187,10 @@ export class SettingsPaymentsPage extends BasePage {
 
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
-
     if (!this.hashChangeFn) {
       this.hashChangeFn = this.hashChangeSwitchToPro.bind(this);
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
-
     this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'switchtopro'
     });
@@ -251,10 +198,8 @@ export class SettingsPaymentsPage extends BasePage {
 
   private hashChangeUpdateBillingInfo() {
     this.logger.info(this, "hashChangeUpdateBillingInfo");
-    this.extractQueryParams();
-
-    if (this.queryParams['id'] && this.queryParams['state']) {
-      if (this.queryParams['state'] === 'succeeded') {
+    if (this.hasParameter('id') && this.hasParameter('state')) {
+      if (this.getParameter('state') === 'succeeded') {
         this.switchToProModal.dismiss();
         this.showToast("Your billing info has been updated");
       }
@@ -263,12 +208,10 @@ export class SettingsPaymentsPage extends BasePage {
 
   private updateBillingInfo(event:any) {
     this.logger.info(this, "updateBillingInfo");
-
     if (!this.hashChangeFn) {
       this.hashChangeFn = this.hashChangeUpdateBillingInfo.bind(this);
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
-
     this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'update'
     });
@@ -276,13 +219,10 @@ export class SettingsPaymentsPage extends BasePage {
 
   private calcBillingEstimate(extraCredits?:number):number {
     let estimate = this.organization.user_count * 3;
-
     if (!extraCredits) {
       extraCredits = this.organization.credits_extra;
     }
-
     estimate += extraCredits * .1;
-
     return estimate
   }
 

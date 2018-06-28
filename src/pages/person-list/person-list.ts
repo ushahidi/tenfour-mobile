@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
@@ -24,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonDetailsPage, PersonEditPage, PersonInvitePage, PersonImportPage ]
 })
-export class PersonListPage extends BasePage {
+export class PersonListPage extends BasePrivatePage {
 
   organization:Organization = null;
   user:User = null;
@@ -45,7 +45,7 @@ export class PersonListPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
@@ -54,15 +54,9 @@ export class PersonListPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.loading = true;
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((finished:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-      this.loading = false;
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.loading = false;
     });
   }
 
@@ -97,42 +91,6 @@ export class PersonListPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
-    });
   }
 
   private loadPeople(cache:boolean=true) {
@@ -206,8 +164,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
-      user: this.user,
-      modal: true
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
@@ -230,8 +187,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "invitePerson");
     let modal = this.showModal(PersonInvitePage, {
       organization: this.organization,
-      user: this.user,
-      modal: true
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "invitePerson", "Modal", data);
@@ -251,8 +207,7 @@ export class PersonListPage extends BasePage {
     this.logger.info(this, "importPerson");
     let modal = this.showModal(PersonImportPage, {
       organization: this.organization,
-      user: this.user,
-      modal: true
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "importPerson", "Modal", data);
@@ -270,23 +225,12 @@ export class PersonListPage extends BasePage {
 
   private showPerson(person:Person, event:any=null) {
     this.logger.info(this, "showPerson", person);
-    if (this.platform.width() > this.WIDTH_LARGE) {
-      this.showModal(PersonDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: person,
-        person_id: person.id,
-        modal: true
-      });
-    }
-    else {
-      this.showPage(PersonDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: person,
-        person_id: person.id
-      });
-    }
+    this.showModalOrPage(PersonDetailsPage, {
+      organization: this.organization,
+      user: this.user,
+      person: person,
+      person_id: person.id
+    });
   }
 
   private removePerson(person:Person, event:any=null) {

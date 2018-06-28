@@ -1,7 +1,7 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 
@@ -28,10 +28,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonSelectPage ]
 })
-export class CheckinSendPage extends BasePage {
+export class CheckinSendPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
   checkin:Checkin = null;
 
   @ViewChild('select')
@@ -51,18 +49,13 @@ export class CheckinSendPage extends BasePage {
       protected popoverController:PopoverController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(false).then((finished:any) => {
-      this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
-      loading.dismiss();
-    },
-    (error:any) => {
-      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
   }
@@ -96,42 +89,6 @@ export class CheckinSendPage extends BasePage {
         }
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
-    });
   }
 
   private loadCheckin(cache:boolean=true):Promise<Checkin> {

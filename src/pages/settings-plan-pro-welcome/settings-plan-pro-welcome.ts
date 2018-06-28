@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Subscription } from '../../models/subscription';
 import { Organization } from '../../models/organization';
@@ -14,9 +14,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-plan-pro-welcome',
   templateUrl: 'settings-plan-pro-welcome.html',
 })
-export class SettingsPlanProWelcomePage extends BasePage {
+export class SettingsPlanProWelcomePage extends BasePrivatePage {
 
-  organization:Organization = null;
   subscription:Subscription = null;
   retryCount:number = 0;
 
@@ -34,16 +33,13 @@ export class SettingsPlanProWelcomePage extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillLoad() {
     super.ionViewDidEnter();
     let loading = this.showLoading("Checking your plan...", true);
     this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }
@@ -52,6 +48,7 @@ export class SettingsPlanProWelcomePage extends BasePage {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadSubscription(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -67,24 +64,6 @@ export class SettingsPlanProWelcomePage extends BasePage {
         this.showAlert("Problem Switching to Pro Plan", error);
         this.hideModal();
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
   }
 
   private loadSubscription(cache:boolean=true):Promise<Subscription> {
