@@ -76,4 +76,8 @@ export class SettingsRolesPage extends BasePrivatePage {
       });
   }
 
+  private cancelEdit(event:any) {
+    this.hideModal();
+  }
+
 }

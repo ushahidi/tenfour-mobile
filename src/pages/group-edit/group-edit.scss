@@ -5,8 +5,8 @@ page-group-edit {
         ion-icon {
           height:50px;
           width:50px;
-          color: #fff;
-          background-color: #000;
+          color: color($colors, white);
+          background-color: color($colors, black);
           font-size: 40px;
           border-radius: 50%;
           -webkit-border-radius: 50%;
