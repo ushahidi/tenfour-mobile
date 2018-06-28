@@ -291,12 +291,14 @@ export class SettingsEditPage extends BasePage {
           let loading = this.showLoading("Deleting...", true);
           if (this.user && this.user.isOwner()) {
             this.api.deleteOrganization(this.organization).then((deleted:any) => {
+              this.events.publish('account:deleted');
               loading.dismiss();
               this.showToast("Your Organization Account has been deleted");
               this.hideModal({
                 deleted: true
               });
               this.showPage(SigninUrlPage, {});
+              this.showRootPage(SigninUrlPage, {});
             },
             (error:any) => {
               loading.dismiss();
