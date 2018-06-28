@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SigninUrlPage } from '../../pages/signin-url/signin-url';
@@ -34,8 +34,6 @@ export class SettingsEditPage extends BasePrivatePage {
   @ViewChild("fileInput")
   fileInput:any = null;
 
-  organization:Organization = null;
-  user:User = null;
   logo:string = "assets/images/dots.png";
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
@@ -57,7 +55,8 @@ export class SettingsEditPage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected camera:CameraProvider,
-      protected location:LocationProvider) {
+      protected location:LocationProvider,
+      protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -103,40 +102,6 @@ export class SettingsEditPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
 
   private loadCamera():Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -301,7 +266,6 @@ export class SettingsEditPage extends BasePrivatePage {
               this.hideModal({
                 deleted: true
               });
-              this.showPage(SigninUrlPage, {});
               this.showRootPage(SigninUrlPage, {});
             },
             (error:any) => {
