@@ -137,7 +137,7 @@ export class SigninPasswordPage extends BasePublicPage {
         .then(() => { return this.api.userLogin(this.organization, this.email, password); })
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
-        .then((organization:Organization) => { this.organization = organization; return this.api.getSubscriptions(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.loadSubscriptions(this.organization, this.person); })
         .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
@@ -170,6 +170,22 @@ export class SigninPasswordPage extends BasePublicPage {
           this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
         });
       }
+  }
+
+  private loadSubscriptions(organization:Organization, person:Person):Promise<Subscription[]> {
+    return new Promise((resolve, reject) => {
+      if (person && person.isOwner()) {
+        this.api.getSubscriptions(organization).then((subscriptions:Subscription[]) => {
+          resolve(subscriptions);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+      else {
+        resolve([]);
+      }
+    });
   }
 
   private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<any[]> {
