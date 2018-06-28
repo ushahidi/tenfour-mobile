@@ -3,10 +3,7 @@
     <ion-title>Payment Details</ion-title>
   </ion-navbar>
 </ion-header>
-
 <ion-content padding>
-
   <ion-spinner name="ios" *ngIf="iframe == null"></ion-spinner>
   <iframe [src]="iframe" frameborder="0" *ngIf="iframe"></iframe>
-
 </ion-content>

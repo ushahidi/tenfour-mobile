@@ -15,16 +15,16 @@ page-checkin-respond {
     h1 {
     }
     p {
-      color: #888 !important;
+      color: color($colors, text) !important;
       margin-top: 5px !important;
       strong {
-        color: #444 !important;
+        color: color($colors, black) !important;
         font-weight: 500 !important;
       }
     }
     item-content, .content {
       small {
-        color: #888 !important;
+        color: color($colors, text) !important;
       }
     }
   }

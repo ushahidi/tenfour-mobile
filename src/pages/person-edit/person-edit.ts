@@ -98,8 +98,8 @@ export class PersonEditPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadRegions(); })
       .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadRegions(); })
       .then(() => { return this.loadCamera(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");

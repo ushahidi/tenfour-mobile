@@ -1,18 +1,14 @@
 checkin-card {
   ion-card {
-    &.selected {
-      background-color: #f6f6f6 !important;
-    }
     ion-card-content {
-      border-bottom: 1px solid #ccc;
       person-avatar {
       }
       h1 {
       }
       p {
-        color: #888 !important;
+        color: color($colors, text) !important;
         strong {
-          color: #444 !important;
+          color: color($colors, black) !important;
           font-weight: 500 !important;
         }
       }
@@ -23,6 +19,7 @@ checkin-card {
       }
     }
     ion-row {
+      border-top: 1px solid color($colors, light) !important;
       ion-col {
         button {
           font-weight: 500 !important;

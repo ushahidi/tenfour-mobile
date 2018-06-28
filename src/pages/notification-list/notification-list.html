@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left *ngIf="modal == true">
-      <button ion-button color="primary" (click)="close($event)">Close</button>
+      <button ion-button color="cancel" (click)="close($event)">Close</button>
     </ion-buttons>
     <ion-title>Notifications</ion-title>
   </ion-navbar>
@@ -17,55 +17,55 @@
     <ion-item no-lines *ngIf="loading == false && notifications.length == 0">
       <h2>There currently are no notifications...</h2>
     </ion-item>
-    <ion-card [class.viewed]="notification.viewed_at" *ngFor="let notification of notifications">
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'Welcome'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+    <ion-card color="card" [class.viewed]="notification.viewed_at" *ngFor="let notification of notifications">
+      <ion-card-content text-wrap *ngIf="notification.type == 'Welcome'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>Welcome to TenFour!</h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'WelcomeAbandoned'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'WelcomeAbandoned'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>Welcome to TenFour.</h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonJoinedOrganization'">
-        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'PersonJoinedOrganization'">
+        <person-avatar float-left margin-right [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h2>
           <strong>{{notification.person_name}}</strong> joined the organization.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonLeftOrganization'">
-        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'PersonLeftOrganization'">
+        <person-avatar float-left margin-right [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h2>
           <strong>{{notification.person_name}}</strong> left the organization.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'PersonToPerson'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'PersonToPerson'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>{{notification.person_name}}</strong> sent you a notification:
           <em>{{notification.message}}</em>
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'CheckInReceived'">
-        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'CheckInReceived'">
+        <person-avatar float-left margin-right [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h2>
           You received a Check-In <strong *ngIf="notification.checkin_message">{{notification.checkin_message}}</strong>.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'ReplyReceived'">
-        <person-avatar item-left [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'ReplyReceived'">
+        <person-avatar float-left margin-right [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h2>
           <strong>{{notification.reply_from}}</strong> responded to a Check-In.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'ImportSucceeded'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'ImportSucceeded'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>
             <span *ngIf="notification.import_count == 0">Nobody was imported</span>
@@ -76,53 +76,53 @@
           <span *ngIf="notification.import_dupe_count > 1">{{notification.import_dupe_count}} duplicates were found.</span>
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'ImportFailed'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'ImportFailed'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>Import failed</strong> {{notification.message}}
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'Unsubscribe'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'Unsubscribe'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>{{notification.person_name}}</strong> blocked the {{notification.contact_type}} <strong>{{notification.contact}}</strong> from receiving Check-Ins.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'Complaint'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'Complaint'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>{{notification.person_name}}</strong> reported the TenFour <strong>{{notification.checkin_message}}</strong> as spam.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'FreePromoEnding'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'FreePromoEnding'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>{{notification.message}}</h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'TrialEnding'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'TrialEnding'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>{{notification.message}}</h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'PaymentSucceeded'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'PaymentSucceeded'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>Successful Payment</strong> to TenFour on the {{notification.card_type}} card ending in {{notification.card_last_four}}.
           We have added {{notification.card_adjustment}} credits to your account.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
-      <ion-item color="white" text-wrap *ngIf="notification.type == 'PaymentFailed'">
-        <organization-logo item-left [image]="organization.profile_picture"></organization-logo>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'PaymentFailed'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>Payment Failure</strong> on the {{notification.card_type}} card ending in {{notification.card_last_four}}.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
-      </ion-item>
+      </ion-card-content>
     </ion-card>
   </ion-list>
   <ion-infinite-scroll *ngIf="mobile == true" (ionInfinite)="loadMore($event)">

@@ -1,4 +1,4 @@
-<ion-card color="white" [class.selected]="selected == true">
+<ion-card margin-top margin-bottom color="card" [class.selected]="selected == true">
   <ion-card-content text-center tappable (click)="onCardSelected($event)">
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>

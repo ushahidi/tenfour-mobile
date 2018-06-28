@@ -9,17 +9,17 @@ page-onboard-list {
   }
   ion-card {
     ion-card-content {
-      background-color: white;
+      background-color: color($colors, white);
     }
     ion-icon {
       font-size: 50px;
-      color: #888;
+      color: color($colors, text);
     }
     h2 {
       margin-top: 5px !important;
     }
     h5 {
-      color: #666;
+      color: color($colors, text);
       margin-top: 3px !important;
     }
     &.disabled {
@@ -36,7 +36,7 @@ page-onboard-list {
       border-radius: 50%;
       border-width: 2px;
       border-style: solid;
-      border-color: #888;
+      border-color: color($colors, text);
       padding: 5px;
     }
   }

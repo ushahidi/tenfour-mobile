@@ -1,18 +1,40 @@
 // Ionic Variables and Theming. For more info, please see:
 // http://ionicframework.com/docs/v2/theming/
 $font-path: "../assets/fonts";
+@font-face {
+  font-family: "Lato-Regular";
+  src: url($font-path+'/Lato-Regular.ttf');
+}
+@font-face {
+  font-family: "Lato-Black";
+  src: url($font-path+'/Lato-Black.ttf');
+}
+@font-face {
+  font-family: "Lato-Thin";
+  src: url($font-path+'/Lato-Thin.ttf');
+}
+@font-face {
+  font-family: "Lato-Italic";
+  src: url($font-path+'/Lato-Italic.ttf');
+}
+@font-face {
+  font-family: "Lato-Medium";
+  src: url($font-path+'/Lato-Medium.ttf');
+}
+@font-face {
+  font-family: "Lato-Bold";
+  src: url($font-path+'/Lato-Bold.ttf');
+}
+@font-face {
+  font-family: "Lato-Semibold";
+  src: url($font-path+'/Lato-Semibold.ttf');
+}
+@font-face {
+  font-family: "Lato-Heavy";
+  src: url($font-path+'/Lato-Heavy.ttf');
+}
 
 @import "ionic.globals";
-
-// Shared Variables
-// --------------------------------------------------
-// To customize the look and feel of this app, you can override
-// the Sass variables found in Ionic's source scss files.
-// To view all the possible Ionic variables, see:
-// http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
-
-$background-color: #F7F7F4;
-$toolbar-text-color: #5BAB60;
 
 // Named Color Variables
 // --------------------------------------------------
@@ -23,20 +45,39 @@ $toolbar-text-color: #5BAB60;
 // The "primary" color is the only required color in the map.
 
 $colors: (
-  primary:    #5BAB60,
-  secondary:  #EECC50,
-  danger:     #A74B4B,
-  light:      #EFEFEB,
-  dark:       #E6E6DD,
-  info:       #888888,
-  waiting:    #CCCCCC,
-  navbar:     #F5F5F1,
-  background: #EFEFEB,
-  text:       #8F8F8F,
-  grey:       #888888,
-  white:      #FFFFFF,
-  black:      #000000
+  primary:      #00AF64,
+  primarydark:  #016B3E,
+  secondary:    #FFC900,
+  cancel:       #777777,
+  danger:       #E31B48,
+  dark:         #CCCCCC,
+  light:        #DDDDDD,
+  input:        #F7F7F7,
+  icon:         #777777,
+  card:         #F7F7F7,
+  header:       #F7F7F7,
+  navbar:       #EDEDED,
+  waiting:      #CCCCCC,
+  background:   #FFFFFF,
+  text:         #777777,
+  grey:         #777777,
+  white:        #FFFFFF,
+  black:        #000000,
+  yellow:       #FFC900,
+  orange:       #F7921E,
+  blue:         #1553A5,
+  purple:       #603795
 );
+
+// Shared Variables
+// --------------------------------------------------
+// To customize the look and feel of this app, you can override
+// the Sass variables found in Ionic's source scss files.
+// To view all the possible Ionic variables, see:
+// http://ionicframework.com/docs/v2/theming/overriding-ionic-variables/
+
+$background-color: color($colors, background);
+$toolbar-text-color: color($colors, text);
 
 // App Web Variables
 // --------------------------------------------------
@@ -48,20 +89,28 @@ $modal-inset-height-small: 90%;
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
-$toolbar-ios-text-color: #5BAB60;
-$toolbar-ios-button-color: #5BAB60;
+$font-family-ios-base: "Lato-Regular";
+$toolbar-ios-text-color: color($colors, primary);
+$toolbar-ios-button-color: color($colors, primary);
+$card-ios-background-color: color($colors, card);
 
 // App Material Design Variables
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
-$toolbar-md-text-color: #5BAB60;
-$toolbar-md-button-color: #5BAB60;
+$font-family-md-base: "Lato-Regular";
+$toolbar-md-text-color: color($colors, primary);
+$toolbar-md-button-color: color($colors, primary);
+$card-md-background-color: color($colors, card);
 
 // App Windows Variables
 // --------------------------------------------------
 // Windows only Sass variables can go here
 
+$font-family-wp-base: "Lato-Regular";
+$toolbar-wp-text-color: color($colors, primary);
+$toolbar-wp-button-color: color($colors, primary);
+$card-wp-background-color: color($colors, card);
 
 // App Theme
 // --------------------------------------------------

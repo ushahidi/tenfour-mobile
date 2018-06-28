@@ -3,7 +3,7 @@ page-notification-list {
     &.viewed {
       opacity: 0.5 !important;
     }
-    ion-item {
+    ion-card-content {
       person-avatar {
         width: 35px;
       }
@@ -11,11 +11,13 @@ page-notification-list {
         width: 35px;
       }
       h2 {
-
+        strong {
+          font-weight: 600 !important;
+        }
       }
       p {
         font-size: 14px !important;
-        color: #888 !important;
+        color: color($colors, text) !important;
       }
     }
   }

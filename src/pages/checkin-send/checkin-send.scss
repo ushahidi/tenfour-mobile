@@ -2,7 +2,7 @@ page-checkin-send {
   ion-item {
     h3 {
       padding-top: 4px;
-      color: #888 !important;
+      color: color($colors, text) !important;
     }
     &.group {
       ion-icon {

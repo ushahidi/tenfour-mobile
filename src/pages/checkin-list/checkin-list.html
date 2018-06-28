@@ -21,7 +21,7 @@
         <div padding-top padding-left padding-right>
           <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
             <ion-segment-button value="all">All Check-Ins</ion-segment-button>
-            <ion-segment-button value="waiting">Waiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
+            <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
           </ion-segment>
         </div>
         <div text-center class="spinner" *ngIf="loading == true && checkins.length == 0">
