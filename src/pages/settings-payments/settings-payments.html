@@ -1,44 +1,91 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
-    </ion-buttons>
-    <ion-title>Plan & Credits</ion-title>
-    <ion-buttons right>
-      <button ion-button color="primary" (click)="doneEdit($event)">Done</button>
-    </ion-buttons>
+    <ion-title>Subscription Plans</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content color="white">
-  <div padding *ngIf="mobile">
-    <p text-center>You can edit your plan or add more credits to your organization from the TenFour website.</p>
-    <button ion-button color="primary" (click)="showUrl(url, '_blank', $event)">Visit Website</button>
-  </div>
-  <div *ngIf="website">
-    <ion-list>
-      <ion-item text-wrap no-lines text-center color="white">
-        <ion-grid>
-          <ion-row>
-            <ion-col>
-              <h1 text-right no-padding no-margin>$3</h1>
-            </ion-col>
-            <ion-col>
-              <p text-left no-padding no-margin>per user,<br>per month</p>
-            </ion-col>
-          </ion-row>
-        </ion-grid>
-        <p>Unlimited in-app messages</p>
-        <p>Unlimited email messages</p>
-        <p>Unlimited Slack messages</p>
-        <p>5 text messages (SMS) credits per user, per month</p>
-      </ion-item>
-      <ion-item text-wrap text-center no-lines color="white" *ngIf="person && person.isOwner() == true">
-        <ion-spinner name="ios" *ngIf="iframe == null"></ion-spinner>
-        <iframe [src]="iframe" frameborder="0" *ngIf="iframe"></iframe>
-      </ion-item>
-      <ion-item text-wrap no-lines color="white" *ngIf="person && person.isOwner() == false">
-        <h2 text-center>Note, only organization owners can edit payment information.</h2>
-      </ion-item>
-   </ion-list>
-  </div>
+
+  <!-- <h1>Upgrade to TenFour Pro</h1> -->
+
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12 col-sm>
+
+        <h2 [ngClass]="{'activated' : organization && organization.hasFreePlan()}">Free</h2>
+        <ion-card [ngClass]="{'activated' : organization && organization.hasFreePlan()}">
+          <ion-card-header>
+            Free!
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="features">
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+            </ion-list>
+            <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="switchToFree($event)">Switch to TenFour free</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+      <ion-col col-12 col-sm>
+
+        <h2 [ngClass]="{'activated' : organization && organization.hasProPlan()}">Pro</h2>
+        <ion-card [ngClass]="{'activated' : organization && organization.hasProPlan()}">
+          <ion-card-header>
+            $3 USD per user, per month
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list class="features">
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
+              <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
+            </ion-list>
+            <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
+              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}} people. (Estimate)</ion-item>
+              <ion-item><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
+              <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
+              <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
+            </ion-list>
+            <p text-center *ngIf="organization && organization.hasProPlan()">
+              <button ion-button block clear color="secondary" (click)="updateBillingInfo($event)">Update your billing info</button>
+            </p>
+            <button ion-button icon-left outline disabled block color="primary" *ngIf="organization && organization.hasProPlan()"><ion-icon name="checkmark"></ion-icon> You have TenFour Pro</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasProPlan()" (click)="switchToPro($event)">Upgrade to TenFour Pro</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+      <ion-col col-12 col-sm>
+
+        <h2 class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">Extra SMS Credits</h2>
+        <ion-card class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">
+          <ion-card-header>
+            $0.10 USD per credit per month
+          </ion-card-header>
+          <ion-card-content>
+
+            <ion-list class="features">
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Credits do not rollover</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
+            </ion-list>
+
+            <div *ngIf="organization && organization.hasProPlan()">
+              <p>Add credits</p>
+              <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
+              <p>Cost: {{updatedCreditsCost | currency}} per month</p>
+            </div>
+
+            <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
+            <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>
+          </ion-card-content>
+        </ion-card>
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
 </ion-content>

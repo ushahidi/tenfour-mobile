@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
@@ -25,10 +25,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
-export class OnboardListPage extends BasePage {
+export class OnboardListPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
   loading:boolean = false;
 
   constructor(
@@ -44,16 +42,13 @@ export class OnboardListPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(false).then((finished:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
   }
@@ -89,48 +84,6 @@ export class OnboardListPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        },
-        (error:any) => {
-          reject("Problem loading organization");
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        },
-        (error:any) => {
-          reject("Problem loading user");
-        });
-      }
-    });
   }
 
   private loadPeople(cache:boolean=true):Promise<any> {

@@ -1,8 +1,9 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SigninUrlPage } from '../../pages/signin-url/signin-url';
+
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -27,18 +28,18 @@ import { LocationSuggestComponent } from '../../components/location-suggest/loca
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
-export class SettingsEditPage extends BasePage {
+
+export class SettingsEditPage extends BasePrivatePage {
+
+  @ViewChild("fileInput")
+  fileInput:any = null;
 
   organization:Organization = null;
   user:User = null;
   logo:string = "assets/images/dots.png";
-
-  @ViewChild("fileInput")
-  fileInput:any = null;
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
   search:string = null;
-
   locations:Location[] = [];
   timer:any = null;
 
@@ -57,12 +58,7 @@ export class SettingsEditPage extends BasePage {
       protected storage:StorageProvider,
       protected camera:CameraProvider,
       protected location:LocationProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
-  }
-
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
-    this.loadCamera();
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -92,6 +88,7 @@ export class SettingsEditPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCamera(); })
+      .then(() => { return this.loadCameraRoll(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -140,6 +137,24 @@ export class SettingsEditPage extends BasePage {
           resolve(this.user);
         });
       }
+
+  private loadCamera():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.camera.cameraPresent().then((cameraPresent:boolean) => {
+        this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
+        this.cameraPresent = cameraPresent;
+        resolve(cameraPresent);
+      });
+    });
+  }
+
+  private loadCameraRoll():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
+        this.logger.info(this, "loadCameraRoll", "cameraRollPresent", cameraRollPresent);
+        this.cameraRollPresent = cameraRollPresent;
+        resolve(cameraRollPresent);
+      });
     });
   }
 
@@ -160,17 +175,6 @@ export class SettingsEditPage extends BasePage {
     (error:any) => {
       loading.dismiss();
       this.showAlert("Problem Updating Organization", error);
-    });
-  }
-
-  private loadCamera() {
-    this.camera.cameraPresent().then((cameraPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
-      this.cameraPresent = cameraPresent;
-    });
-    this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraRollPresent", cameraRollPresent);
-      this.cameraRollPresent = cameraRollPresent;
     });
   }
 

@@ -60,8 +60,8 @@ ionic cordova emulate android --livereload --consolelogs --emulator --target Nex
 ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
 ```
+ENV=local ionic serve --livereload --consolelogs
 ENV=dev ionic serve --livereload --consolelogs
-ENV=sandbox ionic serve --livereload --consolelogs
 ENV=staging ionic serve --livereload --consolelogs
 ENV=prod ionic serve --livereload --consolelogs
 ```
@@ -87,7 +87,6 @@ ENV=prod npm run ionic:build --prod --release
 ```
 
 #### Commit Branch
-
 ```
 ISSUE_NAME="123 Fixed A Bug"
 BRANCH_NAME=$(echo $ISSUE_NAME | tr '[:upper:]' '[:lower:]' | tr '/' '-' | tr ' ' '-')
@@ -97,4 +96,14 @@ git add -u
 git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
 git checkout develop
+```
+```
+git checkout develop
+git merge origin/master
+git push origin develop
+```
+```
+git checkout staging
+git merge origin/master
+git push origin staging
 ```

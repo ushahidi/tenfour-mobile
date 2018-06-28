@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { Organization } from '../../models/organization';
@@ -23,9 +23,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonSelectPage ]
 })
-export class GroupEditPage extends BasePage {
+export class GroupEditPage extends BasePrivatePage {
 
-  organization:Organization = null;
   group:Group = null;
   person:Person = null;
   editing:boolean = false;
@@ -44,24 +43,15 @@ export class GroupEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.organization = this.getParameter<Organization>("organization");
-    this.person = this.getParameter<Person>("person");
-    this.group = this.getParameter<Group>("group");
-    if (this.group == null || this.group.id == null) {
-      this.group = new Group({});
-      if (this.organization) {
-        this.group.organization_id = this.organization.id;
-      }
-      this.editing = false;
-    }
-    else {
-      this.editing = true;
-    }
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    });
   }
 
   ionViewDidEnter() {
@@ -72,6 +62,46 @@ export class GroupEditPage extends BasePage {
         group: this.group.name
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.loading = true;
+    return Promise.resolve()
+      .then(() => this.loadOrganization(cache))
+      .then(() => this.loadUser(cache))
+      .then(() => this.loadGroup(cache))
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+      })
+      .catch((error) => {
+        this.logger.info(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.loading = false;
+        this.showToast(error);
+      });
+  }
+
+  private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {
+    return new Promise((resolve, reject) => {
+      this.group = this.getParameter<Group>("group");
+      if (this.group == null || this.group.id == null) {
+        this.group = new Group({});
+        if (this.organization) {
+          this.group.organization_id = this.organization.id;
+        }
+        this.editing = false;
+      }
+      else {
+        this.editing = true;
+      }
+      resolve(this.group);
+    });
   }
 
   private cancelEdit(event:any) {

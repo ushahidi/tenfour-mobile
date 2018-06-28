@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 
@@ -26,10 +26,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, CheckinDetailsPage ]
 })
-export class PersonDetailsPage extends BasePage {
+export class PersonDetailsPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
   person:Person = null;
   profile:boolean = false;
   loading:boolean = false;
@@ -51,20 +49,14 @@ export class PersonDetailsPage extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.modal = this.getParameter<boolean>("modal");
-    this.loading = true;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
-      this.loading = false;
-      loading.dismiss();
-    },
-    (error:any) => {
-      this.loading = false;
       loading.dismiss();
     });
   }
@@ -81,6 +73,7 @@ export class PersonDetailsPage extends BasePage {
 
   protected loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
+    this.loading = true;
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
@@ -91,50 +84,16 @@ export class PersonDetailsPage extends BasePage {
         if (event) {
           event.complete();
         }
+        this.loading = false;
       })
       .catch((error:any) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
+        this.loading = false;
         this.showToast(error);
       });
-  }
-
-  protected loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
-  protected loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        });
-      }
-    });
   }
 
   protected loadPerson(cache:boolean=true):Promise<Person> {
@@ -212,8 +171,7 @@ export class PersonDetailsPage extends BasePage {
       user: this.user,
       person: this.person,
       person_id: this.person.id,
-      profile: this.profile,
-      modal: true
+      profile: this.profile
     });
     modal.onDidDismiss((data:any) => {
       this.logger.info(this, "editPerson", "Modal", data);
@@ -296,25 +254,13 @@ export class PersonDetailsPage extends BasePage {
 
   protected showCheckinDetails(checkin:Checkin, event:any=null) {
     this.logger.info(this, "showCheckinDetails", checkin);
-    if (this.platform.width() > this.WIDTH_LARGE) {
-      this.showModal(CheckinDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: this.person,
-        checkin: checkin,
-        checkin_id: checkin.id,
-        modal: true
-      });
-    }
-    else {
-      this.showPage(CheckinDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: this.person,
-        checkin: checkin,
-        checkin_id: checkin.id
-      });
-    }
+    this.showModalOrPage(CheckinDetailsPage, {
+      organization: this.organization,
+      user: this.user,
+      person: this.person,
+      checkin: checkin,
+      checkin_id: checkin.id
+    });
   }
 
 }

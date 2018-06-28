@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, Events, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
@@ -26,11 +26,9 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, BadgeProvider ],
   entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
 })
-export class CheckinListPage extends BasePage {
+export class CheckinListPage extends BasePrivatePage {
 
   filter:string = "all";
-  organization:Organization = null;
-  user:User = null;
   checkins:Checkin[] = [];
   selected:Checkin = null;
   loading:boolean = false;
@@ -53,19 +51,21 @@ export class CheckinListPage extends BasePage {
       protected badge:BadgeProvider,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    let loading = this.showLoading("Loading...");
     this.limit = this.tablet ? 10 : 5;
-    this.loadUpdates(false).then((finished:any) => {
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
-      this.loadWaitingResponse(true, this.mobile);
-    },
-    (error:any) => {
-      loading.dismiss();
+      this.loadWaitingResponse(true, this.mobile).then((waiting:Checkin[]) => {
+
+      },
+      (error:any) => {
+        this.logger.error(this, "ionViewDidLoad", "loadWaitingResponse", error);
+      });
     });
   }
 
@@ -105,48 +105,6 @@ export class CheckinListPage extends BasePage {
         this.loading = false;
         this.showToast(error);
       });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        },
-        (error:any) => {
-          reject("Problem loading organization");
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        },
-        (error:any) => {
-          reject("Problem loading user");
-        });
-      }
-    });
   }
 
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
@@ -233,30 +191,13 @@ export class CheckinListPage extends BasePage {
   }
 
   private showCheckinDetails(checkin:Checkin) {
-    if (document.body.clientWidth > this.WIDTH_LARGE) {
-      this.events.publish('checkin:details', {
-        checkin: checkin
-      });
-    }
-    else if (document.body.clientWidth > this.WIDTH_MEDIUM) {
-      this.showModal(CheckinDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: this.user,
-        checkin: checkin,
-        checkin_id: checkin.id,
-        modal: true
-      });
-    }
-    else {
-      this.showPage(CheckinDetailsPage, {
-        organization: this.organization,
-        user: this.user,
-        person: this.user,
-        checkin: checkin,
-        checkin_id: checkin.id
-      });
-    }
+    this.showModalOrPage(CheckinDetailsPage, {
+      organization: this.organization,
+      user: this.user,
+      person: this.user,
+      checkin: checkin,
+      checkin_id: checkin.id
+    });
   }
 
   private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {
@@ -265,8 +206,7 @@ export class CheckinListPage extends BasePage {
       organization: this.organization,
       user: this.user,
       checkins: checkins || [checkin],
-      checkin: checkin,
-      modal: true
+      checkin: checkin
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "showCheckinRespond", "Modal", data);
@@ -302,8 +242,7 @@ export class CheckinListPage extends BasePage {
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
-      user: this.user,
-      modal: true
+      user: this.user
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "createCheckin", "Modal", data);

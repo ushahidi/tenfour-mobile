@@ -2,7 +2,7 @@ var path = require('path');
 var useDefaultConfig = require('@ionic/app-scripts/config/webpack.config.js');
 
 module.exports = function () {
-    var environment = process.env.ENV || process.env.IONIC_ENV || "dev";
+    var environment = process.env.ENV || process.env.IONIC_ENV;
     var sourcePath = getSourcePath(environment);
     useDefaultConfig.dev.resolve.alias = {
       "@app/env": path.resolve(sourcePath)
@@ -16,7 +16,7 @@ module.exports = function () {
 
 function getSourcePath(env) {
   if (env == 'local' || env == 'sandbox') {
-    return './src/environments/environment.sandbox.ts';
+    return './src/environments/environment.local.ts';
   }
   else if (env == 'dev' || env == 'develop' || env == 'development') {
     return './src/environments/environment.development.ts';
@@ -30,7 +30,7 @@ function getSourcePath(env) {
   else if (env == 'prod' || env == 'production') {
     return './src/environments/environment.production.ts';
   }
-  return './src/environments/environment.sandbox.ts';
+  return './src/environments/environment.ts';
 }
 
 function consoleLog(env) {

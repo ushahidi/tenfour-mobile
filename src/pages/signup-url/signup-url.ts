@@ -2,8 +2,8 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
-import { SignupPlanPage } from '../../pages/signup-plan/signup-plan';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
+import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -20,9 +20,9 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-signup-url',
   templateUrl: 'signup-url.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SignupPlanPage ]
+  entryComponents:[ SignupPasswordPage ]
 })
-export class SignupUrlPage extends BasePage {
+export class SignupUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
@@ -42,7 +42,7 @@ export class SignupUrlPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -50,10 +50,6 @@ export class SignupUrlPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showToast(error);
     });
   }
 
@@ -115,7 +111,7 @@ export class SignupUrlPage extends BasePage {
       else {
         this.organization.subdomain = this.subdomain.value;
         this.storage.setOrganization(this.organization).then((stored:boolean) => {
-          this.showPage(SignupPlanPage, {
+          this.showPage(SignupPasswordPage, {
             organization: this.organization
           });
         });

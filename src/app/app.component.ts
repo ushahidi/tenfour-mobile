@@ -15,7 +15,7 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
-import { PasswordResetPage } from '../pages/password-reset/password-reset'; 
+import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
@@ -25,6 +25,7 @@ import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { NotificationListPage } from '../pages/notification-list/notification-list';
+import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 
 import { Model } from '../models/model';
 import { Organization } from '../models/organization';
@@ -205,8 +206,8 @@ export class TenFourApp {
         if (deeplink) {
           if (deeplink.path === '/organization/email/confirmation/') {
             let email = deeplink.parameters['email'];
-            let token = deeplink.parameters['token'];
-            this.showSignupVerify(email, token);
+            let code = deeplink.parameters['code'];
+            this.showSignupVerify(email, code);
           }
           else if (deeplink.path === '/login/email') {
              //SigninEmailPage
@@ -238,6 +239,9 @@ export class TenFourApp {
       this.events.subscribe('checkin:details', (data:any) => {
         this.showCheckinDetails(data.checkin);
       });
+      this.events.subscribe('subscription:changed', (subscription, time) => {
+        this.loadOrganization();
+      });
       resolve(true);
     })
   }
@@ -265,22 +269,21 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            this.logger.info(this, "loadWebApp", "Location", location.hash);
-            if (location.hash == '') {
+            if (this.hasLocationHash() == false) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (location.hash == '') {
+            if (this.hasLocationHash() == false) {
               this.showOnboardList(user);
             }
             resolve(true);
           }
         },
         (error:any) => {
-          this.logger.info(this, "loadWebApp", "Person", "None");
-          if (location.hash == '') {
+          this.logger.info(this, "loadWebApp", "User", "None");
+          if (this.hasLocationHash() == false) {
             this.showSigninUrl();
           }
           resolve(false);
@@ -288,7 +291,7 @@ export class TenFourApp {
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", "Organization", "None");
-        if (location.hash == '') {
+        if (this.hasLocationHash() == false) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -453,12 +456,12 @@ export class TenFourApp {
     });
   }
 
-  private showSignupVerify(email:string, token:string) {
+  private showSignupVerify(email:string, code:string) {
     let organization = new Organization({email: email});
     return Promise.resolve()
       .then(() => { return this.nav.setRoot(SigninUrlPage, {}); })
       .then(() => { return this.nav.push(SignupEmailPage, {}); })
-      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, token:token }); })
+      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, code:code }); })
       .then((loaded:any) => {
         this.logger.info(this, "showSignupVerify", "Loaded");
         this.hideSideMenu();
@@ -644,6 +647,9 @@ export class TenFourApp {
   }
 
   protected showModal(page:any, params:any={}, options:any={}):Modal {
+    if (params) {
+      params['modal'] = true;
+    }
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
@@ -688,8 +694,7 @@ export class TenFourApp {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply,
-        modal: true
+        reply: reply
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
@@ -710,8 +715,7 @@ export class TenFourApp {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin,
-      modal: true
+      checkin: this.checkin
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
@@ -737,6 +741,25 @@ export class TenFourApp {
       loading.dismiss();
       this.showAlert("Problem Resending Check-In", error);
     });
+  }
+
+  private upgradeToPro(event:any) {
+    this.logger.info(this, "upgradeToPro");
+    this.navController.push(SettingsPaymentsPage);
+  }
+
+  private locationHash():string {
+    if (location && location.hash) {
+        return location.hash;
+    }
+    return "";
+  }
+
+  private hasLocationHash():boolean {
+    if (location && location.hash) {
+        return location.hash.length > 0;
+    }
+    return false;
   }
 
 }

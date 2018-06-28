@@ -21,6 +21,9 @@ export class Subscription extends Model {
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
 
+  @Column("plan_id", TEXT)
+  public plan_id:string = null;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 
