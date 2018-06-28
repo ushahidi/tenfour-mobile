@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput,
          Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupNamePage } from '../../pages/signup-name/signup-name';
 
 import { Organization } from '../../models/organization';
@@ -21,7 +21,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SignupNamePage ]
 })
-export class SignupOwnerPage extends BasePage {
+export class SignupOwnerPage extends BasePublicPage {
 
   @ViewChild('owner')
   owner:TextInput;
@@ -41,7 +41,7 @@ export class SignupOwnerPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -49,10 +49,6 @@ export class SignupOwnerPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showToast(error);
     });
   }
 

@@ -90,9 +90,7 @@ export class HttpProvider {
           .timeout(12000)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            this.logger.error(this, "httpGet", error);
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((items) => {
             this.logger.info(this, "GET", url, items);
@@ -146,8 +144,7 @@ export class HttpProvider {
           .timeout(12000)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "POST", url, json);
@@ -200,8 +197,7 @@ export class HttpProvider {
           .timeout(12000)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "PUT", url, json);
@@ -254,8 +250,7 @@ export class HttpProvider {
           .timeout(12000)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "PATCH", url, json);
@@ -308,8 +303,7 @@ export class HttpProvider {
           .timeout(12000)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((items) => {
             this.logger.info(this, "DELETE", url, items);
@@ -438,18 +432,16 @@ export class HttpProvider {
         return error['error'] || error;
       }
       else if (typeof error === 'object') {
-        if (error['message']) {
-          return error['message'];
-        }
-        else if (error['error']) {
-          if (error['error'].toString().indexOf("The host could not be resolved") != -1) {
+        if (error['_body'] || error['message'] || error['error']) {
+          let message = error['_body'] || error['message'] || error['error']
+          if (message.toString().indexOf("The host could not be resolved") != -1) {
             return "The internet connection appears to be offline";
           }
-          else if (error['error'].toString().indexOf("The Internet connection appears to be offline") != -1) {
+          else if (message.toString().indexOf("The Internet connection appears to be offline") != -1) {
             return "The internet connection appears to be offline";
           }
-          else if (error.headers['content-type'] == "application/json") {
-            let json = JSON.parse(error['error']);
+          else {
+            let json = JSON.parse(message);
             if (json['errors']) {
               let errors = json['errors'];
               let messages = [];
@@ -468,7 +460,7 @@ export class HttpProvider {
               return json['message'];
             }
           }
-          return JSON.stringify(error['error']);
+          return JSON.stringify(message);
         }
       }
       else if (error['status'] == 401) {

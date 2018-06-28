@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
 
 import { Organization } from '../../models/organization';
@@ -22,7 +22,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
   entryComponents:[ SignupOwnerPage ]
 })
-export class SignupVerifyPage extends BasePage  {
+export class SignupVerifyPage extends BasePublicPage  {
 
   email:string = null;
   code:string = null;
@@ -43,20 +43,13 @@ export class SignupVerifyPage extends BasePage  {
       protected api:ApiProvider,
       protected mailer:MailerProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
-  }
-
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }
@@ -66,7 +59,7 @@ export class SignupVerifyPage extends BasePage  {
     this.analytics.trackPage(this);
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null) {
+  private loadUpdates(cache:boolean=true, event:any=null):Promise<any> {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     this.verified = false;
@@ -118,7 +111,7 @@ export class SignupVerifyPage extends BasePage  {
     })
   }
 
-  private verifyEmail() {
+  private verifyEmail():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "verifyEmail", "Email", this.email, "Code", this.code);
       if (this.email && this.email.length > 0 && this.code && this.code.length > 0) {
@@ -127,7 +120,7 @@ export class SignupVerifyPage extends BasePage  {
           resolve(true);
         },
         (error:any) => {
-          this.logger.info(this, "verifyEmail", "Email", this.email, "Code", this.code, "Failed");
+          this.logger.error(this, "verifyEmail", "Email", this.email, "Code", this.code, "Failed", error);
           reject(error);
         });
       }

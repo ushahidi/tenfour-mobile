@@ -269,22 +269,21 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            this.logger.info(this, "loadWebApp", "Location", location.hash);
-            if (location.hash == '') {
+            if (this.hasLocationHash() == false) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (location.hash == '') {
+            if (this.hasLocationHash() == false) {
               this.showOnboardList(user);
             }
             resolve(true);
           }
         },
         (error:any) => {
-          this.logger.info(this, "loadWebApp", "Person", "None");
-          if (location.hash == '') {
+          this.logger.info(this, "loadWebApp", "User", "None");
+          if (this.hasLocationHash() == false) {
             this.showSigninUrl();
           }
           resolve(false);
@@ -292,7 +291,7 @@ export class TenFourApp {
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", "Organization", "None");
-        if (location.hash == '') {
+        if (this.hasLocationHash() == false) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -648,6 +647,9 @@ export class TenFourApp {
   }
 
   protected showModal(page:any, params:any={}, options:any={}):Modal {
+    if (params) {
+      params['modal'] = true;
+    }
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
@@ -692,8 +694,7 @@ export class TenFourApp {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply,
-        modal: true
+        reply: reply
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
@@ -714,8 +715,7 @@ export class TenFourApp {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin,
-      modal: true
+      checkin: this.checkin
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
@@ -746,6 +746,20 @@ export class TenFourApp {
   private upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
     this.navController.push(SettingsPaymentsPage);
+  }
+
+  private locationHash():string {
+    if (location && location.hash) {
+        return location.hash;
+    }
+    return "";
+  }
+
+  private hasLocationHash():boolean {
+    if (location && location.hash) {
+        return location.hash.length > 0;
+    }
+    return false;
   }
 
 }

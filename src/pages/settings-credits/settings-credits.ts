@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Subscription } from '../../models/subscription';
 import { Organization } from '../../models/organization';
@@ -14,9 +14,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-credits',
   templateUrl: 'settings-credits.html',
 })
-export class SettingsCreditsPage  extends BasePage {
+export class SettingsCreditsPage  extends BasePrivatePage {
 
-  organization:Organization = null;
   credits:number = 0;
   billingEstimate:number = 0;
 
@@ -34,7 +33,7 @@ export class SettingsCreditsPage  extends BasePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {

@@ -1,7 +1,7 @@
 import { Component,  NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, Alert } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 
 import { Organization } from '../../models/organization';
 
@@ -21,7 +21,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SigninUrlPage ]
 })
-export class PasswordResetPage extends BasePage {
+export class PasswordResetPage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
@@ -48,7 +48,7 @@ export class PasswordResetPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone,platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone,platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
@@ -59,9 +59,6 @@ export class PasswordResetPage extends BasePage {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }

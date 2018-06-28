@@ -161,6 +161,9 @@ export class ApiProvider extends HttpProvider {
         this.logger.info(this, "userLogin", token);
         this.saveToken(organization, token).then(saved => {
           resolve(token);
+        },
+        (error:any) => {
+          resolve(token);
         });
       },
       (error:any) => {
