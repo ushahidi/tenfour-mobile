@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -290,12 +291,12 @@ export class SettingsEditPage extends BasePage {
           let loading = this.showLoading("Deleting...", true);
           if (this.user && this.user.isOwner()) {
             this.api.deleteOrganization(this.organization).then((deleted:any) => {
-              this.api.deletePerson(this.organization, this.person);
               loading.dismiss();
               this.showToast("Your Organization Account has been deleted");
               this.hideModal({
                 deleted: true
               });
+              this.showPage(SigninUrlPage, {});
             },
             (error:any) => {
               loading.dismiss();
