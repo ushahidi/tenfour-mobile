@@ -20,6 +20,8 @@ import { PasswordResetPage } from '../pages/password-reset/password-reset';
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 
+import { ContactsImportPage } from '../pages/contacts-import/contacts-import';
+
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonProfilePage } from '../pages/person-profile/person-profile';

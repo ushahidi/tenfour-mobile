@@ -1,0 +1,25 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons center>
+      <button ion-button color="cancel" (click)="cancel($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Import Contacts</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+    <ion-buttons>
+      <button ion-button color="primary" (click)="uploadCSV($event)">Upload CSV</button>
+    </ion-buttons>
+    <ion-list>
+    <ion-item text-wrap no-lines class="info">
+      <p> We created an example CSV file for you with all the correct formatting.
+    Download it, fill it out with your contacts' information, save it,
+    and upload it.</p>
+    </ion-item>
+    <ion-buttons left>
+      <button ion-button color="cancel" target="_self" (ng-href)="exampleDownloadUrl($event)" download="tenfour_import.csv">Download Example</button>
+    </ion-buttons>
+
+  </ion-list>
+
+</ion-content>

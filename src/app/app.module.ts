@@ -70,6 +70,8 @@ import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
 
+import { ContactsImportModule } from '../pages/contacts-import/contacts-import.module';
+
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
 import { PasswordResetModule } from '../pages/password-reset/password-reset.module';
@@ -176,6 +178,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinTestModule,
     CheckinDetailsModule,
     CheckinRespondModule,
+    ContactsImportModule,
     NotificationListModule,
     PersonListModule,
     PersonEditModule,
