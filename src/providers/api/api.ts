@@ -161,6 +161,9 @@ export class ApiProvider extends HttpProvider {
         this.logger.info(this, "userLogin", token);
         this.saveToken(organization, token).then(saved => {
           resolve(token);
+        },
+        (error:any) => {
+          resolve(token);
         });
       },
       (error:any) => {
@@ -213,9 +216,9 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public verifyEmail(email:string, token:string):Promise<Email> {
+  public verifyEmail(email:string, code:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email/?address=${email}&token=${token}`;
+      let url = `${this.api}/verification/email/?address=${email}&code=${code}`;
       let params = {};
       this.httpGet(url, params).then((data:any) => {
         let email = new Email(data);
@@ -1264,6 +1267,24 @@ export class ApiProvider extends HttpProvider {
       },
       (error:any) => {
         reject(`There was a problem resetting password for ${email}.`);
+      });
+    });
+  }
+
+  public deleteOrganization(organization:Organization):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

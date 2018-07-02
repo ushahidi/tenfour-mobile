@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelReply($event)">Cancel</button>
+      <button ion-button color="cancel" (click)="cancelReply($event)">Cancel</button>
     </ion-buttons>
     <ion-title *ngIf="checkins && checkins.length == 0"></ion-title>
     <ion-title *ngIf="checkins && checkins.length > 1">{{index + 1}} / {{checkins.length}}</ion-title>
@@ -28,7 +28,7 @@
         </div>
       </div>
       <ion-list lines *ngIf="checkin && checkin.reply">
-        <ion-item color="dark">
+        <ion-item color="input">
           <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
           <ion-input type="text" placeholder="Add message" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.message"></ion-input>
           <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(checkin.reply)"
@@ -36,7 +36,7 @@
             <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
           </button>
         </ion-item>
-        <ion-item color="dark">
+        <ion-item color="input">
           <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
           <ion-input type="text" placeholder="Add location" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="checkin.reply.location_text"></ion-input>
           <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(checkin.reply)"

@@ -4,7 +4,7 @@ page-group-list {
 
     }
     p {
-      color: #888 !important;
+      color: color($colors, text) !important;
     }
   }
 }

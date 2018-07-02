@@ -3,14 +3,14 @@ import { IonicPageModule } from 'ionic-angular';
 
 import { SignupUrlPage } from './signup-url';
 
-import { SignupPlanModule } from '../../pages/signup-plan/signup-plan.module';
+import { SignupPasswordModule } from '../../pages/signup-password/signup-password.module';
 
 @NgModule({
   declarations: [
     SignupUrlPage,
   ],
   imports: [
-    SignupPlanModule,
+    SignupPasswordModule,
     IonicPageModule.forChild(SignupUrlPage),
   ],
   exports: [

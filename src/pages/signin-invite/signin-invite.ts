@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
@@ -24,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
-export class SigninInvitePage extends BasePage {
+export class SigninInvitePage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
@@ -57,16 +57,13 @@ export class SigninInvitePage extends BasePage {
       protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }
@@ -86,17 +83,17 @@ export class SigninInvitePage extends BasePage {
       .then(() => { return this.loadToken(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
-        this.loading = false;
         if (event) {
           event.complete();
         }
+        this.loading = false;
       })
       .catch((error) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
-        this.loading = false;
         if (event) {
           event.complete();
         }
+        this.loading = false;
         let alert = this.showAlert("Problem Accepting Invitation", "Please try clicking the link in your invitation email again.");
         alert.onDidDismiss((dismiss:any) => {
           this.closePage();

@@ -12,7 +12,7 @@ import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 
 @Component({
   selector: 'base-page',
-  templateUrl: 'base-page.html',
+  template: "<ion-header></ion-header><ion-content></ion-content>",
   providers: [ LoggerProvider ],
 })
 export class BasePage {
@@ -42,8 +42,6 @@ export class BasePage {
   protected analytics:AnalyticsProvider;
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
-
-  protected queryParams:string[] = [];
 
   @ViewChild(Content)
   content:Content;
@@ -126,7 +124,6 @@ export class BasePage {
   }
 
   protected getParameter<T extends Object>(param:string):T {
-    this.platform.getQueryParam(param)
     if (this.platform.getQueryParam(param) != null) {
       return <T>this.platform.getQueryParam(param);
     }
@@ -182,6 +179,9 @@ export class BasePage {
   }
 
   protected showModal(page:any, params:any={}, options:any={}):Modal {
+    if (params) {
+      params['modal'] = true;
+    }
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
@@ -192,6 +192,9 @@ export class BasePage {
   }
 
   protected showPage(page:any, params:any={}, options:any={}):Promise<any> {
+    if (params) {
+      params['modal'] = false;
+    }
     return this.navController.push(page, params, options);
   }
 
@@ -204,6 +207,15 @@ export class BasePage {
       return this.viewController.dismiss(data, options);
     }
     return Promise.resolve();
+  }
+
+  protected showModalOrPage(page:any, params:any={}, options:any={}):any {
+    if (document.body.clientWidth > this.WIDTH_LARGE) {
+      return this.showModal(page, params, options);
+    }
+    else {
+      return this.showPage(page, params, options);
+    }
   }
 
   protected showShare(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
@@ -279,19 +291,6 @@ export class BasePage {
       return true;
     }
     return false;
-  }
-
-  protected extractQueryParams() {
-    let matches = location.hash.match(/(.*)\?(.*)/);
-
-    if (matches && matches.length > 1) {
-      let params = matches[2].split(/&/);
-
-      for (let param of params) {
-        let keyValue = param.match(/(.*)=(.*)/);
-        this.queryParams[decodeURIComponent(keyValue[1])] = decodeURIComponent(keyValue[2]);
-      }
-    }
   }
 
 }
