@@ -130,11 +130,14 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private hashChangeSwitchToPro() {
     this.logger.info(this, "hashChangeSwitchToPro");
-    if (this.hasParameter('id') && this.hasParameter('state')) {
-      if (this.getParameter('state') === 'succeeded') {
-        this.completeSwitchToPro();
+
+    setTimeout(() => {
+      if (this.hasParameter('id') && this.hasParameter('state')) {
+        if (this.getParameter('state') === 'succeeded') {
+          this.completeSwitchToPro();
+        }
       }
-    }
+    }, 100);
   }
 
   private completeSwitchToPro() {
@@ -198,12 +201,15 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private hashChangeUpdateBillingInfo() {
     this.logger.info(this, "hashChangeUpdateBillingInfo");
-    if (this.hasParameter('id') && this.hasParameter('state')) {
-      if (this.getParameter('state') === 'succeeded') {
-        this.switchToProModal.dismiss();
-        this.showToast("Your billing info has been updated");
+
+    setTimeout(() => {
+      if (this.hasParameter('id') && this.hasParameter('state')) {
+        if (this.getParameter('state') === 'succeeded') {
+          this.switchToProModal.dismiss();
+          this.showToast("Your billing info has been updated");
+        }
       }
-    }
+    }, 100);
   }
 
   private updateBillingInfo(event:any) {
