@@ -119,6 +119,7 @@ import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
+import { FileTransferProvider } from '../providers/filetransfer/filetransfer';
 import { BadgeProvider } from '../providers/badge/badge';
 import { AnalyticsProvider } from '../providers/analytics/analytics';
 import { BrowserProvider } from '../providers/browser/browser';

@@ -5,6 +5,7 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+//import { FileTransferProvider } from '../../providers/filetransfer/filetransfer';
 import { ContactsProvider } from '../../providers/contacts/contacts';
 
 @IonicPage({
@@ -34,6 +35,7 @@ export class ContactsImportPage extends BasePrivatePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
+      //protected filetransfer:FileTransferProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   } 
@@ -77,6 +79,35 @@ export class ContactsImportPage extends BasePrivatePage {
         }
         this.showToast(error);
       });
+  }
+
+  private uploadCSV(event:any) {
+    let loading = this.showLoading("Uploading...", true);
+
+    let options: FileUploadOptions = {
+      fileKey: 'file',
+      fileName: 'file',
+      headers: {}
+    }
+
+    /*
+    filetransfer.upload(file, this.api.getOrganization(this.organization), options).then((data)) => {
+      this.logger.info(this, "CSV Upload", "data");
+      this.showPage(ContactMappingPage, {});
+    }
+    */
+    
+  }
+
+  private exampleDownloadUrl(event:any) {
+    let url = "https://s3.amazonaws.com/ushahidi-tenfour-files/csv_import_example.csv";
+    /*
+    filetransfer.download(url, this.file.dataDirectory + csv_import_example.csv).then((entry) => {
+      this.logger.info(this, "download example csv");
+    }, (error:any) => {
+      this.showAlert("Problem Downloading Sample CSV", error);
+    });
+    */
   }
 
 }
