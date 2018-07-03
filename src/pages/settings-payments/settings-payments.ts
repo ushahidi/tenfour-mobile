@@ -132,12 +132,17 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     this.logger.info(this, "hashChangeSwitchToPro");
 
     setTimeout(() => {
+      // hack: this function only works if these 3 following statements are present
+      console.log(this.hasParameter('id'));
+      console.log(this.hasParameter('state'));
+      console.log(this.getParameter('state'));
+
       if (this.hasParameter('id') && this.hasParameter('state')) {
         if (this.getParameter('state') === 'succeeded') {
           this.completeSwitchToPro();
         }
       }
-    }, 100);
+    }, 1000);
   }
 
   private completeSwitchToPro() {
@@ -203,13 +208,18 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     this.logger.info(this, "hashChangeUpdateBillingInfo");
 
     setTimeout(() => {
+      // hack: this function only works if these 3 following statements are present
+      console.log(this.hasParameter('id'));
+      console.log(this.hasParameter('state'));
+      console.log(this.getParameter('state'));
+
       if (this.hasParameter('id') && this.hasParameter('state')) {
         if (this.getParameter('state') === 'succeeded') {
           this.switchToProModal.dismiss();
           this.showToast("Your billing info has been updated");
         }
       }
-    }, 100);
+    }, 1000);
   }
 
   private updateBillingInfo(event:any) {
