@@ -10,6 +10,7 @@ import { User } from '../../models/user';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @IonicPage({
   name: 'SigninUrlPage',
@@ -38,13 +39,37 @@ export class SigninUrlPage extends BasePublicPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected environment:EnvironmentProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+
+    let organizationSubdomain = this.parseOrganizationSubdomain();
+
+    if (organizationSubdomain) {
+      this.subdomain.value = organizationSubdomain;
+      this.showNext(undefined);
+    }
+  }
+
+  private parseOrganizationSubdomain() {
+    let hostname = location.hostname;
+    let appDomain = this.environment.getAppDomain();
+
+    if (appDomain && appDomain !== hostname) {
+      let subdomain = hostname.replace('.' + appDomain, '');
+
+      if (subdomain !== 'app') {
+        this.logger.info(this, 'Subdomain', subdomain);
+        return subdomain;
+      }
+    }
+
+    return null;
   }
 
   private showNext(event:any) {
