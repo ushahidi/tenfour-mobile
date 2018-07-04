@@ -46,6 +46,11 @@ export class SignupEmailPage extends BasePublicPage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+
+    if (this.hasParameter('email')) {
+      this.email.value = this.getParameter('email');
+      this.showNext(undefined);
+    }
   }
 
   private showNext(event:any) {
