@@ -31,7 +31,7 @@
 
     - name: "deploy PWA client (staging)"
       service: awscli
-      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client-pwa/
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client/
 
 
 - type: serial
@@ -43,4 +43,4 @@
 
   - name: "deploy PWA client (dev)"
     service: awscli
-    command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client-pwa/
+    command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client/
