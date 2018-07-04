@@ -82,11 +82,14 @@ export class SigninUrlPage extends BasePublicPage {
         loading.dismiss();
         if (organizations && organizations.length > 0) {
           let organization:Organization = organizations[0];
-          this.storage.setOrganization(organization).then((stored:boolean) => {
-            this.showPage(SigninEmailPage, {
-              organization: organization
+
+          if (!this.redirectToOrganizationSubdomain(organization)) {
+            this.storage.setOrganization(organization).then((stored:boolean) => {
+              this.showPage(SigninEmailPage, {
+                organization: organization
+              });
             });
-          });
+          }
         }
         else {
           this.showPage(SignupEmailPage, {});
@@ -98,6 +101,25 @@ export class SigninUrlPage extends BasePublicPage {
         this.showAlert("Problem Finding Organization", error);
       });
     }
+  }
+
+  private redirectToOrganizationSubdomain(organization:Organization) {
+    let appDomain = this.environment.getAppDomain();
+    let extension = '.' + appDomain;
+    let locationSubdomain = location.hostname.replace(extension, '');
+    let subdomain = this.subdomain.value.toLowerCase();
+
+    if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
+      location.assign(location.protocol
+        + "//"
+        + subdomain
+        + extension
+        + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+        + "/");
+      return true;
+    }
+
+    return false;
   }
 
   private createOrganization(event:any) {
