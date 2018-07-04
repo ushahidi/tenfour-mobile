@@ -64,7 +64,9 @@ export class SigninUrlPage extends BasePublicPage {
           });
         }
         else {
-          this.showPage(SignupEmailPage, {});
+          // changing this behaviour to have parity with existing client
+          // this.showPage(SignupEmailPage, {});
+          this.showAlert("Organization not found", `Sorry, that organization doesn't exist.`);
         }
       },
       (error:any) => {
