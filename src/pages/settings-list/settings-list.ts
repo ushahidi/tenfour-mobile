@@ -140,7 +140,10 @@ export class SettingsListPage extends BasePrivatePage {
 
   private contactsImport(event:any) {
     this.logger.info(this, "contactsImport");
-    this.showPage(ContactsImportPage);
+    this.showModal(ContactsImportPage, {
+      organization: this.organization,
+      user: this.user
+    });
   }
 
 }

@@ -5,12 +5,11 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-//import { FileTransferProvider } from '../../providers/filetransfer/filetransfer';
 import { ContactsProvider } from '../../providers/contacts/contacts';
 
 @IonicPage({
   name: 'ContactsImportPage',
-  segment: 'settings/contactsImport',
+  segment: 'settings/contacts',
   defaultHistory: ['SettingsListPage']
 })
 
@@ -21,6 +20,10 @@ import { ContactsProvider } from '../../providers/contacts/contacts';
 })
 
 export class ContactsImportPage extends BasePrivatePage {
+
+  @ViewChild("fileInput")
+  fileInput:any = null;
+  fileData:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -35,10 +38,9 @@ export class ContactsImportPage extends BasePrivatePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
-      //protected filetransfer:FileTransferProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
-  } 
+  }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
@@ -81,33 +83,37 @@ export class ContactsImportPage extends BasePrivatePage {
       });
   }
 
-  private uploadCSV(event:any) {
-    let loading = this.showLoading("Uploading...", true);
-
-    let options: FileUploadOptions = {
-      fileKey: 'file',
-      fileName: 'file',
-      headers: {}
+  private onFileChanged(event:any){
+    this.logger.info(this, "onFileChanged", event.target);
+    if (event.target.files && event.target.files.length > 0) {
+      this.fileData = event.target.files[0];
+      this.logger.info(this, "onFileChanged", "FilePath", this.fileData);
     }
-
-    /*
-    filetransfer.upload(file, this.api.getOrganization(this.organization), options).then((data)) => {
-      this.logger.info(this, "CSV Upload", "data");
-      this.showPage(ContactMappingPage, {});
-    }
-    */
-    
   }
 
-  private exampleDownloadUrl(event:any) {
+  private uploadCSV(event:any) {
+    if (this.fileData) {
+      let loading = this.showLoading("Uploading...", true);
+      this.logger.info(this, "uploadCSV", this.fileData);
+      this.api.uploadContactsCSV(this.organization, this.fileData).then((data:any) => {
+        this.logger.info(this, "uploadCSV", data);
+        loading.dismiss();
+        this.showAlert("Contacts Uploaded", "TODO finish implementing CSV import...");
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Uploading CSV", error);
+      });
+    }
+  }
+
+  private downloadCSV(event:any) {
     let url = "https://s3.amazonaws.com/ushahidi-tenfour-files/csv_import_example.csv";
-    /*
-    filetransfer.download(url, this.file.dataDirectory + csv_import_example.csv).then((entry) => {
-      this.logger.info(this, "download example csv");
-    }, (error:any) => {
-      this.showAlert("Problem Downloading Sample CSV", error);
-    });
-    */
+    this.showToast("Not implemented yet...");
+  }
+
+  private cancelImport(event:any) {
+    this.hideModal();
   }
 
 }

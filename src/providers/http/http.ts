@@ -317,53 +317,70 @@ export class HttpProvider {
     });
   }
 
-  protected fileUpload(url:string, token:string, file:string, caption:string,
-             httpMethod:string="POST",
-             mimeType:string='application/binary',
-             acceptType:string="application/json",
-             contentType:string=undefined,
-             contentLength:number=null) {
+  protected fileUpload(url:string, token:string, file:any, httpMethod:string="POST", mimeType:string='application/binary', acceptType:string="application/json", contentType:string=undefined, contentLength:number=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let fileName = file.substr(file.lastIndexOf('/') + 1).split('?').shift();
-      let headers = {};
-      if (acceptType) {
-        headers['Accept'] = acceptType;
+      if (this.platform.is("cordova")) {
+        let headers = {};
+        if (acceptType) {
+          headers['Accept'] = acceptType;
+        }
+        if (contentType) {
+          headers['Content-Type'] = contentType;
+        }
+        if (contentLength) {
+          headers['Content-Length'] = contentLength;
+        }
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        var params = {};
+        var options:FileUploadOptions = {
+          httpMethod: httpMethod,
+          mimeType: mimeType,
+          fileName: file.name,
+          headers: headers,
+          params: params
+        };
+        this.logger.info(this, "UPLOAD", url, file, options);
+        let fileTransfer:FileTransferObject = this.transfer.create();
+        fileTransfer.upload(file, url, options, true).then((data:FileUploadResult) => {
+          this.logger.info(this, "UPLOAD", url, file, data);
+          resolve(data);
+        },
+        (error:FileTransferError) => {
+          this.logger.error(this, "UPLOAD", url, file,
+            "Code", error.code,
+            "Source", error.source,
+            "Target", error.target,
+            "Body", error.body,
+            "Exception", error.exception);
+          reject(error.body || error.exception);
+        });
       }
-      if (contentType) {
-        headers['Content-Type'] = contentType;
+      else {
+        this.logger.info(this, "POST", url);
+        let params:FormData = new FormData();
+        params.append('file', file, file.name);
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
+        });
+        this.logger.info(this, "POST", url, params);
+        this.http.post(url, params, options)
+          .timeout(12000)
+          .map((res:any) => this.httpResponse(res))
+          .catch((error:any) => {
+            return Observable.throw(error || 'Request Error');
+          })
+          .subscribe((json) => {
+            this.logger.info(this, "POST", url, json);
+            resolve(json);
+          },
+          (error) => {
+            this.logger.error(this, "POST", url, error);
+            reject(this.httpError(error));
+          });
       }
-      if (contentLength) {
-        headers['Content-Length'] = contentLength;
-      }
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      var params = {};
-      if (caption && caption.length > 0) {
-        params['caption'] = caption;
-      }
-      var options:FileUploadOptions = {
-        httpMethod: httpMethod,
-        mimeType: mimeType,
-        fileName: fileName,
-        headers: headers,
-        params: params
-      };
-      this.logger.info(this, "UPLOAD", url, file, options);
-      let fileTransfer:FileTransferObject = this.transfer.create();
-      fileTransfer.upload(file, url, options, true).then((data:FileUploadResult) => {
-        this.logger.info(this, "UPLOAD", url, file, data);
-        resolve(data);
-      },
-      (error:FileTransferError) => {
-        this.logger.error(this, "UPLOAD", url, file,
-          "Code", error.code,
-          "Source", error.source,
-          "Target", error.target,
-          "Body", error.body,
-          "Exception", error.exception);
-        reject(error.body || error.exception);
-     });
     });
   }
 
