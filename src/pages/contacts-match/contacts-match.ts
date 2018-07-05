@@ -21,7 +21,8 @@ export class ContactsMatchPage extends BasePrivatePage {
 
   data:any = null;
   columns:any = null;
-  map:any = null;
+  map:any = {};
+  myIndex:number = 0;
 
   constructor(
       protected zone:NgZone,
@@ -42,9 +43,9 @@ export class ContactsMatchPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.data = this.navParams.get('csvData');
-    this.columns = this.data.columns;
-    this.preselectMatchingColumns();
+    let data = this.getParameter<any>('data');
+    let columns = data.file.columns;
+    this.preselectMatchingColumns(columns);
   }
 
   ionViewWillEnter() {
@@ -85,8 +86,12 @@ export class ContactsMatchPage extends BasePrivatePage {
   }
 
   private preselectMatchingColumns() {
-    for (var i=0; i<this.columns.length; i++) {
-      Object.keys(this.columns).forEach(key=> {
+    //let data = this.getParameter<any>('data');
+    //let columns = data.file.columns;
+    //console.log(columns);
+
+    for (var i=0; i<Object.keys(columns).length; i++) {
+      Object.keys(columns).forEach(key=> {
         if (this.columns[i].toLowerCase() === key) {
           this.map[key] = i;
         }

@@ -101,11 +101,9 @@ export class ContactsImportPage extends BasePrivatePage {
         loading.dismiss();
         this.showModal(ContactsMatchPage, {
           organization: this.organization,
-          user: this.user
+          user: this.user,
+          data: data
         });
-        this.navController.push(ContactsMatchPage, {
-          csvData: data
-        })
       },
       (error:any) => {
         loading.dismiss();

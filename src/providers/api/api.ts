@@ -1313,8 +1313,9 @@ export class ApiProvider extends HttpProvider {
         // Initialize a new array of the length of the csv column with nulls
         let maps_to = [];
         let fileId = data.id;
+        let columns = data.columns;
 
-        for (let i = 0; i < data.columns.length; i++) {
+        for (let i = 0; i < Object.keys(columns).length; i++) {
           maps_to.push(null);
         }
 
