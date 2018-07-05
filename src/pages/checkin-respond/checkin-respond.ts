@@ -13,7 +13,6 @@ import { Location } from '../../models/location';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-import { LocationProvider } from '../../providers/location/location';
 
 @IonicPage({
   name: 'CheckinRespondPage',
@@ -23,7 +22,7 @@ import { LocationProvider } from '../../providers/location/location';
 @Component({
   selector: 'page-checkin-respond',
   templateUrl: 'checkin-respond.html',
-  providers: [ ApiProvider, StorageProvider, LocationProvider ],
+  providers: [ ApiProvider, StorageProvider ],
   entryComponents:[  ]
 })
 export class CheckinRespondPage extends BasePrivatePage {
@@ -32,12 +31,8 @@ export class CheckinRespondPage extends BasePrivatePage {
   slides:Slides;
   index:number = 0;
   loading:boolean = false;
-  locating:boolean = false;
-
   checkins:Checkin[] = [];
   checkin:Checkin = null;
-  locations:Location[] = [];
-  timer:any = null;
 
   constructor(
     protected zone:NgZone,
@@ -51,8 +46,7 @@ export class CheckinRespondPage extends BasePrivatePage {
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController,
     protected api:ApiProvider,
-    protected storage:StorageProvider,
-    protected location:LocationProvider) {
+    protected storage:StorageProvider) {
     super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -80,7 +74,6 @@ export class CheckinRespondPage extends BasePrivatePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckins(cache); })
-      .then(() => { return this.loadLocation(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -128,45 +121,6 @@ export class CheckinRespondPage extends BasePrivatePage {
     });
   }
 
-  private loadLocation(cache:boolean=true):Promise<Location> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadLocation");
-      this.locating = true;
-      this.location.detectLocation().then((location:Location) => {
-        this.logger.info(this, "loadLocation", location);
-        this.location.lookupAddress(location).then((address:string) => {
-          this.logger.info(this, "loadLocation", address);
-          location.address = address;
-          for (let checkin of this.checkins) {
-            if (checkin.reply.location_text == null) {
-              checkin.reply.latitude = location.latitude;
-              checkin.reply.longitude = location.longitude;
-              checkin.reply.location_text = location.address;
-            }
-          }
-          this.locating = false;
-          resolve(location);
-        },
-        (error:any) => {
-          this.logger.error(this, "loadLocation", error);
-          for (let checkin of this.checkins) {
-            if (checkin.reply.location_text == null) {
-              checkin.reply.latitude = location.latitude;
-              checkin.reply.longitude = location.longitude;
-            }
-          }
-          this.locating = false;
-          resolve(location);
-        });
-      },
-      (error:any) => {
-        this.logger.error(this, "loadLocation", error);
-        this.locating = false;
-        reject(error);
-      });
-    });
-  }
-
   private slideChanged(event:any) {
     let index = this.slides.getActiveIndex();
     if (index >= 0 && index < this.checkins.length) {
@@ -177,11 +131,6 @@ export class CheckinRespondPage extends BasePrivatePage {
     else {
       this.logger.error(this, "slideChanged", event, index);
     }
-  }
-
-  private selectAnswer(checkin:Checkin, reply:Reply, answer:Answer) {
-    this.logger.info(this, "selectAnswer", answer);
-    reply.answer = answer.answer;
   }
 
   private cancelReply(event:any) {
@@ -293,71 +242,6 @@ export class CheckinRespondPage extends BasePrivatePage {
       this.showToast("Your reply has been sent");
       this.hideModal({reply: reply});
     }
-  }
-
-  private removeMessage(reply:Reply) {
-    this.logger.info(this, "removeMessage", reply);
-    reply.message = null;
-  }
-
-  private removeLocation(reply:Reply) {
-    this.logger.info(this, "removeLocation", reply);
-    reply.location_text = null;
-    reply.latitude = null;
-    reply.longitude = null;
-    this.locations = [];
-  }
-
-  private onKeyPress(event:any) {
-    if (this.isKeyReturn(event)) {
-      this.logger.info(this, "onKeyPress", "Enter");
-      this.hideKeyboard();
-      return false;
-    }
-    else {
-      return true;
-    }
-  }
-
-  private searchAddress() {
-    clearTimeout(this.timer);
-    this.timer = setTimeout((address:string, latitude:number, longitude:number) => {
-      if (address && address.length > 0) {
-        this.logger.info(this, "searchAddress", address);
-        this.location.searchAddress(address, 5, latitude, longitude).then((locations:Location[]) => {
-          this.logger.info(this, "searchAddress", address, locations);
-          this.zone.run(() => {
-            this.locations = locations;
-          });
-        },
-        (error:any) => {
-          this.logger.error(this, "searchAddress", address, error);
-          this.zone.run(() => {
-            this.locations = [];
-          });
-        });
-      }
-      else {
-        this.zone.run(() => {
-          this.locations = [];
-        });
-      }
-    }, 900, this.checkin.reply.location_text, this.checkin.reply.latitude, this.checkin.reply.longitude);
-  }
-
-  private selectLocation(location:Location) {
-    this.logger.info(this, "selectLocation", location);
-    this.location.placeDetails(location).then((_location:Location) => {
-      this.logger.info(this, "selectLocation", location, "placeDetails", _location);
-      if (_location && _location.latitude && _location.longitude) {
-        this.checkin.reply.latitude = _location.latitude;
-        this.checkin.reply.longitude = _location.longitude;
-      }
-    });
-    this.zone.run(() => {
-      this.checkin.reply.location_text = location.address;
-      this.locations = [];
-    });
   }
 
 }

@@ -33,7 +33,6 @@ export class PersonDetailsPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 3;
   offset:number = 0;
-  modal:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -54,7 +53,6 @@ export class PersonDetailsPage extends BasePrivatePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

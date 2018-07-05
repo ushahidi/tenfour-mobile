@@ -27,7 +27,6 @@ export class NotificationListPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
-  modal:boolean = true;
   defaultLogo:string = "assets/images/dots.png";
 
   constructor(
@@ -48,7 +47,6 @@ export class NotificationListPage extends BasePrivatePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

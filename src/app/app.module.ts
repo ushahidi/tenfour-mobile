@@ -66,6 +66,7 @@ import { CheckinListModule } from '../pages/checkin-list/checkin-list.module';
 import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
+import { CheckinEmailModule } from '../pages/checkin-email/checkin-email.module';
 
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
@@ -107,6 +108,7 @@ import { CheckinDetailModule } from '../components/checkin-details/checkin-detai
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
 import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
+import { CheckinRespondComponentModule } from '../components/checkin-respond/checkin-respond.module';
 import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
@@ -149,6 +151,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinCardModule,
     CheckinReplyModule,
     CheckinDetailModule,
+    CheckinRespondComponentModule,
     PersonRowModule,
     GroupRowModule,
     GroupListModule,
@@ -174,6 +177,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinEditModule,
     CheckinSendModule,
     CheckinTestModule,
+    CheckinEmailModule,
     CheckinDetailsModule,
     CheckinRespondModule,
     NotificationListModule,
