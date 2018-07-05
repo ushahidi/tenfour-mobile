@@ -41,6 +41,7 @@ export class BasePage {
   protected logger:LoggerProvider;
   protected network:NetworkProvider;
   protected analytics:AnalyticsProvider;
+  protected intercom:IntercomProvider;
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
 
