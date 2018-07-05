@@ -95,27 +95,31 @@ export class PersonEditPage extends BasePrivatePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-    return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadPerson(cache); })
-      .then(() => { return this.loadRegions(); })
-      .then(() => { return this.loadCamera(); })
-      .then(() => {
-        this.logger.info(this, "loadUpdates", "Loaded");
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadUpdates", "Failed", error);
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
+
+    return new Promise((resolve, reject) => {
+      return this.loadOrganization(cache)
+        .then((org) => { return this.loadUser(cache); })
+        .then((user) => { return this.loadPerson(cache); })
+        .then((person) => { return this.loadRegions(cache); })
+        .then((regions) => { return this.loadCamera(); })
+        .then(() => {
+          this.logger.info(this, "loadUpdates", "Loaded");
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          resolve();
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadUpdates", "Failed", error);
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          this.showToast(error);
+          reject(error);
+        });
+    });
   }
 
   private loadRegions(cache:boolean=true):Promise<boolean> {
@@ -175,6 +179,7 @@ export class PersonEditPage extends BasePrivatePage {
           description: null,
           role: "responder"
         });
+        resolve(this.person);
       }
     });
   }

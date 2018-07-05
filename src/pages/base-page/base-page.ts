@@ -8,6 +8,7 @@ import { SharingProvider } from '../../providers/sharing/sharing';
 import { KeyboardProvider } from '../../providers/keyboard/keyboard';
 import { InjectorProvider } from '../../providers/injector/injector';
 import { AnalyticsProvider } from '../../providers/analytics/analytics';
+import { IntercomProvider } from '../../providers/intercom/intercom';
 import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 
 @Component({
@@ -41,6 +42,7 @@ export class BasePage {
   protected logger:LoggerProvider;
   protected network:NetworkProvider;
   protected analytics:AnalyticsProvider;
+  protected intercom:IntercomProvider;
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
 
@@ -64,6 +66,7 @@ export class BasePage {
     this.keyboard = InjectorProvider.injector.get(KeyboardProvider);
     this.statusBar = InjectorProvider.injector.get(StatusBarProvider);
     this.analytics = InjectorProvider.injector.get(AnalyticsProvider);
+    this.intercom = InjectorProvider.injector.get(IntercomProvider);
     this.browser = InjectorProvider.injector.get(BrowserProvider);
     this.sharing = InjectorProvider.injector.get(SharingProvider);
   }
