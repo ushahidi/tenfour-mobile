@@ -141,6 +141,7 @@ export class SigninPasswordPage extends BasePublicPage {
         .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
+          this.intercom.trackLogin(this.organization, this.person);
           this.events.publish('user:login');
           loading.dismiss();
           this.loading = false;
