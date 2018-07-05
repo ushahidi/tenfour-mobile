@@ -198,8 +198,6 @@ export class SigninInvitePage extends BasePublicPage {
         .then((person:Person) => { return this.storage.setUser(person); })
         .then((stored:boolean) => { return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { return this.storage.setOrganization(organization); })
-        .then((stored:boolean) => { return this.api.getSubscriptions(this.organization); })
-        .then((subscriptions:Subscription[]) => { return this.storage.setSubscription(subscriptions[0]); })
         .then((stored:boolean) => {
           this.logger.info(this, "acceptInitation", "Accepted");
           this.events.publish('user:login');
