@@ -19,14 +19,14 @@
     <ion-item>
       <ion-label>Name</ion-label>
       <ion-select [(ngModel)] = "map.name">
-        <ion-option value=""></ion-option>
+        <ion-option *ngFor="column of columns" [value]="column" >{{column.name}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Description</ion-label>
       <ion-select [(ngModel)] = "map.description">
-      <ion-option *ngFor="column of columns" [value]="column" >{{column.name}}</ion-option>
+      <ion-option *ngFor="column of columns" [value]="column" >{{column.description}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>

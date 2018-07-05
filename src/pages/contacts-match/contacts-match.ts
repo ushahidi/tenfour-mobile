@@ -19,6 +19,7 @@ import { ContactsProvider } from '../../providers/contacts/contacts';
 })
 export class ContactsMatchPage extends BasePrivatePage {
 
+  Object:Object = Object;
 
   constructor(
       protected zone:NgZone,
