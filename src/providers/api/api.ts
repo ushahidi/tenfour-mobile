@@ -1306,4 +1306,54 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public matchCSVContacts(organization:Organization, map:any, data:data):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+
+        // Initialize a new array of the length of the csv column with nulls
+        let maps_to = [];
+        let fileId = this.data.id;
+
+        for (let i = 0; i < this.data.columns.length; i++) {
+          maps_to.push(null);
+        }
+
+        //iterate through the map Object, check if value is null and replace any null with value
+        //insert this into the maps_to array in the correct positions
+        
+        forEach(map, function(value, key){
+          if (value !== null) {
+            maps_to.splice(value, 1, key);
+          }
+        });
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+        this.httpPut(url, maps_to, token.access_token, fileId).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public importContacts() {
+   return new Promise((resolve, reject) => {
+    this.getToken(organization).then((token:Token) => {
+      let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+      let fileId = this.data.id;
+      this.httpPost(url, fileId).then((data:any) => {
+        resolve(true);
+      },
+      (error:any) => {
+        reject(`Could not process the CSV, please check the file format and column names and try again.`);
+      });
+    });
+   })
+  }
+
 }

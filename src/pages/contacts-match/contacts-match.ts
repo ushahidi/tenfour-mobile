@@ -2,29 +2,23 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
-import { ContactsMatchPage } from '../../pages/contacts-match/contacts-match';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { ContactsProvider } from '../../providers/contacts/contacts';
 
 @IonicPage({
-  name: 'ContactsImportPage',
-  segment: 'settings/contacts',
-  defaultHistory: ['SettingsListPage']
+  name: 'ContactsMatchPage',
+  segment: 'settings/contacts/match',
+  defaultHistory: ['ContactsImportPage']
 })
-
 @Component({
-  selector: 'page-contacts-import',
-  templateUrl: 'contacts-import.html',
+  selector: 'page-contacts-match',
+  templateUrl: 'contacts-match.html',
   providers: [ ApiProvider, StorageProvider, ContactsProvider ]
 })
+export class ContactsMatchPage extends BasePrivatePage {
 
-export class ContactsImportPage extends BasePrivatePage {
-
-  @ViewChild("fileInput")
-  fileInput:any = null;
-  fileData:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -41,10 +35,14 @@ export class ContactsImportPage extends BasePrivatePage {
       protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
+      this.data = navParams.get('csvData');
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+
+    this.columns = this.data.columns;
+    this.preselectMatchingColumns();
   }
 
   ionViewWillEnter() {
@@ -84,43 +82,24 @@ export class ContactsImportPage extends BasePrivatePage {
       });
   }
 
-  private onFileChanged(event:any){
-    this.logger.info(this, "onFileChanged", event.target);
-    if (event.target.files && event.target.files.length > 0) {
-      this.fileData = event.target.files[0];
-      this.logger.info(this, "onFileChanged", "FilePath", this.fileData);
-    }
-  }
-
-  private uploadCSV(event:any) {
-    if (this.fileData) {
-      let loading = this.showLoading("Uploading...", true);
-      this.logger.info(this, "uploadCSV", this.fileData);
-      this.api.uploadContactsCSV(this.organization, this.fileData).then((data:any) => {
-        this.logger.info(this, "uploadCSV", data);
-        loading.dismiss();
-        this.showModal(ContactsMatchPage, {
-          organization: this.organization,
-          user: this.user
-        });
-        this.navController.push(ContactsMatchPage, {
-          csvData: data
-        })
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Uploading CSV", error);
+  private preselectMatchingColumns(columns) {
+    for (var i=0; i<this.columns.length; i++) {
+      Object.keys(this.columns).forEach(key=> {
+        if (this.columns[i].toLowerCase() === key) {
+          this.map[key] = i;     
+        }
       });
     }
   }
 
-  private downloadCSV(event:any) {
-    let url = "https://s3.amazonaws.com/ushahidi-tenfour-files/csv_import_example.csv";
-    this.showToast("Not implemented yet...");
+  private importContacts(map) {
+    if (this.data) {
+      this.logger.info(this, "matchCSVContacts", this.data);
+      this.api.matchCSVContacts(this.organization, this.map, this.data).then((data:any) => {
+        this.logger.info(this, "contactsMatched", data);
+        this.api.importContacts();
+      });
+    }
   }
-
-  private cancelImport(event:any) {
-    this.hideModal();
-  }
-
 }
+

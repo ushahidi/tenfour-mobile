@@ -71,6 +71,7 @@ import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.m
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
 
 import { ContactsImportModule } from '../pages/contacts-import/contacts-import.module';
+import { ContactsMatchModule } from '../pages/contacts-match/contacts-match.module';
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
@@ -180,6 +181,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinDetailsModule,
     CheckinRespondModule,
     ContactsImportModule,
+    ContactsMatchModule,
     NotificationListModule,
     PersonListModule,
     PersonEditModule,

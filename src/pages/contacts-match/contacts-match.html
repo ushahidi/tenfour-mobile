@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" (click)="cancelImport($event)">Back</button>
+    </ion-buttons>
+    <ion-buttons right>
+      <button ion-button color="primary" (click)="importContacts($event)">Import</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item text-wrap no-lines class="info">
+      <p>The fields for your contacts are listed below. Choose the column from your CSV file that you'd like to use to populate each field.</p>
+    </ion-item>
+    <ion-item text-wrap no-lines class="info">
+      <p>All imported contacts will receive an email invite to join the organization.</p>
+    </ion-item>
+    <ion-item>
+      <ion-label>Name</ion-label>
+      <ion-select [(ngModel)] = "map.name">
+        <ion-option value=""></ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Description</ion-label>
+      <ion-select [(ngModel)] = "map.description">
+      <ion-option *ngFor="column of columns" [value]="column" >{{column.name}}</ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Phone</ion-label>
+      <ion-select [(ngModel)] = "map.phone">
+        <ion-option *ngFor="column of columns" [value]="column" >{{column.phone}}</ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Email</ion-label>
+      <ion-select [(ngModel)] = "map.email">
+        <ion-option *ngFor="column of columns" [value]="column" >{{column.email}}</ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Address</ion-label>
+      <ion-select [(ngModel)] = "map.address">
+        <ion-option *ngFor="column of columns" [value]="column" >{{column.email}}</ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    <!--
+    <ion-item>
+      <ion-label>Twitter</ion-label>
+      <ion-select [(ngModel)] = "twitter">
+        <ion-option value=""></ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
+    -->
+  </ion-list>
+</ion-content>
