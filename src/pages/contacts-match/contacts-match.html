@@ -19,35 +19,35 @@
     <ion-item>
       <ion-label>Name</ion-label>
       <ion-select [(ngModel)] = "map.name">
-        <ion-option *ngFor="column of columns" [value]="column" >{{column.name}}</ion-option>
+        <ion-option *ngFor="let column of columns" [value]="column" >{{column.name}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Description</ion-label>
       <ion-select [(ngModel)] = "map.description">
-      <ion-option *ngFor="column of columns" [value]="column" >{{column.description}}</ion-option>
+      <ion-option *ngFor="let column of columns" [value]="column" >{{column.description}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Phone</ion-label>
       <ion-select [(ngModel)] = "map.phone">
-        <ion-option *ngFor="column of columns" [value]="column" >{{column.phone}}</ion-option>
+        <ion-option *ngFor="let column of columns" [value]="column" >{{column.phone}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Email</ion-label>
       <ion-select [(ngModel)] = "map.email">
-        <ion-option *ngFor="column of columns" [value]="column" >{{column.email}}</ion-option>
+        <ion-option *ngFor="let column of columns" [value]="column" >{{column.email}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Address</ion-label>
       <ion-select [(ngModel)] = "map.address">
-        <ion-option *ngFor="column of columns" [value]="column" >{{column.email}}</ion-option>
+        <ion-option *ngFor="let column of columns" [value]="column" >{{column.email}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>

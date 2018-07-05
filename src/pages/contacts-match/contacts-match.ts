@@ -19,7 +19,9 @@ import { ContactsProvider } from '../../providers/contacts/contacts';
 })
 export class ContactsMatchPage extends BasePrivatePage {
 
-  Object:Object = Object;
+  data:any = null;
+  columns:any = null;
+  map:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -36,12 +38,11 @@ export class ContactsMatchPage extends BasePrivatePage {
       protected storage:StorageProvider,
       protected events:Events) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
-      this.data = navParams.get('csvData');
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-
+    this.data = this.navParams.get('csvData');
     this.columns = this.data.columns;
     this.preselectMatchingColumns();
   }
@@ -83,24 +84,23 @@ export class ContactsMatchPage extends BasePrivatePage {
       });
   }
 
-  private preselectMatchingColumns(columns) {
+  private preselectMatchingColumns() {
     for (var i=0; i<this.columns.length; i++) {
       Object.keys(this.columns).forEach(key=> {
         if (this.columns[i].toLowerCase() === key) {
-          this.map[key] = i;     
+          this.map[key] = i;
         }
       });
     }
   }
 
-  private importContacts(map) {
-    if (this.data) {
+  private importContacts(map, data:any) {
+    if (data) {
       this.logger.info(this, "matchCSVContacts", this.data);
       this.api.matchCSVContacts(this.organization, this.map, this.data).then((data:any) => {
         this.logger.info(this, "contactsMatched", data);
-        this.api.importContacts();
+        this.api.importContacts(this.organization, this.data);
       });
     }
   }
 }
-
