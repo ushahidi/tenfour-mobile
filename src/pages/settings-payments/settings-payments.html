@@ -31,7 +31,7 @@
         <h2 [ngClass]="{'activated' : organization && organization.hasProPlan()}">Pro</h2>
         <ion-card [ngClass]="{'activated' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            $39 USD per month
+            {{PRO_FLAT_RATE | currency}} USD per month
           </ion-card-header>
           <ion-card-content>
             <ion-list class="features">
@@ -44,7 +44,10 @@
               <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
             </ion-list>
             <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
-              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}} people. (Estimate)</ion-item>
+              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}}
+                <ng-container *ngIf="organization.user_count == 1">person</ng-container>
+                <ng-container *ngIf="organization.user_count > 1">people</ng-container>
+                (Estimate)</ion-item>
               <ion-item><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
               <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
               <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
@@ -63,7 +66,7 @@
         <h2 class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">Extra SMS Credits</h2>
         <ion-card class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            $0.10 USD per credit per month
+            {{this.CREDIT_BUNDLE_RATE | currency}} USD per credit per month
           </ion-card-header>
           <ion-card-content>
 

@@ -28,6 +28,12 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class SettingsPaymentsPage extends BasePrivatePage {
 
+  PRO_FLAT_RATE:number = 39;
+  FREE_USERS:number = 100;
+  USER_BUNDLE_RATE:number = 5;
+  USER_BUNDLE_UNIT:number = 25;
+  CREDIT_BUNDLE_RATE:number = .1;
+
   subscription:Subscription = null;
   hashChangeFn = null;
   switchToProModal = null;
@@ -220,11 +226,18 @@ export class SettingsPaymentsPage extends BasePrivatePage {
   }
 
   private calcBillingEstimate(extraCredits?:number):number {
-    let estimate = this.organization.user_count * 3;
-    if (!extraCredits) {
-      extraCredits = this.organization.credits_extra;
+    let estimate = this.PRO_FLAT_RATE;
+
+    if (this.organization.user_count > this.FREE_USERS) {
+      estimate += this.USER_BUNDLE_RATE * Math.ceil((this.organization.user_count - this.FREE_USERS)/this.USER_BUNDLE_UNIT);
     }
-    estimate += extraCredits * .1;
+
+    if (extraCredits) {
+      estimate += extraCredits * this.CREDIT_BUNDLE_RATE;
+    } else if (this.updatedCredits) {
+      estimate += this.updatedCredits * this.CREDIT_BUNDLE_RATE;
+    }
+
     return estimate
   }
 
@@ -242,11 +255,19 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addCredits", "Modal", data);
+
+      this.api.getOrganization(this.organization).then((organization:Organization) => {
+        this.storage.setOrganization(organization).then(() => {
+          this.loadUpdates();
+        });
+      });
+
       if (data) {
         if (data.organization) {
           this.logger.info(this, "addCredits", "Modal", data.organization);
           this.organization = data.organization;
           this.billingEstimate = this.calcBillingEstimate();
+          this.loadUpdates();
         }
       }
    });
