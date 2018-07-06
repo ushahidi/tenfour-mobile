@@ -24,6 +24,7 @@ export class ContactsMatchPage extends BasePrivatePage {
   map:any = {};
   myIndex:number = 0;
   Object:any = [];
+  selectOptions:any = {};
 
   constructor(
       protected zone:NgZone,
@@ -46,7 +47,16 @@ export class ContactsMatchPage extends BasePrivatePage {
     super.ionViewDidLoad();
     let data = this.getParameter<any>('data');
     let columns = data.file.columns;
-    this.preselectMatchingColumns(columns);
+    let map = {
+      name: null,
+      description: null,
+      phone: null,
+      email: null,
+      address: null,
+      twitter: null
+    };
+    
+    this.preselectMatchingColumns(columns, map);
   }
 
   ionViewWillEnter() {
@@ -86,20 +96,11 @@ export class ContactsMatchPage extends BasePrivatePage {
       });
   }
 
-  private preselectMatchingColumns(columns) {
+  private preselectMatchingColumns(columns, map) {
     for (var i=0; i<Object.keys(columns).length; i++) {
-      let map = {
-        name: null,
-        description: null,
-        phone: null,
-        email: null,
-        address: null,
-        twitter: null
-      };
-
-      Object.keys(map).forEach((key) => {
+      Object.keys(map).forEach(function(key, value) {
         if (columns[i].toLowerCase() === key) {
-          map[key] = i;
+          (map[key] = i);
         }
       });
     }
