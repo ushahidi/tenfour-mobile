@@ -85,7 +85,7 @@ export class TenFourRoutes {
     { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
 
     { component: ContactsImportPage, name: 'ContactsImportPage', segment: 'settings/contacts', defaultHistory: ['SettingsListPage'] },
-    { component: ContactsMatchPage, name: 'ContactsMatchPage', segment: 'settings/contacts/match', defaultHistory: ['ContactsImportPage'] },
+    { component: ContactsMatchPage, name: 'ContactsMatchPage', segment: 'settings/contacts', defaultHistory: ['ContactsImportPage'] },
 
     { component: PersonProfilePage, name: 'PersonProfilePage', segment: 'profile' },
 

@@ -1312,8 +1312,7 @@ export class ApiProvider extends HttpProvider {
 
         // Initialize a new array of the length of the csv column with nulls
         let maps_to = [];
-        let fileId = data.id;
-        let columns = data.columns;
+        let columns = data.file.columns;
 
         for (let i = 0; i < Object.keys(columns).length; i++) {
           maps_to.push(null);
@@ -1322,18 +1321,18 @@ export class ApiProvider extends HttpProvider {
         //iterate through the map Object, check if value is null and replace any null with value
         //insert this into the maps_to array in the correct positions
 
-        map.forEach(function(value, key){
+        Object.keys(map).forEach(function(key, value) {
           if (value !== null) {
             maps_to.splice(value, 1, key);
           }
         });
 
         let params = {
-          file: fileId,
+          columns: columns,
           data: maps_to
         };
 
-        let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
         this.httpPut(url, params, token.access_token).then((data:any) => {
           resolve(data);
         },
@@ -1348,18 +1347,13 @@ export class ApiProvider extends HttpProvider {
   }
 
   public importContacts(organization:Organization, data:any) {
-   return new Promise((resolve, reject) => {
-    this.getToken(organization).then((token:Token) => {
-      let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
-      let fileId = data.id;
-      this.httpPost(url, fileId).then((data:any) => {
-        resolve(true);
-      },
-      (error:any) => {
-        reject(`Could not process the CSV, please check the file format and column names and try again.`);
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
+        let params = { };
+        this.httpPost(url, params, token.access_token);
       });
     });
-   })
   }
 
 }

@@ -9,7 +9,7 @@ import { ContactsProvider } from '../../providers/contacts/contacts';
 
 @IonicPage({
   name: 'ContactsMatchPage',
-  segment: 'settings/contacts/match',
+  segment: 'settings/contacts',
   defaultHistory: ['ContactsImportPage']
 })
 @Component({
@@ -45,18 +45,16 @@ export class ContactsMatchPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    let data = this.getParameter<any>('data');
-    let columns = data.file.columns;
-    let map = {
+    this.data = this.getParameter<any>('data');
+    this.columns = this.data.file.columns;
+    this.map = {
       name: null,
       description: null,
       phone: null,
       email: null,
-      address: null,
-      twitter: null
+      address: null
     };
-    
-    this.preselectMatchingColumns(columns, map);
+    this.preselectMatchingColumns(this.columns, this.map);
   }
 
   ionViewWillEnter() {
@@ -97,22 +95,25 @@ export class ContactsMatchPage extends BasePrivatePage {
   }
 
   private preselectMatchingColumns(columns, map) {
-    for (var i=0; i<Object.keys(columns).length; i++) {
-      Object.keys(map).forEach(function(key, value) {
-        if (columns[i].toLowerCase() === key) {
-          (map[key] = i);
+    for (let column of columns) {
+      for (let key of Object.keys(map)) {
+        if (column.toLowerCase() === key.toLowerCase()) {
+          map[key] = column;
         }
-      });
+      }
     }
   }
 
-  private importContacts(map, data:any) {
-    if (data) {
-      this.logger.info(this, "matchCSVContacts", this.data);
-      this.api.matchCSVContacts(this.organization, this.map, this.data).then((data:any) => {
-        this.logger.info(this, "contactsMatched", data);
-        this.api.importContacts(this.organization, this.data);
+  private importContacts(event:any) {;
+    this.api.matchCSVContacts(this.organization, this.map, this.data).then((data:any) => {
+      this.logger.info(this, "contactsMatched", data);
+      this.api.importContacts(this.organization, this.data).then((contacts:any) => {
+        this.logger.info(this, "contactsUploaded", contacts);
+        this.showToast("Your Contacts have been Uploaded");
+      },
+      (error:any) => {
+        reject(`Could not process the CSV, please check the file format and column names and try again.`);
       });
-    }
+    });
   }
 }
