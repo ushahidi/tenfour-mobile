@@ -56,6 +56,7 @@ import { StatusBarProvider } from '../providers/status-bar/status-bar';
 import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
 import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
+import { IntercomProvider } from '../providers/intercom/intercom';
 
 @Component({
   templateUrl: 'app.html'
@@ -107,7 +108,8 @@ export class TenFourApp {
     protected alertController:AlertController,
     protected menuController:MenuController,
     protected deeplinks:DeeplinksProvider,
-    protected firebase:FirebaseProvider) {
+    protected firebase:FirebaseProvider,
+    protected intercom:IntercomProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
     this.platform.ready().then((ready) => {
@@ -139,6 +141,7 @@ export class TenFourApp {
         Promise.resolve()
           .then(() => this.loadPlatforms())
           .then(() => this.loadAnalytics())
+          .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
           .then(() => this.loadWebApp());
@@ -199,6 +202,13 @@ export class TenFourApp {
     });
   }
 
+  private loadIntercom():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.intercom.initialize();
+      resolve(true);
+    });
+  }
+
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
@@ -240,6 +250,10 @@ export class TenFourApp {
         this.showCheckinDetails(data.checkin);
       });
       this.events.subscribe('subscription:changed', (subscription, time) => {
+        this.loadOrganization();
+      });
+      this.events.subscribe('credits:changed', (credits) => {
+        // this.logger.info(this, 'credits:changed', credits);
         this.loadOrganization();
       });
       resolve(true);

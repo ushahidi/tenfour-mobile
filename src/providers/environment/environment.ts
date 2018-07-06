@@ -30,4 +30,12 @@ export class EnvironmentProvider {
     return this.environment.clientSecret;
   }
 
+  public getAppDomain():string {
+    return this.environment.appDomain;
+  }
+
+  public getIntercomAppId():string {
+    return this.environment.intercomAppId;
+  }
+
 }

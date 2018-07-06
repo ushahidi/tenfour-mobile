@@ -33,7 +33,7 @@ import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
 import { Firebase } from '@ionic-native/firebase';
-
+import { IntercomModule } from 'ng-intercom';
 import { TenFourApp } from './app.component';
 import { TenFourRoutes } from './app.routes';
 
@@ -131,6 +131,7 @@ import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { ContactsProvider } from '../providers/contacts/contacts';
 import { MailerProvider } from '../providers/mailer/mailer';
 import { EnvironmentProvider } from '../providers/environment/environment';
+import { IntercomProvider } from '../providers/intercom/intercom';
 
 @NgModule({
   declarations: [
@@ -207,14 +208,16 @@ import { EnvironmentProvider } from '../providers/environment/environment';
       apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
       debug: false
     }),
-    IonicModule.forRoot(TenFourApp, {
-      scrollAssist: true,
-      autoFocusAssist: true
-    },
-    {
-      links: TenFourRoutes.ROUTES
-    }
-  )
+    IntercomModule.forRoot(),
+    IonicModule.forRoot(TenFourApp,
+      {
+        scrollAssist: true,
+        autoFocusAssist: true
+      },
+      {
+        links: TenFourRoutes.ROUTES
+      }
+    )
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -268,6 +271,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     { provide: MailerProvider, useClass: MailerProvider },
     { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: EnvironmentProvider, useClass: EnvironmentProvider },
+    { provide: IntercomProvider, useClass: IntercomProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

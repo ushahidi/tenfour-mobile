@@ -230,3 +230,8 @@ ion-list {
   -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
 }
+
+
+.toast-md .toast-wrapper {
+  padding-left: 40px; // because of intercom button
+}

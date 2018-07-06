@@ -18,6 +18,7 @@ export class SettingsCreditsPage  extends BasePrivatePage {
 
   credits:number = 0;
   billingEstimate:number = 0;
+  subscription:Subscription = null;
 
   constructor(
       protected zone:NgZone,
@@ -50,6 +51,49 @@ export class SettingsCreditsPage  extends BasePrivatePage {
         organization: this.organization.name
       });
     }
+  }
+
+  ionViewWillLoad() {
+    super.ionViewDidEnter();
+    let loading = this.showLoading("Checking your plan...", true);
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    });
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadSubscription(cache); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.hideModal();
+      });
+  }
+
+  private loadSubscription(cache:boolean=true):Promise<Subscription> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.subscription) {
+        resolve(this.subscription);
+      }
+      else {
+        this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
+          this.subscription = subscriptions[0];
+          resolve(this.subscription);
+        });
+      }
+    });
   }
 
   private closeModal(event:any) {
