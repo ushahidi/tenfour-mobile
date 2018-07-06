@@ -26,7 +26,7 @@ export class IntercomProvider {
 
   public initialize() {
     if (!this.environment.getIntercomAppId()) {
-      return this.logger.warn(this, 'Skipping Intercom initialization - no app id.');  
+      return this.logger.warn(this, 'Skipping Intercom initialization - no app id.');
     }
 
     this.logger.info(this, 'Initializing Intercom');
@@ -44,7 +44,11 @@ export class IntercomProvider {
   }
 
   public trackLogin(organization:Organization, user:User) {
-    if (organization && user && this.intercom) {
+    if (!this.intercom || !window.hasOwnProperty('Intercom')) {
+      return this.logger.warn(this, 'trackLogin', 'intercom not initialized.');
+    }
+
+    if (organization && user) {
       this.intercom.update({
         name: user.name,
         email: organization.email,
