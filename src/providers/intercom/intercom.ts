@@ -25,6 +25,10 @@ export class IntercomProvider {
   }
 
   public initialize() {
+    if (!this.environment.getIntercomAppId()) {
+      return this.logger.warn(this, 'Skipping Intercom initialization - no app id.');  
+    }
+
     this.logger.info(this, 'Initializing Intercom');
 
     require('./intercom.loader')();
