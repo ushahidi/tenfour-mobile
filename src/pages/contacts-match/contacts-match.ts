@@ -23,6 +23,7 @@ export class ContactsMatchPage extends BasePrivatePage {
   columns:any = null;
   map:any = {};
   myIndex:number = 0;
+  Object:any = [];
 
   constructor(
       protected zone:NgZone,
@@ -85,15 +86,20 @@ export class ContactsMatchPage extends BasePrivatePage {
       });
   }
 
-  private preselectMatchingColumns() {
-    //let data = this.getParameter<any>('data');
-    //let columns = data.file.columns;
-    //console.log(columns);
-
+  private preselectMatchingColumns(columns) {
     for (var i=0; i<Object.keys(columns).length; i++) {
-      Object.keys(columns).forEach(key=> {
-        if (this.columns[i].toLowerCase() === key) {
-          this.map[key] = i;
+      let map = {
+        name: null,
+        description: null,
+        phone: null,
+        email: null,
+        address: null,
+        twitter: null
+      };
+
+      Object.keys(map).forEach((key) => {
+        if (columns[i].toLowerCase() === key) {
+          map[key] = i;
         }
       });
     }

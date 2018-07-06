@@ -18,8 +18,8 @@
     </ion-item>
     <ion-item *ngIf="map">
       <ion-label>Name</ion-label>
-      <ion-select [(ngModel)] = "map.name" interface="popover">
-        <ion-option *ngFor="let column of columns let i = index" [value]="column.name" >{{column.name}}</ion-option>
+      <ion-select [(ngModel)] = "map.name" interface="popover" ng-options ="column.name for column in columns">
+        <ion-option *ngFor="let column of columns" [value]="column.name" >{{column.name}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
