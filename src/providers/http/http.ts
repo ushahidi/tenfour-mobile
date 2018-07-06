@@ -431,7 +431,7 @@ export class HttpProvider {
       else if (typeof error === 'string') {
         return error['error'] || error;
       }
-      else if (typeof error === 'object') {
+      else if (typeof error === 'object' && !error['status']) {
         if (error['_body'] || error['message'] || error['error']) {
           let message = error['_body'] || error['message'] || error['error']
           if (message.toString().indexOf("The host could not be resolved") != -1) {
@@ -465,6 +465,9 @@ export class HttpProvider {
       }
       else if (error['status'] == 401) {
         return "Unauthorized";
+      }
+      else if (error['status'] == 402) {
+        return "You do not have enough credits";
       }
       else if (error['status'] == 403) {
         return "Forbidden";
