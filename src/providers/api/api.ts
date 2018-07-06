@@ -211,7 +211,7 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
-        if (error === '409 Conflict') {
+        if (error === '409 Conflict' || error === 'Conflict') {
           return reject(`A verification email has already been sent to ${email}`);
         }
         reject(`There was a problem registering email ${email}.`);
