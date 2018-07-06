@@ -19,7 +19,5 @@
     <p>We created an example CSV file for you with all the correct formatting.
     Download it, fill it out with your contacts' information, save it, and upload it.</p>
   </ion-item>
-  <ion-buttons *ngIf="website || desktop">
-    <button color="primary" clear ion-button text-only (click)="downloadCSV($event)">Download Example CSV</button>
-  </ion-buttons>
+  <a ion-button clear color="primary" href="https://s3.amazonaws.com/ushahidi-tenfour-files/csv_import_example.csv" target="_blank">Download Sample CSV</a>
 </ion-content>

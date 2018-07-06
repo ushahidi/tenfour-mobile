@@ -112,11 +112,6 @@ export class ContactsImportPage extends BasePrivatePage {
     }
   }
 
-  private downloadCSV(event:any) {
-    let url = "https://s3.amazonaws.com/ushahidi-tenfour-files/csv_import_example.csv";
-    this.showToast("Not implemented yet...");
-  }
-
   private cancelImport(event:any) {
     this.hideModal();
   }
