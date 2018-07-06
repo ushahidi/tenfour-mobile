@@ -110,6 +110,7 @@ export class ContactsMatchPage extends BasePrivatePage {
       this.api.importContacts(this.organization, this.data).then((contacts:any) => {
         this.logger.info(this, "contactsUploaded", contacts);
         this.showToast("Your Contacts have been Uploaded");
+        this.showPage(PersonListPage);
       },
       (error:any) => {
         reject(`Could not process the CSV, please check the file format and column names and try again.`);
