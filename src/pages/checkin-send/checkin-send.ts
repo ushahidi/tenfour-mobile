@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { IonicPage, Events, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -38,6 +38,7 @@ export class CheckinSendPage extends BasePrivatePage {
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
+      protected events:Events,
       protected navParams:NavParams,
       protected navController:NavController,
       protected viewController:ViewController,
@@ -161,8 +162,17 @@ export class CheckinSendPage extends BasePrivatePage {
     }
     else {
       let loading = this.showLoading("Sending...", true);
-      this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+      this.api.sendCheckin(this.organization, this.checkin)
+        .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
+        .then((saved:boolean) => { return this.api.getOrganization(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
+        .then(() => {
+
+          this.events.publish('credits:changed', this.organization.credits, Date.now());
+
+          // refresh credits
+          this.api.getOrganization
+
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {
@@ -175,12 +185,11 @@ export class CheckinSendPage extends BasePrivatePage {
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
           });
+        })
+        .catch((error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem Creating Check-In", error);
         });
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Creating Check-In", error);
-      });
     }
   }
 

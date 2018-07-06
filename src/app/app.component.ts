@@ -252,6 +252,10 @@ export class TenFourApp {
       this.events.subscribe('subscription:changed', (subscription, time) => {
         this.loadOrganization();
       });
+      this.events.subscribe('credits:changed', (credits) => {
+        // this.logger.info(this, 'credits:changed', credits);
+        this.loadOrganization();
+      });
       resolve(true);
     })
   }
