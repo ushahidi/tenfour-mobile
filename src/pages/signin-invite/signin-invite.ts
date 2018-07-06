@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
@@ -12,6 +12,8 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_USER_LOGIN } from '../../constants/events';
 
 @IonicPage({
   name: 'SigninInvitePage',
@@ -54,7 +56,6 @@ export class SigninInvitePage extends BasePublicPage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -200,7 +201,7 @@ export class SigninInvitePage extends BasePublicPage {
         .then((organization:Organization) => { return this.storage.setOrganization(organization); })
         .then((stored:boolean) => {
           this.logger.info(this, "acceptInitation", "Accepted");
-          this.events.publish('user:login');
+          this.events.publish(EVENT_USER_LOGIN);
           loading.dismiss();
           this.loading = false;
           if (this.user.name && this.user.name.length > 0) {

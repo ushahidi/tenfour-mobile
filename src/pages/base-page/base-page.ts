@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
+import { Content, Events, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { BrowserProvider } from '../../providers/browser/browser';
@@ -35,7 +35,8 @@ export class BasePage {
   protected desktop:boolean = false;
 
   protected zone:NgZone;
-
+  protected events:Events;
+  
   protected statusBar:StatusBarProvider;
   protected keyboard:KeyboardProvider;
   protected logger:LoggerProvider;
@@ -68,6 +69,7 @@ export class BasePage {
     this.intercom = InjectorProvider.injector.get(IntercomProvider);
     this.browser = InjectorProvider.injector.get(BrowserProvider);
     this.sharing = InjectorProvider.injector.get(SharingProvider);
+    this.events = InjectorProvider.injector.get(Events);
   }
 
   ionViewDidLoad() {

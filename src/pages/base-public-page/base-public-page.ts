@@ -1,5 +1,5 @@
-import { Component, ViewChild, NgZone } from '@angular/core';
-import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { Platform, NavParams, AlertController, ToastController, ModalController, LoadingController, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
