@@ -17,6 +17,8 @@ import { LocationProvider } from '../../providers/location/location';
 
 import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
 
+import { EVENT_ACCOUNT_DELETED } from '../../constants/events';
+
 @IonicPage({
   name: 'SettingsEditPage',
   segment: 'settings/edit',
@@ -55,8 +57,7 @@ export class SettingsEditPage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected camera:CameraProvider,
-      protected location:LocationProvider,
-      protected events:Events) {
+      protected location:LocationProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -260,7 +261,7 @@ export class SettingsEditPage extends BasePrivatePage {
           let loading = this.showLoading("Deleting...", true);
           if (this.user && this.user.isOwner()) {
             this.api.deleteOrganization(this.organization).then((deleted:any) => {
-              this.events.publish('account:deleted');
+              this.events.publish(EVENT_ACCOUNT_DELETED);
               loading.dismiss();
               this.showToast("Your Organization Account has been deleted");
               this.hideModal({

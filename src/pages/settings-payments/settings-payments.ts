@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SettingsPlanFreePage } from '../settings-plan-free/settings-plan-free';
@@ -14,6 +14,8 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
 
 @IonicPage({
   name: 'SettingsPaymentsPage',
@@ -53,8 +55,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -117,7 +118,6 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       }
       else {
         this.storage.getSubscription().then((subscription:Subscription) => {
-          console.log(subscription);
           this.subscription = subscription;
           resolve(this.subscription);
         });
@@ -160,7 +160,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
               this.storage.setOrganization(organization)
                 .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
                 .then(()=>{
-                  this.events.publish('subscription:changed', this.subscription, Date.now());
+                  this.events.publish(EVENT_SUBSCRIPTION_CHANGED, this.subscription, Date.now());
                   resolve(this.subscription);
                 });
             });

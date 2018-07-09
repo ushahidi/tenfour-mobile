@@ -58,6 +58,16 @@ import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { IntercomProvider } from '../providers/intercom/intercom';
 
+import {
+  EVENT_USER_AUTHENTICATED,
+  EVENT_USER_REDIRECTED,
+  EVENT_USER_DELETED,
+  EVENT_USER_UNAUTHORIZED,
+  EVENT_ACCOUNT_DELETED,
+  EVENT_CHECKIN_DETAILS,
+  EVENT_CREDITS_CHANGED,
+  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
+
 @Component({
   templateUrl: 'app.html'
 })
@@ -67,6 +77,7 @@ export class TenFourApp {
   rootPage:any = SplashScreenPage;
   organization:Organization = null;
   user:User = null;
+
   tablet:boolean = false;
   mobile:boolean = false;
   phone:boolean = false;
@@ -135,7 +146,10 @@ export class TenFourApp {
                 new Settings(),
                 new Country(),
                 new Notification(),
-                new Subscription()]));
+                new Subscription()]))
+          .then(() => {
+            this.logger.info(this, "constructor", "loadMobileApp", "Loaded");
+          });
       }
       else {
         Promise.resolve()
@@ -144,7 +158,10 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
-          .then(() => this.loadWebApp());
+          .then(() => this.loadWebApp())
+          .then(() => {
+            this.logger.error(this, "constructor", "loadWebApp", "Loaded");
+          });
       }
     });
   }
@@ -240,20 +257,46 @@ export class TenFourApp {
   private loadEvents():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadEvents");
-      this.events.subscribe('account:deleted', () => {
-        this.userLogout(false);
+      this.events.subscribe(EVENT_USER_DELETED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_DELETED);
       });
-      this.events.subscribe('user:login', () => {
+      this.events.subscribe(EVENT_USER_AUTHENTICATED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_AUTHENTICATED);
         this.loadMenu();
       });
-      this.events.subscribe('checkin:details', (data:any) => {
+      this.events.subscribe(EVENT_USER_UNAUTHORIZED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Not Authorized",
+          `You are not authorized to access this protected page, please login and try again.`);
+        alert.onDidDismiss(data => {
+          this.showSigninUrl();
+        });
+      });
+      this.events.subscribe(EVENT_USER_REDIRECTED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_REDIRECTED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Already Authenticated",
+          `You are trying to access a public page when you are already logged in, redirecting back to Check-Ins.`);
+        alert.onDidDismiss(data => {
+          this.showCheckinList();
+        });
+      });
+      this.events.subscribe(EVENT_ACCOUNT_DELETED, () => {
+        this.logger.info(this, "loadEvents", EVENT_ACCOUNT_DELETED);
+        this.userLogout(false);
+      });
+      this.events.subscribe(EVENT_CHECKIN_DETAILS, (data:any) => {
+        this.logger.info(this, "loadEvents", EVENT_CHECKIN_DETAILS, data);
         this.showCheckinDetails(data.checkin);
       });
-      this.events.subscribe('subscription:changed', (subscription, time) => {
+      this.events.subscribe(EVENT_CREDITS_CHANGED, (credits) => {
+        this.logger.info(this, "loadEvents", EVENT_CREDITS_CHANGED, credits);
+        this.logger.info(this, EVENT_CREDITS_CHANGED, credits);
         this.loadOrganization();
       });
-      this.events.subscribe('credits:changed', (credits) => {
-        // this.logger.info(this, 'credits:changed', credits);
+      this.events.subscribe(EVENT_SUBSCRIPTION_CHANGED, (subscription, time) => {
+        this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
       });
       resolve(true);
@@ -275,12 +318,12 @@ export class TenFourApp {
 
   private loadWebApp() {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadWebApp");
+      this.logger.info(this, "loadWebApp", this.locationHash());
       this.storage.getOrganization().then((organization:Organization) => {
-        this.logger.info(this, "loadWebApp", "Organization", organization);
+        this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", organization);
         this.organization = organization;
         this.storage.getUser().then((user:User) => {
-          this.logger.info(this, "loadWebApp", "User", user);
+          this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
             if (this.hasLocationHash() == false) {
@@ -296,7 +339,7 @@ export class TenFourApp {
           }
         },
         (error:any) => {
-          this.logger.info(this, "loadWebApp", "User", "None");
+          this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
           if (this.hasLocationHash() == false) {
             this.showSigninUrl();
           }
@@ -304,7 +347,7 @@ export class TenFourApp {
         });
       },
       (error:any) => {
-        this.logger.info(this, "loadWebApp", "Organization", "None");
+        this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
         if (this.hasLocationHash() == false) {
           this.showSigninUrl();
         }
@@ -625,7 +668,6 @@ export class TenFourApp {
       this.organization = null;
       this.user = null;
       this.clearBadgeCount();
-      this.events.publish('user:logout');
       loading.dismiss();
       this.showSigninUrl(event);
     });

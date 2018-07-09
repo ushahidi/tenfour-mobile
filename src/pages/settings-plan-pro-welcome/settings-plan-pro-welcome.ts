@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
@@ -8,6 +8,8 @@ import { Organization } from '../../models/organization';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
 
 @IonicPage()
 @Component({
@@ -31,8 +33,7 @@ export class SettingsPlanProWelcomePage extends BasePrivatePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -79,10 +80,8 @@ export class SettingsPlanProWelcomePage extends BasePrivatePage {
           if (subscriptions[0].plan_id !== 'pro-plan') {
             return reject("There was a problem changing to Pro plan");
           }
-
           this.subscription = subscriptions[0];
-          this.events.publish('subscription:changed', this.subscription, Date.now());
-
+          this.events.publish(EVENT_SUBSCRIPTION_CHANGED, this.subscription, Date.now());
           resolve(this.subscription);
         });
       }

@@ -27,7 +27,24 @@ Visit [THEME.md](/docs/THEME.md) for information on changing colors and styling.
 * [Ionic Community Forum](https://forum.ionicframework.com/)
 
 ---
-
+#### Setup Environment
+```
+sudo npm install -g cordova@7.1.0
+sudo npm install -g ionic@latest
+npm install -g xcode@latest
+npm install -g cordova-common@latest
+npm install -g cordova-ios@latest
+npm install -g cordova-android@latest
+npm install -g cordova-browser@latest
+sudo npm install -g ios-sim@latest
+npm install -g ios-deploy@latest
+npm install -g android-simulator@latest
+```
+#### Clean Modules
+```
+rm -r node_modules
+npm install
+```
 #### Remove Platforms
 ```
 cordova clean
@@ -88,6 +105,11 @@ ENV=prod npm run ionic:build --prod --release
 
 #### Commit Branch
 ```
+git checkout develop
+git reset --hard
+git pull
+```
+```
 ISSUE_NAME="123 Fixed A Bug"
 BRANCH_NAME=$(echo $ISSUE_NAME | tr '[:upper:]' '[:lower:]' | tr '/' '-' | tr ' ' '-')
 git checkout -b $BRANCH_NAME
@@ -95,7 +117,6 @@ git add .
 git add -u
 git commit -m "Fixed a bug for #123"
 git push -u origin $BRANCH_NAME
-git checkout develop
 ```
 ```
 git checkout develop
