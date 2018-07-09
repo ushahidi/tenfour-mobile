@@ -17,15 +17,15 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'CheckinEmailPage',
-  segment: 'checkins/email/:checkin_id/:answer_id/:user_id/:token'
+  name: 'CheckinTokenPage',
+  segment: 'r/:checkin_id/:answer_id/:user_id/:token'
 })
 @Component({
-  selector: 'page-checkin-email',
-  templateUrl: 'checkin-email.html',
+  selector: 'page-checkin-token',
+  templateUrl: 'checkin-token.html',
   providers:[ StorageProvider, ApiProvider ]
 })
-export class CheckinEmailPage extends BasePage {
+export class CheckinTokenPage extends BasePage {
 
   organization:Organization = null;
   user:User = null;

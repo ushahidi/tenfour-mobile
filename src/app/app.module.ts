@@ -66,7 +66,7 @@ import { CheckinListModule } from '../pages/checkin-list/checkin-list.module';
 import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
-import { CheckinEmailModule } from '../pages/checkin-email/checkin-email.module';
+import { CheckinTokenModule } from '../pages/checkin-token/checkin-token.module';
 
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
@@ -178,7 +178,7 @@ import { IntercomProvider } from '../providers/intercom/intercom';
     CheckinEditModule,
     CheckinSendModule,
     CheckinTestModule,
-    CheckinEmailModule,
+    CheckinTokenModule,
     CheckinDetailsModule,
     CheckinRespondModule,
     NotificationListModule,
