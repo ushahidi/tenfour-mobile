@@ -12,7 +12,7 @@ import { Token } from '../../models/token';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-import { EVENT_USER_LOGIN } from '../../constants/events';
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
   name: 'SignupPasswordPage',
@@ -148,7 +148,7 @@ export class SignupPasswordPage extends BasePublicPage {
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
-          this.events.publish(EVENT_USER_LOGIN);
+          this.events.publish(EVENT_USER_AUTHENTICATED);
           loading.dismiss();
           this.loading = false;
           if (this.person.name && this.person.name.length > 0) {

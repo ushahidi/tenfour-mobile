@@ -1,8 +1,8 @@
-export let EVENT_USER_LOGIN:string = "user:login";
-
-export let EVENT_USER_LOGOUT:string = "user:logout";
+export let EVENT_USER_AUTHENTICATED:string = "user:authenticated";
 
 export let EVENT_USER_DELETED:string = "user:deleted";
+
+export let EVENT_USER_RESTRICTED:string = "user:restricted";
 
 export let EVENT_USER_UNAUTHORIZED:string = "user:unauthorized";
 

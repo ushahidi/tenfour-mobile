@@ -47,13 +47,17 @@ export class BasePrivatePage extends BasePage {
           }
           else {
             this.logger.error(this, "ionViewCanEnter", "NO");
-            this.events.publish(EVENT_USER_UNAUTHORIZED);
+            setTimeout(() => {
+              this.events.publish(EVENT_USER_UNAUTHORIZED);
+            }, 500);
             resolve(false);
           }
         })
         .catch((error:any) => {
           this.logger.error(this, "ionViewCanEnter", "NO");
-          this.events.publish(EVENT_USER_UNAUTHORIZED);
+          setTimeout(() => {
+            this.events.publish(EVENT_USER_UNAUTHORIZED);
+          }, 500);
           resolve(false);
         });
     });

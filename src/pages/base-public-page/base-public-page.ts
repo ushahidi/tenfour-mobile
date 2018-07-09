@@ -8,6 +8,8 @@ import { User } from '../../models/user';
 
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_USER_RESTRICTED } from '../../constants/events';
+
 @Component({
   selector: 'base-public-page',
   template: "<ion-header></ion-header><ion-content></ion-content>",
@@ -35,6 +37,9 @@ export class BasePublicPage extends BasePage {
       this.storage.hasUser().then((hasUser:boolean) => {
         if (hasUser) {
           this.logger.error(this, "ionViewCanEnter", "NO");
+          setTimeout(() => {
+            this.events.publish(EVENT_USER_RESTRICTED);
+          }, 500);
           resolve(false);
         }
         else {

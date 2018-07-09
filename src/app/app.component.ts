@@ -59,8 +59,8 @@ import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { IntercomProvider } from '../providers/intercom/intercom';
 
 import {
-  EVENT_USER_LOGIN,
-  EVENT_USER_LOGOUT,
+  EVENT_USER_AUTHENTICATED,
+  EVENT_USER_RESTRICTED,
   EVENT_USER_DELETED,
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
@@ -77,6 +77,7 @@ export class TenFourApp {
   rootPage:any = SplashScreenPage;
   organization:Organization = null;
   user:User = null;
+
   tablet:boolean = false;
   mobile:boolean = false;
   phone:boolean = false;
@@ -145,7 +146,10 @@ export class TenFourApp {
                 new Settings(),
                 new Country(),
                 new Notification(),
-                new Subscription()]));
+                new Subscription()]))
+          .then(() => {
+            this.logger.info(this, "constructor", "loadMobileApp", "Loaded");
+          });
       }
       else {
         Promise.resolve()
@@ -154,7 +158,10 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
-          .then(() => this.loadWebApp());
+          .then(() => this.loadWebApp())
+          .then(() => {
+            this.logger.error(this, "constructor", "loadWebApp", "Loaded");
+          });
       }
     });
   }
@@ -250,23 +257,34 @@ export class TenFourApp {
   private loadEvents():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadEvents");
+      this.events.subscribe(EVENT_USER_DELETED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_DELETED);
+      });
+      this.events.subscribe(EVENT_USER_AUTHENTICATED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_AUTHENTICATED);
+        this.loadMenu();
+      });
+      this.events.subscribe(EVENT_USER_UNAUTHORIZED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Not Authorized",
+          `You are not authorized to access ${this.locationHash()}, please login and try again.`);
+        alert.onDidDismiss(data => {
+          this.showSigninUrl();
+        });
+      });
+      this.events.subscribe(EVENT_USER_RESTRICTED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_RESTRICTED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Already Authenticated",
+          `You are trying to access ${this.locationHash()} when you are already authenticated, redirecting back to Check-Ins.`);
+        alert.onDidDismiss(data => {
+          this.showCheckinList();
+        });
+      });
       this.events.subscribe(EVENT_ACCOUNT_DELETED, () => {
         this.logger.info(this, "loadEvents", EVENT_ACCOUNT_DELETED);
         this.userLogout(false);
-      });
-      this.events.subscribe(EVENT_USER_LOGIN, () => {
-        this.logger.info(this, "loadEvents", EVENT_USER_LOGIN);
-        this.loadMenu();
-      });
-      this.events.subscribe(EVENT_USER_LOGOUT, () => {
-        this.logger.info(this, "loadEvents", EVENT_USER_LOGOUT);
-      });
-      this.events.subscribe(EVENT_USER_UNAUTHORIZED, () => {
-        this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED);
-        let modal = this.showModal("Not Authorized", "You are not authorized to access this page, please login and then try again.");
-        modal.onDidDismiss(data => {
-          this.showSigninUrl();
-        });
       });
       this.events.subscribe(EVENT_CHECKIN_DETAILS, (data:any) => {
         this.logger.info(this, "loadEvents", EVENT_CHECKIN_DETAILS, data);
@@ -650,7 +668,6 @@ export class TenFourApp {
       this.organization = null;
       this.user = null;
       this.clearBadgeCount();
-      this.events.publish(EVENT_USER_LOGOUT);
       loading.dismiss();
       this.showSigninUrl(event);
     });

@@ -13,7 +13,7 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-import { EVENT_USER_LOGIN } from '../../constants/events';
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
   name: 'SigninInvitePage',
@@ -201,7 +201,7 @@ export class SigninInvitePage extends BasePublicPage {
         .then((organization:Organization) => { return this.storage.setOrganization(organization); })
         .then((stored:boolean) => {
           this.logger.info(this, "acceptInitation", "Accepted");
-          this.events.publish(EVENT_USER_LOGIN);
+          this.events.publish(EVENT_USER_AUTHENTICATED);
           loading.dismiss();
           this.loading = false;
           if (this.user.name && this.user.name.length > 0) {
