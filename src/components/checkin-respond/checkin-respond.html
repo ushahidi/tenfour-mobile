@@ -1,0 +1,38 @@
+<ion-list no-margin *ngIf="checkin">
+  <ion-item text-wrap color="white">
+    <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
+    <h1 text-center>{{checkin.message}}</h1>
+    <p text-center>{{checkin.created_at | dateTime}} <strong> {{checkin.user_name}}</strong></p>
+  </ion-item>
+</ion-list>
+<div class="buttons" margin-top margin-bottom *ngIf="checkin && checkin.reply">
+  <div padding-left padding-right *ngFor="let answer of checkin.answers">
+    <button ion-button block [style.background]="answer.color" [style.color]="white" *ngIf="answer.answer == checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
+    <button ion-button block outline color="grey" *ngIf="answer.answer != checkin.reply.answer" (click)="selectAnswer(checkin, checkin.reply, answer)">{{answer.answer}}</button>
+  </div>
+</div>
+<ion-list lines *ngIf="checkin && checkin.reply">
+  <ion-item color="input">
+    <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+    <ion-input type="text" placeholder="Add message" (keypress)="onKeyPress($event)" [(ngModel)]="checkin.reply.message"></ion-input>
+    <button ion-button icon-only item-right clear color="black" tappable (click)="removeMessage(checkin.reply)"
+            *ngIf="checkin.reply.message && checkin.reply.message.length > 0">
+      <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+    </button>
+  </ion-item>
+  <ion-item color="input">
+    <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+    <ion-input type="text" placeholder="Add location" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="checkin.reply.location_text"></ion-input>
+    <button ion-button icon-only item-right clear color="black" tappable (click)="removeLocation(checkin.reply)"
+            *ngIf="checkin.reply.location_text && checkin.reply.location_text.length > 0">
+      <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+    </button>
+    <button ion-button icon-only item-right clear color="black" *ngIf="locating">
+      <ion-spinner name="ios-small"></ion-spinner>
+    </button>
+  </ion-item>
+  <ion-item color="white" tappable (click)="selectLocation(location)" *ngFor="let location of locations">
+    <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>
+    <div item-content text-left item-left class="content">{{location.address}}</div>
+  </ion-item>
+</ion-list>

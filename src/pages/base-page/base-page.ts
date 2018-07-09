@@ -33,6 +33,7 @@ export class BasePage {
   protected ios:boolean = false;
   protected website:boolean = false;
   protected desktop:boolean = false;
+  protected modal:boolean = false;
 
   protected zone:NgZone;
 
@@ -80,6 +81,7 @@ export class BasePage {
       this.desktop = this.platform.is('core');
       this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
       this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
+      this.modal = this.getParameter<boolean>("modal");
     })
   }
 

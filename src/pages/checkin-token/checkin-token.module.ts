@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
-import { CheckinRespondPage } from './checkin-respond';
+import { CheckinTokenPage } from './checkin-token';
 
 import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
@@ -9,19 +9,19 @@ import { CheckinRespondComponentModule } from '../../components/checkin-respond/
 
 @NgModule({
   declarations: [
-    CheckinRespondPage,
+    CheckinTokenPage,
   ],
   imports: [
-    PersonAvatarModule,
     DateTimeModule,
+    PersonAvatarModule,
     CheckinRespondComponentModule,
-    IonicPageModule.forChild(CheckinRespondPage),
+    IonicPageModule.forChild(CheckinTokenPage),
   ],
   exports: [
-    CheckinRespondPage
+    CheckinTokenPage
   ],
   entryComponents: [
-    CheckinRespondPage
+    CheckinTokenPage
   ]
 })
-export class CheckinRespondModule {}
+export class CheckinTokenModule {}

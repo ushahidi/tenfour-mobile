@@ -47,10 +47,8 @@ export class SigninUrlPage extends BasePublicPage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
-
     let organizationSubdomain = this.parseOrganizationSubdomain();
-
-    if (organizationSubdomain) {
+    if (organizationSubdomain && organizationSubdomain != "localhost") {
       this.subdomain.value = organizationSubdomain;
       this.showNext(undefined);
     }
@@ -59,16 +57,13 @@ export class SigninUrlPage extends BasePublicPage {
   private parseOrganizationSubdomain() {
     let hostname = location.hostname;
     let appDomain = this.environment.getAppDomain();
-
     if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
       let subdomain = hostname.replace('.' + appDomain, '');
-
       if (subdomain !== 'app') {
         this.logger.info(this, 'Subdomain', subdomain);
         return subdomain;
       }
     }
-
     return null;
   }
 
@@ -110,7 +105,6 @@ export class SigninUrlPage extends BasePublicPage {
     let extension = '.' + appDomain;
     let locationSubdomain = location.hostname.replace(extension, '');
     let subdomain = this.subdomain.value.toLowerCase();
-
     if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
       location.assign(location.protocol
         + "//"
@@ -120,7 +114,6 @@ export class SigninUrlPage extends BasePublicPage {
         + "/");
       return true;
     }
-
     return false;
   }
 

@@ -1,0 +1,14 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left *ngIf="organization == null && user == null">
+      <button ion-button color="cancel" (click)="showNextPage($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Check-In</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" (click)="sendCheckinReply($event)">Send</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <checkin-respond [(checkin)]="checkin" [organization]="organization" *ngIf="checkin"></checkin-respond>
+</ion-content>

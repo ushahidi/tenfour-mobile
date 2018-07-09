@@ -65,6 +65,12 @@ export class Checkin extends Model {
           this.waiting_count = data.recipients.length - data.replies.length;
         }
       }
+      if (data.user) {
+        this.user = new User(data.user);
+        this.user_name = this.user.name;
+        this.user_initials = this.user.initials;
+        this.user_picture = this.user.profile_picture;
+      }
     }
   }
 

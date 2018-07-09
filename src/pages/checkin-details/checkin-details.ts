@@ -33,7 +33,6 @@ export class CheckinDetailsPage extends BasePrivatePage {
   create:Button;
 
   checkin:Checkin = null;
-  modal:boolean = false;
   loading:boolean = false;
 
   constructor(
@@ -55,7 +54,6 @@ export class CheckinDetailsPage extends BasePrivatePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
