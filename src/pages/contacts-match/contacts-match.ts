@@ -25,7 +25,6 @@ export class ContactsMatchPage extends BasePrivatePage {
   map:any = {};
   myIndex:number = 0;
   Object:any = [];
-  selectOptions:any = {};
 
   constructor(
       protected zone:NgZone,

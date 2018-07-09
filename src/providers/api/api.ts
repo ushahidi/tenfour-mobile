@@ -1328,8 +1328,9 @@ export class ApiProvider extends HttpProvider {
         });
 
         let params = {
-          columns: columns,
-          data: maps_to
+          fileId: data.file.id,
+          orgId: organization.id,
+          maps_to: maps_to
         };
 
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
@@ -1353,6 +1354,7 @@ export class ApiProvider extends HttpProvider {
           fileId: data.file.id,
           orgId: organization.id
         };
+
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
         this.httpPost(url, params, token.access_token).then((data:any) => {
           resolve(true);
