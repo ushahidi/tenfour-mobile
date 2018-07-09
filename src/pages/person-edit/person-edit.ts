@@ -279,14 +279,21 @@ export class PersonEditPage extends BasePrivatePage {
       }
       else {
         this.logger.info(this, "savePerson", "Create", person);
-        this.api.createPerson(this.organization, person).then((person:Person) => {
-          this.person.id = person.id;
-          this.storage.savePerson(this.organization, person).then((saved:any) => {
-            resolve(person);
+        this.api.getOrganization(this.organization).then((organization:Organization) => {
+          if (organization.subscription_plan === 'free-plan' &&
+            organization.user_count >= 50) {
+            return reject('You have reached your person quota for your current plan. Please upgrade your plan to add more people.');
+          }
+
+          return this.api.createPerson(this.organization, person).then((person:Person) => {
+            this.person.id = person.id;
+            this.storage.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
         });
       }
     });
