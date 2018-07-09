@@ -34,7 +34,7 @@ export class SettingsEditPage extends BasePrivatePage {
   @ViewChild("fileInput")
   fileInput:any = null;
 
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
   search:string = null;

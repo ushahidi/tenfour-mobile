@@ -34,7 +34,7 @@ export class SigninPasswordPage extends BasePublicPage {
   person:Person = null;
   token:Token = null;
   email:string = null;
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   loading:boolean = false;
 
   constructor(
