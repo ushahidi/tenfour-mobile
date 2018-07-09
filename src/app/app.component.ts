@@ -60,7 +60,7 @@ import { IntercomProvider } from '../providers/intercom/intercom';
 
 import {
   EVENT_USER_AUTHENTICATED,
-  EVENT_USER_RESTRICTED,
+  EVENT_USER_REDIRECTED,
   EVENT_USER_DELETED,
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
@@ -268,16 +268,16 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED, this.rootPage, this.locationHash());
         let alert = this.showAlert(
           "Not Authorized",
-          `You are not authorized to access ${this.locationHash()}, please login and try again.`);
+          `You are not authorized to access this protected page, please login and try again.`);
         alert.onDidDismiss(data => {
           this.showSigninUrl();
         });
       });
-      this.events.subscribe(EVENT_USER_RESTRICTED, () => {
-        this.logger.info(this, "loadEvents", EVENT_USER_RESTRICTED, this.rootPage, this.locationHash());
+      this.events.subscribe(EVENT_USER_REDIRECTED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_REDIRECTED, this.rootPage, this.locationHash());
         let alert = this.showAlert(
           "Already Authenticated",
-          `You are trying to access ${this.locationHash()} when you are already authenticated, redirecting back to Check-Ins.`);
+          `You are trying to access a public page when you are already logged in, redirecting back to Check-Ins.`);
         alert.onDidDismiss(data => {
           this.showCheckinList();
         });

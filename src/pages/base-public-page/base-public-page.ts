@@ -8,7 +8,7 @@ import { User } from '../../models/user';
 
 import { StorageProvider } from '../../providers/storage/storage';
 
-import { EVENT_USER_RESTRICTED } from '../../constants/events';
+import { EVENT_USER_REDIRECTED } from '../../constants/events';
 
 @Component({
   selector: 'base-public-page',
@@ -38,7 +38,7 @@ export class BasePublicPage extends BasePage {
         if (hasUser) {
           this.logger.error(this, "ionViewCanEnter", "NO");
           setTimeout(() => {
-            this.events.publish(EVENT_USER_RESTRICTED);
+            this.events.publish(EVENT_USER_REDIRECTED);
           }, 500);
           resolve(false);
         }
