@@ -252,10 +252,14 @@ export class Checkin extends Model {
   }
 
   public sendVia() {
-    if (this.send_via) {
+    if (Array.isArray(this.send_via)) {
+      return this.send_via;
+    }
+
+    if (typeof this.send_via === 'string') {
       return this.send_via.split(",");
     }
-    
+
     return [];
   }
 
