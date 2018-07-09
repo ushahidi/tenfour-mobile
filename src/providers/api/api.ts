@@ -1346,12 +1346,24 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public importContacts(organization:Organization, data:any) {
+  public importContacts(organization:any, data:any):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id
+        };
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
-        let params = { };
-        this.httpPost(url, params, token.access_token);
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "import", token, "Error", error);
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }
