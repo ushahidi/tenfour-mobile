@@ -252,7 +252,11 @@ export class Checkin extends Model {
   }
 
   public sendVia() {
-    return this.send_via;
+    if (this.send_via) {
+      return this.send_via.split(",");
+    }
+    
+    return [];
   }
 
   public hasBlankAnswers():boolean {
