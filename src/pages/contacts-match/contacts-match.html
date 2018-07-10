@@ -18,34 +18,34 @@
     </ion-item>
     <ion-item>
       <ion-label>Name</ion-label>
-      <ion-select [(ngModel)] = "map.name">
+      <ion-select [(ngModel)] = "map.name" interface="popover">
         <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Description</ion-label>
-      <ion-select [(ngModel)] = "map.description">
+      <ion-select [(ngModel)] = "map.description" interface="popover">
         <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Phone</ion-label>
-      <ion-select [(ngModel)] = "map.phone">
+      <ion-select [(ngModel)] = "map.phone" interface="popover">
         <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Email</ion-label>
-      <ion-select [(ngModel)] = "map.email">
+      <ion-select [(ngModel)] = "map.email" interface="popover">
         <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
       <ion-label>Address</ion-label>
-      <ion-select [(ngModel)] = "map.address">
+      <ion-select [(ngModel)] = "map.address" interface="popover">
         <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
