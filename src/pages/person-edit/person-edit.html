@@ -64,7 +64,7 @@
       <ion-input item-right type="text" autocorrect="off" autocapitalize="yes" placeholder="street address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="person && user && user.isOwnerOrAdmin()">
+  <ion-list *ngIf="person && !person.isOwner() && user && user.isOwnerOrAdmin()">
     <ion-item class="role" color="white">
       <ion-label no-padding no-margin icon-only text-left>
         <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
