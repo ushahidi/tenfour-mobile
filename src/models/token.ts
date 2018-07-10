@@ -3,7 +3,7 @@ export interface Token {
 
   username:string;
 
-  password:string;
+  // password:string;
 
   organization:string;
 
