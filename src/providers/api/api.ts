@@ -1382,11 +1382,13 @@ export class ApiProvider extends HttpProvider {
         //iterate through the map Object, check if value is null and replace any null with value
         //insert this into the maps_to array in the correct positions
 
-        Object.keys(map).forEach(function(key, value) {
-          if (value !== null) {
-            maps_to.splice(value, 1, key);
+        for (let i=0; i<columns.length; i++) {
+          for (let mapKey of Object.keys(map)) {
+            if (map[mapKey] === columns[i]) {
+              maps_to[i] = mapKey;
+            }
           }
-        });
+        }
 
         let params = {
           fileId: data.file.id,
