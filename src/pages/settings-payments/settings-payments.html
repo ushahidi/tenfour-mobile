@@ -80,8 +80,21 @@
             <div *ngIf="organization && organization.hasProPlan()">
               <p>Add credits</p>
               <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
-              <p>Cost: {{updatedCreditsCost | currency}} per month</p>
+
+            <ion-item color="white">
+              <ion-label>Add extra credits immediately</ion-label>
+              <ion-checkbox></ion-checkbox>
+            </ion-item>
+
+            <ion-item color="white">
+              <ion-label>Make this a recurring payment</ion-label>
+              <ion-checkbox></ion-checkbox>
+            </ion-item>
+
+              <p *ngIf="updatedCreditsCost">Cost: {{updatedCreditsCost | currency}} (per month)</p>
             </div>
+
+
 
             <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
             <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>
