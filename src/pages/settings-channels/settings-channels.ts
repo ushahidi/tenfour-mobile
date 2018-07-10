@@ -88,7 +88,7 @@ export class SettingsChannelsPage extends BasePrivatePage {
   private doneEdit(event:any) {
     let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.storage.saveOrganization(organization).then(saved => {
+      this.storage.setOrganization(organization).then(saved => {
         loading.dismiss();
         this.hideModal({
           organization: organization
