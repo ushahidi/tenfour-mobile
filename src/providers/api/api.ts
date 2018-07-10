@@ -85,12 +85,6 @@ export class ApiProvider extends HttpProvider {
             (error:any) => {
               reject(error);
             });
-            // this.userLogin(organization, token.username, token.password).then((token:Token) => {
-            //   resolve(token);
-            // },
-            // (error:any) => {
-            //   reject(error);
-            // });
           }
         }
         else {
