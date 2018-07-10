@@ -34,7 +34,7 @@ export class SigninInvitePage extends BasePublicPage {
   @ViewChild('confirm')
   confirm:TextInput;
 
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   organization:Organization = null;
   user:User = null;
   email:string = null;

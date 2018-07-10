@@ -86,7 +86,7 @@ export class TenFourApp {
   website:boolean = false;
   desktop:boolean = false;
 
-  defaultLogo:string = "assets/images/dots.png";
+  defaultLogo:string = "assets/images/logo-dots.png";
 
   checkin:Checkin = null;
 

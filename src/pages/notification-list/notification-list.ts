@@ -27,7 +27,7 @@ export class NotificationListPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
-  defaultLogo:string = "assets/images/dots.png";
+  defaultLogo:string = "assets/images/logo-dots.png";
 
   constructor(
       protected zone:NgZone,
