@@ -1349,4 +1349,88 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
+
+  public uploadContactsCSV(organization:Organization, file:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+        this.fileUpload(url, token.access_token, file).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public matchCSVContacts(organization:Organization, map:any, data:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+
+        // Initialize a new array of the length of the csv column with nulls
+        let maps_to = [];
+        let columns = data.file.columns;
+
+        for (let i = 0; i < Object.keys(columns).length; i++) {
+          maps_to.push(null);
+        }
+
+        //iterate through the map Object, check if value is null and replace any null with value
+        //insert this into the maps_to array in the correct positions
+
+        for (let i=0; i<columns.length; i++) {
+          for (let mapKey of Object.keys(map)) {
+            if (map[mapKey] === columns[i]) {
+              maps_to[i] = mapKey;
+            }
+          }
+        }
+
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id,
+          maps_to: maps_to
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public importContacts(organization:any, data:any):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "import", token, "Error", error);
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
 }

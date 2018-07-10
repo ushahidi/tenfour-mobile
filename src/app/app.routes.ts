@@ -35,6 +35,9 @@ import { CheckinTestPage } from '../pages/checkin-test/checkin-test';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
 import { CheckinTokenPage } from '../pages/checkin-token/checkin-token';
 
+import { ContactsImportPage } from '../pages/contacts-import/contacts-import';
+import { ContactsMatchPage } from '../pages/contacts-match/contacts-match';
+
 import { GroupListPage } from '../pages/group-list/group-list';
 import { GroupEditPage } from '../pages/group-edit/group-edit';
 import { GroupDetailsPage } from '../pages/group-details/group-details';
@@ -83,6 +86,9 @@ export class TenFourRoutes {
     { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
 
     { component: CheckinTokenPage, name: 'CheckinTokenPage', segment: 'r/:checkin_id/:answer_id/:user_id/:token' },
+
+    { component: ContactsImportPage, name: 'ContactsImportPage', segment: 'settings/contacts', defaultHistory: ['SettingsListPage'] },
+    { component: ContactsMatchPage, name: 'ContactsMatchPage', segment: 'settings/contacts', defaultHistory: ['ContactsImportPage'] },
 
     { component: PersonProfilePage, name: 'PersonProfilePage', segment: 'profile' },
 

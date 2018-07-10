@@ -71,6 +71,9 @@ import { CheckinTokenModule } from '../pages/checkin-token/checkin-token.module'
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
 
+import { ContactsImportModule } from '../pages/contacts-import/contacts-import.module';
+import { ContactsMatchModule } from '../pages/contacts-match/contacts-match.module';
+
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
 import { PasswordResetModule } from '../pages/password-reset/password-reset.module';
@@ -119,6 +122,7 @@ import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
+import { FileTransferProvider } from '../providers/filetransfer/filetransfer';
 import { BadgeProvider } from '../providers/badge/badge';
 import { AnalyticsProvider } from '../providers/analytics/analytics';
 import { BrowserProvider } from '../providers/browser/browser';
@@ -181,6 +185,8 @@ import { IntercomProvider } from '../providers/intercom/intercom';
     CheckinTokenModule,
     CheckinDetailsModule,
     CheckinRespondModule,
+    ContactsImportModule,
+    ContactsMatchModule,
     NotificationListModule,
     PersonListModule,
     PersonEditModule,

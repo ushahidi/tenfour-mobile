@@ -9,6 +9,7 @@ import { SettingsSizesPage } from '../../pages/settings-sizes/settings-sizes';
 import { SettingsRegionsPage } from '../../pages/settings-regions/settings-regions';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
+import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -132,6 +133,14 @@ export class SettingsListPage extends BasePrivatePage {
   private settingsCheckins(event:any) {
     this.logger.info(this, "settingsCheckins");
     this.showModal(SettingsChannelsPage, {
+      organization: this.organization,
+      user: this.user
+    });
+  }
+
+  private contactsImport(event:any) {
+    this.logger.info(this, "contactsImport");
+    this.showModal(ContactsImportPage, {
       organization: this.organization,
       user: this.user
     });
