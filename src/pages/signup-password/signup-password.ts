@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
@@ -11,6 +11,8 @@ import { Token } from '../../models/token';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
   name: 'SignupPasswordPage',
@@ -51,7 +53,6 @@ export class SignupPasswordPage extends BasePublicPage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -146,7 +147,8 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
-          this.events.publish('user:login');
+          this.intercom.trackLogin(this.organization, this.person);
+          this.events.publish(EVENT_USER_AUTHENTICATED);
           loading.dismiss();
           this.loading = false;
           if (this.person.name && this.person.name.length > 0) {

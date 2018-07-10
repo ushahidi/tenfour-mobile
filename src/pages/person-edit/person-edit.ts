@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -64,8 +64,7 @@ export class PersonEditPage extends BasePrivatePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected camera:CameraProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -95,27 +94,31 @@ export class PersonEditPage extends BasePrivatePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-    return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadPerson(cache); })
-      .then(() => { return this.loadRegions(); })
-      .then(() => { return this.loadCamera(); })
-      .then(() => {
-        this.logger.info(this, "loadUpdates", "Loaded");
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadUpdates", "Failed", error);
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
+
+    return new Promise((resolve, reject) => {
+      return this.loadOrganization(cache)
+        .then((org) => { return this.loadUser(cache); })
+        .then((user) => { return this.loadPerson(cache); })
+        .then((person) => { return this.loadRegions(cache); })
+        .then((regions) => { return this.loadCamera(); })
+        .then(() => {
+          this.logger.info(this, "loadUpdates", "Loaded");
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          resolve();
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadUpdates", "Failed", error);
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          this.showToast(error);
+          reject(error);
+        });
+    });
   }
 
   private loadRegions(cache:boolean=true):Promise<boolean> {
@@ -175,6 +178,7 @@ export class PersonEditPage extends BasePrivatePage {
           description: null,
           role: "responder"
         });
+        resolve(this.person);
       }
     });
   }
@@ -274,14 +278,21 @@ export class PersonEditPage extends BasePrivatePage {
       }
       else {
         this.logger.info(this, "savePerson", "Create", person);
-        this.api.createPerson(this.organization, person).then((person:Person) => {
-          this.person.id = person.id;
-          this.storage.savePerson(this.organization, person).then((saved:any) => {
-            resolve(person);
+        this.api.getOrganization(this.organization).then((organization:Organization) => {
+          if (organization.subscription_plan === 'free-plan' &&
+            organization.user_count >= 50) {
+            return reject('You have reached your person quota for your current plan. Please upgrade your plan to add more people.');
+          }
+
+          return this.api.createPerson(this.organization, person).then((person:Person) => {
+            this.person.id = person.id;
+            this.storage.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
         });
       }
     });

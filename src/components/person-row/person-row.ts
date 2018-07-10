@@ -27,7 +27,7 @@ export class PersonRowComponent {
 
   hasRemoveSelected:boolean = false;
 
-  dots:string =  "assets/images/dots.png";
+  dots:string =  "assets/images/logo-dots.png";
 
   constructor() {
   }

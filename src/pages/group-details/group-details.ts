@@ -30,7 +30,6 @@ export class GroupDetailsPage extends BasePrivatePage {
   user:User = null;
   group:Group = null;
   loading:boolean = false;
-  modal:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -50,7 +49,6 @@ export class GroupDetailsPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();

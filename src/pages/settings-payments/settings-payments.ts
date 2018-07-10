@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SettingsPlanFreePage } from '../settings-plan-free/settings-plan-free';
@@ -15,6 +15,8 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
+
 @IonicPage({
   name: 'SettingsPaymentsPage',
   segment: 'settings/payments',
@@ -27,6 +29,12 @@ import { StorageProvider } from '../../providers/storage/storage';
   entryComponents:[ SettingsPlanFreePage, SettingsPlanProPage, SettingsPlanProWelcomePage, SettingsCreditsPage ]
 })
 export class SettingsPaymentsPage extends BasePrivatePage {
+
+  PRO_FLAT_RATE:number = 39;
+  FREE_USERS:number = 100;
+  USER_BUNDLE_RATE:number = 5;
+  USER_BUNDLE_UNIT:number = 25;
+  CREDIT_BUNDLE_RATE:number = .1;
 
   subscription:Subscription = null;
   hashChangeFn = null;
@@ -47,8 +55,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -111,7 +118,6 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       }
       else {
         this.storage.getSubscription().then((subscription:Subscription) => {
-          console.log(subscription);
           this.subscription = subscription;
           resolve(this.subscription);
         });
@@ -130,6 +136,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private hashChangeSwitchToPro() {
     this.logger.info(this, "hashChangeSwitchToPro");
+    this.platform.setQueryParams(window.location.href);
     if (this.hasParameter('id') && this.hasParameter('state')) {
       if (this.getParameter('state') === 'succeeded') {
         this.completeSwitchToPro();
@@ -153,7 +160,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
               this.storage.setOrganization(organization)
                 .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
                 .then(()=>{
-                  this.events.publish('subscription:changed', this.subscription, Date.now());
+                  this.events.publish(EVENT_SUBSCRIPTION_CHANGED, this.subscription, Date.now());
                   resolve(this.subscription);
                 });
             });
@@ -198,6 +205,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private hashChangeUpdateBillingInfo() {
     this.logger.info(this, "hashChangeUpdateBillingInfo");
+    this.platform.setQueryParams(window.location.href);
     if (this.hasParameter('id') && this.hasParameter('state')) {
       if (this.getParameter('state') === 'succeeded') {
         this.switchToProModal.dismiss();
@@ -218,11 +226,18 @@ export class SettingsPaymentsPage extends BasePrivatePage {
   }
 
   private calcBillingEstimate(extraCredits?:number):number {
-    let estimate = this.organization.user_count * 3;
-    if (!extraCredits) {
-      extraCredits = this.organization.credits_extra;
+    let estimate = this.PRO_FLAT_RATE;
+
+    if (this.organization.user_count > this.FREE_USERS) {
+      estimate += this.USER_BUNDLE_RATE * Math.ceil((this.organization.user_count - this.FREE_USERS)/this.USER_BUNDLE_UNIT);
     }
-    estimate += extraCredits * .1;
+
+    if (extraCredits) {
+      estimate += extraCredits * this.CREDIT_BUNDLE_RATE;
+    } else if (this.updatedCredits) {
+      estimate += this.updatedCredits * this.CREDIT_BUNDLE_RATE;
+    }
+
     return estimate
   }
 
@@ -240,11 +255,19 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addCredits", "Modal", data);
+
+      this.api.getOrganization(this.organization).then((organization:Organization) => {
+        this.storage.setOrganization(organization).then(() => {
+          this.loadUpdates();
+        });
+      });
+
       if (data) {
         if (data.organization) {
           this.logger.info(this, "addCredits", "Modal", data.organization);
           this.organization = data.organization;
           this.billingEstimate = this.calcBillingEstimate();
+          this.loadUpdates();
         }
       }
    });

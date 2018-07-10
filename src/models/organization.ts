@@ -77,7 +77,7 @@ export class Organization extends Model {
               }
             }
             else if (_settings.key == 'plan_and_credits') {
-              this.credits_extra = _settings.values.monthlyCreditsExtra;
+              this.credits_extra = parseInt(_settings.values.monthlyCreditsExtra);
             }
           }
           let settings = new Settings(_settings);

@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, Events, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
@@ -47,7 +47,6 @@ export class CheckinListPage extends BasePrivatePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected badge:BadgeProvider,
       protected api:ApiProvider,
       protected storage:StorageProvider) {

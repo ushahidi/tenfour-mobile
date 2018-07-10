@@ -17,6 +17,8 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+
 @IonicPage({
   name: 'CheckinSendPage',
   segment: 'checkins/send',
@@ -161,8 +163,13 @@ export class CheckinSendPage extends BasePrivatePage {
     }
     else {
       let loading = this.showLoading("Sending...", true);
-      this.api.sendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-        this.storage.saveCheckin(this.organization, checkin).then((saved:boolean) => {
+      this.api.sendCheckin(this.organization, this.checkin)
+        .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
+        .then((saved:boolean) => { return this.api.getOrganization(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
+        .then(() => {
+          this.events.publish(EVENT_CREDITS_CHANGED, this.organization.credits, Date.now());
+          this.api.getOrganization
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {
@@ -175,12 +182,11 @@ export class CheckinSendPage extends BasePrivatePage {
           this.navController.popToRoot({ animate: false }).then(() => {
             firstViewController.dismiss({ checkin: Checkin });
           });
+        })
+        .catch((error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem Creating Check-In", error);
         });
-      },
-      (error:any) => {
-        loading.dismiss();
-        this.showAlert("Problem Creating Check-In", error);
-      });
     }
   }
 

@@ -211,6 +211,9 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
+        if (error === '409 Conflict' || error === 'Conflict') {
+          return reject(`A verification email has already been sent to ${email}`);
+        }
         reject(`There was a problem registering email ${email}.`);
       });
     });
@@ -218,6 +221,7 @@ export class ApiProvider extends HttpProvider {
 
   public verifyEmail(email:string, code:string):Promise<Email> {
     return new Promise((resolve, reject) => {
+      email = encodeURIComponent(email);
       let url = `${this.api}/verification/email/?address=${email}&code=${code}`;
       let params = {};
       this.httpGet(url, params).then((data:any) => {
@@ -747,6 +751,27 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getCheckinForToken(id:number, token:string):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${id}&token=${token}`;
+      let params = {
+        token: token
+      };
+      this.httpGet(url, params).then((data:any) => {
+        if (data && data.checkin) {
+          let checkin = new Checkin(data.checkin);
+          resolve(checkin);
+        }
+        else {
+          reject("Checkin Not Found");
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
@@ -901,6 +926,42 @@ export class ApiProvider extends HttpProvider {
         (error:any) => {
           reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public emailReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${checkin.id}/replies`;
+      let params = {
+        token: token,
+        answer: reply.answer
+      };
+      if (reply.message) {
+        params["message"] = reply.message;
+      }
+      if (reply.location_text) {
+        params["location_text"] = reply.location_text;
+      }
+      if (reply.latitude != null && reply.longitude != null) {
+        params["location_geo"] = {
+          location: {
+            lat: reply.latitude,
+            lng: reply.longitude
+          }
+        };
+      }
+      this.httpPost(url, params).then((data:any) => {
+        if (data && data.reply) {
+          let reply = new Reply(data.reply);
+          resolve(reply);
+        }
+        else {
+          reject("Reply Not Sent");
+        }
       },
       (error:any) => {
         reject(error);

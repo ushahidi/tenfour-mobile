@@ -30,7 +30,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class SettingsListPage extends BasePrivatePage {
 
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
 
   constructor(
       protected zone:NgZone,

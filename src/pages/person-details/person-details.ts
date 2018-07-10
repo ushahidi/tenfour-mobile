@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
@@ -14,6 +14,8 @@ import { Reply } from '../../models/reply';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_ACCOUNT_DELETED } from '../../constants/events';
 
 @IonicPage({
   name: 'PersonDetailsPage',
@@ -33,7 +35,6 @@ export class PersonDetailsPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 3;
   offset:number = 0;
-  modal:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -47,14 +48,12 @@ export class PersonDetailsPage extends BasePrivatePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.modal = this.getParameter<boolean>("modal");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -178,7 +177,7 @@ export class PersonDetailsPage extends BasePrivatePage {
       if (data) {
         if (data.deleted) {
           this.logger.info(this, "editPerson", "Modal", "Deleted");
-          this.events.publish('account:deleted');
+          this.events.publish(EVENT_ACCOUNT_DELETED);
         }
         else if (data.removed) {
           this.logger.info(this, "editPerson", "Modal", "Removed");

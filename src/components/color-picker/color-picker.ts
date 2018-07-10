@@ -19,7 +19,6 @@ export class ColorPickerComponent {
   }
 
   selectColor(color:string) {
-    console.log(`selectColor ${color}`);
     this.params.get('on_changed')(color);
     this.viewController.dismiss();
   }

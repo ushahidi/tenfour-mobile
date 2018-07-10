@@ -16,7 +16,7 @@
 
 .md, .ios {
   .back-button {
-    color: color($colors, primary) !important;
+    color: color($colors, cancel) !important;
   }
 }
 ion-toolbar {
@@ -229,4 +229,9 @@ ion-list {
   display: -webkit-box;
   -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
+}
+
+
+.toast-md .toast-wrapper {
+  padding-left: 40px; // because of intercom button
 }

@@ -123,6 +123,13 @@
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'ApproachingPersonQuotaLimit'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Upgrade your Plan</strong> You are approaching the person limit on your free plan. You might want to consider upgrading your plan to add more people.
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
     </ion-card>
   </ion-list>
   <ion-infinite-scroll *ngIf="mobile == true" (ionInfinite)="loadMore($event)">
