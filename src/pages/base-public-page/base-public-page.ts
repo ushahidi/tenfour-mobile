@@ -1,5 +1,5 @@
-import { Component, ViewChild, NgZone } from '@angular/core';
-import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
+import { Component, NgZone } from '@angular/core';
+import { Platform, NavParams, AlertController, ToastController, ModalController, LoadingController, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
@@ -7,6 +7,8 @@ import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_USER_REDIRECTED } from '../../constants/events';
 
 @Component({
   selector: 'base-public-page',
@@ -35,6 +37,9 @@ export class BasePublicPage extends BasePage {
       this.storage.hasUser().then((hasUser:boolean) => {
         if (hasUser) {
           this.logger.error(this, "ionViewCanEnter", "NO");
+          setTimeout(() => {
+            this.events.publish(EVENT_USER_REDIRECTED);
+          }, 500);
           resolve(false);
         }
         else {

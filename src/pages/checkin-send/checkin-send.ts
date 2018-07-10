@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, Events, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -16,6 +16,8 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_CREDITS_CHANGED } from '../../constants/events';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -38,7 +40,6 @@ export class CheckinSendPage extends BasePrivatePage {
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
-      protected events:Events,
       protected navParams:NavParams,
       protected navController:NavController,
       protected viewController:ViewController,
@@ -167,12 +168,8 @@ export class CheckinSendPage extends BasePrivatePage {
         .then((saved:boolean) => { return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
         .then(() => {
-
-          this.events.publish('credits:changed', this.organization.credits, Date.now());
-
-          // refresh credits
+          this.events.publish(EVENT_CREDITS_CHANGED, this.organization.credits, Date.now());
           this.api.getOrganization
-
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {

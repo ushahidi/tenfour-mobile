@@ -211,7 +211,7 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
-        if (error === '409 Conflict') {
+        if (error === '409 Conflict' || error === 'Conflict') {
           return reject(`A verification email has already been sent to ${email}`);
         }
         reject(`There was a problem registering email ${email}.`);
@@ -751,6 +751,27 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getCheckinForToken(id:number, token:string):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${id}&token=${token}`;
+      let params = {
+        token: token
+      };
+      this.httpGet(url, params).then((data:any) => {
+        if (data && data.checkin) {
+          let checkin = new Checkin(data.checkin);
+          resolve(checkin);
+        }
+        else {
+          reject("Checkin Not Found");
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
@@ -905,6 +926,42 @@ export class ApiProvider extends HttpProvider {
         (error:any) => {
           reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public emailReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${checkin.id}/replies`;
+      let params = {
+        token: token,
+        answer: reply.answer
+      };
+      if (reply.message) {
+        params["message"] = reply.message;
+      }
+      if (reply.location_text) {
+        params["location_text"] = reply.location_text;
+      }
+      if (reply.latitude != null && reply.longitude != null) {
+        params["location_geo"] = {
+          location: {
+            lat: reply.latitude,
+            lng: reply.longitude
+          }
+        };
+      }
+      this.httpPost(url, params).then((data:any) => {
+        if (data && data.reply) {
+          let reply = new Reply(data.reply);
+          resolve(reply);
+        }
+        else {
+          reject("Reply Not Sent");
+        }
       },
       (error:any) => {
         reject(error);
@@ -1292,4 +1349,88 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
+
+  public uploadContactsCSV(organization:Organization, file:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+        this.fileUpload(url, token.access_token, file).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public matchCSVContacts(organization:Organization, map:any, data:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+
+        // Initialize a new array of the length of the csv column with nulls
+        let maps_to = [];
+        let columns = data.file.columns;
+
+        for (let i = 0; i < Object.keys(columns).length; i++) {
+          maps_to.push(null);
+        }
+
+        //iterate through the map Object, check if value is null and replace any null with value
+        //insert this into the maps_to array in the correct positions
+
+        for (let i=0; i<columns.length; i++) {
+          for (let mapKey of Object.keys(map)) {
+            if (map[mapKey] === columns[i]) {
+              maps_to[i] = mapKey;
+            }
+          }
+        }
+
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id,
+          maps_to: maps_to
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public importContacts(organization:any, data:any):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "import", token, "Error", error);
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
 }

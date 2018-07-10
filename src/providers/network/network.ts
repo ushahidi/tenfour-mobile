@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Platform, Events } from 'ionic-angular';
+import { Platform } from 'ionic-angular';
 
 import { Observable } from "rxjs/Observable"
 import 'rxjs/add/observable/of';
@@ -23,7 +23,6 @@ export class NetworkProvider {
   constructor(
     private platform:Platform,
     private network:Network,
-    private events:Events,
     private logger:LoggerProvider) {
 
   }

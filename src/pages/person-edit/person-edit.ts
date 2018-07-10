@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -64,8 +64,7 @@ export class PersonEditPage extends BasePrivatePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected camera:CameraProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -279,14 +278,21 @@ export class PersonEditPage extends BasePrivatePage {
       }
       else {
         this.logger.info(this, "savePerson", "Create", person);
-        this.api.createPerson(this.organization, person).then((person:Person) => {
-          this.person.id = person.id;
-          this.storage.savePerson(this.organization, person).then((saved:any) => {
-            resolve(person);
+        this.api.getOrganization(this.organization).then((organization:Organization) => {
+          if (organization.subscription_plan === 'free-plan' &&
+            organization.user_count >= 50) {
+            return reject('You have reached your person quota for your current plan. Please upgrade your plan to add more people.');
+          }
+
+          return this.api.createPerson(this.organization, person).then((person:Person) => {
+            this.person.id = person.id;
+            this.storage.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
         });
       }
     });

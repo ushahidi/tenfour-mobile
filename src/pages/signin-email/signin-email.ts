@@ -24,7 +24,7 @@ export class SigninEmailPage extends BasePublicPage {
 
   @ViewChild('email')
   email:TextInput;
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   organization:Organization = null;
 
   constructor(

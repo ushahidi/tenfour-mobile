@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
@@ -39,9 +39,8 @@ export class PersonProfilePage extends PersonDetailsPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, storage, events);
+      protected storage:StorageProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, storage);
     this.profile = true;
   }
 

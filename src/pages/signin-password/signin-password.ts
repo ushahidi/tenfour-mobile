@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
@@ -13,6 +13,8 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
   name: 'SigninPasswordPage',
@@ -34,7 +36,7 @@ export class SigninPasswordPage extends BasePublicPage {
   person:Person = null;
   token:Token = null;
   email:string = null;
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   loading:boolean = false;
 
   constructor(
@@ -48,7 +50,6 @@ export class SigninPasswordPage extends BasePublicPage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -142,7 +143,7 @@ export class SigninPasswordPage extends BasePublicPage {
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
-          this.events.publish('user:login');
+          this.events.publish(EVENT_USER_AUTHENTICATED);
           loading.dismiss();
           this.loading = false;
           if (this.person.name && this.person.name.length > 0) {

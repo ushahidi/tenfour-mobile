@@ -24,6 +24,7 @@ import { LoggerProvider } from '../../providers/logger/logger';
 export class LocationProvider {
 
   private key:string = "AIzaSyCLSlgNz3MtA4DlWenAAbc6UPFEZW4G2Po";
+  private location:Location = null;
 
   constructor(
     private platform:Platform,
@@ -33,18 +34,21 @@ export class LocationProvider {
     private logger:LoggerProvider) {
   }
 
-  public detectLocation():Promise<Location> {
+  public detectLocation(cache:boolean=false):Promise<Location> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "detectLocation");
-      if (this.platform.is("cordova")) {
+      if (cache && this.location) {
+        resolve(this.location);
+      }
+      else if (this.platform.is("cordova")) {
         this.geolocation.getCurrentPosition().then((position:any) => {
           this.logger.info(this, "detectLocation", position);
           if (position && position.coords) {
-            let location = <Location>{
+            this.location = <Location>{
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
             };
-            resolve(location);
+            resolve(this.location);
           }
           else {
             reject(null);
@@ -58,11 +62,11 @@ export class LocationProvider {
         navigator.geolocation.getCurrentPosition((position:any) => {
           this.logger.info(this, "detectLocation", position);
           if (position) {
-            let location = <Location>{
+            this.location = <Location>{
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
             };
-            resolve(location);
+            resolve(this.location);
           }
           else {
             reject("Location Not Supported");

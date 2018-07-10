@@ -9,7 +9,7 @@ export class OrganizationLogoComponent {
   @Input()
   image:string = null;
 
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
 
   constructor() {
 
