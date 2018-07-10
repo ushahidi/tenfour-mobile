@@ -122,4 +122,8 @@ export class ContactsMatchPage extends BasePrivatePage {
       });
     });
   }
+
+  private cancelImport(event:any) {
+    this.hideModal();
+  }
 }
