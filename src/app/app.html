@@ -17,13 +17,13 @@
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
         <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
       </ion-list>
-      <div *ngIf="organization && organization.hasFreePlan()">
+      <div *ngIf="organization && organization.hasFreePlan() && (user.isOwner() || user.isAdmin())">
         <p text-center>You are using the free version of TenFour</p>
         <p text-center *ngIf="user && user.isOwner() && !ios">
           <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
         </p>
       </div>
-      <div *ngIf="organization && organization.hasProPlan()">
+      <div *ngIf="organization && organization.hasProPlan() && (user.isOwner() || user.isAdmin())">
         <p text-center *ngIf="organization.credits == 0">No credits remaining</p>
         <p text-center *ngIf="organization.credits > 0">{{organization.credits}} credits remaining</p>
       </div>
