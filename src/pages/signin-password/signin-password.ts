@@ -195,7 +195,6 @@ export class SigninPasswordPage extends BasePublicPage {
     organization.user_id = person.id;
     organization.user_name = person.name;
     organization.email = this.email;
-    organization.password = this.password.value;
     let saves = [
       this.storage.setOrganization(organization),
       this.storage.setSubscription(subscription),
