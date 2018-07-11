@@ -1354,7 +1354,7 @@ export class ApiProvider extends HttpProvider {
           resolve(data);
         },
         (error:any) => {
-          reject(error);
+          reject(`Could not process the CSV, please check the file format and column names and try again`);
         });
       },
       (error:any) => {
