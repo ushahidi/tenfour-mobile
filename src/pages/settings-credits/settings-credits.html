@@ -1,14 +1,25 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Add {{credits}} credits per month</ion-title>
+    <ion-title>Add {{credits}} credits <span *ngIf="addCreditsRecurring">per month</span></ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content padding>
-  <p>Your account will be billed {{ billingEstimate | currency}} per month. (Estimate)</p>
+
+  <ion-list *ngIf="credits">
+    <ion-item *ngIf="addCreditsImmediately">
+      <ion-icon name="checkmark-circle" item-start></ion-icon>
+      <p>Your account will be billed {{ creditsEstimate | currency }} immediately</p>
+      <p>{{ credits }} credits will be added to your account</p>
+    </ion-item>
+
+    <ion-item *ngIf="addCreditsRecurring && subscription">
+      <ion-icon name="checkmark-circle" item-start></ion-icon>
+      <p>{{ credits }} extra credits will be added to your monthly subscription</p>
+      <p>Next billing date is {{subscription.next_billing_at | dateTime}}</p>
+    </ion-item>
+  </ion-list>
 
   <p>Your current payment method will be used.</p>
-
-  <p *ngIf="subscription">Additional credits will be added next time your account is billed on {{subscription.next_billing_at | dateTime}}</p>
 
   <button ion-button outline color="primary" (click)="closeModal($event)">Cancel</button>
 

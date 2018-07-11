@@ -17,8 +17,11 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class SettingsCreditsPage  extends BasePrivatePage {
 
   credits:number = 0;
+  creditsEstimate:number = 0;
   billingEstimate:number = 0;
   subscription:Subscription = null;
+  addCreditsImmediately:boolean = true;
+  addCreditsRecurring:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -39,8 +42,11 @@ export class SettingsCreditsPage  extends BasePrivatePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.credits = this.getParameter<number>("credits");
+    this.creditsEstimate = this.getParameter<number>("creditsEstimate");
     this.billingEstimate = this.getParameter<number>("billingEstimate");
     this.organization = this.getParameter<Organization>("organization");
+    this.addCreditsImmediately = this.getParameter<boolean>("addCreditsImmediately");
+    this.addCreditsRecurring = this.getParameter<boolean>("addCreditsRecurring");
   }
 
   ionViewDidEnter() {
