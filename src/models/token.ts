@@ -3,8 +3,6 @@ export interface Token {
 
   username:string;
 
-  password:string;
-
   organization:string;
 
   subdomain:string;

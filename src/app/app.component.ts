@@ -163,7 +163,7 @@ export class TenFourApp {
           .then(() => this.loadNotifications())
           .then(() => this.loadWebApp())
           .then(() => {
-            this.logger.error(this, "constructor", "loadWebApp", "Loaded");
+            this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
       }
     });
