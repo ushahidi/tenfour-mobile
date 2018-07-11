@@ -107,20 +107,38 @@ export class SettingsCreditsPage  extends BasePrivatePage {
 
   private doneAdd(event:any) {
     let loading = this.showLoading("Updating...", true);
-    this.organization.credits_extra = this.credits;
-    this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.storage.saveOrganization(organization).then(saved => {
-        loading.dismiss();
-        this.showToast(this.credits + ' extra credits have been added to your plan');
-        this.hideModal({
-          organization: organization
+
+    // if (this.addCreditsRecurring) {
+    //     this.organization.credits_extra = this.credits;
+    //     this.api.updateOrganization(this.organization).then((organization:Organization) => {
+    //       this.storage.saveOrganization(organization).then(saved => {
+    //         loading.dismiss();
+    //         this.showToast(this.credits + ' extra credits have been added to your plan');
+    //         this.hideModal({
+    //           organization: organization
+    //         });
+    //       });
+    //     },
+    //     (error:any) => {
+    //       loading.dismiss();
+    //       this.showAlert("Problem adding credits", error);
+    //     });
+    // }
+
+    if (this.addCreditsImmediately) {
+        this.api.addCredits(this.organization, this.subscription, this.credits).then(() => {
+            loading.dismiss();
+            this.showToast(this.credits + ' extra credits have been added to your account');
+            this.hideModal({
+              organization: this.organization
+          });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert("Problem adding credits", error);
         });
-      });
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem adding credits", error);
-    });
+    }
+
   }
 
 }

@@ -1429,4 +1429,21 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public addCredits(organization:Organization, subscription:Subscription, quantity:number):Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}/credits`;
+        let params = { quantity: quantity };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve();
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
 }
