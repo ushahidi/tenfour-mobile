@@ -168,6 +168,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
             });
           }
           if (retryCount++ > 5) {
+            // HACK HACK HACK server polling - this can be replaced when push notifications land
             reject('Could not switch plans. Try logging out of your account.');
           }
           setTimeout(() => {

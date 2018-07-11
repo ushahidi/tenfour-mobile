@@ -108,36 +108,43 @@ export class SettingsCreditsPage  extends BasePrivatePage {
   private doneAdd(event:any) {
     let loading = this.showLoading("Updating...", true);
 
-    // if (this.addCreditsRecurring) {
-    //     this.organization.credits_extra = this.credits;
-    //     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-    //       this.storage.saveOrganization(organization).then(saved => {
-    //         loading.dismiss();
-    //         this.showToast(this.credits + ' extra credits have been added to your plan');
-    //         this.hideModal({
-    //           organization: organization
-    //         });
-    //       });
-    //     },
-    //     (error:any) => {
-    //       loading.dismiss();
-    //       this.showAlert("Problem adding credits", error);
-    //     });
-    // }
+    Promise.resolve()
+    .then(() => {
+      if (this.addCreditsImmediately) {
+        return this.api.addCredits(this.organization, this.subscription, this.credits);
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
+      if (this.addCreditsRecurring) {
+        this.organization.credits_extra = this.credits;
 
-    if (this.addCreditsImmediately) {
-        this.api.addCredits(this.organization, this.subscription, this.credits).then(() => {
-            loading.dismiss();
-            this.showToast(this.credits + ' extra credits have been added to your account');
-            this.hideModal({
-              organization: this.organization
-          });
-        },
-        (error:any) => {
-          loading.dismiss();
-          this.showAlert("Problem adding credits", error);
+        return this.api.updateOrganization(this.organization).then((organization:Organization) => {
+          this.organization = organization;
+          return this.storage.saveOrganization(organization);
         });
-    }
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
+      let alert = this.credits + ' extra credits have been added to your account';
+
+      if (this.addCreditsRecurring) {
+        alert += ' (recurring)';
+      }
+      
+      loading.dismiss();
+      this.showToast(alert);
+      this.hideModal({
+        organization: this.organization
+      });
+    })
+    .catch((error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem adding credits", error);
+    });
 
   }
 
