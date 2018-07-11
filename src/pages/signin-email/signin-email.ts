@@ -8,6 +8,7 @@ import { Organization } from '../../models/organization';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @IonicPage({
   name: 'SigninEmailPage',
@@ -39,7 +40,8 @@ export class SigninEmailPage extends BasePublicPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected environment:EnvironmentProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -115,6 +117,14 @@ export class SigninEmailPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private back(event:any) {
+    location.assign(location.protocol
+      + "//"
+      + this.environment.getAppDomain()
+      + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+      + "/");
   }
 
 }

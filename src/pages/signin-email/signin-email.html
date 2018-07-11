@@ -1,6 +1,11 @@
 <ion-header>
-  <ion-navbar color="navbar">
+  <ion-navbar hideBackButton color="navbar">
     <ion-title></ion-title>
+    <ion-buttons left>
+        <button ion-button icon-only (click)="back()">
+            <ion-icon name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
     <ion-buttons right>
       <button color="primary" ion-button text-only [disabled]="email.value.length == 0" (click)="showNext($event)">Next</button>
     </ion-buttons>
