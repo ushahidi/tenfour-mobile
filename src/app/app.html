@@ -26,6 +26,9 @@
       <div *ngIf="organization && organization.hasProPlan() && (user.isOwner() || user.isAdmin())">
         <p text-center *ngIf="organization.credits == 0">No credits remaining</p>
         <p text-center *ngIf="organization.credits > 0">{{organization.credits}} credits remaining</p>
+        <p text-center *ngIf="user && user.isOwner() && !ios && organization.credits == 0">
+          <button ion-button color="primary" (click)="upgradeToPro($event)">Add SMS Credits</button>
+        </p>
       </div>
       <p text-center *ngIf="user">
         <button ion-button block clear color="primary" (click)="userLogout($event)">Log out</button>
