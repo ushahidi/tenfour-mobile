@@ -23,5 +23,7 @@
 
   <button ion-button outline color="primary" (click)="closeModal($event)">Cancel</button>
 
-  <button ion-button color="primary" (click)="doneAdd($event)">Agree - Change</button>
+  <button ion-button color="primary" (click)="doneAdd($event)" *ngIf="addCreditsRecurring">Agree - Change</button>
+  <button ion-button color="primary" (click)="doneAdd($event)" *ngIf="!addCreditsRecurring">Add Credits</button>
+
 </ion-content>
