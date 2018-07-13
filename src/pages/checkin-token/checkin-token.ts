@@ -112,7 +112,6 @@ export class CheckinTokenPage extends BasePage {
         resolve(this.user);
       }
       else {
-        let userId = this.getParameter<number>("user_id");
         this.storage.getUser().then((user:User) => {
           this.user = user;
           resolve(this.user);
