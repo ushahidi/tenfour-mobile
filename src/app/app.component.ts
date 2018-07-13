@@ -331,13 +331,13 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            if (this.hasLocationHash() == false) {
+            if (this.hasRootPage() == false) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (this.hasLocationHash() == false) {
+            if (this.hasRootPage() == false) {
               this.showOnboardList(user);
             }
             resolve(true);
@@ -345,7 +345,7 @@ export class TenFourApp {
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
-          if (this.hasLocationHash() == false) {
+          if (this.hasRootPage() == false) {
             this.showSigninUrl();
           }
           resolve(false);
@@ -353,7 +353,7 @@ export class TenFourApp {
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
-        if (this.hasLocationHash() == false) {
+        if (this.hasRootPage() == false) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -821,6 +821,10 @@ export class TenFourApp {
         return location.hash.length > 0;
     }
     return false;
+  }
+
+  private hasRootPage() {
+    return this.hasLocationHash() && this.locationHash() != "#/loading";
   }
 
 }
