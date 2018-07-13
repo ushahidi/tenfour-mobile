@@ -115,12 +115,7 @@ export class CheckinTokenPage extends BasePage {
         let userId = this.getParameter<number>("user_id");
         this.storage.getUser().then((user:User) => {
           this.user = user;
-          if (user && user.id == userId) {
-            resolve(this.user);
-          }
-          else {
-            reject("It doesn't look like the Check-In was not sent to the current logged in user.");
-          }
+          resolve(this.user);
         },
         (error:any) => {
           this.user = null;
