@@ -126,7 +126,9 @@ export class TenFourApp {
     protected intercom:IntercomProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
+    this.logger.info(this, "Booting...");
     this.platform.ready().then((ready) => {
+      this.logger.info(this, "Platform is ready");
       if (this.platform.is("cordova")) {
         Promise.resolve()
           .then(() => this.loadPlatforms())
