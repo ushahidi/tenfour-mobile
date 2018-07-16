@@ -282,7 +282,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public createOrganization(organization:Organization, password:string):Promise<Organization> {
+  public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/create_organization`;
       let params = {
@@ -292,6 +292,7 @@ export class ApiProvider extends HttpProvider {
         password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
+        verification_code: verificationCode,
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
