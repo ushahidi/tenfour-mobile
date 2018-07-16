@@ -1630,4 +1630,12 @@ export class StorageProvider {
     });
   }
 
+  public getVerificationCode():Promise<string> {
+    return this.get('verification_code');
+  }
+
+  public setVerificationCode(code:string):Promise<any> {
+    return this.set('verification_code', code);
+  }
+
 }

@@ -102,8 +102,9 @@ export class SignupVerifyPage extends BasePublicPage  {
     return new Promise((resolve, reject) => {
       if (this.hasParameter("code")){
         this.code = this.getParameter<string>("code");
-        this.storage.set("verification_code", this.code);
-        resolve(this.code);
+        this.storage.setVerificationCode(this.code).then(() => {
+          resolve(this.code);
+        }, reject);
       }
       else {
         this.code = null;
