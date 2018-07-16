@@ -202,7 +202,7 @@ export class CheckinTokenPage extends BasePage {
     }
     else {
       let loading = this.showLoading("Sending...", true);
-      this.api.emailReply(this.checkin, this.checkin.reply, this.token).then((replied:Reply) => {
+      this.api.tokenReply(this.checkin, this.checkin.reply, this.token).then((replied:Reply) => {
         this.logger.info(this, "sendCheckinReply", "Reply", replied);
         loading.dismiss();
         let alert = this.showAlert("Check-In Sent", "Your reply has been sent.");
