@@ -79,12 +79,11 @@ export class ApiProvider extends HttpProvider {
           }
           else {
             this.logger.info(this, "getToken", "Expired", token);
-            this.userLogin(organization, token.username, token.password).then(
-              (token:Token) => {
-                resolve(token);
-              },
-              (error:any) => {
-                reject(error);
+            this.refreshLogin(organization, token.refresh_token).then((token:Token) => {
+              resolve(token);
+            },
+            (error:any) => {
+              reject(error);
             });
           }
         }
@@ -151,7 +150,6 @@ export class ApiProvider extends HttpProvider {
       this.httpPost(url, params).then((data:any) => {
         let token:Token = <Token>data;
         token.username = username;
-        token.password = password;
         token.organization = organization.name;
         token.issued_at = new Date();
         if (data.expires_in) {
@@ -284,16 +282,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public createOrganization(organization:Organization):Promise<Organization> {
+  public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/create_organization`;
       let params = {
         name: organization.name,
         email: organization.email,
         owner: organization.user_name,
-        password: organization.password,
+        password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
+        verification_code: verificationCode,
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
@@ -301,7 +300,6 @@ export class ApiProvider extends HttpProvider {
             let _organization:Organization = new Organization(data.organization);
             _organization.user_name = organization.user_name;
             _organization.email = organization.email;
-            _organization.password = organization.password;
             resolve(_organization);
           }
           else {
@@ -366,7 +364,6 @@ export class ApiProvider extends HttpProvider {
           if (data && data.organization) {
             let _organization:Organization = new Organization(data.organization);
             _organization.email = organization.email;
-            _organization.password = organization.password;
             resolve(_organization);
           }
           else {
@@ -1358,7 +1355,7 @@ export class ApiProvider extends HttpProvider {
           resolve(data);
         },
         (error:any) => {
-          reject(error);
+          reject(`Could not process the CSV, please check the file format and column names and try again`);
         });
       },
       (error:any) => {

@@ -130,6 +130,13 @@
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'SubscriptionChanged'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Your Subscription Plan has Changed</strong> You will be billed {{notification.billing_estimate | currency}} (estimate) on {{notification.billing_next | dateTime}}.
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
     </ion-card>
   </ion-list>
   <ion-infinite-scroll *ngIf="mobile == true" (ionInfinite)="loadMore($event)">

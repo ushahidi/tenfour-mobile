@@ -111,9 +111,25 @@ export class CheckinEditPage extends BasePrivatePage {
       user_initials: this.user.initials,
       user_picture: this.user.profile_picture
     });
+    let send_via = [];
+
     if (this.organization.app_enabled) {
-      this.checkin.send_via = 'app';
+      send_via.push('app');
     }
+
+    if (this.organization.hasProPlan() && this.organization.sms_enabled) {
+      send_via.push('sms');
+    }
+
+    if (this.organization.hasProPlan() && this.organization.email_enabled) {
+      send_via.push('email');
+    }
+
+    if (this.organization.hasProPlan() && this.organization.slack_enabled) {
+      send_via.push('slack');
+    }
+
+    this.checkin.send_via = send_via.join(',');
     this.addDefaults();
   }
 

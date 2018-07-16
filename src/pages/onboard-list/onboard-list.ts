@@ -7,6 +7,7 @@ import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
+import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -121,7 +122,11 @@ export class OnboardListPage extends BasePrivatePage {
       },{
         text: 'Import People',
         handler: () => {
-          this.importPerson();
+          if (this.website) {
+            this.importPersonWebsite();
+          } else {
+            this.importPersonPhone();
+          }
         }
       },{
         text: 'Cancel',
@@ -138,7 +143,7 @@ export class OnboardListPage extends BasePrivatePage {
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
       user: this.user,
-      person_id: this.user.id
+      // person_id: this.user.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
@@ -172,7 +177,26 @@ export class OnboardListPage extends BasePrivatePage {
     });
   }
 
-  private importPerson() {
+  private importPersonWebsite() {
+    this.logger.info(this, "importPerson");
+    let modal = this.showModal(ContactsImportPage, {
+      organization: this.organization,
+      user: this.user
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "importPerson", "Modal", data);
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.user.config_people_invited = true;
+        }
+        else {
+          this.user.config_people_invited = false;
+        }
+      });
+    });
+  }
+
+  private importPersonPhone() {
     this.logger.info(this, "importPerson");
     let modal = this.showModal(PersonImportPage, {
       organization: this.organization,

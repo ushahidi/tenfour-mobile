@@ -126,7 +126,9 @@ export class TenFourApp {
     protected intercom:IntercomProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
+    this.logger.info(this, "Booting...");
     this.platform.ready().then((ready) => {
+      this.logger.info(this, "Platform is ready");
       if (this.platform.is("cordova")) {
         Promise.resolve()
           .then(() => this.loadPlatforms())
@@ -163,7 +165,7 @@ export class TenFourApp {
           .then(() => this.loadNotifications())
           .then(() => this.loadWebApp())
           .then(() => {
-            this.logger.error(this, "constructor", "loadWebApp", "Loaded");
+            this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
       }
     });
@@ -329,13 +331,13 @@ export class TenFourApp {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            if (this.hasLocationHash() == false) {
+            if (this.hasRootPage() == false) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (this.hasLocationHash() == false) {
+            if (this.hasRootPage() == false) {
               this.showOnboardList(user);
             }
             resolve(true);
@@ -343,7 +345,7 @@ export class TenFourApp {
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
-          if (this.hasLocationHash() == false) {
+          if (this.hasRootPage() == false) {
             this.showSigninUrl();
           }
           resolve(false);
@@ -351,7 +353,7 @@ export class TenFourApp {
       },
       (error:any) => {
         this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
-        if (this.hasLocationHash() == false) {
+        if (this.hasRootPage() == false) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -819,6 +821,10 @@ export class TenFourApp {
         return location.hash.length > 0;
     }
     return false;
+  }
+
+  private hasRootPage() {
+    return this.hasLocationHash() && this.locationHash() != "#/loading";
   }
 
 }

@@ -52,6 +52,7 @@
     </ion-item>
     <ion-item color="white" class="role">
       <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      <div item-content class="content" *ngIf="person.role =='owner'">Organization Owner</div>
       <div item-content class="content" *ngIf="person.role =='admin'">Administrator</div>
       <div item-content class="content" *ngIf="person.role =='author'">Author</div>
       <div item-content class="content" *ngIf="person.role =='viewer'">Viewer</div>
