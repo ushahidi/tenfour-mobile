@@ -26,6 +26,7 @@ export class SigninUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
+  title:string = null;
 
   constructor(
       protected zone:NgZone,
@@ -42,6 +43,13 @@ export class SigninUrlPage extends BasePublicPage {
       protected storage:StorageProvider,
       protected environment:EnvironmentProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
+  }
+
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    if (this.environment.isProduction() == false) {
+      this.title = this.environment.getEnvironmentName().toUpperCase();
+    }
   }
 
   ionViewDidEnter() {

@@ -60,6 +60,7 @@ import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
 import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { IntercomProvider } from '../providers/intercom/intercom';
+import { EnvironmentProvider } from '../providers/environment/environment';
 
 import {
   EVENT_USER_AUTHENTICATED,
@@ -93,6 +94,10 @@ export class TenFourApp {
 
   checkin:Checkin = null;
 
+  environmentName:string = null;
+  appDomain:string = null;
+  apiEndpoint:string = null;
+
   @ViewChild(Nav)
   nav:Nav;
 
@@ -123,7 +128,8 @@ export class TenFourApp {
     protected menuController:MenuController,
     protected deeplinks:DeeplinksProvider,
     protected firebase:FirebaseProvider,
-    protected intercom:IntercomProvider) {
+    protected intercom:IntercomProvider,
+    protected environment:EnvironmentProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
     this.logger.info(this, "Booting...");
@@ -132,6 +138,7 @@ export class TenFourApp {
       if (this.platform.is("cordova")) {
         Promise.resolve()
           .then(() => this.loadPlatforms())
+          .then(() => this.loadEnvironment())
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
           .then(() => this.loadAnalytics())
@@ -159,6 +166,7 @@ export class TenFourApp {
       else {
         Promise.resolve()
           .then(() => this.loadPlatforms())
+          .then(() => this.loadEnvironment())
           .then(() => this.loadAnalytics())
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
@@ -181,6 +189,16 @@ export class TenFourApp {
       this.desktop = this.platform.is('core');
       this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
       this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
+      resolve(true);
+    });
+  }
+
+  private loadEnvironment():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.environment.isProduction() == false) {
+        this.environmentName = this.environment.getEnvironmentName();
+        this.apiEndpoint = this.environment.getApiEndpoint();
+      }
       resolve(true);
     });
   }
