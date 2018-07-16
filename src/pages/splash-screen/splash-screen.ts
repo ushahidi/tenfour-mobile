@@ -2,6 +2,10 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
+
+import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
   name: 'SplashScreenPage',
@@ -10,8 +14,11 @@ import { BasePage } from '../../pages/base-page/base-page';
 @Component({
   selector: 'page-splash-screen',
   templateUrl: 'splash-screen.html',
+  providers:[ StorageProvider ]
 })
 export class SplashScreenPage extends BasePage {
+
+  private timer:any = null;
 
   constructor(
       protected zone:NgZone,
@@ -23,8 +30,53 @@ export class SplashScreenPage extends BasePage {
       protected toastController:ToastController,
       protected alertController:AlertController,
       protected loadingController:LoadingController,
-      protected actionController:ActionSheetController) {
+      protected actionController:ActionSheetController,
+      protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+  }
+
+  ionViewDidEnter() {
+    super.ionViewDidEnter();
+    this.timer = setTimeout(()=> {
+      this.logger.error(this, "Loading Timeout", "Redirecting...");
+      Promise.all([this.hasOrganization(), this.hasUser()]).then(() => {
+        this.showRootPage(CheckinListPage);
+      })
+      .catch((error) => {
+        this.showRootPage(SigninUrlPage);
+      });
+    }, 5000);
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    clearTimeout(this.timer);
+  }
+
+  protected hasOrganization():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.hasOrganization().then((hasOrganization:boolean) => {
+        if (hasOrganization) {
+          resolve(true);
+        }
+        else {
+          reject("No organization");
+        }
+      });
+    });
+  }
+
+  protected hasUser():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.hasUser().then((hasUser:boolean) => {
+        if (hasUser) {
+          resolve(true);
+        }
+        else {
+          reject("No user");
+        }
+      });
+    });
   }
 
 }
