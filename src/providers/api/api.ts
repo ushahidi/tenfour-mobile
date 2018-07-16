@@ -750,7 +750,7 @@ export class ApiProvider extends HttpProvider {
 
   public getCheckinForToken(id:number, token:string):Promise<Checkin> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/checkins/${id}&token=${token}`;
+      let url = `${this.api}/checkins/${id}`;
       let params = {
         token: token
       };
@@ -930,7 +930,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public emailReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+  public tokenReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/checkins/${checkin.id}/replies`;
       let params = {
