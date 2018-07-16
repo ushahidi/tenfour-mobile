@@ -95,7 +95,6 @@ export class TenFourApp {
   checkin:Checkin = null;
 
   environmentName:string = null;
-  appDomain:string = null;
   apiEndpoint:string = null;
 
   @ViewChild(Nav)
