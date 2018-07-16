@@ -1637,5 +1637,4 @@ export class StorageProvider {
   public setVerificationCode(code:string):Promise<any> {
     return this.set('verification_code', code);
   }
-
 }
