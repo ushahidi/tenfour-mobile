@@ -65,7 +65,7 @@ export class SigninUrlPage extends BasePublicPage {
   private parseOrganizationSubdomain() {
     if (this.website) {
       let hostname = location.hostname;
-      let appDomain = this.environment.getAppDomain();
+      let appDomain = this.environment.getAppDomain().replace('app.', '');
       if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
         let subdomain = hostname.replace('.' + appDomain, '');
         if (subdomain !== 'app') {
