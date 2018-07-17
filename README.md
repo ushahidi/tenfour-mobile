@@ -88,7 +88,7 @@ ENV=prod ionic serve --livereload --consolelogs
 ```
 rvm use system
 ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
-ENV=prod ionic cordova build ios --debug --buildConfig=build.json
+ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 #### Release Android
 ```
