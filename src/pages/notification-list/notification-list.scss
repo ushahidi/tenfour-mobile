@@ -1,4 +1,7 @@
 page-notification-list {
+  ion-content {
+    background-color: color($colors, cards) !important;  
+  }
   ion-card {
     &.viewed {
       opacity: 0.5 !important;
