@@ -48,7 +48,7 @@ export class SignupEmailPage extends BasePublicPage {
     this.analytics.trackPage(this);
 
     if (this.hasParameter('email')) {
-      this.email.value = this.getParameter('email');
+      this.email.value = decodeURIComponent(this.getParameter('email'));
       this.showNext(undefined);
     }
   }

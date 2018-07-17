@@ -371,7 +371,13 @@ export class TenFourApp {
       (error:any) => {
         this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
         if (this.hasRootPage() == false) {
-          this.showSigninUrl();
+          this.logger.info(this, "redirecting to showSigninUrl");
+
+          if (this.platform.getQueryParam('email')) {
+              this.showSignupPage();
+          } else {
+              this.showSigninUrl();
+          }
         }
         resolve(false);
       });
@@ -533,6 +539,17 @@ export class TenFourApp {
     (error:any) => {
       this.logger.error(this, "showSigninUrl", error);
     });
+  }
+
+  private showSignupPage(event:any=null) {
+    this.logger.info(this, "showSignupPage");
+
+    location.assign(location.protocol
+      + "//"
+      + this.environment.getAppDomain()
+      + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+      + "/#/signup?email="
+      + this.platform.getQueryParam('email'));
   }
 
   private showSignupVerify(email:string, code:string) {
