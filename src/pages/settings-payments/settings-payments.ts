@@ -256,7 +256,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       return this.showAlert("Add credits", "Please select an option.");
     }
 
-    if (!this.updatedCredits) {
+    if (!this.updatedCredits || this.updatedCredits <= 0) {
       return this.showAlert("Add credits", "Please specify how many credits to add.");
     }
 
