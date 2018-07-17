@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
@@ -12,6 +12,8 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
   name: 'SigninInvitePage',
@@ -24,7 +26,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ OnboardListPage ]
 })
-export class SigninInvitePage extends BasePage {
+export class SigninInvitePage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
@@ -32,7 +34,7 @@ export class SigninInvitePage extends BasePage {
   @ViewChild('confirm')
   confirm:TextInput;
 
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   organization:Organization = null;
   user:User = null;
   email:string = null;
@@ -54,19 +56,15 @@ export class SigninInvitePage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }
@@ -86,17 +84,17 @@ export class SigninInvitePage extends BasePage {
       .then(() => { return this.loadToken(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
-        this.loading = false;
         if (event) {
           event.complete();
         }
+        this.loading = false;
       })
       .catch((error) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
-        this.loading = false;
         if (event) {
           event.complete();
         }
+        this.loading = false;
         let alert = this.showAlert("Problem Accepting Invitation", "Please try clicking the link in your invitation email again.");
         alert.onDidDismiss((dismiss:any) => {
           this.closePage();
@@ -201,11 +199,9 @@ export class SigninInvitePage extends BasePage {
         .then((person:Person) => { return this.storage.setUser(person); })
         .then((stored:boolean) => { return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { return this.storage.setOrganization(organization); })
-        .then((stored:boolean) => { return this.api.getSubscriptions(this.organization); })
-        .then((subscriptions:Subscription[]) => { return this.storage.setSubscription(subscriptions[0]); })
         .then((stored:boolean) => {
           this.logger.info(this, "acceptInitation", "Accepted");
-          this.events.publish('user:login');
+          this.events.publish(EVENT_USER_AUTHENTICATED);
           loading.dismiss();
           this.loading = false;
           if (this.user.name && this.user.name.length > 0) {

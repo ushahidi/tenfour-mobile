@@ -33,7 +33,7 @@ import { NativeGeocoder } from '@ionic-native/native-geocoder';
 import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
 import { Firebase } from '@ionic-native/firebase';
-
+import { IntercomModule } from 'ng-intercom';
 import { TenFourApp } from './app.component';
 import { TenFourRoutes } from './app.routes';
 
@@ -66,9 +66,13 @@ import { CheckinListModule } from '../pages/checkin-list/checkin-list.module';
 import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
+import { CheckinTokenModule } from '../pages/checkin-token/checkin-token.module';
 
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
+
+import { ContactsImportModule } from '../pages/contacts-import/contacts-import.module';
+import { ContactsMatchModule } from '../pages/contacts-match/contacts-match.module';
 
 import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
 
@@ -107,6 +111,7 @@ import { CheckinDetailModule } from '../components/checkin-details/checkin-detai
 import { PersonRowModule } from '../components/person-row/person-row.module';
 import { GroupRowModule } from '../components/group-row/group-row.module';
 import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
+import { CheckinRespondComponentModule } from '../components/checkin-respond/checkin-respond.module';
 import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
@@ -117,6 +122,7 @@ import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
+import { FileTransferProvider } from '../providers/filetransfer/filetransfer';
 import { BadgeProvider } from '../providers/badge/badge';
 import { AnalyticsProvider } from '../providers/analytics/analytics';
 import { BrowserProvider } from '../providers/browser/browser';
@@ -131,6 +137,7 @@ import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
 import { ContactsProvider } from '../providers/contacts/contacts';
 import { MailerProvider } from '../providers/mailer/mailer';
 import { EnvironmentProvider } from '../providers/environment/environment';
+import { IntercomProvider } from '../providers/intercom/intercom';
 
 @NgModule({
   declarations: [
@@ -149,6 +156,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinCardModule,
     CheckinReplyModule,
     CheckinDetailModule,
+    CheckinRespondComponentModule,
     PersonRowModule,
     GroupRowModule,
     GroupListModule,
@@ -174,8 +182,11 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     CheckinEditModule,
     CheckinSendModule,
     CheckinTestModule,
+    CheckinTokenModule,
     CheckinDetailsModule,
     CheckinRespondModule,
+    ContactsImportModule,
+    ContactsMatchModule,
     NotificationListModule,
     PersonListModule,
     PersonEditModule,
@@ -207,14 +218,16 @@ import { EnvironmentProvider } from '../providers/environment/environment';
       apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
       debug: false
     }),
-    IonicModule.forRoot(TenFourApp, {
-      scrollAssist: true,
-      autoFocusAssist: true
-    },
-    {
-      links: TenFourRoutes.ROUTES
-    }
-  )
+    IntercomModule.forRoot(),
+    IonicModule.forRoot(TenFourApp,
+      {
+        scrollAssist: true,
+        autoFocusAssist: true
+      },
+      {
+        links: TenFourRoutes.ROUTES
+      }
+    )
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -268,6 +281,7 @@ import { EnvironmentProvider } from '../providers/environment/environment';
     { provide: MailerProvider, useClass: MailerProvider },
     { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: EnvironmentProvider, useClass: EnvironmentProvider },
+    { provide: IntercomProvider, useClass: IntercomProvider },
     { provide: ErrorHandler, useClass: IonicErrorHandler }
   ]
 })

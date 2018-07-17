@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SettingsPlanFreePage } from '../settings-plan-free/settings-plan-free';
 import { SettingsPlanProPage } from '../settings-plan-pro/settings-plan-pro';
 import { SettingsPlanProWelcomePage } from '../settings-plan-pro-welcome/settings-plan-pro-welcome';
@@ -15,6 +15,8 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
+
 @IonicPage({
   name: 'SettingsPaymentsPage',
   segment: 'settings/payments',
@@ -26,16 +28,22 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SettingsPlanFreePage, SettingsPlanProPage, SettingsPlanProWelcomePage, SettingsCreditsPage ]
 })
-export class SettingsPaymentsPage extends BasePage {
+export class SettingsPaymentsPage extends BasePrivatePage {
 
-  organization:Organization = null;
+  PRO_FLAT_RATE:number = 39;
+  FREE_USERS:number = 100;
+  USER_BUNDLE_RATE:number = 5;
+  USER_BUNDLE_UNIT:number = 25;
+  CREDIT_BUNDLE_RATE:number = .1;
+
   subscription:Subscription = null;
-  user:User = null;
   hashChangeFn = null;
   switchToProModal = null;
   billingEstimate:number = 0;
   updatedCredits:number = 0;
   updatedCreditsCost:number = 0;
+  addCreditsImmediately:boolean = true;
+  addCreditsRecurring:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -49,9 +57,8 @@ export class SettingsPaymentsPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      protected storage:StorageProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -59,12 +66,7 @@ export class SettingsPaymentsPage extends BasePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showToast(error);
     });
-
     this.events.subscribe('subscription:changed', (subscription, time) => {
       this.loadUpdates(false);
     });
@@ -93,7 +95,6 @@ export class SettingsPaymentsPage extends BasePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadSubscription(cache); })
       .then(() => { return this.loadUser(cache); })
-      // .then(() => { return this.loadPaymentForm(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         this.updatedCredits = this.organization.credits_extra;
@@ -112,24 +113,6 @@ export class SettingsPaymentsPage extends BasePage {
       });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        });
-      }
-    });
-  }
-
   private loadSubscription(cache:boolean=true):Promise<Subscription> {
     return new Promise((resolve, reject) => {
       if (cache && this.subscription) {
@@ -137,27 +120,8 @@ export class SettingsPaymentsPage extends BasePage {
       }
       else {
         this.storage.getSubscription().then((subscription:Subscription) => {
-          console.log(subscription);
           this.subscription = subscription;
           resolve(this.subscription);
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
         });
       }
     });
@@ -174,10 +138,9 @@ export class SettingsPaymentsPage extends BasePage {
 
   private hashChangeSwitchToPro() {
     this.logger.info(this, "hashChangeSwitchToPro");
-    this.extractQueryParams();
-
-    if (this.queryParams['id'] && this.queryParams['state']) {
-      if (this.queryParams['state'] === 'succeeded') {
+    this.platform.setQueryParams(window.location.href);
+    if (this.hasParameter('id') && this.hasParameter('state')) {
+      if (this.getParameter('state') === 'succeeded') {
         this.completeSwitchToPro();
       }
     }
@@ -187,31 +150,27 @@ export class SettingsPaymentsPage extends BasePage {
     this.switchToProModal.dismiss();
     let loading = this.showLoading("Switching to TenFour Pro...", true);
     let retryCount = 0;
-
     let checkSubscription = () => {
       return new Promise((resolve, reject) => {
         this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
           if (subscriptions.length < 1) {
             return reject("Current plan was not found");
           }
-
           if (subscriptions[0].plan_id === 'pro-plan') {
             this.subscription = subscriptions[0];
-
             return this.api.getOrganization(this.organization).then((organization:Organization) => {
               this.storage.setOrganization(organization)
                 .then(()=>{return this.storage.saveSubscription(organization, this.subscription)})
                 .then(()=>{
-                  this.events.publish('subscription:changed', this.subscription, Date.now());
+                  this.events.publish(EVENT_SUBSCRIPTION_CHANGED, this.subscription, Date.now());
                   resolve(this.subscription);
                 });
             });
           }
-
           if (retryCount++ > 5) {
+            // HACK HACK HACK server polling - this can be replaced when push notifications land
             reject('Could not switch plans. Try logging out of your account.');
           }
-
           setTimeout(() => {
             checkSubscription().then((subscription:Subscription) => {
               resolve(subscription);
@@ -238,12 +197,10 @@ export class SettingsPaymentsPage extends BasePage {
 
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
-
     if (!this.hashChangeFn) {
       this.hashChangeFn = this.hashChangeSwitchToPro.bind(this);
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
-
     this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'switchtopro'
     });
@@ -251,10 +208,9 @@ export class SettingsPaymentsPage extends BasePage {
 
   private hashChangeUpdateBillingInfo() {
     this.logger.info(this, "hashChangeUpdateBillingInfo");
-    this.extractQueryParams();
-
-    if (this.queryParams['id'] && this.queryParams['state']) {
-      if (this.queryParams['state'] === 'succeeded') {
+    this.platform.setQueryParams(window.location.href);
+    if (this.hasParameter('id') && this.hasParameter('state')) {
+      if (this.getParameter('state') === 'succeeded') {
         this.switchToProModal.dismiss();
         this.showToast("Your billing info has been updated");
       }
@@ -263,25 +219,27 @@ export class SettingsPaymentsPage extends BasePage {
 
   private updateBillingInfo(event:any) {
     this.logger.info(this, "updateBillingInfo");
-
     if (!this.hashChangeFn) {
       this.hashChangeFn = this.hashChangeUpdateBillingInfo.bind(this);
       window.addEventListener("hashchange", this.hashChangeFn, false);
     }
-
     this.switchToProModal = this.showModal(SettingsPlanProPage, {
       action: 'update'
     });
   }
 
   private calcBillingEstimate(extraCredits?:number):number {
-    let estimate = this.organization.user_count * 3;
+    let estimate = this.PRO_FLAT_RATE;
 
-    if (!extraCredits) {
-      extraCredits = this.organization.credits_extra;
+    if (this.organization.user_count > this.FREE_USERS) {
+      estimate += this.USER_BUNDLE_RATE * Math.ceil((this.organization.user_count - this.FREE_USERS)/this.USER_BUNDLE_UNIT);
     }
 
-    estimate += extraCredits * .1;
+    if (extraCredits) {
+      estimate += extraCredits * this.CREDIT_BUNDLE_RATE;
+    } else if (this.updatedCredits) {
+      estimate += this.updatedCredits * this.CREDIT_BUNDLE_RATE;
+    }
 
     return estimate
   }
@@ -293,18 +251,38 @@ export class SettingsPaymentsPage extends BasePage {
 
   private addCredits(event:any) {
     this.logger.info(this, "addCredits");
+
+    if (!this.addCreditsImmediately && !this.addCreditsRecurring) {
+      return this.showAlert("Add credits", "Please select an option.");
+    }
+
+    if (!this.updatedCredits || this.updatedCredits <= 0) {
+      return this.showAlert("Add credits", "Please specify how many credits to add.");
+    }
+
     let modal = this.showModal(SettingsCreditsPage, {
       credits: this.updatedCredits,
+      creditsEstimate: this.updatedCredits * this.CREDIT_BUNDLE_RATE,
       billingEstimate: this.calcBillingEstimate(this.updatedCredits),
-      organization: this.organization
+      organization: this.organization,
+      addCreditsImmediately: this.addCreditsImmediately,
+      addCreditsRecurring: this.addCreditsRecurring
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addCredits", "Modal", data);
+
+      this.api.getOrganization(this.organization).then((organization:Organization) => {
+        this.storage.setOrganization(organization).then(() => {
+          this.loadUpdates();
+        });
+      });
+
       if (data) {
         if (data.organization) {
           this.logger.info(this, "addCredits", "Modal", data.organization);
           this.organization = data.organization;
           this.billingEstimate = this.calcBillingEstimate();
+          this.loadUpdates();
         }
       }
    });

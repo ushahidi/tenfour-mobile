@@ -8,10 +8,10 @@ import { NavParams, ViewController } from 'ionic-angular';
 export class ColorPickerComponent {
 
   colors = [
-    "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
-    "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
-    "#A28AD9", "#19AEE9", "#0273A3", "#304170",
-    "#99238C", "#C7470D", "#793EE8", "#1E9545"];
+    "#00AF64", "#FFC900", "#F381A1", "#1D8DD8",
+    "#F7921E", "#C65DBC", "#52BFCD", "#30B7A4",
+    "#AE94E0", "#ACE0F1", "#BFE254", "#3C4DA5",
+    "#DA1C5C", "#F15A29", "#603795", "#016B3E"];
 
   constructor(
     private params:NavParams,
@@ -19,7 +19,6 @@ export class ColorPickerComponent {
   }
 
   selectColor(color:string) {
-    console.log(`selectColor ${color}`);
     this.params.get('on_changed')(color);
     this.viewController.dismiss();
   }

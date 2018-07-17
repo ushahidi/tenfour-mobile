@@ -3,7 +3,7 @@ page-group-details {
     ion-item {
       ion-label {
         p {
-          color: #888 !important;
+          color: color($colors, text) !important;
         }
       }
     }

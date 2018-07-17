@@ -15,10 +15,13 @@ import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
-import { PasswordResetPage } from '../pages/password-reset/password-reset'; 
+import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
+
+import { ContactsImportPage } from '../pages/contacts-import/contacts-import';
+import { ContactsMatchPage } from '../pages/contacts-match/contacts-match';
 
 import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
@@ -56,6 +59,18 @@ import { StatusBarProvider } from '../providers/status-bar/status-bar';
 import { SplashScreenProvider } from '../providers/splash-screen/splash-screen';
 import { FirebaseProvider } from '../providers/firebase/firebase';
 import { DeeplinksProvider } from '../providers/deeplinks/deeplinks';
+import { IntercomProvider } from '../providers/intercom/intercom';
+import { EnvironmentProvider } from '../providers/environment/environment';
+
+import {
+  EVENT_USER_AUTHENTICATED,
+  EVENT_USER_REDIRECTED,
+  EVENT_USER_DELETED,
+  EVENT_USER_UNAUTHORIZED,
+  EVENT_ACCOUNT_DELETED,
+  EVENT_CHECKIN_DETAILS,
+  EVENT_CREDITS_CHANGED,
+  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -66,6 +81,7 @@ export class TenFourApp {
   rootPage:any = SplashScreenPage;
   organization:Organization = null;
   user:User = null;
+
   tablet:boolean = false;
   mobile:boolean = false;
   phone:boolean = false;
@@ -74,9 +90,12 @@ export class TenFourApp {
   website:boolean = false;
   desktop:boolean = false;
 
-  defaultLogo:string = "assets/images/dots.png";
+  defaultLogo:string = "assets/images/logo-dots.png";
 
   checkin:Checkin = null;
+
+  environmentName:string = null;
+  apiEndpoint:string = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -107,13 +126,18 @@ export class TenFourApp {
     protected alertController:AlertController,
     protected menuController:MenuController,
     protected deeplinks:DeeplinksProvider,
-    protected firebase:FirebaseProvider) {
+    protected firebase:FirebaseProvider,
+    protected intercom:IntercomProvider,
+    protected environment:EnvironmentProvider) {
     this.zone = _zone;
     InjectorProvider.injector = injector;
+    this.logger.info(this, "Booting...");
     this.platform.ready().then((ready) => {
+      this.logger.info(this, "Platform is ready");
       if (this.platform.is("cordova")) {
         Promise.resolve()
           .then(() => this.loadPlatforms())
+          .then(() => this.loadEnvironment())
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
           .then(() => this.loadAnalytics())
@@ -133,15 +157,23 @@ export class TenFourApp {
                 new Settings(),
                 new Country(),
                 new Notification(),
-                new Subscription()]));
+                new Subscription()]))
+          .then(() => {
+            this.logger.info(this, "constructor", "loadMobileApp", "Loaded");
+          });
       }
       else {
         Promise.resolve()
           .then(() => this.loadPlatforms())
+          .then(() => this.loadEnvironment())
           .then(() => this.loadAnalytics())
+          .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
-          .then(() => this.loadWebApp());
+          .then(() => this.loadWebApp())
+          .then(() => {
+            this.logger.info(this, "constructor", "loadWebApp", "Loaded");
+          });
       }
     });
   }
@@ -156,6 +188,16 @@ export class TenFourApp {
       this.desktop = this.platform.is('core');
       this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
       this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
+      resolve(true);
+    });
+  }
+
+  private loadEnvironment():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.environment.isProduction() == false) {
+        this.environmentName = this.environment.getEnvironmentName();
+        this.apiEndpoint = this.environment.getApiEndpoint();
+      }
       resolve(true);
     });
   }
@@ -199,6 +241,13 @@ export class TenFourApp {
     });
   }
 
+  private loadIntercom():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.intercom.initialize();
+      resolve(true);
+    });
+  }
+
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
@@ -206,8 +255,8 @@ export class TenFourApp {
         if (deeplink) {
           if (deeplink.path === '/organization/email/confirmation/') {
             let email = deeplink.parameters['email'];
-            let token = deeplink.parameters['token'];
-            this.showSignupVerify(email, token);
+            let code = deeplink.parameters['code'];
+            this.showSignupVerify(email, code);
           }
           else if (deeplink.path === '/login/email') {
              //SigninEmailPage
@@ -230,16 +279,46 @@ export class TenFourApp {
   private loadEvents():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadEvents");
-      this.events.subscribe('account:deleted', () => {
-        this.userLogout(false);
+      this.events.subscribe(EVENT_USER_DELETED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_DELETED);
       });
-      this.events.subscribe('user:login', () => {
+      this.events.subscribe(EVENT_USER_AUTHENTICATED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_AUTHENTICATED);
         this.loadMenu();
       });
-      this.events.subscribe('checkin:details', (data:any) => {
+      this.events.subscribe(EVENT_USER_UNAUTHORIZED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Not Authorized",
+          `You are not authorized to access this protected page, please login and try again.`);
+        alert.onDidDismiss(data => {
+          this.showSigninUrl();
+        });
+      });
+      this.events.subscribe(EVENT_USER_REDIRECTED, () => {
+        this.logger.info(this, "loadEvents", EVENT_USER_REDIRECTED, this.rootPage, this.locationHash());
+        let alert = this.showAlert(
+          "Already Authenticated",
+          `You are trying to access a public page when you are already logged in, redirecting back to Check-Ins.`);
+        alert.onDidDismiss(data => {
+          this.showCheckinList();
+        });
+      });
+      this.events.subscribe(EVENT_ACCOUNT_DELETED, () => {
+        this.logger.info(this, "loadEvents", EVENT_ACCOUNT_DELETED);
+        this.userLogout(false);
+      });
+      this.events.subscribe(EVENT_CHECKIN_DETAILS, (data:any) => {
+        this.logger.info(this, "loadEvents", EVENT_CHECKIN_DETAILS, data);
         this.showCheckinDetails(data.checkin);
       });
-      this.events.subscribe('subscription:changed', (subscription, time) => {
+      this.events.subscribe(EVENT_CREDITS_CHANGED, (credits) => {
+        this.logger.info(this, "loadEvents", EVENT_CREDITS_CHANGED, credits);
+        this.logger.info(this, EVENT_CREDITS_CHANGED, credits);
+        this.loadOrganization();
+      });
+      this.events.subscribe(EVENT_SUBSCRIPTION_CHANGED, (subscription, time) => {
+        this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
       });
       resolve(true);
@@ -261,38 +340,37 @@ export class TenFourApp {
 
   private loadWebApp() {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadWebApp");
+      this.logger.info(this, "loadWebApp", this.locationHash());
       this.storage.getOrganization().then((organization:Organization) => {
-        this.logger.info(this, "loadWebApp", "Organization", organization);
+        this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", organization);
         this.organization = organization;
         this.storage.getUser().then((user:User) => {
-          this.logger.info(this, "loadWebApp", "User", user);
+          this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
           if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            this.logger.info(this, "loadWebApp", "Location", location.hash);
-            if (location.hash == '') {
+            if (this.hasRootPage() == false) {
               this.showCheckinList();
             }
             resolve(true);
           }
           else {
-            if (location.hash == '') {
+            if (this.hasRootPage() == false) {
               this.showOnboardList(user);
             }
             resolve(true);
           }
         },
         (error:any) => {
-          this.logger.info(this, "loadWebApp", "Person", "None");
-          if (location.hash == '') {
+          this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
+          if (this.hasRootPage() == false) {
             this.showSigninUrl();
           }
           resolve(false);
         });
       },
       (error:any) => {
-        this.logger.info(this, "loadWebApp", "Organization", "None");
-        if (location.hash == '') {
+        this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
+        if (this.hasRootPage() == false) {
           this.showSigninUrl();
         }
         resolve(false);
@@ -457,12 +535,12 @@ export class TenFourApp {
     });
   }
 
-  private showSignupVerify(email:string, token:string) {
+  private showSignupVerify(email:string, code:string) {
     let organization = new Organization({email: email});
     return Promise.resolve()
       .then(() => { return this.nav.setRoot(SigninUrlPage, {}); })
       .then(() => { return this.nav.push(SignupEmailPage, {}); })
-      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, token:token }); })
+      .then(() => { return this.nav.push(SignupVerifyPage, { organization:organization, email:email, code:code }); })
       .then((loaded:any) => {
         this.logger.info(this, "showSignupVerify", "Loaded");
         this.hideSideMenu();
@@ -612,7 +690,6 @@ export class TenFourApp {
       this.organization = null;
       this.user = null;
       this.clearBadgeCount();
-      this.events.publish('user:logout');
       loading.dismiss();
       this.showSigninUrl(event);
     });
@@ -648,6 +725,9 @@ export class TenFourApp {
   }
 
   protected showModal(page:any, params:any={}, options:any={}):Modal {
+    if (params) {
+      params['modal'] = true;
+    }
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
@@ -692,8 +772,7 @@ export class TenFourApp {
         organization: this.organization,
         checkins: [this.checkin],
         checkin: this.checkin,
-        reply: reply,
-        modal: true
+        reply: reply
       });
       modal.onDidDismiss(data => {
         this.logger.info(this, "editReply", "Modal", data);
@@ -714,8 +793,7 @@ export class TenFourApp {
     let modal = this.showModal(CheckinRespondPage, {
       organization: this.organization,
       checkins: [this.checkin],
-      checkin: this.checkin,
-      modal: true
+      checkin: this.checkin
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "sendReply", "Modal", data);
@@ -746,6 +824,24 @@ export class TenFourApp {
   private upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
     this.navController.push(SettingsPaymentsPage);
+  }
+
+  private locationHash():string {
+    if (location && location.hash) {
+        return location.hash;
+    }
+    return "";
+  }
+
+  private hasLocationHash():boolean {
+    if (location && location.hash) {
+        return location.hash.length > 0;
+    }
+    return false;
+  }
+
+  private hasRootPage() {
+    return this.hasLocationHash() && this.locationHash() != "#/loading";
   }
 
 }

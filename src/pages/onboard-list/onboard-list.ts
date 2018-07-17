@@ -1,12 +1,13 @@
 import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
+import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -25,10 +26,8 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ PersonEditPage, PersonInvitePage, PersonImportPage, CheckinTestPage, CheckinListPage ]
 })
-export class OnboardListPage extends BasePage {
+export class OnboardListPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
   loading:boolean = false;
 
   constructor(
@@ -44,16 +43,13 @@ export class OnboardListPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(false).then((finished:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
+    this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
   }
@@ -91,48 +87,6 @@ export class OnboardListPage extends BasePage {
       });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        },
-        (error:any) => {
-          reject("Problem loading organization");
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
-        },
-        (error:any) => {
-          reject("Problem loading user");
-        });
-      }
-    });
-  }
-
   private loadPeople(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.api.getPeople(this.organization).then((people:Person[]) => {
@@ -168,7 +122,11 @@ export class OnboardListPage extends BasePage {
       },{
         text: 'Import People',
         handler: () => {
-          this.importPerson();
+          if (this.website) {
+            this.importPersonWebsite();
+          } else {
+            this.importPersonPhone();
+          }
         }
       },{
         text: 'Cancel',
@@ -185,7 +143,7 @@ export class OnboardListPage extends BasePage {
     let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
       user: this.user,
-      person_id: this.user.id
+      // person_id: this.user.id
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", "Modal", data);
@@ -219,7 +177,26 @@ export class OnboardListPage extends BasePage {
     });
   }
 
-  private importPerson() {
+  private importPersonWebsite() {
+    this.logger.info(this, "importPerson");
+    let modal = this.showModal(ContactsImportPage, {
+      organization: this.organization,
+      user: this.user
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "importPerson", "Modal", data);
+      this.storage.getPeople(this.organization).then((people:Person[]) => {
+        if (people && people.length > 1) {
+          this.user.config_people_invited = true;
+        }
+        else {
+          this.user.config_people_invited = false;
+        }
+      });
+    });
+  }
+
+  private importPersonPhone() {
     this.logger.info(this, "importPerson");
     let modal = this.showModal(PersonImportPage, {
       organization: this.organization,

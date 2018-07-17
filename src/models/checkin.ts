@@ -65,6 +65,12 @@ export class Checkin extends Model {
           this.waiting_count = data.recipients.length - data.replies.length;
         }
       }
+      if (data.user) {
+        this.user = new User(data.user);
+        this.user_name = this.user.name;
+        this.user_initials = this.user.initials;
+        this.user_picture = this.user.profile_picture;
+      }
     }
   }
 
@@ -252,9 +258,14 @@ export class Checkin extends Model {
   }
 
   public sendVia() {
-    if (this.send_via) {
+    if (Array.isArray(this.send_via)) {
+      return this.send_via;
+    }
+
+    if (typeof this.send_via === 'string') {
       return this.send_via.split(",");
     }
+
     return [];
   }
 

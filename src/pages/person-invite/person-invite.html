@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelInvite($event)">Cancel</button>
+      <button ion-button color="cancel" (click)="cancelInvite($event)">Cancel</button>
     </ion-buttons>
     <ion-title>Invite People</ion-title>
     <ion-buttons right *ngIf="people">
@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadPeople($event, false)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-item no-lines text-wrap *ngIf="loading == false && people && people.length == 0">

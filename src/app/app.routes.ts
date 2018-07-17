@@ -33,6 +33,10 @@ import { CheckinEditPage } from '../pages/checkin-edit/checkin-edit';
 import { CheckinSendPage } from '../pages/checkin-send/checkin-send';
 import { CheckinTestPage } from '../pages/checkin-test/checkin-test';
 import { CheckinRespondPage } from '../pages/checkin-respond/checkin-respond';
+import { CheckinTokenPage } from '../pages/checkin-token/checkin-token';
+
+import { ContactsImportPage } from '../pages/contacts-import/contacts-import';
+import { ContactsMatchPage } from '../pages/contacts-match/contacts-match';
 
 import { GroupListPage } from '../pages/group-list/group-list';
 import { GroupEditPage } from '../pages/group-edit/group-edit';
@@ -57,7 +61,7 @@ export class TenFourRoutes {
     { component: SplashScreenPage, name: 'SplashScreenPage', segment: 'loading' },
 
     { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
-    { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email'},
     { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: ['SigninUrlPage'] },
     { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },
 
@@ -65,13 +69,13 @@ export class TenFourRoutes {
 
     { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
     { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
-    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:token', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
+    { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:code', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupNamePage, name: 'SignupNamePage', segment: 'signup/name', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage'] },
     { component: SignupUrlPage, name: 'SignupUrlPage', segment: 'signup/url', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage'] },
     { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
     { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
-    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage', 'SignupPlanPage'] },
+    { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
 
     { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 
@@ -80,6 +84,11 @@ export class TenFourRoutes {
     { component: CheckinSendPage, name: 'CheckinSendPage', segment: 'checkins/send', defaultHistory: ['CheckinListPage'] },
     { component: CheckinRespondPage, name: 'CheckinRespondPage', segment: 'checkins/respond', defaultHistory: ['CheckinListPage'] },
     { component: CheckinDetailsPage, name: 'CheckinDetailsPage', segment: 'checkins/:checkin_id', defaultHistory: ['CheckinListPage'] },
+
+    { component: CheckinTokenPage, name: 'CheckinTokenPage', segment: 'r/:checkin_id/:answer_id/:user_id/:token' },
+
+    { component: ContactsImportPage, name: 'ContactsImportPage', segment: 'settings/contacts', defaultHistory: ['SettingsListPage'] },
+    { component: ContactsMatchPage, name: 'ContactsMatchPage', segment: 'settings/contacts', defaultHistory: ['ContactsImportPage'] },
 
     { component: PersonProfilePage, name: 'PersonProfilePage', segment: 'profile' },
 

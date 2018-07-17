@@ -49,6 +49,18 @@ export class Notification extends Model {
       if (data.data.profile_picture && data.data.profile_picture.toString().indexOf("http") != -1) {
         this.person_picture = data.data.profile_picture;
       }
+      if (data.data.count) {
+        this.import_count = data.data.count;
+      }
+      if (data.data.dupe_count) {
+        this.import_dupe_count = data.data.dupe_count;
+      }
+      if (data.data.estimate) {
+        this.billing_estimate = data.data.estimate;
+      }
+      if (data.data.next_billing_at && data.data.next_billing_at.date) {
+        this.billing_next = new Date(data.data.next_billing_at.date);
+      }
     }
   }
 
@@ -115,6 +127,12 @@ export class Notification extends Model {
 
   @Column("import_dupe_count", INTEGER)
   public import_dupe_count:number = null;
+
+  @Column("billing_estimate", INTEGER)
+  public billing_estimate:number = null;
+
+  @Column("billing_next", TEXT)
+  public billing_next:Date = null;
 
   @Column("read_at", TEXT)
   public read_at:Date = null;

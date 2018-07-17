@@ -1,6 +1,5 @@
 // http://ionicframework.com/docs/v2/theming/
 
-
 // App Global Sass
 // --------------------------------------------------
 // Put style rules here that you want to apply globally. These
@@ -17,7 +16,7 @@
 
 .md, .ios {
   .back-button {
-    color: color($colors, primary) !important;
+    color: color($colors, cancel) !important;
   }
 }
 ion-toolbar {
@@ -29,16 +28,16 @@ ion-toolbar {
 }
 ion-item {
   ion-icon {
-    color: #888888;
+    color: color($colors, icon);
   }
   ion-label {
     ion-icon {
-      color: #888888;
+      color: color($colors, icon);
     }
   }
   &.item-input {
     ion-label {
-      color: #333333 !important;
+      color: color($colors, black) !important;
     }
   }
 }
@@ -66,26 +65,28 @@ ion-menu {
 ion-list {
   ion-list-header {
     margin-bottom: 0px !important;
+    background-color: color($colors, header) !important;
     h2 {
+      color: color($colors, black);
       margin-bottom: 0px !important;
     }
   }
   ion-item {
     h1 {
-      color: #000000;
+      color: color($colors, black);
     }
     h2 {
 
     }
     p {
-      color: #ccc;
+      color: color($colors, text);
     }
     .group-icon {
       height:35px;
       width:35px;
       padding: 4px;
-      color: #fff;
-      background-color: #000;
+      color: color($colors, white);
+      background-color: color($colors, black);
       font-size: 30px;
       border-radius: 50%;
       -webkit-border-radius: 50%;
@@ -94,8 +95,8 @@ ion-list {
       height:50px;
       width:50px;
       padding: 4px;
-      color: #fff;
-      background-color: #000;
+      color: color($colors, white);
+      background-color: color($colors, black);
       font-size: 42px;
       border-radius: 50%;
       -webkit-border-radius: 50%;
@@ -103,7 +104,7 @@ ion-list {
     &.heading {
       text-align: center;
       margin-bottom: 20px;
-      background-color: white;
+      background-color: color($colors, white);
       img {
         width: 60px;
       }
@@ -114,14 +115,13 @@ ion-list {
         padding-bottom: 15px;
       }
       p {
-        color: #888;
+        color: color($colors, text);
         font-size: 1.0em;
         padding-bottom: 10px;
       }
     }
     &.input {
       margin-top: 20px;
-      background-color: color($colors, dark);
     }
     &.info {
       p {
@@ -229,4 +229,9 @@ ion-list {
   display: -webkit-box;
   -webkit-line-clamp: 8;
   -webkit-box-orient: vertical;
+}
+
+
+.toast-md .toast-wrapper {
+  padding-left: 40px; // because of intercom button
 }

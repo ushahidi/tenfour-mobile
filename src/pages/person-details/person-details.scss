@@ -1,9 +1,12 @@
 page-person-details {
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
   .profile {
     h1 {
     }
     p {
-      color: #888;
+      color: color($colors, text);
     }
   }
   .contact {
@@ -13,19 +16,19 @@ page-person-details {
 
   }
   .content {
-    color: #888;
+    color: color($colors, text);
   }
   ion-card {
     ion-card-content {
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid color($colors, dark);
       person-avatar {
       }
       h1 {
       }
       p {
-        color: #888 !important;
+        color: color($colors, text) !important;
         strong {
-          color: #444 !important;
+          color: color($colors, black) !important;
           font-weight: 500 !important;
         }
       }

@@ -1,7 +1,7 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Subscription } from '../../models/subscription';
 import { Organization } from '../../models/organization';
@@ -9,14 +9,15 @@ import { Organization } from '../../models/organization';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
+
 @IonicPage()
 @Component({
   selector: 'page-settings-plan-free',
   templateUrl: 'settings-plan-free.html',
 })
-export class SettingsPlanFreePage extends BasePage {
+export class SettingsPlanFreePage extends BasePrivatePage {
 
-  organization:Organization = null;
   subscription:Subscription = null;
 
   constructor(
@@ -31,18 +32,14 @@ export class SettingsPlanFreePage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      protected storage:StorageProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillLoad() {
     super.ionViewDidEnter();
     let loading = this.showLoading("Checking your plan...", true);
     this.loadUpdates(false).then((loaded:any) => {
-      loading.dismiss();
-    },
-    (error:any) => {
       loading.dismiss();
     });
   }
@@ -51,6 +48,7 @@ export class SettingsPlanFreePage extends BasePage {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadSubscription(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -63,27 +61,11 @@ export class SettingsPlanFreePage extends BasePage {
         if (event) {
           event.complete();
         }
-        this.showAlert("Problem Switching to Free Plan", error);
-        this.hideModal();
-      });
-  }
-
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
+        let alert = this.showAlert("Problem Switching to Free Plan", error);
+        alert.onDidDismiss((dismiss:any) => {
+          this.hideModal();
         });
-      }
-    });
+      });
   }
 
   private loadSubscription(cache:boolean=true):Promise<Subscription> {
@@ -94,14 +76,15 @@ export class SettingsPlanFreePage extends BasePage {
       else {
         this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
           if (subscriptions.length !== 1) {
-            return reject("Current plan was not found");
+            reject("Current plan was not found");
           }
-          if (subscriptions[0].plan_id === 'free-plan') {
-            return reject("You are already on the free plan");
+          else if (subscriptions[0].plan_id === 'free-plan') {
+            reject("You are already on the free plan");
           }
-          this.subscription = subscriptions[0];
-
-          resolve(this.subscription);
+          else {
+            this.subscription = subscriptions[0];
+            resolve(this.subscription);
+          }
         });
       }
     });
@@ -124,11 +107,11 @@ export class SettingsPlanFreePage extends BasePage {
     this.logger.info(this, "switchToFree");
     let loading = this.showLoading("Switching to Free Plan...", true);
     this.api.deleteSubscription(this.organization, this.subscription)
-      .then((subscription:Subscription) => {this.subscription = subscription; return this.api.getOrganization(this.organization)})
-      .then((organization:Organization) => {return this.storage.setOrganization(organization)})
-      .then(()=>{return this.storage.saveSubscription(this.organization, this.subscription)})
-      .then(()=>{
-        this.events.publish('subscription:changed', this.subscription, Date.now());
+      .then((subscription:Subscription) => { this.subscription = subscription; return this.api.getOrganization(this.organization); })
+      .then((organization:Organization) => { return this.storage.setOrganization(organization); })
+      .then(() => { return this.storage.saveSubscription(this.organization, this.subscription); })
+      .then(() => {
+        this.events.publish(EVENT_SUBSCRIPTION_CHANGED, this.subscription, Date.now());
         loading.dismiss();
         this.hideModal();
       })

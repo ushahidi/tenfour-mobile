@@ -73,18 +73,17 @@ export class ApiProvider extends HttpProvider {
           let json = JSON.parse(data);
           let token:Token = <Token>json;
           let now = new Date();
-          if (now > token.expires_at) {
+          if (now < new Date(token.expires_at)) {
             this.logger.info(this, "getToken", "Valid", token);
             resolve(token);
           }
           else {
             this.logger.info(this, "getToken", "Expired", token);
-            this.userLogin(organization, token.username, token.password).then(
-              (token:Token) => {
-                resolve(token);
-              },
-              (error:any) => {
-                reject(error);
+            this.refreshLogin(organization, token.refresh_token).then((token:Token) => {
+              resolve(token);
+            },
+            (error:any) => {
+              reject(error);
             });
           }
         }
@@ -151,7 +150,6 @@ export class ApiProvider extends HttpProvider {
       this.httpPost(url, params).then((data:any) => {
         let token:Token = <Token>data;
         token.username = username;
-        token.password = password;
         token.organization = organization.name;
         token.issued_at = new Date();
         if (data.expires_in) {
@@ -160,6 +158,9 @@ export class ApiProvider extends HttpProvider {
         }
         this.logger.info(this, "userLogin", token);
         this.saveToken(organization, token).then(saved => {
+          resolve(token);
+        },
+        (error:any) => {
           resolve(token);
         });
       },
@@ -208,14 +209,18 @@ export class ApiProvider extends HttpProvider {
         resolve(email);
       },
       (error:any) => {
+        if (error === '409 Conflict' || error === 'Conflict') {
+          return reject(`A verification email has already been sent to ${email}`);
+        }
         reject(`There was a problem registering email ${email}.`);
       });
     });
   }
 
-  public verifyEmail(email:string, token:string):Promise<Email> {
+  public verifyEmail(email:string, code:string):Promise<Email> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/verification/email/?address=${email}&token=${token}`;
+      email = encodeURIComponent(email);
+      let url = `${this.api}/verification/email/?address=${email}&code=${code}`;
       let params = {};
       this.httpGet(url, params).then((data:any) => {
         let email = new Email(data);
@@ -277,16 +282,17 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public createOrganization(organization:Organization):Promise<Organization> {
+  public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/create_organization`;
       let params = {
         name: organization.name,
         email: organization.email,
         owner: organization.user_name,
-        password: organization.password,
+        password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
+        verification_code: verificationCode,
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
@@ -294,7 +300,6 @@ export class ApiProvider extends HttpProvider {
             let _organization:Organization = new Organization(data.organization);
             _organization.user_name = organization.user_name;
             _organization.email = organization.email;
-            _organization.password = organization.password;
             resolve(_organization);
           }
           else {
@@ -359,7 +364,6 @@ export class ApiProvider extends HttpProvider {
           if (data && data.organization) {
             let _organization:Organization = new Organization(data.organization);
             _organization.email = organization.email;
-            _organization.password = organization.password;
             resolve(_organization);
           }
           else {
@@ -744,6 +748,27 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getCheckinForToken(id:number, token:string):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${id}`;
+      let params = {
+        token: token
+      };
+      this.httpGet(url, params).then((data:any) => {
+        if (data && data.checkin) {
+          let checkin = new Checkin(data.checkin);
+          resolve(checkin);
+        }
+        else {
+          reject("Checkin Not Found");
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
@@ -898,6 +923,42 @@ export class ApiProvider extends HttpProvider {
         (error:any) => {
           reject(error);
         });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public tokenReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/checkins/${checkin.id}/replies`;
+      let params = {
+        token: token,
+        answer: reply.answer
+      };
+      if (reply.message) {
+        params["message"] = reply.message;
+      }
+      if (reply.location_text) {
+        params["location_text"] = reply.location_text;
+      }
+      if (reply.latitude != null && reply.longitude != null) {
+        params["location_geo"] = {
+          location: {
+            lat: reply.latitude,
+            lng: reply.longitude
+          }
+        };
+      }
+      this.httpPost(url, params).then((data:any) => {
+        if (data && data.reply) {
+          let reply = new Reply(data.reply);
+          resolve(reply);
+        }
+        else {
+          reject("Reply Not Sent");
+        }
       },
       (error:any) => {
         reject(error);
@@ -1264,6 +1325,125 @@ export class ApiProvider extends HttpProvider {
       },
       (error:any) => {
         reject(`There was a problem resetting password for ${email}.`);
+      });
+    });
+  }
+
+  public deleteOrganization(organization:Organization):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public uploadContactsCSV(organization:Organization, file:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files`;
+        this.fileUpload(url, token.access_token, file).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(`Could not process the CSV, please check the file format and column names and try again`);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public matchCSVContacts(organization:Organization, map:any, data:any):Promise<any> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+
+        // Initialize a new array of the length of the csv column with nulls
+        let maps_to = [];
+        let columns = data.file.columns;
+
+        for (let i = 0; i < Object.keys(columns).length; i++) {
+          maps_to.push(null);
+        }
+
+        //iterate through the map Object, check if value is null and replace any null with value
+        //insert this into the maps_to array in the correct positions
+
+        for (let i=0; i<columns.length; i++) {
+          for (let mapKey of Object.keys(map)) {
+            if (map[mapKey] === columns[i]) {
+              maps_to[i] = mapKey;
+            }
+          }
+        }
+
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id,
+          maps_to: maps_to
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public importContacts(organization:any, data:any):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let params = {
+          fileId: data.file.id,
+          orgId: organization.id
+        };
+
+        let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "import", token, "Error", error);
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public addCredits(organization:Organization, subscription:Subscription, quantity:number):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/subscriptions/${subscription.id}/credits`;
+        let params = { quantity: quantity };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

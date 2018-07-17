@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { Organization } from '../../models/organization';
@@ -26,10 +26,10 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, CameraProvider ],
   entryComponents:[ PersonSelectPage ]
 })
-export class PersonEditPage extends BasePage {
+export class PersonEditPage extends BasePrivatePage {
 
-  organization:Organization = null;
-  user:User = null;
+  MAX_PERSONS_FREE_PLAN:number = 100;
+
   person:Person = null;
   editing:boolean = true;
   profile:boolean = false;
@@ -66,23 +66,16 @@ export class PersonEditPage extends BasePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected camera:CameraProvider,
-      protected storage:StorageProvider,
-      protected events:Events) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      protected storage:StorageProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
     this.profile = this.getParameter<boolean>("profile");
-    this.loading = true;
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((finished:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
-      this.loading = false;
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.loading = false;
     });
   }
 
@@ -103,44 +96,30 @@ export class PersonEditPage extends BasePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-    return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadRegions(); })
-      .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadPerson(cache); })
-      .then(() => { return this.loadCamera(); })
-      .then(() => {
-        this.logger.info(this, "loadUpdates", "Loaded");
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadUpdates", "Failed", error);
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
-  }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (cache && this.hasParameter("organization")){
-        this.organization = this.getParameter<Organization>("organization");
-        resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
+      return this.loadOrganization(cache)
+        .then((org) => { return this.loadUser(cache); })
+        .then((user) => { return this.loadPerson(cache); })
+        .then((person) => { return this.loadRegions(cache); })
+        .then((regions) => { return this.loadCamera(); })
+        .then(() => {
+          this.logger.info(this, "loadUpdates", "Loaded");
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          resolve();
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "loadUpdates", "Failed", error);
+          if (event) {
+            event.complete();
+          }
+          this.loading = false;
+          this.showToast(error);
+          reject(error);
         });
-      }
     });
   }
 
@@ -165,24 +144,6 @@ export class PersonEditPage extends BasePage {
             .map(region => region.country_code)
             .filter((v, i, a) => a.indexOf(v) === i);
           resolve();
-        });
-      }
-    });
-  }
-
-  private loadUser(cache:boolean=true):Promise<User> {
-    return new Promise((resolve, reject) => {
-      if (cache && this.user) {
-        resolve(this.user);
-      }
-      else if (cache && this.hasParameter("user")){
-        this.user = this.getParameter<User>("user");
-        resolve(this.user);
-      }
-      else {
-        this.storage.getUser().then((user:User) => {
-          this.user = user;
-          resolve(this.user);
         });
       }
     });
@@ -219,6 +180,7 @@ export class PersonEditPage extends BasePage {
           description: null,
           role: "responder"
         });
+        resolve(this.person);
       }
     });
   }
@@ -318,14 +280,21 @@ export class PersonEditPage extends BasePage {
       }
       else {
         this.logger.info(this, "savePerson", "Create", person);
-        this.api.createPerson(this.organization, person).then((person:Person) => {
-          this.person.id = person.id;
-          this.storage.savePerson(this.organization, person).then((saved:any) => {
-            resolve(person);
+        this.api.getOrganization(this.organization).then((organization:Organization) => {
+          if (organization.subscription_plan === 'free-plan' &&
+            organization.user_count >= this.MAX_PERSONS_FREE_PLAN) {
+            return reject('You have reached your person quota for your current plan. Please upgrade your plan to add more people.');
+          }
+
+          return this.api.createPerson(this.organization, person).then((person:Person) => {
+            this.person.id = person.id;
+            this.storage.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            });
+          },
+          (error:any) => {
+            reject(error);
           });
-        },
-        (error:any) => {
-          reject(error);
         });
       }
     });

@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
@@ -10,6 +10,7 @@ import { User } from '../../models/user';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @IonicPage({
   name: 'SigninUrlPage',
@@ -21,10 +22,11 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ SigninEmailPage, SignupEmailPage ]
 })
-export class SigninUrlPage extends BasePage {
+export class SigninUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
+  title:string = null;
 
   constructor(
       protected zone:NgZone,
@@ -38,16 +40,44 @@ export class SigninUrlPage extends BasePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      protected storage:StorageProvider,
+      protected environment:EnvironmentProvider) {
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
+  }
+
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    if (this.environment.isProduction() == false) {
+      this.title = this.environment.getEnvironmentName().toUpperCase();
+    }
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+    let organizationSubdomain = this.parseOrganizationSubdomain();
+    if (organizationSubdomain && organizationSubdomain.length > 0) {
+      this.subdomain.value = organizationSubdomain;
+      this.showNext();
+    }
   }
 
-  private showNext(event:any) {
+  private parseOrganizationSubdomain() {
+    if (this.website) {
+      let hostname = location.hostname;
+      let appDomain = this.environment.getAppDomain();
+      if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
+        let subdomain = hostname.replace('.' + appDomain, '');
+        if (subdomain !== 'app') {
+          this.logger.info(this, 'Subdomain', subdomain);
+          return subdomain;
+        }
+      }
+    }
+    return null;
+  }
+
+  private showNext(event:any=null) {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
@@ -57,14 +87,16 @@ export class SigninUrlPage extends BasePage {
         loading.dismiss();
         if (organizations && organizations.length > 0) {
           let organization:Organization = organizations[0];
-          this.storage.setOrganization(organization).then((stored:boolean) => {
-            this.showPage(SigninEmailPage, {
-              organization: organization
+          if (!this.redirectToOrganizationSubdomain(organization)) {
+            this.storage.setOrganization(organization).then((stored:boolean) => {
+              this.showPage(SigninEmailPage, {
+                organization: organization
+              });
             });
-          });
+          }
         }
         else {
-          this.showPage(SignupEmailPage, {});
+          this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
         }
       },
       (error:any) => {
@@ -73,6 +105,25 @@ export class SigninUrlPage extends BasePage {
         this.showAlert("Problem Finding Organization", error);
       });
     }
+  }
+
+  private redirectToOrganizationSubdomain(organization:Organization):boolean {
+    if (this.website) {
+      let appDomain = this.environment.getAppDomain();
+      let extension = '.' + appDomain;
+      let locationSubdomain = location.hostname.replace(extension, '');
+      let subdomain = this.subdomain.value.toLowerCase();
+      if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
+        location.assign(location.protocol
+          + "//"
+          + subdomain
+          + extension
+          + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+          + "/");
+        return true;
+      }
+    }
+    return false;
   }
 
   private createOrganization(event:any) {

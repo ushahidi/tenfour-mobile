@@ -1,8 +1,8 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left *ngIf="tablet == true || website == true">
-      <button ion-button icon-only color="primary" (click)="cancelEdit($event)">
-        <ion-icon ios="ios-arrow-back" md="ios-arrow-back"></ion-icon>
+      <button ion-button icon-only color="cancel" (click)="cancelEdit($event)">
+        <ion-icon ios="ios-arrow-round-back" md="md-arrow-back"></ion-icon>
       </button>
     </ion-buttons>
     <ion-title>Check-In</ion-title>
@@ -20,8 +20,11 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
+    <ion-list-header>
+      <h2>Send Via</h2>
+    </ion-list-header>
     <ion-item color="white" detail-push tappable (click)="showPopover($event)">
-      <ion-label>Send via</ion-label>
+      <ion-label color="primary">Select channels</ion-label>
       <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
     </ion-item>
     <ion-item tappable (click)="upgradeToPro($event)" *ngIf="organization && organization.hasFreePlan()">

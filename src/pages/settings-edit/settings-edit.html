@@ -1,7 +1,7 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+      <button ion-button color="cancel" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
     <ion-title>Edit Organization</ion-title>
     <ion-buttons right>
@@ -31,4 +31,7 @@
       <div item-content text-left item-left class="content">{{location.address}}</div>
     </ion-item>
   </ion-list>
+  <div padding margin-top *ngIf="user && user.isOwner()">
+    <button ion-button block color="danger" *ngIf="user && user.isOwner() == true" (click)="deleteOrganizationAccount($event)">Delete Organization</button>
+  </div>
 </ion-content>

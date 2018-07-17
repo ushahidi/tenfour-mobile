@@ -1,7 +1,7 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Events, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
@@ -14,6 +14,8 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
+
 @IonicPage({
   name: 'SigninPasswordPage',
   segment: 'signin/password',
@@ -25,14 +27,16 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ CheckinListPage, OnboardListPage ]
 })
-export class SigninPasswordPage extends BasePage {
+export class SigninPasswordPage extends BasePublicPage {
 
   @ViewChild('password')
   password:TextInput;
 
   organization:Organization = null;
+  person:Person = null;
+  token:Token = null;
   email:string = null;
-  logo:string = "assets/images/dots.png";
+  logo:string = "assets/images/logo-dots.png";
   loading:boolean = false;
 
   constructor(
@@ -46,10 +50,9 @@ export class SigninPasswordPage extends BasePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
-      protected events:Events,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
@@ -122,81 +125,87 @@ export class SigninPasswordPage extends BasePage {
   private showNext(event:any) {
     this.logger.info(this, "showNext");
     this.loading = true;
-    if (this.password.value && this.password.value.length > 0) {
+    if (this.password.value == null || this.password.value.length == 0) {
+      this.showToast("Please enter your password");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
+    }
+    else {
       let loading = this.showLoading("Logging in...", true);
       let password = this.password.value;
-      this.api.userLogin(this.organization, this.email, password).then((token:Token) => {
-        this.logger.info(this, "showNext", "Token", token);
-        this.api.getPerson(this.organization, "me").then((person:Person) => {
-          this.logger.info(this, "showNext", "Person", person);
-          this.api.getOrganization(this.organization).then((organization:Organization) => {
-            this.logger.info(this, "showNext", "Organization", organization);
-            this.api.getSubscriptions(this.organization).then((subscriptions:Subscription[]) => {
-              let subscription = subscriptions[0];
-              this.logger.info(this, "showNext", "Subscription", subscription);
-              organization.user_id = person.id;
-              organization.user_name = person.name;
-              organization.email = this.email;
-              organization.password = password;
-              let saves = [
-                this.storage.setOrganization(organization),
-                this.storage.setSubscription(subscription),
-                this.storage.setUser(person)
-              ];
-              if (this.mobile) {
-                saves.push(this.storage.saveOrganization(organization));
-                saves.push(this.storage.saveSubscription(organization, subscription));
-                saves.push(this.storage.savePerson(organization, person));
-              }
-              Promise.all(saves).then(saved => {
-                this.analytics.trackLogin(organization, person);
-                this.events.publish('user:login');
-                loading.dismiss();
-                this.loading = false;
-                if (person.name && person.name.length > 0) {
-                  this.showToast(`Hello ${person.name}, welcome to ${organization.name}`);
-                }
-                else {
-                  this.showToast(`Welcome to ${organization.name}`);
-                }
-                if (person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRootPage(CheckinListPage, {
-                    organization: organization
-                  });
-                }
-                else {
-                  this.showRootPage(OnboardListPage, {
-                    organization: organization,
-                    person: person
-                  });
-                }
-              },
-              (error:any) => {
-                this.logger.error(this, "showNext", error);
-                this.loading = false;
-                if (person.config_profile_reviewed && person.config_self_test_sent) {
-                  this.showRootPage(CheckinListPage, {
-                    organization: organization
-                  });
-                }
-                else {
-                  this.showRootPage(OnboardListPage, {
-                    organization: organization,
-                    person: person
-                  });
-                }
-              });
+      Promise.resolve()
+        .then(() => { return this.api.userLogin(this.organization, this.email, password); })
+        .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
+        .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
+        .then((organization:Organization) => { this.organization = organization; return this.loadSubscriptions(this.organization, this.person); })
+        .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
+        .then(() => {
+          this.analytics.trackLogin(this.organization, this.person);
+          this.intercom.trackLogin(this.organization, this.person);
+          this.events.publish(EVENT_USER_AUTHENTICATED);
+          loading.dismiss();
+          this.loading = false;
+          if (this.person.name && this.person.name.length > 0) {
+            this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
+          }
+          else {
+            this.showToast(`Welcome to ${this.organization.name}`);
+          }
+          if (this.person.config_profile_reviewed && this.person.config_self_test_sent) {
+            this.showRootPage(CheckinListPage, {
+              organization: this.organization,
+              user: this.person
             });
-          });
+          }
+          else {
+            this.showRootPage(OnboardListPage, {
+              organization: this.organization,
+              user: this.person
+            });
+          }
+        })
+        .catch((error:any) => {
+          this.logger.error(this, "showNext", error);
+          this.loading = false;
+          loading.dismiss();
+          this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
         });
-      },
-      (error:any) => {
-        this.logger.error(this, "showNext", error);
-        this.loading = false;
-        loading.dismiss();
-        this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
-      });
+      }
+  }
+
+  private loadSubscriptions(organization:Organization, person:Person):Promise<Subscription[]> {
+    return new Promise((resolve, reject) => {
+      if (person && person.isOwner()) {
+        this.api.getSubscriptions(organization).then((subscriptions:Subscription[]) => {
+          resolve(subscriptions);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      }
+      else {
+        resolve([]);
+      }
+    });
+  }
+
+  private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<any[]> {
+    let subscription = subscriptions[0];
+    organization.user_id = person.id;
+    organization.user_name = person.name;
+    organization.email = this.email;
+    let saves = [
+      this.storage.setOrganization(organization),
+      this.storage.setSubscription(subscription),
+      this.storage.setUser(person)
+    ];
+    if (this.mobile) {
+      saves.push(this.storage.saveOrganization(organization));
+      saves.push(this.storage.saveSubscription(organization, subscription));
+      saves.push(this.storage.savePerson(organization, person));
     }
+    return Promise.all(saves);
   }
 
   private resetPassword(event:any) {

@@ -1,11 +1,14 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Events, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
-import { BasePage } from '../../pages/base-page/base-page';
+import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
+
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Location } from '../../models/location';
+import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
@@ -13,6 +16,8 @@ import { StorageProvider } from '../../providers/storage/storage';
 import { LocationProvider } from '../../providers/location/location';
 
 import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
+
+import { EVENT_ACCOUNT_DELETED } from '../../constants/events';
 
 @IonicPage({
   name: 'SettingsEditPage',
@@ -25,17 +30,16 @@ import { LocationSuggestComponent } from '../../components/location-suggest/loca
   providers: [ ApiProvider, StorageProvider, LocationProvider ],
   entryComponents:[ ]
 })
-export class SettingsEditPage extends BasePage {
 
-  organization:Organization = null;
-  logo:string = "assets/images/dots.png";
+export class SettingsEditPage extends BasePrivatePage {
 
   @ViewChild("fileInput")
   fileInput:any = null;
+
+  logo:string = "assets/images/logo-dots.png";
   cameraPresent:boolean = true;
   cameraRollPresent:boolean = true;
   search:string = null;
-
   locations:Location[] = [];
   timer:any = null;
 
@@ -54,17 +58,19 @@ export class SettingsEditPage extends BasePage {
       protected storage:StorageProvider,
       protected camera:CameraProvider,
       protected location:LocationProvider) {
-      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController);
-  }
-
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
-    this.loadCamera();
+      super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.organization = this.getParameter<Organization>("organization");
+    let loading = this.showLoading("Loading...");
+    this.loadUpdates(true).then((loaded:any) => {
+      loading.dismiss();
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showToast(error);
+    });
   }
 
   ionViewDidEnter() {
@@ -74,6 +80,48 @@ export class SettingsEditPage extends BasePage {
         organization: this.organization.name
       });
     }
+  }
+
+  private loadUpdates(cache:boolean=true, event:any=null) {
+    this.logger.info(this, "loadUpdates");
+    return Promise.resolve()
+      .then(() => { return this.loadOrganization(cache); })
+      .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadCamera(); })
+      .then(() => { return this.loadCameraRoll(); })
+      .then(() => {
+        this.logger.info(this, "loadUpdates", "Loaded");
+        if (event) {
+          event.complete();
+        }
+      })
+      .catch((error) => {
+        this.logger.error(this, "loadUpdates", "Failed", error);
+        if (event) {
+          event.complete();
+        }
+        this.showToast(error);
+      });
+  }
+
+  private loadCamera():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.camera.cameraPresent().then((cameraPresent:boolean) => {
+        this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
+        this.cameraPresent = cameraPresent;
+        resolve(cameraPresent);
+      });
+    });
+  }
+
+  private loadCameraRoll():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
+        this.logger.info(this, "loadCameraRoll", "cameraRollPresent", cameraRollPresent);
+        this.cameraRollPresent = cameraRollPresent;
+        resolve(cameraRollPresent);
+      });
+    });
   }
 
   private cancelEdit(event:any) {
@@ -93,17 +141,6 @@ export class SettingsEditPage extends BasePage {
     (error:any) => {
       loading.dismiss();
       this.showAlert("Problem Updating Organization", error);
-    });
-  }
-
-  private loadCamera() {
-    this.camera.cameraPresent().then((cameraPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraPresent", cameraPresent);
-      this.cameraPresent = cameraPresent;
-    });
-    this.camera.cameraRollPresent().then((cameraRollPresent:boolean) => {
-      this.logger.info(this, "loadCamera", "cameraRollPresent", cameraRollPresent);
-      this.cameraRollPresent = cameraRollPresent;
     });
   }
 
@@ -214,6 +251,40 @@ export class SettingsEditPage extends BasePage {
       this.organization.location = location.address;
       this.locations = [];
     });
+  }
+
+  private deleteOrganizationAccount(event:any) {
+    let buttons = [
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          if (this.user && this.user.isOwner()) {
+            this.api.deleteOrganization(this.organization).then((deleted:any) => {
+              this.events.publish(EVENT_ACCOUNT_DELETED);
+              loading.dismiss();
+              this.showToast("Your Organization Account has been deleted");
+              this.hideModal({
+                deleted: true
+              });
+              this.showRootPage(SigninUrlPage, {});
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.showAlert("Problem Deleting Organization Acount", error);
+            });
+          }
+        }
+      },
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteOrganizationAccount", "Cancelled");
+        }
+      }
+    ];
+    this.showConfirm("Delete Organization Account", "Are you sure you want to delete your organization account?", buttons);
   }
 
 }

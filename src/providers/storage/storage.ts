@@ -92,6 +92,22 @@ export class StorageProvider {
     });
   }
 
+  public has(key:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.get(key).then((data:any) => {
+        if (data) {
+          resolve(true);
+        }
+        else {
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
+
   public remove(key:string):Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
@@ -99,7 +115,7 @@ export class StorageProvider {
           resolve(true);
         },
         (error:any) => {
-          reject(error);
+          resolve(false);
         });
       }
       else {
@@ -179,6 +195,10 @@ export class StorageProvider {
 
   // ########## USER ##########
 
+  public hasUser():Promise<boolean> {
+    return this.has("user");
+  }
+
   public getUser():Promise<User> {
     return new Promise((resolve, reject) => {
       this.get("user").then((data:any) => {
@@ -221,6 +241,10 @@ export class StorageProvider {
   }
 
   // ########## ORGANIZATION ##########
+
+  public hasOrganization():Promise<boolean> {
+    return this.has("organization");
+  }
 
   public getOrganization():Promise<Organization> {
     return new Promise((resolve, reject) => {
@@ -1411,6 +1435,22 @@ export class StorageProvider {
 
   // ########## SUBSCRIPTIONS ##########
 
+  public hasSubscription():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.get("subscription").then((data:any) => {
+        if (data) {
+          resolve(true);
+        }
+        else {
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
+
   public saveSubscription(organization:Organization, subscription:Subscription):Promise<boolean> {
     return new Promise((resolve, reject) => {
       subscription.organization_id = organization.id;
@@ -1588,6 +1628,14 @@ export class StorageProvider {
         resolve(false);
       });
     });
+  }
+
+  public getVerificationCode():Promise<string> {
+    return this.get('verification_code');
+  }
+
+  public setVerificationCode(code:string):Promise<any> {
+    return this.set('verification_code', code);
   }
 
 }

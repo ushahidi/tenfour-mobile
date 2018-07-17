@@ -1,14 +1,12 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button icon-only menuToggle *ngIf="title" color="primary">
+      <button ion-button icon-only menuToggle *ngIf="title" color="cancel">
         <ion-icon name="menu"></ion-icon>
       </button>
-      <button ion-button color="primary" *ngIf="modal == true" (click)="hideModal($event)">
-        Cancel
-      </button>
+      <button ion-button color="cancel" *ngIf="modal == true" (click)="hideModal($event)">Close</button>
     </ion-buttons>
-    <ion-title *ngIf="profile == false"></ion-title>
+    <ion-title *ngIf="profile == false">Person</ion-title>
     <ion-title *ngIf="profile == true">Profile</ion-title>
     <ion-buttons right *ngIf="user && person">
       <button tappable ion-button color="primary" *ngIf="person.isMe() || user.isOwner() || user.isAdmin()" (click)="editPerson($event)">Edit</button>
@@ -54,6 +52,7 @@
     </ion-item>
     <ion-item color="white" class="role">
       <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      <div item-content class="content" *ngIf="person.role =='owner'">Organization Owner</div>
       <div item-content class="content" *ngIf="person.role =='admin'">Administrator</div>
       <div item-content class="content" *ngIf="person.role =='author'">Author</div>
       <div item-content class="content" *ngIf="person.role =='viewer'">Viewer</div>

@@ -31,18 +31,23 @@
         <h2 [ngClass]="{'activated' : organization && organization.hasProPlan()}">Pro</h2>
         <ion-card [ngClass]="{'activated' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            $3 USD per user, per month
+            {{PRO_FLAT_RATE | currency}} USD per month
           </ion-card-header>
           <ion-card-content>
             <ion-list class="features">
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>5 SMS check-ins per user, per month</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>100 SMS credits per month</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>100 users included</ion-item>
+              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>$5 per month for every additional 25 users</ion-item>
               <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
             </ion-list>
             <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
-              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}} people. (Estimate)</ion-item>
+              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}}
+                <ng-container *ngIf="organization.user_count == 1">person</ng-container>
+                <ng-container *ngIf="organization.user_count > 1">people</ng-container>
+                (Estimate)</ion-item>
               <ion-item><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
               <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
               <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
@@ -61,22 +66,32 @@
         <h2 class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">Extra SMS Credits</h2>
         <ion-card class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">
           <ion-card-header>
-            $0.10 USD per credit per month
+            {{this.CREDIT_BUNDLE_RATE | currency}} USD per credit <span *ngIf="addCreditsRecurring">per month</span>
           </ion-card-header>
           <ion-card-content>
 
             <ion-list class="features">
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Credits do not rollover</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item>
+              <!-- <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item> -->
               <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
             </ion-list>
 
             <div *ngIf="organization && organization.hasProPlan()">
               <p>Add credits</p>
               <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
-              <p>Cost: {{updatedCreditsCost | currency}} per month</p>
+
+              <ion-item color="white">
+                <ion-label>Add extra credits immediately</ion-label>
+                <ion-checkbox [(ngModel)]="addCreditsImmediately"></ion-checkbox>
+              </ion-item>
+
+              <ion-item color="white">
+                <ion-label>Make this a recurring payment</ion-label>
+                <ion-checkbox [(ngModel)]="addCreditsRecurring"></ion-checkbox>
+              </ion-item>
+
+              <p *ngIf="updatedCreditsCost">Cost: {{updatedCreditsCost | currency}} <span *ngIf="addCreditsRecurring">per month</span></p>
             </div>
 
             <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>

@@ -19,6 +19,9 @@ import { LoggerProvider } from '../logger/logger';
 @Injectable()
 export class HttpProvider {
 
+  timeout:number        = 30 * 1000;
+  timeout_upload:number = 240 * 1000;
+
   constructor(
     protected platform:Platform,
     protected http:Http,
@@ -87,12 +90,10 @@ export class HttpProvider {
         });
         this.logger.info(this, "GET", url, params);
         this.http.get(url, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            this.logger.error(this, "httpGet", error);
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((items) => {
             this.logger.info(this, "GET", url, items);
@@ -143,11 +144,10 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "POST", url, json);
@@ -197,11 +197,10 @@ export class HttpProvider {
         });
         this.logger.info(this, "PUT", url, params);
         this.http.put(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "PUT", url, json);
@@ -251,11 +250,10 @@ export class HttpProvider {
         });
         this.logger.info(this, "PATCH", url, params);
         this.http.patch(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((json) => {
             this.logger.info(this, "PATCH", url, json);
@@ -305,11 +303,10 @@ export class HttpProvider {
         });
         this.logger.info(this, "DELETE", url);
         this.http.delete(url, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
-            let message = this.httpError(error);
-            return Observable.throw(message || 'Request Error');
+            return Observable.throw(error || 'Request Error');
           })
           .subscribe((items) => {
             this.logger.info(this, "DELETE", url, items);
@@ -323,53 +320,70 @@ export class HttpProvider {
     });
   }
 
-  protected fileUpload(url:string, token:string, file:string, caption:string,
-             httpMethod:string="POST",
-             mimeType:string='application/binary',
-             acceptType:string="application/json",
-             contentType:string=undefined,
-             contentLength:number=null) {
+  protected fileUpload(url:string, token:string, file:any, httpMethod:string="POST", mimeType:string='application/binary', acceptType:string="application/json", contentType:string=undefined, contentLength:number=null):Promise<any> {
     return new Promise((resolve, reject) => {
-      let fileName = file.substr(file.lastIndexOf('/') + 1).split('?').shift();
-      let headers = {};
-      if (acceptType) {
-        headers['Accept'] = acceptType;
+      if (this.platform.is("cordova")) {
+        let headers = {};
+        if (acceptType) {
+          headers['Accept'] = acceptType;
+        }
+        if (contentType) {
+          headers['Content-Type'] = contentType;
+        }
+        if (contentLength) {
+          headers['Content-Length'] = contentLength;
+        }
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`;
+        }
+        var params = {};
+        var options:FileUploadOptions = {
+          httpMethod: httpMethod,
+          mimeType: mimeType,
+          fileName: file.name,
+          headers: headers,
+          params: params
+        };
+        this.logger.info(this, "UPLOAD", url, file, options);
+        let fileTransfer:FileTransferObject = this.transfer.create();
+        fileTransfer.upload(file, url, options, true).then((data:FileUploadResult) => {
+          this.logger.info(this, "UPLOAD", url, file, data);
+          resolve(data);
+        },
+        (error:FileTransferError) => {
+          this.logger.error(this, "UPLOAD", url, file,
+            "Code", error.code,
+            "Source", error.source,
+            "Target", error.target,
+            "Body", error.body,
+            "Exception", error.exception);
+          reject(error.body || error.exception);
+        });
       }
-      if (contentType) {
-        headers['Content-Type'] = contentType;
+      else {
+        this.logger.info(this, "POST", url);
+        let params:FormData = new FormData();
+        params.append('file', file, file.name);
+        let headers = new Headers(this.httpHeaders(token));
+        let options = new RequestOptions({
+          headers: headers
+        });
+        this.logger.info(this, "POST", url, params);
+        this.http.post(url, params, options)
+          .timeout(this.timeout_upload)
+          .map((res:any) => this.httpResponse(res))
+          .catch((error:any) => {
+            return Observable.throw(error || 'Request Error');
+          })
+          .subscribe((json) => {
+            this.logger.info(this, "POST", url, json);
+            resolve(json);
+          },
+          (error) => {
+            this.logger.error(this, "POST", url, error);
+            reject(this.httpError(error));
+          });
       }
-      if (contentLength) {
-        headers['Content-Length'] = contentLength;
-      }
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-      var params = {};
-      if (caption && caption.length > 0) {
-        params['caption'] = caption;
-      }
-      var options:FileUploadOptions = {
-        httpMethod: httpMethod,
-        mimeType: mimeType,
-        fileName: fileName,
-        headers: headers,
-        params: params
-      };
-      this.logger.info(this, "UPLOAD", url, file, options);
-      let fileTransfer:FileTransferObject = this.transfer.create();
-      fileTransfer.upload(file, url, options, true).then((data:FileUploadResult) => {
-        this.logger.info(this, "UPLOAD", url, file, data);
-        resolve(data);
-      },
-      (error:FileTransferError) => {
-        this.logger.error(this, "UPLOAD", url, file,
-          "Code", error.code,
-          "Source", error.source,
-          "Target", error.target,
-          "Body", error.body,
-          "Exception", error.exception);
-        reject(error.body || error.exception);
-     });
     });
   }
 
@@ -437,19 +451,17 @@ export class HttpProvider {
       else if (typeof error === 'string') {
         return error['error'] || error;
       }
-      else if (typeof error === 'object') {
-        if (error['message']) {
-          return error['message'];
-        }
-        else if (error['error']) {
-          if (error['error'].toString().indexOf("The host could not be resolved") != -1) {
+      else if (typeof error === 'object' && !error['status']) {
+        if (error['_body'] || error['message'] || error['error']) {
+          let message = error['_body'] || error['message'] || error['error']
+          if (message.toString().indexOf("The host could not be resolved") != -1) {
             return "The internet connection appears to be offline";
           }
-          else if (error['error'].toString().indexOf("The Internet connection appears to be offline") != -1) {
+          else if (message.toString().indexOf("The Internet connection appears to be offline") != -1) {
             return "The internet connection appears to be offline";
           }
-          else if (error.headers['content-type'] == "application/json") {
-            let json = JSON.parse(error['error']);
+          else {
+            let json = JSON.parse(message);
             if (json['errors']) {
               let errors = json['errors'];
               let messages = [];
@@ -468,11 +480,14 @@ export class HttpProvider {
               return json['message'];
             }
           }
-          return JSON.stringify(error['error']);
+          return JSON.stringify(message);
         }
       }
       else if (error['status'] == 401) {
         return "Unauthorized";
+      }
+      else if (error['status'] == 402) {
+        return "You do not have enough credits";
       }
       else if (error['status'] == 403) {
         return "Forbidden";

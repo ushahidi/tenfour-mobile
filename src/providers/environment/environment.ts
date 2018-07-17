@@ -14,6 +14,10 @@ export class EnvironmentProvider {
     this.logger.info("Environment", this.environment);
   }
 
+  public isProduction():boolean {
+    return this.environment.appDomain === "app.tenfour.org";
+  }
+
   public getEnvironmentName():string {
     return this.environment.environmentName;
   }
@@ -28,6 +32,14 @@ export class EnvironmentProvider {
 
   public getClientSecret():string {
     return this.environment.clientSecret;
+  }
+
+  public getAppDomain():string {
+    return this.environment.appDomain;
+  }
+
+  public getIntercomAppId():string {
+    return this.environment.intercomAppId;
   }
 
 }

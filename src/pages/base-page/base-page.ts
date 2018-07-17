@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { Content, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
+import { Content, Events, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { BrowserProvider } from '../../providers/browser/browser';
@@ -8,11 +8,12 @@ import { SharingProvider } from '../../providers/sharing/sharing';
 import { KeyboardProvider } from '../../providers/keyboard/keyboard';
 import { InjectorProvider } from '../../providers/injector/injector';
 import { AnalyticsProvider } from '../../providers/analytics/analytics';
+import { IntercomProvider } from '../../providers/intercom/intercom';
 import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 
 @Component({
   selector: 'base-page',
-  templateUrl: 'base-page.html',
+  template: "<ion-header></ion-header><ion-content></ion-content>",
   providers: [ LoggerProvider ],
 })
 export class BasePage {
@@ -32,18 +33,19 @@ export class BasePage {
   protected ios:boolean = false;
   protected website:boolean = false;
   protected desktop:boolean = false;
+  protected modal:boolean = false;
 
   protected zone:NgZone;
-
+  protected events:Events;
+  
   protected statusBar:StatusBarProvider;
   protected keyboard:KeyboardProvider;
   protected logger:LoggerProvider;
   protected network:NetworkProvider;
   protected analytics:AnalyticsProvider;
+  protected intercom:IntercomProvider;
   protected browser:BrowserProvider;
   protected sharing:SharingProvider;
-
-  protected queryParams:string[] = [];
 
   @ViewChild(Content)
   content:Content;
@@ -65,8 +67,10 @@ export class BasePage {
     this.keyboard = InjectorProvider.injector.get(KeyboardProvider);
     this.statusBar = InjectorProvider.injector.get(StatusBarProvider);
     this.analytics = InjectorProvider.injector.get(AnalyticsProvider);
+    this.intercom = InjectorProvider.injector.get(IntercomProvider);
     this.browser = InjectorProvider.injector.get(BrowserProvider);
     this.sharing = InjectorProvider.injector.get(SharingProvider);
+    this.events = InjectorProvider.injector.get(Events);
   }
 
   ionViewDidLoad() {
@@ -79,6 +83,7 @@ export class BasePage {
       this.desktop = this.platform.is('core');
       this.phone = this.platform.is('cordova') && this.platform.is('tablet') == false;
       this.website = this.platform.is('mobileweb') || this.platform.is('cordova') == false;
+      this.modal = this.getParameter<boolean>("modal");
     })
   }
 
@@ -126,7 +131,6 @@ export class BasePage {
   }
 
   protected getParameter<T extends Object>(param:string):T {
-    this.platform.getQueryParam(param)
     if (this.platform.getQueryParam(param) != null) {
       return <T>this.platform.getQueryParam(param);
     }
@@ -182,6 +186,9 @@ export class BasePage {
   }
 
   protected showModal(page:any, params:any={}, options:any={}):Modal {
+    if (params) {
+      params['modal'] = true;
+    }
     let modal = this.modalController.create(page, params, options);
     modal.present();
     return modal;
@@ -192,6 +199,9 @@ export class BasePage {
   }
 
   protected showPage(page:any, params:any={}, options:any={}):Promise<any> {
+    if (params) {
+      params['modal'] = false;
+    }
     return this.navController.push(page, params, options);
   }
 
@@ -204,6 +214,15 @@ export class BasePage {
       return this.viewController.dismiss(data, options);
     }
     return Promise.resolve();
+  }
+
+  protected showModalOrPage(page:any, params:any={}, options:any={}):any {
+    if (document.body.clientWidth > this.WIDTH_LARGE) {
+      return this.showModal(page, params, options);
+    }
+    else {
+      return this.showPage(page, params, options);
+    }
   }
 
   protected showShare(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
@@ -279,19 +298,6 @@ export class BasePage {
       return true;
     }
     return false;
-  }
-
-  protected extractQueryParams() {
-    let matches = location.hash.match(/(.*)\?(.*)/);
-
-    if (matches && matches.length > 1) {
-      let params = matches[2].split(/&/);
-
-      for (let param of params) {
-        let keyValue = param.match(/(.*)=(.*)/);
-        this.queryParams[decodeURIComponent(keyValue[1])] = decodeURIComponent(keyValue[2]);
-      }
-    }
   }
 
 }

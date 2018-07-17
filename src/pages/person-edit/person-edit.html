@@ -1,11 +1,11 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-buttons left>
-      <button ion-button color="primary" (click)="cancelEdit($event)">Cancel</button>
+      <button ion-button color="cancel" (click)="cancelEdit($event)">Cancel</button>
     </ion-buttons>
     <ion-title *ngIf="profile == true">Edit Profile</ion-title>
-    <ion-title *ngIf="profile == false && editing == true">Edit Person</ion-title>
-    <ion-title *ngIf="profile == false && editing == false">Add Person</ion-title>
+    <ion-title *ngIf="profile != true && editing == true">Edit Person</ion-title>
+    <ion-title *ngIf="profile != true && editing == false">Add Person</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" *ngIf="editing == true" (click)="savePersonAndContacts('Updating', $event)">Save</button>
       <button ion-button color="primary" *ngIf="editing == false" (click)="savePersonAndContacts('Creating', $event)">Create</button>
@@ -64,7 +64,7 @@
       <ion-input item-right type="text" autocorrect="off" autocapitalize="yes" placeholder="street address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="person && user && user.isOwnerOrAdmin()">
+  <ion-list *ngIf="person && !person.isOwner() && user && user.isOwnerOrAdmin()">
     <ion-item class="role" color="white">
       <ion-label no-padding no-margin icon-only text-left>
         <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>

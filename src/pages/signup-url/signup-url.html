@@ -9,10 +9,10 @@
 <ion-content>
   <ion-list class="signin">
     <ion-item text-wrap class="heading">
-      <img src="assets/images/dots.png"/>
+      <img src="assets/images/logo-dots.png"/>
       <h2>How should we name your organization's URL?</h2>
     </ion-item>
-    <ion-item class="input">
+    <ion-item color="input" class="input">
       <ion-label fixed>URL</ion-label>
       <h3 item-text item-right>.tenfour.org</h3>
       <ion-input #subdomain type="url" autocorrect="off" autocapitalize="none" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>

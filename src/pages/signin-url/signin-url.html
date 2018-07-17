@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title></ion-title>
+    <ion-title>{{title}}</ion-title>
     <ion-buttons right>
       <button color="primary" #next ion-button text-only [disabled]="subdomain.value.length == 0" (click)="showNext($event)">Next</button>
     </ion-buttons>
@@ -9,11 +9,11 @@
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading">
-      <img class="banner" src="assets/images/banner.png"/>
+      <img class="banner" src="assets/images/logo-banner.png"/>
       <h2>Let's get you signed in.</h2>
       <p>Enter your organization's TenFour web address.</p>
     </ion-item>
-    <ion-item class="input">
+    <ion-item color="input" class="input">
       <ion-label fixed>URL</ion-label>
       <h3 item-text item-right>.tenfour.org</h3>
       <ion-input #subdomain type="url" autocorrect="off" autocapitalize="none" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
