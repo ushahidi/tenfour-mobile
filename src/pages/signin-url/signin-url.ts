@@ -26,6 +26,7 @@ export class SigninUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
+  title:string = null;
 
   constructor(
       protected zone:NgZone,
@@ -44,30 +45,39 @@ export class SigninUrlPage extends BasePublicPage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    if (this.environment.isProduction() == false) {
+      this.title = this.environment.getEnvironmentName().toUpperCase();
+    }
+  }
+
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
     let organizationSubdomain = this.parseOrganizationSubdomain();
-    if (organizationSubdomain && organizationSubdomain != "localhost") {
+    if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
-      this.showNext(undefined);
+      this.showNext();
     }
   }
 
   private parseOrganizationSubdomain() {
-    let hostname = location.hostname;
-    let appDomain = this.environment.getAppDomain();
-    if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
-      let subdomain = hostname.replace('.' + appDomain, '');
-      if (subdomain !== 'app') {
-        this.logger.info(this, 'Subdomain', subdomain);
-        return subdomain;
+    if (this.website) {
+      let hostname = location.hostname;
+      let appDomain = this.environment.getAppDomain();
+      if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
+        let subdomain = hostname.replace('.' + appDomain, '');
+        if (subdomain !== 'app') {
+          this.logger.info(this, 'Subdomain', subdomain);
+          return subdomain;
+        }
       }
     }
     return null;
   }
 
-  private showNext(event:any) {
+  private showNext(event:any=null) {
     this.logger.info(this, "showNext", this.subdomain.value);
     if (this.subdomain.value && this.subdomain.value.length > 0) {
       let subdomain = this.subdomain.value.toLowerCase();
@@ -77,7 +87,6 @@ export class SigninUrlPage extends BasePublicPage {
         loading.dismiss();
         if (organizations && organizations.length > 0) {
           let organization:Organization = organizations[0];
-
           if (!this.redirectToOrganizationSubdomain(organization)) {
             this.storage.setOrganization(organization).then((stored:boolean) => {
               this.showPage(SigninEmailPage, {
@@ -87,9 +96,7 @@ export class SigninUrlPage extends BasePublicPage {
           }
         }
         else {
-          // changing this behaviour to have parity with existing client
-          // this.showPage(SignupEmailPage, {});
-          this.showAlert("Organization not found", `Sorry, that organization doesn't exist.`);
+          this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
         }
       },
       (error:any) => {
@@ -100,19 +107,21 @@ export class SigninUrlPage extends BasePublicPage {
     }
   }
 
-  private redirectToOrganizationSubdomain(organization:Organization) {
-    let appDomain = this.environment.getAppDomain();
-    let extension = '.' + appDomain;
-    let locationSubdomain = location.hostname.replace(extension, '');
-    let subdomain = this.subdomain.value.toLowerCase();
-    if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
-      location.assign(location.protocol
-        + "//"
-        + subdomain
-        + extension
-        + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-        + "/");
-      return true;
+  private redirectToOrganizationSubdomain(organization:Organization):boolean {
+    if (this.website) {
+      let appDomain = this.environment.getAppDomain();
+      let extension = '.' + appDomain;
+      let locationSubdomain = location.hostname.replace(extension, '');
+      let subdomain = this.subdomain.value.toLowerCase();
+      if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
+        location.assign(location.protocol
+          + "//"
+          + subdomain
+          + extension
+          + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+          + "/");
+        return true;
+      }
     }
     return false;
   }

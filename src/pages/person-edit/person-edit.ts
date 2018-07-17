@@ -28,6 +28,8 @@ import { StorageProvider } from '../../providers/storage/storage';
 })
 export class PersonEditPage extends BasePrivatePage {
 
+  MAX_PERSONS_FREE_PLAN:number = 100;
+
   person:Person = null;
   editing:boolean = true;
   profile:boolean = false;
@@ -280,7 +282,7 @@ export class PersonEditPage extends BasePrivatePage {
         this.logger.info(this, "savePerson", "Create", person);
         this.api.getOrganization(this.organization).then((organization:Organization) => {
           if (organization.subscription_plan === 'free-plan' &&
-            organization.user_count >= 50) {
+            organization.user_count >= this.MAX_PERSONS_FREE_PLAN) {
             return reject('You have reached your person quota for your current plan. Please upgrade your plan to add more people.');
           }
 

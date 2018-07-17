@@ -19,6 +19,9 @@ import { LoggerProvider } from '../logger/logger';
 @Injectable()
 export class HttpProvider {
 
+  timeout:number        = 30 * 1000;
+  timeout_upload:number = 240 * 1000;
+
   constructor(
     protected platform:Platform,
     protected http:Http,
@@ -87,7 +90,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "GET", url, params);
         this.http.get(url, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -141,7 +144,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -194,7 +197,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PUT", url, params);
         this.http.put(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -247,7 +250,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PATCH", url, params);
         this.http.patch(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -300,7 +303,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "DELETE", url);
         this.http.delete(url, options)
-          .timeout(12000)
+          .timeout(this.timeout)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -367,7 +370,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(12000)
+          .timeout(this.timeout_upload)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');

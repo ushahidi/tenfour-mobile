@@ -139,7 +139,8 @@ export class SignupPasswordPage extends BasePublicPage {
       this.loading = true;
       let loading = this.showLoading("Signing up...", true);
       Promise.resolve()
-        .then(() => { return this.api.createOrganization(this.organization, this.password.value); })
+        .then(() => { return this.storage.getVerificationCode(); })
+        .then((verificationCode:string) => { return this.api.createOrganization(this.organization, this.password.value, verificationCode); })
         .then((organization:Organization) => { this.organization = organization; return this.api.userLogin(organization, organization.email, this.password.value); })
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })

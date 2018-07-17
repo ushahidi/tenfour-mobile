@@ -73,7 +73,7 @@ export class ApiProvider extends HttpProvider {
           let json = JSON.parse(data);
           let token:Token = <Token>json;
           let now = new Date();
-          if (now > token.expires_at) {
+          if (now < new Date(token.expires_at)) {
             this.logger.info(this, "getToken", "Valid", token);
             resolve(token);
           }
@@ -282,7 +282,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public createOrganization(organization:Organization, password:string):Promise<Organization> {
+  public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/create_organization`;
       let params = {
@@ -292,6 +292,7 @@ export class ApiProvider extends HttpProvider {
         password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
+        verification_code: verificationCode,
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
@@ -749,7 +750,7 @@ export class ApiProvider extends HttpProvider {
 
   public getCheckinForToken(id:number, token:string):Promise<Checkin> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/checkins/${id}&token=${token}`;
+      let url = `${this.api}/checkins/${id}`;
       let params = {
         token: token
       };
@@ -929,7 +930,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public emailReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
+  public tokenReply(checkin:Checkin, reply:Reply, token:string):Promise<Reply> {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/checkins/${checkin.id}/replies`;
       let params = {
@@ -1354,7 +1355,7 @@ export class ApiProvider extends HttpProvider {
           resolve(data);
         },
         (error:any) => {
-          reject(error);
+          reject(`Could not process the CSV, please check the file format and column names and try again`);
         });
       },
       (error:any) => {

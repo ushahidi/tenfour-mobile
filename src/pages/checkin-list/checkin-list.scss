@@ -1,4 +1,7 @@
 page-checkin-list {
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
   ion-segment {
     ion-segment-button {
       ion-badge {
