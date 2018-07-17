@@ -73,7 +73,7 @@ export class ApiProvider extends HttpProvider {
           let json = JSON.parse(data);
           let token:Token = <Token>json;
           let now = new Date();
-          if (now > token.expires_at) {
+          if (now < new Date(token.expires_at)) {
             this.logger.info(this, "getToken", "Valid", token);
             resolve(token);
           }
