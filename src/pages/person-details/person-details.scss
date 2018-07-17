@@ -1,4 +1,7 @@
 page-person-details {
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
   .profile {
     h1 {
     }
