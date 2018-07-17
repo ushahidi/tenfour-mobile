@@ -250,6 +250,7 @@ export class TenFourApp {
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadDeepLinks");
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
         if (deeplink) {
           this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
