@@ -110,7 +110,7 @@ export class SigninUrlPage extends BasePublicPage {
   private redirectToOrganizationSubdomain(organization:Organization):boolean {
     if (this.website) {
       let appDomain = this.environment.getAppDomain();
-      let extension = '.' + appDomain.replace('app', '');
+      let extension = '.' + appDomain.replace('app.', '');
       let locationSubdomain = location.hostname.replace(extension, '');
       let subdomain = this.subdomain.value.toLowerCase();
       if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
