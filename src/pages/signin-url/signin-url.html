@@ -1,6 +1,6 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title></ion-title>
+    <ion-title>{{title}}</ion-title>
     <ion-buttons right>
       <button color="primary" #next ion-button text-only [disabled]="subdomain.value.length == 0" (click)="showNext($event)">Next</button>
     </ion-buttons>

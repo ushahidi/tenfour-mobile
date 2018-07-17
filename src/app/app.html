@@ -30,6 +30,9 @@
       <p text-center *ngIf="user">
         <button ion-button block clear color="primary" (click)="userLogout($event)">Log out</button>
       </p>
+      <p text-center *ngIf="environmentName && apiEndpoint">
+        <button ion-button block clear color="primary" (click)="showAlert(environmentName, apiEndpoint)">{{environmentName}}</button>
+      </p>
     </ion-content>
   </ion-menu>
   <ion-menu #details [content]="content" persistent="true" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">

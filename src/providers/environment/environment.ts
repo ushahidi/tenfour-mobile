@@ -14,6 +14,10 @@ export class EnvironmentProvider {
     this.logger.info("Environment", this.environment);
   }
 
+  public isProduction():boolean {
+    return this.environment.appDomain === "app.tenfour.org";
+  }
+
   public getEnvironmentName():string {
     return this.environment.environmentName;
   }
