@@ -169,7 +169,6 @@ export class CheckinSendPage extends BasePrivatePage {
         .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
         .then(() => {
           this.events.publish(EVENT_CREDITS_CHANGED, this.organization.credits, Date.now());
-          this.api.getOrganization
           loading.dismiss();
           let recipients = this.checkin.recipientIds().length;
           if (recipients == 1) {

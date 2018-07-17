@@ -9,6 +9,8 @@ import { Organization } from '../../models/organization';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+
 @IonicPage()
 @Component({
   selector: 'page-settings-credits',
@@ -17,8 +19,11 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class SettingsCreditsPage  extends BasePrivatePage {
 
   credits:number = 0;
+  creditsEstimate:number = 0;
   billingEstimate:number = 0;
   subscription:Subscription = null;
+  addCreditsImmediately:boolean = true;
+  addCreditsRecurring:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -39,8 +44,11 @@ export class SettingsCreditsPage  extends BasePrivatePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.credits = this.getParameter<number>("credits");
+    this.creditsEstimate = this.getParameter<number>("creditsEstimate");
     this.billingEstimate = this.getParameter<number>("billingEstimate");
     this.organization = this.getParameter<Organization>("organization");
+    this.addCreditsImmediately = this.getParameter<boolean>("addCreditsImmediately");
+    this.addCreditsRecurring = this.getParameter<boolean>("addCreditsRecurring");
   }
 
   ionViewDidEnter() {
@@ -100,21 +108,66 @@ export class SettingsCreditsPage  extends BasePrivatePage {
   }
 
   private doneAdd(event:any) {
-    let loading = this.showLoading("Updating...", true);
-    this.organization.credits_extra = this.credits;
-    this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.storage.saveOrganization(organization).then(saved => {
-        loading.dismiss();
-        this.showToast(this.credits + ' extra credits have been added to your plan');
-        this.hideModal({
-          organization: organization
+    let loading = this.showLoading("Adding credits...", true);
+
+    Promise.resolve()
+    .then(() => {
+      if (this.addCreditsImmediately) {
+        return this.api.addCredits(this.organization, this.subscription, this.credits);
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
+      if (this.addCreditsRecurring) {
+        this.organization.credits_extra = this.credits;
+
+        return this.api.updateOrganization(this.organization).then((organization:Organization) => {
+          this.organization = organization;
+          return this.storage.saveOrganization(organization);
         });
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
+      if (this.addCreditsImmediately) {
+        return new Promise((resolve, reject) => {
+          // HACK HACK HACK server polling - this can be replaced when push notifications land
+          setTimeout(() => {
+            this.api.getOrganization(this.organization)
+            .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
+            .then(() => {
+              this.events.publish(EVENT_CREDITS_CHANGED, this.organization.credits, Date.now());
+              resolve();
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }, 10000);
+        });
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
+      let alert = this.credits + ' extra credits have been added to your account';
+
+      if (this.addCreditsRecurring) {
+        alert += ' (recurring)';
+      }
+
+      loading.dismiss();
+      this.showToast(alert);
+      this.hideModal({
+        organization: this.organization
       });
-    },
-    (error:any) => {
+    })
+    .catch((error:any) => {
       loading.dismiss();
       this.showAlert("Problem adding credits", error);
     });
+
   }
 
 }

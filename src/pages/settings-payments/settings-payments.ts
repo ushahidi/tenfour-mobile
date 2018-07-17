@@ -42,6 +42,8 @@ export class SettingsPaymentsPage extends BasePrivatePage {
   billingEstimate:number = 0;
   updatedCredits:number = 0;
   updatedCreditsCost:number = 0;
+  addCreditsImmediately:boolean = true;
+  addCreditsRecurring:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -166,6 +168,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
             });
           }
           if (retryCount++ > 5) {
+            // HACK HACK HACK server polling - this can be replaced when push notifications land
             reject('Could not switch plans. Try logging out of your account.');
           }
           setTimeout(() => {
@@ -248,10 +251,22 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private addCredits(event:any) {
     this.logger.info(this, "addCredits");
+
+    if (!this.addCreditsImmediately && !this.addCreditsRecurring) {
+      return this.showAlert("Add credits", "Please select an option.");
+    }
+
+    if (!this.updatedCredits || this.updatedCredits <= 0) {
+      return this.showAlert("Add credits", "Please specify how many credits to add.");
+    }
+
     let modal = this.showModal(SettingsCreditsPage, {
       credits: this.updatedCredits,
+      creditsEstimate: this.updatedCredits * this.CREDIT_BUNDLE_RATE,
       billingEstimate: this.calcBillingEstimate(this.updatedCredits),
-      organization: this.organization
+      organization: this.organization,
+      addCreditsImmediately: this.addCreditsImmediately,
+      addCreditsRecurring: this.addCreditsRecurring
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addCredits", "Modal", data);
