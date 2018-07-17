@@ -217,7 +217,7 @@ export class TenFourApp {
         this.logger.info(this, "loadStatusBar", "iOS");
         this.statusBar.setStyle(false);
         this.statusBar.setOverlaysWebView(false);
-        this.statusBar.setColor("#F5F5F1");
+        this.statusBar.setColor("#EDEDED");
       }
       else if (this.android) {
         this.logger.info(this, "loadStatusBar", "Android");
