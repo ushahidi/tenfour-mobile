@@ -9,6 +9,8 @@ import { Organization } from '../../models/organization';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+
 @IonicPage()
 @Component({
   selector: 'page-settings-credits',
@@ -106,7 +108,7 @@ export class SettingsCreditsPage  extends BasePrivatePage {
   }
 
   private doneAdd(event:any) {
-    let loading = this.showLoading("Updating...", true);
+    let loading = this.showLoading("Adding credits...", true);
 
     Promise.resolve()
     .then(() => {
@@ -129,12 +131,32 @@ export class SettingsCreditsPage  extends BasePrivatePage {
       }
     })
     .then(() => {
+      if (this.addCreditsImmediately) {
+        return new Promise((resolve, reject) => {
+          // HACK HACK HACK server polling - this can be replaced when push notifications land
+          setTimeout(() => {
+            this.api.getOrganization(this.organization)
+            .then((organization:Organization) => { this.organization = organization; return this.storage.setOrganization(organization); })
+            .then(() => {
+              this.events.publish(EVENT_CREDITS_CHANGED, this.organization.credits, Date.now());
+              resolve();
+            },
+            (error:any) => {
+              reject(error);
+            });
+          }, 10000);
+        });
+      } else {
+        return Promise.resolve(true);
+      }
+    })
+    .then(() => {
       let alert = this.credits + ' extra credits have been added to your account';
 
       if (this.addCreditsRecurring) {
         alert += ' (recurring)';
       }
-      
+
       loading.dismiss();
       this.showToast(alert);
       this.hideModal({
