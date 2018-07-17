@@ -13,18 +13,22 @@ export class LoggerProvider {
     private platform:Platform) {
     this.platform.ready().then(() => {
       if (this.platform.is("cordova")) {
-        this.isDebug.getIsDebug().then(
-          (isDebug:boolean) => {
-            this.enabled = isDebug;
-          },
-          (error:any) => {
-            this.enabled = false;
-          });
+        this.isDebug.getIsDebug().then((isDebug:boolean) => {
+          console.log(`LoggerProvider isDebug ${isDebug}`);
+          // this.enabled = isDebug;
+          this.enabled = true;
+        },
+        (error:any) => {
+          console.error(`LoggerProvider ${error}`);
+          this.enabled = false;
+        });
       }
       else if (isDevMode()) {
+        console.log(`LoggerProvider isDevMode`);
         this.enabled = true;
       }
       else {
+        console.log(`LoggerProvider Fallback`);
         this.enabled = false;
       }
     });

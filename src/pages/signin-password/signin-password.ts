@@ -191,7 +191,7 @@ export class SigninPasswordPage extends BasePublicPage {
   }
 
   private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<any[]> {
-    let subscription = subscriptions[0];
+    let subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
     organization.user_id = person.id;
     organization.user_name = person.name;
     organization.email = this.email;

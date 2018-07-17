@@ -31,24 +31,31 @@ export class AnalyticsProvider {
     });
   }
 
-  public trackLogin(organization:Organization, user:User) {
+  public trackLogin(organization:Organization, user:User):Promise<any> {
     if (organization && user) {
-      this.trackIdentify(user.id, {
+      let traits = {
         app: this.appName(),
         device: this.deviceName(),
         organization: organization.name,
         person: user.name,
         email: organization.email
+      };
+      return this.trackIdentify(user.id, traits).then(() => {
+        this.logger.info(this, "trackLogin", user, traits || "", "Posted");
+      },
+      (error) => {
+        this.logger.info(this, "trackLogin", error, "Failed");
       });
     }
+    return Promise.resolve();
   }
 
   public trackIdentify(user:any, traits:any=null):Promise<any> {
     return this.segment.identify("" + user, traits).then(() => {
-      this.logger.info(this, "trackIdentify", user, traits|| "", "Posted");
+      this.logger.info(this, "trackIdentify", user, traits || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackIdentify", user, traits|| "", "Failed", error);
+      this.logger.error(this, "trackIdentify", user, traits || "", "Failed", error);
     });
   }
 
@@ -58,7 +65,7 @@ export class AnalyticsProvider {
       this.logger.info(this, "trackPage", name, properties || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackPage", name, properties|| "", "Failed", error);
+      this.logger.error(this, "trackPage", name, properties || "", "Failed", error);
     });
   }
 

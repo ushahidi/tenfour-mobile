@@ -66,8 +66,8 @@ cordova plugin add cordova-plugin-nativestorage@2.2.2
 #### Debug iOS
 ```
 cordova run ios --list
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 11.4"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 11.4"
 ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 11.3"
 ENV=prod ionic cordova run ios --livereload --consolelogs --device --debug
 ```
@@ -88,7 +88,7 @@ ENV=prod ionic serve --livereload --consolelogs
 ```
 rvm use system
 ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
-ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
+ENV=prod ionic cordova build ios --debug --buildConfig=build.json
 ```
 #### Release Android
 ```
