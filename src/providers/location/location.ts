@@ -54,7 +54,7 @@ export class LocationProvider {
             reject(null);
           }
         }).catch((error:any) => {
-          this.logger.error(this, "detectLocation", error);
+          this.logger.warn(this, "detectLocation", error);
           reject(null);
         });
       }
