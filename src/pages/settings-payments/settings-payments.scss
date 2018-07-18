@@ -1,6 +1,7 @@
 page-settings-payments {
-  background-color: color($colors, white);
-
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
   .extra-sms-credits {
     opacity: .7;
 
