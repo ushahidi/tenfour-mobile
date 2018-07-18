@@ -11,6 +11,7 @@ import { Token } from '../../models/token';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { FirebaseProvider } from '../../providers/firebase/firebase';
 
 import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
@@ -54,7 +55,8 @@ export class SignupPasswordPage extends BasePublicPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected firebase:FirebaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -145,6 +147,7 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
+        .then(() => { return this.updateFirebase(this.organization, this.person); })
         .then(() => {
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
@@ -169,6 +172,26 @@ export class SignupPasswordPage extends BasePublicPage {
           this.showAlert("Problem Creating Organization", error);
         });
       }
+  }
+
+  private updateFirebase(organization:Organization, person:Person):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.getFirebase().then((token:string) => {
+        this.logger.info(this, "updateFirebase", token);
+        this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
+          this.logger.error(this, "updateFirebase", token, updated, "Updated");
+          resolve(updated);
+        },
+        (error:any) => {
+          this.logger.error(this, "updateFirebase", token, error);
+          resolve(false);
+        });
+      },
+      (error:any) => {
+        this.logger.error(this, "updateFirebase", error);
+        resolve(false);
+      });
+    });
   }
 
   private saveChanges(organization:Organization, person:Person) {

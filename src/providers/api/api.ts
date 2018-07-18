@@ -1447,4 +1447,22 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
+
+  public updateFirebase(organization:Organization, person:Person, token:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/person/${person.id}/tokens`;
+        let params = { };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
 }
