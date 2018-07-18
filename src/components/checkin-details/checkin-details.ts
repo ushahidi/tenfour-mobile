@@ -27,15 +27,10 @@ export class CheckinDetailsComponent {
   @Output()
   resendClicked = new EventEmitter();
 
-  hasRespondClicked:boolean = false;
-  hasResendClicked:boolean = false;
-
   constructor() {
   }
 
   ngOnInit() {
-    this.hasRespondClicked = this.respondClicked && this.respondClicked.observers.length > 0;
-    this.hasResendClicked = this.resendClicked && this.resendClicked.observers.length > 0;
   }
 
   onRespondClicked(event:any) {

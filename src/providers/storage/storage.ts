@@ -78,7 +78,7 @@ export class StorageProvider {
           resolve(data);
         },
         (error:any) => {
-          reject(error);
+          resolve(null);
         });
       }
       else {
@@ -1453,13 +1453,18 @@ export class StorageProvider {
 
   public saveSubscription(organization:Organization, subscription:Subscription):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      subscription.organization_id = organization.id;
-      this.provider.saveModel(subscription).then((saved:any) => {
-        resolve(true);
-      },
-      (error:any) => {
+      if (subscription) {
+        subscription.organization_id = organization.id;
+        this.provider.saveModel(subscription).then((saved:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
         resolve(false);
-      });
+      }
     });
   }
 

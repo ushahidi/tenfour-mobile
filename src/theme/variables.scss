@@ -79,18 +79,19 @@ $colors: (
 
 $background-color: color($colors, background);
 $toolbar-text-color: color($colors, text);
+$modal-inset-height-small: 90%;
 
 // App Web Variables
 // --------------------------------------------------
 // Web only Sass variables can go here
 
-$modal-inset-height-small: 90%;
+$font-family-base: "Lato-Regular", "Roboto", "Helvetica Neue", sans-serif;
 
 // App iOS Variables
 // --------------------------------------------------
 // iOS only Sass variables can go here
 
-$font-family-ios-base: "Lato-Regular";
+$font-family-ios-base: -apple-system, "Helvetica Neue", "Roboto", sans-serif;
 $toolbar-ios-text-color: color($colors, primary);
 $toolbar-ios-button-color: color($colors, primary);
 $card-ios-background-color: color($colors, card);
@@ -99,7 +100,7 @@ $card-ios-background-color: color($colors, card);
 // --------------------------------------------------
 // Material Design only Sass variables can go here
 
-$font-family-md-base: "Lato-Regular";
+$font-family-md-base: "Roboto", "Helvetica Neue", sans-serif;
 $toolbar-md-text-color: color($colors, primary);
 $toolbar-md-button-color: color($colors, primary);
 $card-md-background-color: color($colors, card);
@@ -108,7 +109,7 @@ $card-md-background-color: color($colors, card);
 // --------------------------------------------------
 // Windows only Sass variables can go here
 
-$font-family-wp-base: "Lato-Regular";
+$font-family-wp-base: "Lato-Regular", "Roboto", "Helvetica Neue", sans-serif;
 $toolbar-wp-text-color: color($colors, primary);
 $toolbar-wp-button-color: color($colors, primary);
 $card-wp-background-color: color($colors, card);

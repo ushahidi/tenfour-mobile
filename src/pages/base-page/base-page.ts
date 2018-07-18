@@ -37,7 +37,7 @@ export class BasePage {
 
   protected zone:NgZone;
   protected events:Events;
-  
+
   protected statusBar:StatusBarProvider;
   protected keyboard:KeyboardProvider;
   protected logger:LoggerProvider;
@@ -108,19 +108,6 @@ export class BasePage {
 
   ionViewWillUnload() {
     this.logger.info(this, "ionViewWillUnload");
-  }
-
-  protected loadStatusBar(lightContent:boolean=true) {
-    this.platform.ready().then(() => {
-      if (lightContent) {
-        this.statusBar.setStyle(true);
-        this.statusBar.setColor('#3F4751');
-      }
-      else {
-        this.statusBar.setStyle(false);
-        this.statusBar.setColor('#F9F9F8');
-      }
-    });
   }
 
   protected hasParameter(param:string):boolean {

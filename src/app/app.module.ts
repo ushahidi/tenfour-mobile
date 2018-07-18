@@ -138,6 +138,7 @@ import { ContactsProvider } from '../providers/contacts/contacts';
 import { MailerProvider } from '../providers/mailer/mailer';
 import { EnvironmentProvider } from '../providers/environment/environment';
 import { IntercomProvider } from '../providers/intercom/intercom';
+import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
 
 @NgModule({
   declarations: [
@@ -282,7 +283,8 @@ import { IntercomProvider } from '../providers/intercom/intercom';
     { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: EnvironmentProvider, useClass: EnvironmentProvider },
     { provide: IntercomProvider, useClass: IntercomProvider },
-    { provide: ErrorHandler, useClass: IonicErrorHandler }
+    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    { provide: ThumbnailProvider, useClass: ThumbnailProvider },
   ]
 })
 export class AppModule {}

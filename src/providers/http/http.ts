@@ -44,14 +44,31 @@ export class HttpProvider {
     return headers;
   }
 
+  private httpParameters(params:any=null):any {
+    let parameters = {};
+    if (params) {
+      for (let key of Object.keys(params)) {
+        let value = params[key];
+        if (typeof value == 'number') {
+          parameters[key] = "" + value;
+        }
+        else {
+          parameters[key] = value;
+        }
+      }
+    }
+    return parameters;
+  }
+
   protected httpGet(url:string, params:any={}, token:string=null):Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = this.httpHeaders(token);
-        this.logger.info(this, "GET", url, params, headers);
+        let parameters = this.httpParameters(params);
+        this.logger.info(this, "GET", url, parameters, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.get(url, params, headers).then((response:any) => {
+        this.httpNative.get(url, parameters, headers).then((response:any) => {
           if (response.data) {
             if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
@@ -111,12 +128,12 @@ export class HttpProvider {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = this.httpHeaders(token, "application/json");
+        let parameters = this.httpParameters(params);
         this.logger.info(this, "POST", url, params, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.post(url, params, headers).then((response:any) => {
+        this.httpNative.post(url, parameters, headers).then((response:any) => {
           if (response.data) {
-            this.logger.info(this, "POST", url, response.status, response.headers, response.data);
             if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
               this.logger.info(this, "POST", url, response.status, data);
@@ -165,10 +182,11 @@ export class HttpProvider {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = this.httpHeaders(token, "application/json");
-        this.logger.info(this, "PUT", url, params, headers);
+        let parameters = this.httpParameters(params);
+        this.logger.info(this, "PUT", url, parameters, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.put(url, params, headers).then((response:any) => {
+        this.httpNative.put(url, parameters, headers).then((response:any) => {
           if (response.data) {
             if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
@@ -218,10 +236,11 @@ export class HttpProvider {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = this.httpHeaders(token, "application/json");
-        this.logger.info(this, "PATCH", url, params, headers);
+        let parameters = this.httpParameters(params);
+        this.logger.info(this, "PATCH", url, parameters, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.patch(url, params, headers).then((response:any) => {
+        this.httpNative.patch(url, parameters, headers).then((response:any) => {
           if (response.data) {
             if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
@@ -271,10 +290,11 @@ export class HttpProvider {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = this.httpHeaders(token);
-        this.logger.info(this, "DELETE", url, params, headers);
+        let parameters = this.httpParameters(params);
+        this.logger.info(this, "DELETE", url, parameters, headers);
         this.httpNative.setRequestTimeout(30);
         this.httpNative.setDataSerializer("json");
-        this.httpNative.delete(url, params, headers).then((response:any) => {
+        this.httpNative.delete(url, parameters, headers).then((response:any) => {
           if (response.data) {
             if (response.headers['content-type'].indexOf("application/json") != -1) {
               let data = JSON.parse(response.data);
