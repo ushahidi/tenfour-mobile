@@ -62,7 +62,7 @@ export class Checkin extends Model {
           this.replies.push(reply);
         }
         if (data.recipients) {
-          this.waiting_count = data.recipients.length - data.replies.length;
+          this.waiting_count = this.recipientsPending().length;
         }
       }
       if (data.user) {
