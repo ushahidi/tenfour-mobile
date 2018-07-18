@@ -147,15 +147,8 @@ export class CheckinEditPage extends BasePrivatePage {
     else if (this.checkin.hasDuplicateAnswers()) {
       this.showAlert("Duplicate Answers", "Answers must be unique.");
     }
-    else if (this.tablet || this.website) {
-      this.showModal(CheckinSendPage, {
-        organization: this.organization,
-        user: this.user,
-        checkin: this.checkin
-      });
-    }
     else {
-      this.showPage(CheckinSendPage, {
+      this.showModal(CheckinSendPage, {
         organization: this.organization,
         user: this.user,
         checkin: this.checkin
@@ -168,13 +161,13 @@ export class CheckinEditPage extends BasePrivatePage {
     this.checkin.answers.push(new Answer({
       icon: "icon-exclaim",
       type: "negative",
-      color: "#E8C440",
+      color: "#E7C24D",
       answer: "No"
     }));
     this.checkin.answers.push(new Answer({
       icon: "icon-check",
       type: "positive",
-      color: "#58AC5D",
+      color: "#5BAA61",
       answer: "Yes"
     }));
   }
