@@ -14,6 +14,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
 import { LocationProvider } from '../../providers/location/location';
+import { ThumbnailProvider } from '../../providers/thumbnail/thumbnail';
 
 import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
 
@@ -27,7 +28,7 @@ import { EVENT_ACCOUNT_DELETED } from '../../constants/events';
 @Component({
   selector: 'page-settings-edit',
   templateUrl: 'settings-edit.html',
-  providers: [ ApiProvider, StorageProvider, LocationProvider ],
+  providers: [ ApiProvider, StorageProvider, LocationProvider, ThumbnailProvider ],
   entryComponents:[ ]
 })
 
@@ -57,7 +58,8 @@ export class SettingsEditPage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider,
       protected camera:CameraProvider,
-      protected location:LocationProvider) {
+      protected location:LocationProvider,
+      protected thumbnail:ThumbnailProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -195,14 +197,19 @@ export class SettingsEditPage extends BasePrivatePage {
       let reader = new FileReader();
       let file = event.target.files[0];
       reader.readAsDataURL(file);
-      reader.onload = () => {
-        let imageData = reader.result.split(',')[1];
-        if (imageData) {
-          this.organization.profile_picture = 'data:image/jpeg;base64,' + imageData;
-        }
-        else {
-          this.organization.profile_picture = null;
-        }
+      reader.onload = (e) => {
+        let img = document.createElement("img");
+        img.src = reader.result;
+        img.onload = function () {
+          let imageData = this.thumbnail.toThumbnailDataURL(img);
+
+          if (imageData) {
+            this.organization.profile_picture = imageData;
+          }
+          else {
+            this.organization.profile_picture = null;
+          }
+        }.bind(this);
       };
     }
   }
