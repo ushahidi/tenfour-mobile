@@ -2,7 +2,7 @@
   <ion-item text-wrap color="white">
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1 text-center>{{checkin.message}}</h1>
-    <p text-center>{{checkin.created_at | dateTime}} <strong> {{checkin.user_name}}</strong></p>
+    <p text-center>{{checkin.created_at | dateTime}}, <strong> {{checkin.user_name}}</strong></p>
   </ion-item>
 </ion-list>
 <div class="buttons" margin-top margin-bottom *ngIf="checkin && checkin.reply">
