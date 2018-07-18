@@ -250,9 +250,10 @@ export class TenFourApp {
 
   private loadDeepLinks():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadDeepLinks");
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
-        this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
         if (deeplink) {
+          this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
           if (deeplink.path === '/organization/email/confirmation/') {
             let email = deeplink.parameters['email'];
             let code = deeplink.parameters['code'];
@@ -327,6 +328,7 @@ export class TenFourApp {
 
   private loadNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
         this.logger.info(this, "loadNotifications", "Loaded");
         resolve(true);
@@ -372,7 +374,6 @@ export class TenFourApp {
         this.logger.info(this, "loadWebApp", this.locationHash(), "Organization", "None");
         if (this.hasRootPage() == false) {
           this.logger.info(this, "redirecting to showSigninUrl");
-
           if (this.platform.getQueryParam('email')) {
               this.showSignupPage();
           } else {
@@ -408,7 +409,7 @@ export class TenFourApp {
             },
             (error:any) => {
               this.logger.info(this, "loadMobileApp", "User", "None");
-              this.showOnboardList();
+              this.showSigninUrl();
               resolve(true);
             });
           }
