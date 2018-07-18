@@ -41,6 +41,10 @@ export class PersonProfilePage extends PersonDetailsPage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, api, storage);
+  }
+
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
     this.profile = true;
   }
 
