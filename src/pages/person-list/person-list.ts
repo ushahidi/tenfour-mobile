@@ -173,7 +173,7 @@ export class PersonListPage extends BasePrivatePage {
         this.loadPeople(true).then((finished:any) => {
           loading.dismiss();
           if (data.person) {
-            this.showPerson(data.person);
+            this.showPerson(this.organization.people.find((p) => { return p.id === data.person.id; }));
           }
         },
         (error:any) => {
