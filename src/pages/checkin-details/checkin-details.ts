@@ -75,7 +75,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadCheckin(false); })
+      .then(() => { return this.loadCheckin(cache); })
       .then(() => { return this.loadReplies(false); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -140,11 +140,12 @@ export class CheckinDetailsPage extends BasePrivatePage {
             resolve(replies);
           },
           (error:any) => {
+            this.logger.error(this, "loadReplies", error);
             resolve(replies);
           });
         },
         (error:any) => {
-          resolve(null);
+          reject(error);
         });
     });
   }
