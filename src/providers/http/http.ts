@@ -19,8 +19,8 @@ import { LoggerProvider } from '../logger/logger';
 @Injectable()
 export class HttpProvider {
 
-  timeout:number        = 30 * 1000;
-  timeout_upload:number = 240 * 1000;
+  timeout:number        = 1 * 60 * 1000;
+  timeout_upload:number = 5 * 60 * 1000;
 
   constructor(
     protected platform:Platform,
