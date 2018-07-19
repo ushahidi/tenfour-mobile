@@ -1342,7 +1342,7 @@ export class StorageProvider {
         organization_id: organization.id,
         id: group.id
       };
-      this.provider.removeModel<Group>(new Group(), where);
+      this.provider.removeModel<Group>(new Group(), where).then(resolve, reject);
     });
   }
 

@@ -205,14 +205,14 @@ export class GroupEditPage extends BasePrivatePage {
   }
 
   private deleteGroup(event:any) {
-    this.logger.info(this, "createGroup");
+    this.logger.info(this, "deleteGroup");
     let buttons = [
       {
         text: 'Delete',
         handler: () => {
           let loading = this.showLoading("Removing...", true);
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
-            this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
+            return this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
               loading.dismiss();
               this.showToast("Group removed from organization");
               this.hideModal({deleted: true});
