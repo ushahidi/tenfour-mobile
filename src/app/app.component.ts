@@ -330,7 +330,15 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
-        this.logger.info(this, "loadNotifications", "Loaded");
+        if (loaded) {
+          this.logger.info(this, "loadNotifications", "Loaded");
+          this.firebase.onNotification().subscribe((notification:any) => {
+            this.logger.info(this, "loadNotifications", "onNotification", notification);
+          });
+        }
+        else {
+          this.logger.warn(this, "loadNotifications", "Not Loaded");
+        }
         resolve(true);
       },
       (error:any) => {

@@ -179,4 +179,5 @@
         <variable name="ANDROID_SUPPORT_VERSION" value="26.+" />
     </plugin>
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
+    <allow-navigation href="http://169.254.69.103:8100" />
 </widget>
