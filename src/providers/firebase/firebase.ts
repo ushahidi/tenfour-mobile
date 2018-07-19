@@ -3,13 +3,6 @@ import { Platform } from 'ionic-angular';
 
 import { Observable } from "rxjs/Observable"
 import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/retry';
-import 'rxjs/add/operator/delay';
-import 'rxjs/add/operator/catch';
-import 'rxjs/add/operator/timeout';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/observable/throw';
 
 import { Firebase } from '@ionic-native/firebase';
 
@@ -30,6 +23,7 @@ export class FirebaseProvider {
 
   public initialize():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "initialize");
       if (this.platform.is("cordova")) {
         this.getToken().then((token:string) => {
           this.logger.info(this, "initialize", token);
@@ -90,6 +84,7 @@ export class FirebaseProvider {
 
   public getToken():Promise<string> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "getToken");
       if (this.platform.is("cordova")) {
         if (this.token) {
           this.logger.info(this, "getToken", this.token, "Cached");

@@ -13,6 +13,8 @@ import { Reply } from '../../models/reply';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_CHECKIN_RECEIVED } from '../../constants/events';
+
 @IonicPage({
   name: 'CheckinDetailsPage',
   segment: 'checkins/:checkin_id',
@@ -67,6 +69,31 @@ export class CheckinDetailsPage extends BasePrivatePage {
         checkin: this.checkin.message
       });
     }
+    this.events.subscribe(EVENT_CHECKIN_RECEIVED, (checkinId:number) => {
+      this.logger.info(this, EVENT_CHECKIN_RECEIVED, checkinId);
+      if (this.checkin.id === checkinId) {
+        let alert = this.showAlert("Check-In Received", "This Check-In has received a new response.");
+        alert.onDidDismiss(data => {
+          let loading = this.showLoading("Loading...");
+          Promise.resolve()
+            .then(() => { return this.loadCheckin(false); })
+            .then(() => { return this.loadReplies(false); })
+            .then(() => {
+              loading.dismiss();
+              this.logger.info(this, "loadUpdates", "Loaded");
+            })
+            .catch((error) => {
+              loading.dismiss();
+              this.logger.error(this, "loadUpdates", "Failed", error);
+            });
+        });
+      }
+    });
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    this.events.unsubscribe(EVENT_CHECKIN_RECEIVED);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -85,7 +112,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
         this.loading = false;
       })
       .catch((error) => {
-        this.logger.info(this, "loadUpdates", "Failed", error);
+        this.logger.error(this, "loadUpdates", "Failed", error);
         if (event) {
           event.complete();
         }
@@ -103,8 +130,8 @@ export class CheckinDetailsPage extends BasePrivatePage {
         this.checkin = this.getParameter<Checkin>("checkin");
         resolve(this.checkin);
       }
-      else if (this.hasParameter("checkin_id")){
-        let checkinId = this.getParameter<number>("checkin_id");
+      else if (this.hasParameter("checkin_id") || this.checkin) {
+        let checkinId = this.getParameter<number>("checkin_id") || this.checkin.id;
         this.promiseFallback(cache,
           this.storage.getCheckin(this.organization, checkinId),
           this.api.getCheckin(this.organization, checkinId)).then((checkin:Checkin) => {

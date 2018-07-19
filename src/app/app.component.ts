@@ -69,6 +69,7 @@ import {
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
   EVENT_CHECKIN_DETAILS,
+  EVENT_CHECKIN_RECEIVED,
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
 
@@ -333,13 +334,19 @@ export class TenFourApp {
         if (loaded) {
           this.logger.info(this, "loadNotifications", "Loaded");
           this.firebase.onNotification().subscribe((notification:any) => {
-            this.logger.info(this, "loadNotifications", "onNotification", notification);
+            this.logger.info(this, "onNotification", notification);
+            if (notification && notification['type'] == EVENT_CHECKIN_RECEIVED) {
+              let checkinId = notification['checkin_id'];
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_RECEIVED, checkinId);
+              this.events.publish(EVENT_CHECKIN_RECEIVED, checkinId);
+            }
           });
+          resolve(true);
         }
         else {
           this.logger.warn(this, "loadNotifications", "Not Loaded");
+          resolve(false);
         }
-        resolve(true);
       },
       (error:any) => {
         this.logger.error(this, "loadNotifications", "Failed", error);
