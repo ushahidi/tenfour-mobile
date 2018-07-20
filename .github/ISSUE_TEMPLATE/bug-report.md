@@ -16,7 +16,7 @@ about: Report something that is broken or not working as intended.
 - [ ] staging.tenfour.org
 - [ ] dev.tenfour.org
 - [ ] localhost:8100
-- [ ] iOS App
-- [ ] iOS TestFlight
-- [ ] Android App
-- [ ] Android Beta
+- [ ] iOS App (live)
+- [ ] iOS App (testflight)
+- [ ] Android App (live)
+- [ ] Android App (beta)
