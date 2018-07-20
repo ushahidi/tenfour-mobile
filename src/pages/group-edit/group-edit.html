@@ -43,6 +43,6 @@
     </ion-item>
   </ion-list>
   <div padding-left padding-right padding-bottom *ngIf="group && group.id">
-    <button ion-button block color="danger" *ngIf="person && person.isOwnerOrAdmin()" (click)="deleteGroup($event)">Remove Group</button>
+    <button ion-button block color="danger" *ngIf="user && user.isOwnerOrAdmin()" (click)="deleteGroup($event)">Remove Group</button>
   </div>
 </ion-content>

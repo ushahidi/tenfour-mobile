@@ -76,7 +76,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckin(cache); })
-      .then(() => { return this.loadReplies(cache); })
+      .then(() => { return this.loadReplies(false); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -138,7 +138,14 @@ export class CheckinDetailsPage extends BasePrivatePage {
           this.storage.saveReplies(this.organization,  this.checkin, replies).then((saved:boolean) => {
             this.checkin.replies = replies;
             resolve(replies);
+          },
+          (error:any) => {
+            this.logger.error(this, "loadReplies", error);
+            resolve(replies);
           });
+        },
+        (error:any) => {
+          reject(error);
         });
     });
   }
