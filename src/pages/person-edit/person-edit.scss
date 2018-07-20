@@ -1,12 +1,10 @@
 page-person-edit {
   .phone {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
   }
   .email {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
     ion-label {
       margin-left: 0 !important;
@@ -19,7 +17,6 @@ page-person-edit {
   }
   .address {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
     ion-label {
       margin-left: 0 !important;
