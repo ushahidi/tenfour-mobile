@@ -1,7 +1,9 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons left *ngIf="modal == true">
-      <button ion-button color="cancel" (click)="close($event)">Close</button>
+    <ion-buttons left>
+      <button ion-button icon-only menuToggle color="cancel">
+        <ion-icon name="menu"></ion-icon>
+      </button>
     </ion-buttons>
     <ion-title>Notifications</ion-title>
   </ion-navbar>
@@ -134,6 +136,22 @@
         <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
         <h2>
           <strong>Your Subscription Plan has Changed</strong> You will be billed {{notification.billing_estimate | currency}} (estimate) on {{notification.billing_next | dateTime}}.
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'CreditsLow'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Your TenFour account is running low on credits</strong>
+          It is important that you can reach your entire team in an emergency. Get more text credits now, so you're ready for anything.
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.type == 'CreditsZero'">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Your TenFour account has run out of credits</strong>
+          You will not be able to reach your team in an emergency. Get more text credits now, so you're ready for anything.
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-card-content>

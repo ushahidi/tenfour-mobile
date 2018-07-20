@@ -14,6 +14,7 @@ import { Region } from '../../models/region';
 import { ApiProvider } from '../../providers/api/api';
 import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
+import { ThumbnailProvider } from '../../providers/thumbnail/thumbnail';
 
 @IonicPage({
   name: 'PersonEditPage',
@@ -23,7 +24,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Component({
   selector: 'page-person-edit',
   templateUrl: 'person-edit.html',
-  providers: [ ApiProvider, StorageProvider, CameraProvider ],
+  providers: [ ApiProvider, StorageProvider, CameraProvider, ThumbnailProvider ],
   entryComponents:[ PersonSelectPage ]
 })
 export class PersonEditPage extends BasePrivatePage {
@@ -66,7 +67,8 @@ export class PersonEditPage extends BasePrivatePage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected camera:CameraProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected thumbnail:ThumbnailProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -409,20 +411,25 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private onFileChanged(event:any){
+  private onFileChanged(event:any) {
     this.logger.info(this, "onFileChanged", event.target);
     if (event.target.files && event.target.files.length > 0) {
       let reader = new FileReader();
       let file = event.target.files[0];
       reader.readAsDataURL(file);
-      reader.onload = () => {
-        let imageData = reader.result.split(',')[1];
-        if (imageData) {
-          this.person.profile_picture = 'data:image/jpeg;base64,' + imageData;
-        }
-        else {
-          this.person.profile_picture = null;
-        }
+      reader.onload = (e) => {
+        let img = document.createElement("img");
+        img.src = reader.result;
+        img.onload = function () {
+          let imageData = this.thumbnail.toThumbnailDataURL(img);
+
+          if (imageData) {
+            this.person.profile_picture = imageData;
+          }
+          else {
+            this.person.profile_picture = null;
+          }
+        }.bind(this);
       };
     }
   }

@@ -2,13 +2,13 @@
   <ion-item text-wrap text-center color="white">
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>
-    <p>{{checkin.created_at | dateTime}}. <strong>From {{checkin.user_name}}.</strong></p>
+    <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
     <ion-badge [style.background]="answer.color" [style.color]="white" *ngFor="let answer of checkin.answers">{{answer.replies}}</ion-badge>
     <ion-badge color="waiting" *ngIf="checkin.waiting_count > 0">{{checkin.waiting_count}}</ion-badge>
   </ion-item>
-  <ion-item text-wrap color="white">
-    <button ion-button text-only item-left clear color="primary" tappable *ngIf="hasRespondClicked && checkin.canRespond(person)" (click)="onRespondClicked($event)">Respond</button>
-    <button ion-button text-only item-right clear color="primary" tappable *ngIf="hasResendClicked && checkin.canResend(person)" (click)="onResendClicked($event)">Resend</button>
+  <ion-item text-wrap color="white" *ngIf="canRespond || canResend">
+    <button ion-button text-only item-left clear color="primary" tappable *ngIf="canRespond" (click)="onRespondClicked($event)">Respond</button>
+    <button ion-button text-only item-right clear color="primary" tappable *ngIf="canResend" (click)="onResendClicked($event)">Resend</button>
   </ion-item>
 </ion-list>
 <ion-list *ngFor="let answer of checkin.answers">

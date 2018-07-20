@@ -55,7 +55,7 @@ export class CheckinRespondComponent {
         this.locating = false;
       },
       (error:any) => {
-        this.logger.error(this, "ngOnInit", error);
+        this.logger.warn(this, "ngOnInit", error);
         this.locating = false;
       });
     }
@@ -77,7 +77,7 @@ export class CheckinRespondComponent {
           resolve(location);
         },
         (error:any) => {
-          this.logger.error(this, "loadLocation", error);
+          this.logger.warn(this, "loadLocation", error);
           if (this.checkin.reply.location_text == null) {
             this.checkin.reply.latitude = location.latitude;
             this.checkin.reply.longitude = location.longitude;
@@ -86,7 +86,7 @@ export class CheckinRespondComponent {
         });
       },
       (error:any) => {
-        this.logger.error(this, "loadLocation", error);
+        this.logger.warn(this, "loadLocation", error);
         reject(error);
       });
     });
@@ -122,7 +122,7 @@ export class CheckinRespondComponent {
           });
         },
         (error:any) => {
-          this.logger.error(this, "searchAddress", address, error);
+          this.logger.warn(this, "searchAddress", address, error);
           this.zone.run(() => {
             this.locations = [];
           });

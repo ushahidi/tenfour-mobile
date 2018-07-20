@@ -13,13 +13,13 @@ export class LoggerProvider {
     private platform:Platform) {
     this.platform.ready().then(() => {
       if (this.platform.is("cordova")) {
-        this.isDebug.getIsDebug().then(
-          (isDebug:boolean) => {
-            this.enabled = isDebug;
-          },
-          (error:any) => {
-            this.enabled = false;
-          });
+        this.isDebug.getIsDebug().then((isDebug:boolean) => {
+          //TODO this isn't reliably returning correct value
+          this.enabled = isDebug;
+        },
+        (error:any) => {
+          this.enabled = false;
+        });
       }
       else if (isDevMode()) {
         this.enabled = true;
