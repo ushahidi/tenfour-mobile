@@ -6,7 +6,6 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AngularFireModule } from 'angularfire2';
-import 'firebase/messaging';
 
 import { SegmentModule } from 'ngx-segment-analytics';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
