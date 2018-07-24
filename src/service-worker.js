@@ -1,30 +1,38 @@
-/**
- * Check out https://googlechrome.github.io/sw-toolbox/docs/master/index.html for
- * more info on how to use sw-toolbox to custom configure your service worker.
- */
-
-
 'use strict';
 importScripts('./build/sw-toolbox.js');
+importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase.js');
+importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase-messaging.js');
+firebase.initializeApp({
+  projectId: "tenfour-7322f",
+  apiKey: "AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI",
+  authDomain: "tenfour-7322f.firebaseapp.com",
+  databaseURL: "https://tenfour-7322f.firebaseio.com",
+  storageBucket: "tenfour-7322f.appspot.com",
+  messagingSenderId: '240600431570'
+});
+const firebaseMessaging = firebase.messaging();
+firebaseMessaging.setBackgroundMessageHandler(function(payload) {
+  console.log('Firebase Background Message Handler', payload);
+  let notificationTitle = "Notification Received";
+  const notificationOptions = {
+    icon: '/assets/images/logo-dots.png'
+  };
+  return self.registration.showNotification(notificationTitle, notificationOptions);
+});
 
 self.toolbox.options.cache = {
   name: 'ionic-cache'
 };
-
-// pre-cache our key assets
 self.toolbox.precache(
   [
+    './build/polyfills.js',
+    './build/vendor.js',
     './build/main.js',
     './build/main.css',
-    './build/polyfills.js',
     'index.html',
     'manifest.json'
   ]
 );
-
-// dynamically cache any other local assets
 self.toolbox.router.any('/*', self.toolbox.cacheFirst);
-
-// for any other requests go to the network, cache,
-// and then only use that cached resource if your user goes offline
 self.toolbox.router.default = self.toolbox.networkFirst;

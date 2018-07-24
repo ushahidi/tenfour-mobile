@@ -3,6 +3,7 @@
   "short_name": "TenFour",
   "start_url": "index.html",
   "display": "standalone",
+  "gcm_sender_id": "103953800507",
   "icons": [
     {
       "src": "assets/icon/icon-72x72.png",

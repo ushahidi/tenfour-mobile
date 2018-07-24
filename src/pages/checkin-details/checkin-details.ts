@@ -13,7 +13,7 @@ import { Reply } from '../../models/reply';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-import { EVENT_CHECKIN_RECEIVED } from '../../constants/events';
+import { EVENT_CHECKIN_UPDATED } from '../../constants/events';
 
 @IonicPage({
   name: 'CheckinDetailsPage',
@@ -69,8 +69,8 @@ export class CheckinDetailsPage extends BasePrivatePage {
         checkin: this.checkin.message
       });
     }
-    this.events.subscribe(EVENT_CHECKIN_RECEIVED, (checkinId:number) => {
-      this.logger.info(this, EVENT_CHECKIN_RECEIVED, checkinId);
+    this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
+      this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
       if (this.checkin.id === checkinId) {
         let alert = this.showAlert("Check-In Received", "This Check-In has received a new response.");
         alert.onDidDismiss(data => {
@@ -93,7 +93,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
 
   ionViewWillLeave() {
     super.ionViewWillLeave();
-    this.events.unsubscribe(EVENT_CHECKIN_RECEIVED);
+    this.events.unsubscribe(EVENT_CHECKIN_UPDATED);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {

@@ -5,6 +5,7 @@ import { Observable } from "rxjs/Observable"
 import 'rxjs/add/observable/of';
 
 import { Firebase } from '@ionic-native/firebase';
+import { FirebaseApp } from 'angularfire2';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -12,13 +13,15 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Injectable()
 export class FirebaseProvider {
 
-  private token:string=null;
+  private firebaseWeb;
 
   constructor(
     private platform:Platform,
-    private firebase:Firebase,
+    private firebaseNative:Firebase,
+    private firebaseApp:FirebaseApp,
     private logger:LoggerProvider,
     private storage:StorageProvider) {
+    this.firebaseWeb = firebaseApp.messaging();
   }
 
   public initialize():Promise<boolean> {
@@ -27,57 +30,78 @@ export class FirebaseProvider {
       if (this.platform.is("cordova")) {
         this.getToken().then((token:string) => {
           this.logger.info(this, "initialize", token);
-          this.storage.setFirebase(token).then((stored:boolean) => {
-            resolve(true);
-          },
-          (error:any) => {
-            resolve(false);
-          });
+          resolve(token != null);
         },
         (error:any) => {
           this.logger.error(this, "initialize", error);
-          this.storage.removeFirebase().then((removed:boolean) => {
-            resolve(false);
-          },
-          (error:any) => {
-            resolve(false);
-          });
+          resolve(false);
         });
       }
       else {
-        resolve(false);
+        navigator.serviceWorker.register('service-worker.js').then((registration) => {
+          this.logger.info(this, "initialize", "registration", registration);
+          this.firebaseWeb.useServiceWorker(registration);
+          this.getToken().then((token:string) => {
+            this.logger.info(this, "initialize", token);
+            resolve(token != null);
+          },
+          (error:any) => {
+            this.logger.error(this, "initialize", error);
+            resolve(false);
+          });
+        });
       }
     });
   }
 
   public hasPermission():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "hasPermission");
       if (this.platform.is("cordova")) {
-        this.firebase.hasPermission().then((data:any) => {
-          resolve(data.isEnabled);
+        this.firebaseNative.hasPermission().then((data:any) => {
+          this.logger.info(this, "hasPermission", data);
+          resolve(data && data.isEnabled);
         },
         (error:any) => {
+          this.logger.error(this, "hasPermission", error);
           resolve(false);
         });
       }
       else {
-        resolve(false);
+        this.firebaseWeb.getToken().then((token:any) => {
+          this.logger.info(this, "hasPermission", token != null);
+          resolve(token != null);
+        },
+        (error:any) => {
+          this.logger.error(this, "hasPermission", error);
+          resolve(false);
+        });
       }
     });
   }
 
-  public grantPermission():Promise<any> {
+  public requestPermission():Promise<any> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "requestPermission");
       if (this.platform.is("cordova")) {
-        this.firebase.grantPermission().then((permission:any) => {
+        this.firebaseNative.grantPermission().then((permission:any) => {
+          this.logger.info(this, "requestPermission", permission);
           resolve(permission);
         },
         (error:any) => {
+          this.logger.error(this, "requestPermission", error);
           resolve(null);
         });
       }
       else {
-        resolve(null);
+        this.firebaseWeb.requestPermission().then((permission:any) => {
+          this.logger.info(this, "requestPermission", permission);
+          resolve(permission);
+        },
+        (error:any) => {
+          this.logger.error(this, "requestPermission", error);
+          resolve(null);
+        });
       }
     });
   }
@@ -86,47 +110,85 @@ export class FirebaseProvider {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "getToken");
       if (this.platform.is("cordova")) {
-        if (this.token) {
-          this.logger.info(this, "getToken", this.token, "Cached");
-          resolve(this.token);
-        }
-        else {
-          this.firebase.getToken().then((token:string) => {
-            this.logger.info(this, "getToken", token);
-            this.token = token;
+        this.firebaseNative.getToken().then((token:string) => {
+          this.logger.info(this, "getToken", token, "Fetched");
+          this.storage.setFirebase(token).then((stored:boolean) => {
             resolve(token);
           },
           (error:any) => {
-            this.logger.error(this, "getToken", error);
-            this.token = null;
+            resolve(token);
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "getToken", error);
+          this.storage.removeFirebase().then((removed:boolean) => {
+            resolve(null);
+          },
+          (error:any) => {
             resolve(null);
           });
-        }
+        });
       }
       else {
-        resolve(null);
+        this.firebaseWeb.getToken().then((token:string) => {
+          this.logger.info(this, "getToken", token);
+          this.storage.setFirebase(token).then((stored:boolean) => {
+            resolve(token);
+          },
+          (error:any) => {
+            resolve(token);
+          });
+        },
+        (error:any) => {
+          this.logger.error(this, "getToken", error);
+          this.storage.removeFirebase().then((removed:boolean) => {
+            resolve(null);
+          },
+          (error:any) => {
+            resolve(null);
+          });
+        });
       }
     });
   }
 
   public freshToken():Promise<string> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "freshToken");
       if (this.platform.is("cordova")) {
-        this.firebase.onTokenRefresh().subscribe((token:string) => {
+        this.firebaseNative.onTokenRefresh().subscribe((token:string) => {
           this.logger.info(this, "freshToken", token);
-          this.token = token;
-          resolve(token);
+          this.storage.setFirebase(token).then((stored:boolean) => {
+            resolve(token);
+          },
+          (error:any) => {
+            resolve(null);
+          });
         });
       }
       else {
-        resolve(null);
+        this.firebaseWeb.onTokenRefresh().subscribe((token:string) => {
+          this.logger.info(this, "freshToken", token);
+          this.storage.setFirebase(token).then((stored:boolean) => {
+            resolve(token);
+          },
+          (error:any) => {
+            resolve(null);
+          });
+        });
       }
     });
   }
 
   public onNotification():Observable<any> {
     if (this.platform.is("cordova")) {
-      this.firebase.onNotificationOpen().subscribe((data:any) => {
+      this.firebaseNative.onNotificationOpen().subscribe((data:any) => {
+        this.logger.info(this, "onNotification", data);
+        return Observable.of(data);
+      });
+    }
+    else {
+      this.firebaseWeb.onMessage((data:any) => {
         this.logger.info(this, "onNotification", data);
         return Observable.of(data);
       });

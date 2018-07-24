@@ -69,7 +69,8 @@ import {
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
   EVENT_CHECKIN_DETAILS,
-  EVENT_CHECKIN_RECEIVED,
+  EVENT_CHECKIN_CREATED,
+  EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
 
@@ -334,11 +335,16 @@ export class TenFourApp {
         if (loaded) {
           this.logger.info(this, "loadNotifications", "Loaded");
           this.firebase.onNotification().subscribe((notification:any) => {
-            this.logger.info(this, "onNotification", notification);
-            if (notification && notification['type'] == EVENT_CHECKIN_RECEIVED) {
-              let checkinId = notification['checkin_id'];
-              this.logger.info(this, "onNotification", EVENT_CHECKIN_RECEIVED, checkinId);
-              this.events.publish(EVENT_CHECKIN_RECEIVED, checkinId);
+            if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
+              this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+            }
+            else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_UPDATED, notification);
+              this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+            }
+            else if (notification) {
+              this.logger.warn(this, "onNotification", "Unknown", notification);
             }
           });
           resolve(true);

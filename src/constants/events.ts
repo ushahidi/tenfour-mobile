@@ -10,7 +10,9 @@ export let EVENT_ACCOUNT_DELETED:string = "account:deleted";
 
 export let EVENT_CHECKIN_DETAILS:string = "checkin:details";
 
-export let EVENT_CHECKIN_RECEIVED:string = "checkin:received";
+export let EVENT_CHECKIN_CREATED:string = "checkin:created";
+
+export let EVENT_CHECKIN_UPDATED:string = "checkin:updated";
 
 export let EVENT_CREDITS_CHANGED:string = "credits:changed";
 
