@@ -296,7 +296,6 @@ export class PersonEditPage extends BasePrivatePage {
           },
           (error:any) => {
             return reject('Invalid phone number or email formatting. User was not created.');
-            //reject(error);
           });
         });
       }
