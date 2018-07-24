@@ -112,6 +112,7 @@ export class CheckinListPage extends BasePrivatePage {
 
   ionViewWillLeave() {
     super.ionViewWillLeave();
+    this.events.unsubscribe(EVENT_CHECKIN_CREATED);
     this.events.unsubscribe(EVENT_CHECKIN_UPDATED);
   }
 
