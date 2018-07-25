@@ -6,6 +6,7 @@ import 'rxjs/add/observable/of';
 
 import { Firebase } from '@ionic-native/firebase';
 import { FirebaseApp } from 'angularfire2';
+import 'firebase/messaging';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -13,7 +14,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Injectable()
 export class FirebaseProvider {
 
-  private firebaseWeb;
+  private firebaseWeb = null;
 
   constructor(
     private platform:Platform,

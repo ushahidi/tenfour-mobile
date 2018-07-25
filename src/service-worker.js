@@ -1,6 +1,5 @@
 'use strict';
 importScripts('./build/sw-toolbox.js');
-importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase.js');
 importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/4.9.1/firebase-messaging.js');
 firebase.initializeApp({
@@ -26,10 +25,6 @@ self.toolbox.options.cache = {
 };
 self.toolbox.precache(
   [
-    './build/polyfills.js',
-    './build/vendor.js',
-    './build/main.js',
-    './build/main.css',
     'index.html',
     'manifest.json'
   ]
