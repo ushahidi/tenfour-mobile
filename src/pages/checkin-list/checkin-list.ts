@@ -55,7 +55,7 @@ export class CheckinListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.limit = this.tablet ? 10 : 5;
+    this.limit = this.tablet || this.website ? 10 : 5;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
