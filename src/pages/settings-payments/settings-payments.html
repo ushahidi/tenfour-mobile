@@ -79,7 +79,7 @@
 
             <div *ngIf="organization && organization.hasProPlan()">
               <p>Add credits</p>
-              <ion-input type="number" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
+              <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
 
               <ion-item color="white">
                 <ion-label>Add extra credits immediately</ion-label>
