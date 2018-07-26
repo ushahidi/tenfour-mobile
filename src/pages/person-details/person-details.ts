@@ -181,7 +181,7 @@ export class PersonDetailsPage extends BasePrivatePage {
         }
         else if (data.removed) {
           this.logger.info(this, "editPerson", "Modal", "Removed");
-          this.closePage();
+          this.closePage(true);
         }
         else if (data.canceled) {
           this.logger.info(this, "editPerson", "Modal", "Cancelled");
