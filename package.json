@@ -65,6 +65,7 @@
     "@ionic/storage": "^2.0.1",
     "cordova-android": "~6.4.0",
     "cordova-android-support-gradle-release": "^1.4.4",
+    "cordova-browser": "~5.0.3",
     "cordova-custom-config": "^4.0.2",
     "cordova-ios": "~4.5.4",
     "cordova-plugin-add-swift-support": "^1.7.1",
