@@ -42,17 +42,14 @@
     <ion-item color="white" class="webhook" [class.hidden]="organization.slack_enabled == false" *ngIf="organization && organization.hasProPlan()">
       <ion-icon color="white" ios="ios-chatboxes" md="md-chatboxes" item-left *ngIf="organization.slack_enabled"></ion-icon>
       <ion-label *ngIf="organization.slack_enabled">Webhook</ion-label>
-      <ion-input type="url" autocorrect="off" autocapitalize="none" placeholder="https://" [(ngModel)]="organization.slack_webhook" *ngIf="organization.slack_enabled"></ion-input>
-
+      <ion-input type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="https://" [(ngModel)]="organization.slack_webhook" *ngIf="organization.slack_enabled"></ion-input>
     </ion-item>
   </ion-list>
   <!-- <button ion-button clear color="primary" (click)="showUrl(help, '_blank', $event)">How to configure channels</button> -->
-
   <div *ngIf="organization && !organization.hasProPlan()">
     <p text-center>This is a Pro feature</p>
     <p text-center *ngIf="user && user.isOwner() && !ios">
       <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
     </p>
   </div>
-
 </ion-content>

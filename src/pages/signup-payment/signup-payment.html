@@ -14,11 +14,11 @@
     </ion-item>
     <ion-item class="input number">
       <ion-label fixed>Number</ion-label>
-      <ion-input #number type="tel" autocorrect="off" autocapitalize="none" placeholder="Credit card number" (keypress)="showNextOnReturn($event)"></ion-input>
+      <ion-input #number type="tel" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Credit card number" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
     <ion-item class="input expiry">
       <ion-label fixed>Expiry</ion-label>
-      <ion-input #expiry type="tel" autocorrect="off" autocapitalize="none" placeholder="MMYY" (keypress)="showNextOnReturn($event)"></ion-input>
+      <ion-input #expiry type="tel" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="MMYY" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
   </ion-list>
 </ion-content>
