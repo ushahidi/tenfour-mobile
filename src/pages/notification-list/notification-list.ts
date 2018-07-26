@@ -45,6 +45,11 @@ export class NotificationListPage extends BasePrivatePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.limit = this.website ? 20 : 10;
+  }
+
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
