@@ -153,6 +153,10 @@ export class StorageProvider {
 
   // ########## FIREBASE ##########
 
+  public hasFirebase():Promise<boolean> {
+    return this.has("firebase");
+  }
+
   public getFirebase():Promise<string> {
     return new Promise((resolve, reject) => {
       this.get("firebase").then((data:any) => {

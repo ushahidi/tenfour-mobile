@@ -69,6 +69,8 @@ import {
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
   EVENT_CHECKIN_DETAILS,
+  EVENT_CHECKIN_CREATED,
+  EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
 
@@ -330,8 +332,27 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
-        this.logger.info(this, "loadNotifications", "Loaded");
-        resolve(true);
+        if (loaded) {
+          this.logger.info(this, "loadNotifications", "Loaded");
+          this.firebase.onNotification().subscribe((notification:any) => {
+            if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
+              this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+            }
+            else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_UPDATED, notification);
+              this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+            }
+            else if (notification) {
+              this.logger.warn(this, "onNotification", "Unknown", notification);
+            }
+          });
+          resolve(true);
+        }
+        else {
+          this.logger.warn(this, "loadNotifications", "Not Loaded");
+          resolve(false);
+        }
       },
       (error:any) => {
         this.logger.error(this, "loadNotifications", "Failed", error);

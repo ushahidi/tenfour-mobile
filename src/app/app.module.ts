@@ -5,6 +5,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { AngularFireModule } from 'angularfire2';
+
 import { SegmentModule } from 'ngx-segment-analytics';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
 
@@ -218,6 +220,14 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SegmentModule.forRoot({
       apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
       debug: false
+    }),
+    AngularFireModule.initializeApp({
+      projectId: "tenfour-7322f",
+      apiKey: "AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI",
+      authDomain: "tenfour-7322f.firebaseapp.com",
+      databaseURL: "https://tenfour-7322f.firebaseio.com",
+      storageBucket: "tenfour-7322f.appspot.com",
+      messagingSenderId: '240600431570'
     }),
     IntercomModule.forRoot(),
     IonicModule.forRoot(TenFourApp,
