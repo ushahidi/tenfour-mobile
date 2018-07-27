@@ -69,6 +69,8 @@ import {
   EVENT_USER_UNAUTHORIZED,
   EVENT_ACCOUNT_DELETED,
   EVENT_CHECKIN_DETAILS,
+  EVENT_CHECKIN_CREATED,
+  EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
 
@@ -141,6 +143,7 @@ export class TenFourApp {
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
           .then(() => this.loadAnalytics())
+          .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
           .then(() => this.loadNotifications())
@@ -330,8 +333,27 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
-        this.logger.info(this, "loadNotifications", "Loaded");
-        resolve(true);
+        if (loaded) {
+          this.logger.info(this, "loadNotifications", "Loaded");
+          this.firebase.onNotification().subscribe((notification:any) => {
+            if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
+              this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+            }
+            else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
+              this.logger.info(this, "onNotification", EVENT_CHECKIN_UPDATED, notification);
+              this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+            }
+            else if (notification) {
+              this.logger.warn(this, "onNotification", "Unknown", notification);
+            }
+          });
+          resolve(true);
+        }
+        else {
+          this.logger.warn(this, "loadNotifications", "Not Loaded");
+          resolve(false);
+        }
       },
       (error:any) => {
         this.logger.error(this, "loadNotifications", "Failed", error);
@@ -684,6 +706,16 @@ export class TenFourApp {
     });
   }
 
+  private showIntercomMessenger(event:any=null) {
+    this.logger.info(this, "showIntercomMessenger");
+    this.intercom.showMessenger(this.user).then((shown:boolean) => {
+      this.logger.info(this, "showIntercomMessenger", shown);
+    },
+    (error:any) => {
+      this.logger.error(this, "showIntercomMessenger", error);
+    });
+  }
+
   private userLogout(event:any=null) {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...", true);
@@ -702,12 +734,13 @@ export class TenFourApp {
       this.storage.removeGroups(),
       this.storage.removeEmails(),
       this.storage.removePeople(),
-      this.storage.removeContacts()
+      this.storage.removeContacts(),
     ];
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
       this.user = null;
       this.clearBadgeCount();
+      this.intercom.resetUser();
       loading.dismiss();
       this.showSigninUrl(event);
     });

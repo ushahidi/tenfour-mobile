@@ -16,6 +16,10 @@ import { ApiProvider } from '../../providers/api/api';
 import { BadgeProvider } from '../../providers/badge/badge';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import {
+  EVENT_CHECKIN_CREATED,
+  EVENT_CHECKIN_UPDATED } from '../../constants/events';
+
 @IonicPage({
   name: 'CheckinListPage',
   segment: 'checkins'
@@ -60,7 +64,7 @@ export class CheckinListPage extends BasePrivatePage {
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
       this.loadWaitingResponse(true, this.mobile).then((waiting:Checkin[]) => {
-
+        this.logger.info(this, "ionViewDidLoad", "loadWaitingResponse", "Loaded");
       },
       (error:any) => {
         this.logger.error(this, "ionViewDidLoad", "loadWaitingResponse", error);
@@ -71,6 +75,30 @@ export class CheckinListPage extends BasePrivatePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.selected = null;
+    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number) => {
+      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId);
+      let alert = this.showAlert("Check-In Received", "You have received a new Check-In.");
+      alert.onDidDismiss(data => {
+        let loading = this.showLoading("Loading...");
+        this.loadCheckins(false).then((checkins:Checkin[]) => {
+          loading.dismiss();
+        },
+        (error:any) => {
+          loading.dismiss();
+        });
+      });
+    });
+    this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
+      this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
+      this.loadCheckin(checkinId).then((checkin:Checkin) => {
+        if (checkin) {
+          this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId, "Loaded");
+        }
+        else {
+          this.logger.warn(this, EVENT_CHECKIN_UPDATED, checkinId, "Not Loaded");
+        }
+      });
+    });
   }
 
   ionViewDidEnter() {
@@ -80,6 +108,12 @@ export class CheckinListPage extends BasePrivatePage {
         organization: this.organization.name
       });
     }
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    this.events.unsubscribe(EVENT_CHECKIN_CREATED);
+    this.events.unsubscribe(EVENT_CHECKIN_UPDATED);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -132,6 +166,28 @@ export class CheckinListPage extends BasePrivatePage {
           this.checkins = [];
           reject(error);
         });
+    });
+  }
+
+  private loadCheckin(checkinId:number):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.logger.error(this, "loadCheckin", checkinId);
+      this.api.getCheckin(this.organization, checkinId).then((checkin:Checkin) => {
+        for (let index in this.checkins) {
+          let _checkin = this.checkins[index];
+          if (_checkin.id === checkin.id) {
+            this.checkins[index] = checkin;
+            this.logger.error(this, "loadCheckin", checkinId, "Loaded");
+            resolve(checkin);
+            break;
+          }
+        }
+        resolve(null);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCheckin", checkinId, error);
+        resolve(null);
+      });
     });
   }
 
