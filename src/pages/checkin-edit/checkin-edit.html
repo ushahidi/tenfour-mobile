@@ -30,7 +30,7 @@
       <button ion-button icon-only item-start clear tappable (click)="changeColor(answer, $event)">
         <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
       </button>
-      <ion-input type="text" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
+      <ion-input type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
       <button ion-button icon-only item-end clear color="black" tappable (click)="removeAnswer(answer)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>

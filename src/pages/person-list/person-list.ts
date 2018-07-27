@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, Modal } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
@@ -50,6 +50,7 @@ export class PersonListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+    this.limit = this.website ? 30 : 20;
   }
 
   ionViewWillEnter() {
@@ -225,12 +226,26 @@ export class PersonListPage extends BasePrivatePage {
 
   private showPerson(person:Person, event:any=null) {
     this.logger.info(this, "showPerson", person);
-    this.showModalOrPage(PersonDetailsPage, {
+    let modal = this.showModalOrPage(PersonDetailsPage, {
       organization: this.organization,
       user: this.user,
       person: person,
       person_id: person.id
     });
+    if (modal instanceof Modal) {
+      modal.onDidDismiss(data => {
+        this.logger.error(this, "showPerson", "Dismissed");
+        if (data && data.removed) {
+          let loading = this.showLoading("Loading...");
+          this.loadPeople(false).then((finished:any) => {
+            loading.dismiss();
+          },
+          (error:any) => {
+            loading.dismiss();
+          });
+        }
+      });
+    }
   }
 
   private removePerson(person:Person, event:any=null) {

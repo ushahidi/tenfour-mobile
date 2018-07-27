@@ -47,6 +47,7 @@ export class GroupListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+    this.limit = this.website ? 30 : 20;
   }
 
   ionViewWillEnter() {
