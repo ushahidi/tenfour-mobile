@@ -143,6 +143,7 @@ export class TenFourApp {
           .then(() => this.loadStatusBar())
           .then(() => this.loadOrientation())
           .then(() => this.loadAnalytics())
+          .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
           .then(() => this.loadNotifications())
@@ -705,6 +706,16 @@ export class TenFourApp {
     });
   }
 
+  private showIntercomMessenger(event:any=null) {
+    this.logger.info(this, "showIntercomMessenger");
+    this.intercom.showMessenger(this.user).then((shown:boolean) => {
+      this.logger.info(this, "showIntercomMessenger", shown);
+    },
+    (error:any) => {
+      this.logger.error(this, "showIntercomMessenger", error);
+    });
+  }
+
   private userLogout(event:any=null) {
     this.logger.info(this, "userLogout");
     let loading = this.showLoading("Logging out...", true);
@@ -723,12 +734,13 @@ export class TenFourApp {
       this.storage.removeGroups(),
       this.storage.removeEmails(),
       this.storage.removePeople(),
-      this.storage.removeContacts()
+      this.storage.removeContacts(),
     ];
     Promise.all(removes).then((removed:any) => {
       this.organization = null;
       this.user = null;
       this.clearBadgeCount();
+      this.intercom.resetUser();
       loading.dismiss();
       this.showSigninUrl(event);
     });

@@ -36,6 +36,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
 import { Firebase } from '@ionic-native/firebase';
 import { IntercomModule } from 'ng-intercom';
+import { Intercom } from '@ionic-native/intercom';
 import { TenFourApp } from './app.component';
 import { TenFourRoutes } from './app.routes';
 
@@ -270,6 +271,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     { provide: Sim, useClass: Sim },
     { provide: HTTP, useClass: HTTP },
     { provide: Firebase, useClass: Firebase },
+    { provide: Intercom, useClass: Intercom },
     { provide: ApiProvider, useClass: ApiProvider },
     { provide: LoggerProvider, useClass: LoggerProvider },
     { provide: CountriesProvider, useClass: CountriesProvider },

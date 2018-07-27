@@ -16,6 +16,7 @@
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showNotificationList($event)">Notifications</ion-item>
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
         <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="mobile" (click)="showIntercomMessenger($event)">Help</ion-item>
       </ion-list>
       <div *ngIf="organization && organization.hasFreePlan() && user && (user.isOwner() || user.isAdmin())">
         <p text-center>You are using the free version of TenFour</p>
@@ -56,4 +57,9 @@
     </ion-content>
   </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
+  <ion-fab left bottom *ngIf="mobile && user == null">
+    <button ion-fab mini tappable color="dark" (click)="showIntercomMessenger($event)">
+      <ion-icon ios="ios-help" md="md-help"></ion-icon>
+    </button>
+  </ion-fab>
 </ion-split-pane>
