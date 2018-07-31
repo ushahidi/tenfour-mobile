@@ -121,13 +121,16 @@ export class SettingsListPage extends BasePrivatePage {
     this.logger.info(this, "settingsRoles");
     this.showModal(SettingsRolesPage, {
       organization: this.organization,
-      person: this.user
+      user: this.user
     });
   }
 
   private settingsPayments(event:any) {
     this.logger.info(this, "settingsPayments");
-    this.showPage(SettingsPaymentsPage);
+    this.showPage(SettingsPaymentsPage, {
+      organization: this.organization,
+      user: this.user
+    });
   }
 
   private settingsCheckins(event:any) {
