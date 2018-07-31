@@ -127,7 +127,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     });
   }
 
-  private back(event:any) {
+  private closeModal(event:any) {
     this.hideModal();
   }
 
@@ -182,7 +182,6 @@ export class SettingsPaymentsPage extends BasePrivatePage {
         });
       });
     };
-
     checkSubscription()
       .then(() => {
         this.showModal(SettingsPlanProWelcomePage);
@@ -230,17 +229,14 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private calcBillingEstimate(extraCredits?:number):number {
     let estimate = this.PRO_FLAT_RATE;
-
     if (this.organization.user_count > this.FREE_USERS) {
       estimate += this.USER_BUNDLE_RATE * Math.ceil((this.organization.user_count - this.FREE_USERS)/this.USER_BUNDLE_UNIT);
     }
-
     if (extraCredits) {
       estimate += extraCredits * this.CREDIT_BUNDLE_RATE;
     } else if (this.updatedCredits) {
       estimate += this.updatedCredits * this.CREDIT_BUNDLE_RATE;
     }
-
     return estimate
   }
 
@@ -251,15 +247,12 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private addCredits(event:any) {
     this.logger.info(this, "addCredits");
-
     if (!this.addCreditsImmediately && !this.addCreditsRecurring) {
       return this.showAlert("Add credits", "Please select an option.");
     }
-
     if (!this.updatedCredits || this.updatedCredits <= 0) {
       return this.showAlert("Add credits", "Please specify how many credits to add.");
     }
-
     let modal = this.showModal(SettingsCreditsPage, {
       credits: this.updatedCredits,
       creditsEstimate: this.updatedCredits * this.CREDIT_BUNDLE_RATE,
@@ -270,13 +263,11 @@ export class SettingsPaymentsPage extends BasePrivatePage {
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addCredits", "Modal", data);
-
       this.api.getOrganization(this.organization).then((organization:Organization) => {
         this.storage.setOrganization(organization).then(() => {
           this.loadUpdates();
         });
       });
-
       if (data) {
         if (data.organization) {
           this.logger.info(this, "addCredits", "Modal", data.organization);
