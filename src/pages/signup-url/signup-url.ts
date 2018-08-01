@@ -103,7 +103,7 @@ export class SignupUrlPage extends BasePublicPage {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Checking...", true);
     this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
-      this.logger.error(this, "showNext", organizations);
+      this.logger.info(this, "showNext", organizations);
       loading.dismiss();
       if (organizations && organizations.length > 0) {
         this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
@@ -118,7 +118,7 @@ export class SignupUrlPage extends BasePublicPage {
       }
     },
     (error:any) => {
-      this.logger.info(this, "showNext", error);
+      this.logger.error(this, "showNext", error);
       loading.dismiss();
       this.showAlert("Organization URL", error);
     });

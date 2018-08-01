@@ -239,7 +239,7 @@ export class BasePage {
         this.content.resize();
       }
       else {
-        this.logger.error(this, "resizeContent", "NULL");
+        this.logger.warn(this, "resizeContent", "NULL");
       }
     }, delay);
   }

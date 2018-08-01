@@ -25,12 +25,12 @@ export class CameraProvider {
           resolve(cameraPresent);
         },
         (error:any) => {
-          this.logger.error(this, "loadCamera", "isCameraPresent", error);
+          this.logger.warn(this, "loadCamera", "isCameraPresent", error);
           resolve(false);
         });
       }
       else {
-        this.logger.error(this, "loadCamera", "isCameraPresent", "Not available");
+        this.logger.warn(this, "loadCamera", "isCameraPresent", "Not available");
         resolve(false);
       }
     });

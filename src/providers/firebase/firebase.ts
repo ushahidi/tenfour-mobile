@@ -64,7 +64,7 @@ export class FirebaseProvider {
           resolve(data && data.isEnabled);
         },
         (error:any) => {
-          this.logger.error(this, "hasPermission", error);
+          this.logger.warn(this, "hasPermission", error);
           resolve(false);
         });
       }
@@ -90,7 +90,7 @@ export class FirebaseProvider {
           resolve(permission);
         },
         (error:any) => {
-          this.logger.error(this, "requestPermission", error);
+          this.logger.warn(this, "requestPermission", error);
           resolve(null);
         });
       }
