@@ -1,12 +1,10 @@
 page-person-edit {
   .phone {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
   }
   .email {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
     ion-label {
       margin-left: 0 !important;
@@ -19,7 +17,6 @@ page-person-edit {
   }
   .address {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
     ion-label {
       margin-left: 0 !important;
@@ -30,7 +27,8 @@ page-person-edit {
       }
     }
   }
-  .role {
+  .roles {
+    border-bottom: 1px solid color($colors, dark) !important;
     ion-label {
       margin-left: 0 !important;
       padding-left: 0 !important;
@@ -46,6 +44,6 @@ page-person-edit {
     }
   }
   .groups {
-
+    border-bottom: 1px solid color($colors, dark) !important;
   }
 }

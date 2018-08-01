@@ -40,6 +40,22 @@ ion-item {
       color: color($colors, black) !important;
     }
   }
+  &.item-input-has-value, &:last-child {
+    border-bottom-color: color($colors, dark) !important;
+    box-shadow: none !important;
+    .item-inner {
+      border-bottom-color: color($colors, dark) !important;
+      box-shadow: none !important;
+    }
+  }
+  &.item-input-has-focus {
+    .item-inner {
+      border-bottom-color: color($colors, primary) !important;
+    }
+  }
+  &.item-input-has-focus:last-child {
+    border-bottom-color: color($colors, primary) !important;
+  }
 }
 ion-menu {
   ion-select {
