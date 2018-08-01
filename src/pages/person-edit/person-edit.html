@@ -65,7 +65,7 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person && !person.isOwner() && user && user.isOwnerOrAdmin()">
-    <ion-item class="role" color="white">
+    <ion-item class="roles" color="white">
       <ion-label no-padding no-margin icon-only text-left>
         <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
       </ion-label>
@@ -78,7 +78,7 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person">
-    <ion-item color="white" class="groups" text-wrap tappable (click)="showPeopleSelect($event)">
+    <ion-item class="groups" color="white" text-wrap tappable (click)="showPeopleSelect($event)">
       <ion-icon ios="ios-people" md="md-people" item-left></ion-icon>
       <div item-content class="content">{{person.groupNames()}}</div>
       <button ion-button clear item-right>
