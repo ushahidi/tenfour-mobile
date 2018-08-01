@@ -39,14 +39,14 @@ export class SplashScreenPage extends BasePage {
     super.ionViewDidEnter();
     if (this.website) {
       this.timer = setTimeout(()=> {
-        this.logger.error(this, "Loading Timeout", "Redirecting...");
+        this.logger.warn(this, "Loading Timeout", "Redirecting...");
         Promise.all([this.hasOrganization(), this.hasUser()]).then(() => {
           this.showRootPage(CheckinListPage);
         })
         .catch((error) => {
           this.showRootPage(SigninUrlPage);
         });
-      }, 5000);  
+      }, 5000);
     }
   }
 

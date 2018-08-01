@@ -234,7 +234,7 @@ export class PersonListPage extends BasePrivatePage {
     });
     if (modal instanceof Modal) {
       modal.onDidDismiss(data => {
-        this.logger.error(this, "showPerson", "Dismissed");
+        this.logger.info(this, "showPerson", "Dismissed");
         if (data && data.removed) {
           let loading = this.showLoading("Loading...");
           this.loadPeople(false).then((finished:any) => {

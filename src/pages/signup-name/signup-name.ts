@@ -102,7 +102,6 @@ export class SignupNamePage extends BasePublicPage {
     this.logger.info(this, "showNext");
     let loading = this.showLoading("Loading...");
     this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
-      this.logger.error(this, "showNext", organizations);
       loading.dismiss();
       if (organizations && organizations.length > 0) {
         this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");

@@ -55,7 +55,7 @@ export class AnalyticsProvider {
       this.logger.info(this, "trackIdentify", user, traits || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackIdentify", user, traits || "", "Failed", error);
+      this.logger.warn(this, "trackIdentify", user, traits || "", "Failed", error);
     });
   }
 
@@ -74,7 +74,7 @@ export class AnalyticsProvider {
       this.logger.info(this, "trackEvent", event, properties || "", "Posted");
     },
     (error:any) => {
-      this.logger.error(this, "trackPage", event, properties || "", "Failed", error);
+      this.logger.warn(this, "trackPage", event, properties || "", "Failed", error);
     });
   }
 

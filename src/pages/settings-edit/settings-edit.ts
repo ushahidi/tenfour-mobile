@@ -238,7 +238,7 @@ export class SettingsEditPage extends BasePrivatePage {
           });
         },
         (error:any) => {
-          this.logger.error(this, "searchAddress", address, error);
+          this.logger.warn(this, "searchAddress", address, error);
           this.zone.run(() => {
             this.locations = [];
           });

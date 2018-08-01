@@ -274,7 +274,7 @@ export class TenFourApp {
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadDeepLinks", "onMatch", error);
+        this.logger.warn(this, "loadDeepLinks", "onMatch", error);
       });
       resolve(true);
     });
@@ -712,7 +712,7 @@ export class TenFourApp {
       this.logger.info(this, "showIntercomMessenger", shown);
     },
     (error:any) => {
-      this.logger.error(this, "showIntercomMessenger", error);
+      this.logger.warn(this, "showIntercomMessenger", error);
     });
   }
 
@@ -799,7 +799,7 @@ export class TenFourApp {
       this.logger.info(this, "badge", "Cleared", cleared);
     },
     (error:any) => {
-      this.logger.error(this, "badge", "Clear Failed", error);
+      this.logger.warn(this, "badge", "Clear Failed", error);
     });
   }
 

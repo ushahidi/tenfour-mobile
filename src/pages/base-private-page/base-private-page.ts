@@ -46,7 +46,7 @@ export class BasePrivatePage extends BasePage {
             resolve(true);
           }
           else {
-            this.logger.error(this, "ionViewCanEnter", "NO");
+            this.logger.warn(this, "ionViewCanEnter", "NO");
             setTimeout(() => {
               this.events.publish(EVENT_USER_UNAUTHORIZED);
             }, 500);
@@ -54,7 +54,7 @@ export class BasePrivatePage extends BasePage {
           }
         })
         .catch((error:any) => {
-          this.logger.error(this, "ionViewCanEnter", "NO");
+          this.logger.warn(this, "ionViewCanEnter", "NO");
           setTimeout(() => {
             this.events.publish(EVENT_USER_UNAUTHORIZED);
           }, 500);
@@ -83,7 +83,7 @@ export class BasePrivatePage extends BasePage {
           }
         },
         (error:any) => {
-          this.logger.error(this, "loadOrganization", error);
+          this.logger.warn(this, "loadOrganization", error);
           reject("Organization is not loaded");
         });
       }

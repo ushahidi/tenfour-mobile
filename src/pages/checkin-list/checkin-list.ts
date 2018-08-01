@@ -171,13 +171,12 @@ export class CheckinListPage extends BasePrivatePage {
 
   private loadCheckin(checkinId:number):Promise<Checkin> {
     return new Promise((resolve, reject) => {
-      this.logger.error(this, "loadCheckin", checkinId);
       this.api.getCheckin(this.organization, checkinId).then((checkin:Checkin) => {
         for (let index in this.checkins) {
           let _checkin = this.checkins[index];
           if (_checkin.id === checkin.id) {
             this.checkins[index] = checkin;
-            this.logger.error(this, "loadCheckin", checkinId, "Loaded");
+            this.logger.info(this, "loadCheckin", checkinId, "Loaded");
             resolve(checkin);
             break;
           }
