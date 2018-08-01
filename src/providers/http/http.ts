@@ -464,86 +464,83 @@ export class HttpProvider {
   }
 
   private httpError(error:any):string {
-    try {
-      if (error == null) {
-        return "Unknown Error";
-      }
-      else if (typeof error === 'string') {
-        return error['error'] || error;
-      }
-      else if (typeof error === 'object' && !error['status']) {
-        if (error['_body'] || error['message'] || error['error']) {
-          let message = error['_body'] || error['message'] || error['error']
-          if (message.toString().indexOf("The host could not be resolved") != -1) {
-            return "The internet connection appears to be offline";
-          }
-          else if (message.toString().indexOf("The Internet connection appears to be offline") != -1) {
-            return "The internet connection appears to be offline";
-          }
-          else {
-            let json = JSON.parse(message);
-            if (json['errors']) {
-              let errors = json['errors'];
-              let messages = [];
-              for (let key of Object.keys(errors)) {
-                let error = errors[key];
-                if (error) {
-                  messages.push(error);
-                }
+    if (error == null) {
+      return "An unknown error has occurred";
+    }
+    if (typeof error === 'string') {
+      return error['error'] || error;
+    }
+    if (typeof error === 'object') {
+      if (error['_body'] || error['message'] || error['error']) {
+        let message = error['_body'] || error['message'] || error['error']
+        if (message.toString().indexOf("The host could not be resolved") != -1) {
+          return "The internet connection appears to be offline";
+        }
+        else if (message.toString().indexOf("The Internet connection appears to be offline") != -1) {
+          return "The internet connection appears to be offline";
+        }
+        else if (message.toString().indexOf("Timeout") != -1) {
+          return "The request has timed out";
+        }
+        else {
+          let json = JSON.parse(message);
+          if (json['errors']) {
+            let errors = json['errors'];
+            let messages = [];
+            for (let key of Object.keys(errors)) {
+              let error = errors[key];
+              if (error) {
+                messages.push(error);
               }
-              return messages.join(", ");
             }
-            else if (json['error']) {
-              return json['error'];
-            }
-            else if (json['message']) {
-              return json['message'];
-            }
+            return messages.join(", ");
           }
-          return JSON.stringify(message);
+          else if (json['error']) {
+            return json['error'];
+          }
+          else if (json['message']) {
+            return json['message'];
+          }
         }
       }
-      else if (error['status'] == 401) {
-        return "Unauthorized";
-      }
-      else if (error['status'] == 402) {
-        return "You do not have enough credits";
-      }
-      else if (error['status'] == 403) {
-        return "Forbidden";
-      }
-      else if (error['status'] == 404) {
-        return "Not Found";
-      }
-      else if (error['status'] == 405) {
-        return "Method Not Allowed";
-      }
-      else if (error['status'] == 406) {
-        return "Not Acceptable";
-      }
-      else if (error['status'] == 408) {
-        return "Request Timeout";
-      }
-      else if (error['status'] == 409) {
-        return "Conflict";
-      }
-      else if (error['status'] == 500) {
-        return "Internal Server Error";
-      }
-      else if (error['status'] == 501) {
-        return "Not Implemented";
-      }
-      else if (error['status'] == 502) {
-        return "Bad Gateway";
-      }
-      else if (error['status'] == 503) {
-        return "Service Unavailable";
-      }
     }
-    catch (err) {
-      this.logger.error(this, "httpError", error, "Error", err);
+    if (error['status'] == 401) {
+      return "You are not authorized to access";
     }
-    return JSON.stringify(error);
+    else if (error['status'] == 402) {
+      return "You do not have enough credits";
+    }
+    else if (error['status'] == 403) {
+      return "You are forbidden to access";
+    }
+    else if (error['status'] == 404) {
+      return "The resource was not found";
+    }
+    else if (error['status'] == 405) {
+      return "The method is not allowed";
+    }
+    else if (error['status'] == 406) {
+      return "Information not acceptable";
+    }
+    else if (error['status'] == 408) {
+      return "The request has timed out";
+    }
+    else if (error['status'] == 409) {
+      return "Unable to process due to conflict";
+    }
+    else if (error['status'] == 500) {
+      return "Internal server error has occurred";
+    }
+    else if (error['status'] == 501) {
+      return "The method is not implemented";
+    }
+    else if (error['status'] == 502) {
+      return "There was a bad gateway";
+    }
+    else if (error['status'] == 503) {
+      return "The service is unavailable";
+    }
+    return "An unknown error has occurred";
   }
 
 }
