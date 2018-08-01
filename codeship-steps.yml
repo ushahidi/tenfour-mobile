@@ -43,4 +43,4 @@
 
   - name: "deploy PWA client (dev)"
     service: awscli
-    command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client/
+    command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client-eu/
