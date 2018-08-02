@@ -183,4 +183,5 @@
     <plugin name="cordova-plugin-intercom" spec="^6.1.0" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
     <plugin name="cordova-plugin-firebase" spec="^1.0.5" />
+    <engine name="browser" spec="~5.0.3" />
 </widget>
