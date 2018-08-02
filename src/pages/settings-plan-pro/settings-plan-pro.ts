@@ -120,7 +120,7 @@ export class SettingsPlanProPage extends BasePrivatePage {
     });
   }
 
-  private closeModal(event:any) {
+  private closeModal(event:any=null) {
     this.hideModal();
   }
 

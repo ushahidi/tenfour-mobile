@@ -873,8 +873,21 @@ export class TenFourApp {
   }
 
   private upgradeToPro(event:any) {
-    this.logger.info(this, "upgradeToPro");
-    this.navController.push(SettingsPaymentsPage);
+    this.logger.info(this, "upgradeToPro", "SettingsListPage");
+    this.nav.setRoot(SettingsListPage, {
+      organization: this.organization,
+      user: this.user
+    }).then((loaded:any) => {
+      this.logger.info(this, "upgradeToPro", "SettingsPaymentsPage");
+      this.navController.push(SettingsPaymentsPage, {
+        organization: this.organization,
+        user: this.user
+      });
+      this.hideSideMenu();
+    },
+    (error:any) => {
+      this.logger.error(this, "upgradeToPro", error);
+    });
   }
 
   private locationHash():string {
