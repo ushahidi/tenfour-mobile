@@ -281,7 +281,7 @@ export class BasePage {
   }
 
   protected promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       var timer = setTimeout(() => {
         reject("Promise Timeout");
       }, milliseconds);

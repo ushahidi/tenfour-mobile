@@ -24,19 +24,25 @@ export class AnalyticsProvider {
     private logger:LoggerProvider,
     private firebase:FirebaseProvider,
     private environment:EnvironmentProvider) {
-
   }
 
   public initialize() {
     return new Promise((resolve, reject) => {
-      this.segment.ready().then((ready:SegmentService) => {
-        if (this.platform.is("cordova")) {
-          this.segment.debug(this.device.isVirtual);
-        }
-        else {
-          this.segment.debug(this.environment.isProduction() == false);
-        }
-        resolve(true);
+      this.platform.ready().then(() => {
+        this.segment.ready().then((ready:SegmentService) => {
+          this.logger.info(this, "initialize", "Initialized");
+          if (this.platform.is("cordova")) {
+            this.segment.debug(this.device.isVirtual);
+          }
+          else {
+            this.segment.debug(this.environment.isProduction() == false);
+          }
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.warn(this, "initialize", "Failed", error);
+          resolve(false);
+        });
       });
     });
   }
@@ -44,23 +50,28 @@ export class AnalyticsProvider {
   public trackLogin(organization:Organization, user:User):Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (organization && user) {
-        let traits = {
-          app: this.appName(),
-          device: this.deviceName(),
-          organization: organization.name,
-          person: user.name,
-          email: organization.email
-        };
-        this.trackIdentify(user.id, traits).then(() => {
-          this.logger.info(this, "trackLogin", user, traits || "", "Posted");
-          resolve(true);
-        },
-        (error) => {
-          this.logger.warn(this, "trackLogin", error, "Failed");
-          resolve(false);
+        Promise.all([
+          this.getAppName(),
+          this.getDeviceName()]).then((results:string[]) => {
+          let traits = {
+            app: results[0],
+            device: results[1],
+            organization: organization.name,
+            person: user.name,
+            email: organization.email
+          };
+          this.trackIdentify(user.id, traits).then(() => {
+            this.logger.info(this, "trackLogin", user, "Tracked", traits || "");
+            resolve(true);
+          },
+          (error) => {
+            this.logger.warn(this, "trackLogin", error, "Failed");
+            resolve(false);
+          });
         });
       }
       else {
+        this.logger.info(this, "trackLogin", "Skipped");
         resolve(false);
       }
     });
@@ -71,11 +82,11 @@ export class AnalyticsProvider {
       Promise.all([
         this.segment.identify("" + userId, traits),
         this.firebase.logUser("" + userId, traits)]).then((results:any) => {
-        this.logger.info(this, "trackIdentify", userId, traits || "", "Posted");
+        this.logger.info(this, "trackIdentify", userId, "Tracked", traits || "");
         resolve(true);
       },
       (error:any) => {
-        this.logger.warn(this, "trackIdentify", userId, traits || "", "Failed", error);
+        this.logger.warn(this, "trackIdentify", userId, "Failed", error);
         resolve(false);
       });
     });
@@ -83,16 +94,17 @@ export class AnalyticsProvider {
 
   public trackPage(page:any, properties:any=null):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      let name = this.pageName(page);
-      Promise.all([
-        this.segment.page(name, properties),
-        this.firebase.logPage(name, properties)]).then((results:any) => {
-        this.logger.info(this, "trackPage", name, properties || "", "Posted");
-        resolve(true);
-      },
-      (error:any) => {
-        this.logger.warn(this, "trackPage", name, properties || "", "Failed", error);
-        resolve(false);
+      this.getPageName(page).then((pageName:string) => {
+        Promise.all([
+          this.segment.page(pageName, properties),
+          this.firebase.logPage(pageName, properties)]).then((results:any) => {
+          this.logger.info(this, "trackPage", pageName, "Tracked", properties || "");
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.warn(this, "trackPage", pageName, "Failed", error);
+          resolve(false);
+        });
       });
     });
   }
@@ -102,11 +114,11 @@ export class AnalyticsProvider {
       Promise.all([
         this.segment.track(event, properties),
         this.firebase.logEvent(event, properties)]).then((results:any) => {
-        this.logger.info(this, "trackEvent", event, properties || "", "Posted");
+        this.logger.info(this, "trackEvent", event, "Tracked", properties || "");
         resolve(true);
       },
       (error:any) => {
-        this.logger.warn(this, "trackEvent", event, properties || "", "Failed", error);
+        this.logger.warn(this, "trackEvent", event, "Failed", error);
         resolve(false);
       });
     });
@@ -116,7 +128,7 @@ export class AnalyticsProvider {
     return new Promise((resolve, reject) => {
       Promise.all([
         this.firebase.logError(message)]).then((results:any) => {
-        this.logger.info(this, "trackError", message, "Posted");
+        this.logger.info(this, "trackError", message, "Tracked");
         resolve(true);
       },
       (error:any) => {
@@ -126,45 +138,61 @@ export class AnalyticsProvider {
     });
   }
 
-  private appName():string {
-    if (this.platform.is("cordova")) {
-      return `${this.appVersion.getAppName()} ${this.appVersion.getVersionNumber()}`;
-    }
-    return "TenFour";
+  private getAppName():Promise<string> {
+    return new Promise((resolve, reject) => {
+      if (this.platform.is("cordova")) {
+        Promise.all([
+          this.appVersion.getAppName(),
+          this.appVersion.getVersionNumber()]).then((results:string[]) => {
+            resolve(`${results[0]} ${results[1]}`);
+          },
+          (error:any) => {
+            resolve("TenFour");
+          });
+      }
+      else {
+        resolve("TenFour");
+      }
+    });
   }
 
-  private deviceName():string {
-    let name = [];
-    if (this.platform.is("cordova")) {
-      if (this.device.manufacturer) {
-        name.push(this.device.manufacturer);
+  private getDeviceName():Promise<string> {
+    return new Promise((resolve, reject) => {
+      let name = [];
+      if (this.platform.is("cordova")) {
+        if (this.device.manufacturer) {
+          name.push(this.device.manufacturer);
+        }
+        if (this.device.platform) {
+          name.push(this.device.platform);
+        }
+        if (this.device.version) {
+          name.push(this.device.version);
+        }
+        if (this.device.model) {
+          name.push(this.device.model);
+        }
       }
-      if (this.device.platform) {
-        name.push(this.device.platform);
+      else {
+        name.push(navigator.appVersion);
       }
-      if (this.device.version) {
-        name.push(this.device.version);
-      }
-      if (this.device.model) {
-        name.push(this.device.model);
-      }
-    }
-    else {
-      name.push(navigator.appVersion);
-    }
-    return name.join(" ");
+      resolve(name.join(" "));
+    });
   }
 
-  private pageName(page:any):string {
-    return page.constructor.name
-      .replace('Page', '')
-      .replace(/([A-Z])/g, function(match) {
-        return " " + match;
-      })
-      .replace(/^./, function(match) {
-        return match.toUpperCase();
-      })
-      .trim();
+  private getPageName(page:any):Promise<string> {
+    return new Promise((resolve, reject) => {
+      let pageName = page.constructor.name
+        .replace('Page', '')
+        .replace(/([A-Z])/g, function(match) {
+          return " " + match;
+        })
+        .replace(/^./, function(match) {
+          return match.toUpperCase();
+        })
+        .trim();
+      resolve(pageName);
+    });
   }
 
 }
