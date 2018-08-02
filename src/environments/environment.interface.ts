@@ -5,4 +5,9 @@ export interface IEnvironment {
   clientId:string;
   clientSecret:string;
   intercomAppId:string;
+  segmentAppId:string;
+  segmentApiKey:string;
+  firebaseAppId:string;
+  firebaseApiKey:string;
+  firebaseSenderId:string;
 }

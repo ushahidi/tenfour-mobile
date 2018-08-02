@@ -10,6 +10,8 @@ import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 
 import { LoggerProvider } from '../../providers/logger/logger';
+import { FirebaseProvider } from '../../providers/firebase/firebase';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @Injectable()
 export class AnalyticsProvider {
@@ -19,62 +21,108 @@ export class AnalyticsProvider {
     private device:Device,
     private appVersion:AppVersion,
     private segment:SegmentService,
-    private logger:LoggerProvider) {
+    private logger:LoggerProvider,
+    private firebase:FirebaseProvider,
+    private environment:EnvironmentProvider) {
 
   }
 
   public initialize() {
-    return this.segment.ready().then((ready:SegmentService) => {
-      if (this.platform.is("cordova")) {
-        this.segment.debug(this.device.isVirtual);
+    return new Promise((resolve, reject) => {
+      this.segment.ready().then((ready:SegmentService) => {
+        if (this.platform.is("cordova")) {
+          this.segment.debug(this.device.isVirtual);
+        }
+        else {
+          this.segment.debug(this.environment.isProduction() == false);
+        }
+        resolve(true);
+      });
+    });
+  }
+
+  public trackLogin(organization:Organization, user:User):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (organization && user) {
+        let traits = {
+          app: this.appName(),
+          device: this.deviceName(),
+          organization: organization.name,
+          person: user.name,
+          email: organization.email
+        };
+        this.trackIdentify(user.id, traits).then(() => {
+          this.logger.info(this, "trackLogin", user, traits || "", "Posted");
+          resolve(true);
+        },
+        (error) => {
+          this.logger.warn(this, "trackLogin", error, "Failed");
+          resolve(false);
+        });
+      }
+      else {
+        resolve(false);
       }
     });
   }
 
-  public trackLogin(organization:Organization, user:User):Promise<any> {
-    if (organization && user) {
-      let traits = {
-        app: this.appName(),
-        device: this.deviceName(),
-        organization: organization.name,
-        person: user.name,
-        email: organization.email
-      };
-      return this.trackIdentify(user.id, traits).then(() => {
-        this.logger.info(this, "trackLogin", user, traits || "", "Posted");
+  public trackIdentify(userId:any, traits:any=null):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      Promise.all([
+        this.segment.identify("" + userId, traits),
+        this.firebase.logUser("" + userId, traits)]).then((results:any) => {
+        this.logger.info(this, "trackIdentify", userId, traits || "", "Posted");
+        resolve(true);
       },
-      (error) => {
-        this.logger.info(this, "trackLogin", error, "Failed");
+      (error:any) => {
+        this.logger.warn(this, "trackIdentify", userId, traits || "", "Failed", error);
+        resolve(false);
       });
-    }
-    return Promise.resolve();
-  }
-
-  public trackIdentify(user:any, traits:any=null):Promise<any> {
-    return this.segment.identify("" + user, traits).then(() => {
-      this.logger.info(this, "trackIdentify", user, traits || "", "Posted");
-    },
-    (error:any) => {
-      this.logger.warn(this, "trackIdentify", user, traits || "", "Failed", error);
     });
   }
 
-  public trackPage(page:any, properties:any=null):Promise<any> {
-    let name = this.pageName(page);
-    return this.segment.page(name, properties).then(() => {
-      this.logger.info(this, "trackPage", name, properties || "", "Posted");
-    },
-    (error:any) => {
-      this.logger.error(this, "trackPage", name, properties || "", "Failed", error);
+  public trackPage(page:any, properties:any=null):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let name = this.pageName(page);
+      Promise.all([
+        this.segment.page(name, properties),
+        this.firebase.logPage(name, properties)]).then((results:any) => {
+        this.logger.info(this, "trackPage", name, properties || "", "Posted");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.warn(this, "trackPage", name, properties || "", "Failed", error);
+        resolve(false);
+      });
     });
   }
 
-  public trackEvent(event:string, properties:any=null):Promise<any> {
-    return this.segment.track(event, properties).then(() => {
-      this.logger.info(this, "trackEvent", event, properties || "", "Posted");
-    },
-    (error:any) => {
-      this.logger.warn(this, "trackPage", event, properties || "", "Failed", error);
+  public trackEvent(event:string, properties:any=null):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      Promise.all([
+        this.segment.track(event, properties),
+        this.firebase.logEvent(event, properties)]).then((results:any) => {
+        this.logger.info(this, "trackEvent", event, properties || "", "Posted");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.warn(this, "trackEvent", event, properties || "", "Failed", error);
+        resolve(false);
+      });
+    });
+  }
+
+  public trackError(message:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      Promise.all([
+        this.firebase.logError(message)]).then((results:any) => {
+        this.logger.info(this, "trackError", message, "Posted");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.warn(this, "trackError", message, "Failed", error);
+        resolve(false);
+      });
     });
   }
 

@@ -4,8 +4,8 @@ import { Platform } from 'ionic-angular';
 import { Observable } from "rxjs/Observable"
 import 'rxjs/add/observable/of';
 
-import { Firebase } from '@ionic-native/firebase';
-import { FirebaseApp } from 'angularfire2';
+import { Firebase as FirebaseNative } from '@ionic-native/firebase';
+import { FirebaseApp as FirebaseWeb } from 'angularfire2';
 import 'firebase/messaging';
 
 import { LoggerProvider } from '../../providers/logger/logger';
@@ -14,44 +14,46 @@ import { StorageProvider } from '../../providers/storage/storage';
 @Injectable()
 export class FirebaseProvider {
 
-  private firebaseWeb = null;
+  private firebaseMessaging:any = null;
 
   constructor(
     private platform:Platform,
-    private firebaseNative:Firebase,
-    private firebaseApp:FirebaseApp,
+    private firebaseNative:FirebaseNative,
+    private firebaseWeb:FirebaseWeb,
     private logger:LoggerProvider,
     private storage:StorageProvider) {
-    this.firebaseWeb = firebaseApp.messaging();
+    this.firebaseMessaging = firebaseWeb.messaging();
   }
 
   public initialize():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "initialize");
-      if (this.platform.is("cordova")) {
-        this.getToken().then((token:string) => {
-          this.logger.info(this, "initialize", token);
-          resolve(token != null);
-        },
-        (error:any) => {
-          this.logger.error(this, "initialize", error);
-          resolve(false);
-        });
-      }
-      else {
-        navigator.serviceWorker.register('service-worker.js').then((registration) => {
-          this.logger.info(this, "initialize", "registration", registration);
-          this.firebaseWeb.useServiceWorker(registration);
+      this.platform.ready().then(() => {
+        this.logger.info(this, "initialize");
+        if (this.platform.is("cordova")) {
           this.getToken().then((token:string) => {
             this.logger.info(this, "initialize", token);
             resolve(token != null);
           },
           (error:any) => {
-            this.logger.error(this, "initialize", error);
+            this.logger.warn(this, "initialize", error);
             resolve(false);
           });
-        });
-      }
+        }
+        else {
+          navigator.serviceWorker.register('service-worker.js').then((registration) => {
+            this.logger.info(this, "initialize", "registration", registration);
+            this.firebaseMessaging.useServiceWorker(registration);
+            this.getToken().then((token:string) => {
+              this.logger.info(this, "initialize", token);
+              resolve(token != null);
+            },
+            (error:any) => {
+              this.logger.warn(this, "initialize", error);
+              resolve(false);
+            });
+          });
+        }
+      });
     });
   }
 
@@ -69,12 +71,12 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.firebaseWeb.getToken().then((token:any) => {
+        this.firebaseMessaging.getToken().then((token:any) => {
           this.logger.info(this, "hasPermission", token != null);
           resolve(token != null);
         },
         (error:any) => {
-          this.logger.error(this, "hasPermission", error);
+          this.logger.warn(this, "hasPermission", error);
           resolve(false);
         });
       }
@@ -95,12 +97,12 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.firebaseWeb.requestPermission().then((permission:any) => {
+        this.firebaseMessaging.requestPermission().then((permission:any) => {
           this.logger.info(this, "requestPermission", permission);
           resolve(permission);
         },
         (error:any) => {
-          this.logger.error(this, "requestPermission", error);
+          this.logger.warn(this, "requestPermission", error);
           resolve(null);
         });
       }
@@ -121,7 +123,7 @@ export class FirebaseProvider {
           });
         },
         (error:any) => {
-          this.logger.error(this, "getToken", error);
+          this.logger.warn(this, "getToken", error);
           this.storage.removeFirebase().then((removed:boolean) => {
             resolve(null);
           },
@@ -131,7 +133,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.firebaseWeb.getToken().then((token:string) => {
+        this.promiseTimeout(this.firebaseMessaging.getToken(), 2000).then((token:string) => {
           this.logger.info(this, "getToken", token);
           this.storage.setFirebase(token).then((stored:boolean) => {
             resolve(token);
@@ -141,7 +143,7 @@ export class FirebaseProvider {
           });
         },
         (error:any) => {
-          this.logger.error(this, "getToken", error);
+          this.logger.warn(this, "getToken", error);
           this.storage.removeFirebase().then((removed:boolean) => {
             resolve(null);
           },
@@ -168,7 +170,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.firebaseWeb.onTokenRefresh().subscribe((token:string) => {
+        this.firebaseMessaging.onTokenRefresh().subscribe((token:string) => {
           this.logger.info(this, "freshToken", token);
           this.storage.setFirebase(token).then((stored:boolean) => {
             resolve(token);
@@ -189,12 +191,107 @@ export class FirebaseProvider {
       });
     }
     else {
-      this.firebaseWeb.onMessage((data:any) => {
+      this.firebaseMessaging.onMessage((data:any) => {
         this.logger.info(this, "onNotification", data);
         return Observable.of(data);
       });
     }
     return Observable.of(null);
+  }
+
+  public logUser(userId:string, properties:any=null):Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      if (this.platform.is("cordova")) {
+        this.firebaseNative.setUserId(userId).then((tracked:any) => {
+          let updates = [];
+          if (properties) {
+            for (let key in properties) {
+              let value = properties[key];
+              updates.push(this.firebaseNative.setUserProperty(key, value));
+            }
+          }
+          Promise.all(updates).then((updated:any) => {
+            this.logger.info(this, "logUser", userId, properties);
+            resolve(true);
+          },
+          (error:any) => {
+            this.logger.warn(this, "logUser", error);
+            resolve(false);
+          });
+        },
+        (error:any) => {
+          this.logger.warn(this, "logUser", error);
+          resolve(false);
+        });
+      }
+      else {
+        resolve(false);
+      }
+    });
+  }
+
+  public logPage(page:string, properties:any=null):Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      if (this.platform.is("cordova")) {
+        this.firebaseNative.setScreenName(page).then((tracked:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
+        resolve(false);
+      }
+    });
+  }
+
+  public logEvent(event:string, properties:any=null):Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      if (this.platform.is("cordova")) {
+        this.firebaseNative.logEvent(event, properties).then((tracked:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
+        resolve(false);
+      }
+    });
+  }
+
+  public logError(message:string): Promise<boolean> {
+    return new Promise(function(resolve, reject) {
+      if (this.platform.is("cordova")) {
+        this.firebaseNative.logError(message).then((tracked:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
+        resolve(false);
+      }
+    });
+  }
+
+  private promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
+    return new Promise(function(resolve, reject) {
+      var timer = setTimeout(() => {
+        reject("Promise Timeout");
+      }, milliseconds);
+      promise.then((result:any) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((error:any) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
   }
 
 }

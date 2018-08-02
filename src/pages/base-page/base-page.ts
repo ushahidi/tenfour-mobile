@@ -280,6 +280,22 @@ export class BasePage {
     });
   }
 
+  protected promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
+    return new Promise(function(resolve, reject) {
+      var timer = setTimeout(() => {
+        reject("Promise Timeout");
+      }, milliseconds);
+      promise.then((result:any) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((error:any) => {
+        clearTimeout(timer);
+        reject(error);
+      });
+    });
+  }
+
   protected isKeyReturn(event:any):boolean {
     if (event && event.keyCode && event.keyCode == 13) {
       return true;

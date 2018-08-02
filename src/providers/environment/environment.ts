@@ -42,4 +42,24 @@ export class EnvironmentProvider {
     return this.environment.intercomAppId;
   }
 
+  public getSegmentAppId():string {
+    return this.environment.segmentAppId;
+  }
+
+  public getSegmentApiKey():string {
+    return this.environment.segmentApiKey;
+  }
+
+  public getFirebaseAppId():string {
+    return this.environment.firebaseAppId;
+  }
+
+  public getFirebaseApiKey():string {
+    return this.environment.firebaseApiKey;
+  }
+
+  public getFirebaseSenderId():string {
+    return this.environment.firebaseSenderId;
+  }
+
 }
