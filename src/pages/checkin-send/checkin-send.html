@@ -1,13 +1,13 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-buttons left *ngIf="modal == true">
+    <!-- <ion-buttons left *ngIf="modal == true">
       <button ion-button icon-only color="cancel" (click)="cancelEdit($event)">
         <ion-icon ios="ios-arrow-round-back" md="md-arrow-back"></ion-icon>
       </button>
-    </ion-buttons>
+    </ion-buttons> -->
     <ion-title>Check-In</ion-title>
     <ion-buttons right *ngIf="checkin">
-      <button ion-button color="primary" [disabled]="checkin.canSend() == false" (click)="sendCheckin($event)">Send</button>
+      <button ion-button color="primary" (click)="sendCheckin($event)">Send</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -28,7 +28,7 @@
       <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
     </ion-item>
     <ion-item tappable (click)="upgradeToPro($event)" *ngIf="organization && organization.hasFreePlan()">
-      <h2 ion-text color="primary">Upgrade to TenFour Pro for SMS and email check-ins</h2>
+      <h2 ion-text color="primary">Upgrade to TenFour Pro to send via SMS and email</h2>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">

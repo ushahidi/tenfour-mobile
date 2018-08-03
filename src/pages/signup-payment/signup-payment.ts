@@ -108,9 +108,23 @@ export class SignupPaymentPage extends BasePage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.showPage(SignupPasswordPage, {
-      organization: this.organization
-    });
+    if (this.number.value.length == 0) {
+      this.showToast("Please enter credit card number");
+      setTimeout(() => {
+        this.number.setFocus();
+      }, 500);
+    }
+    else if (this.expiry.value.length == 0) {
+      this.showToast("Please enter credit card expiry");
+      setTimeout(() => {
+        this.expiry.setFocus();
+      }, 500);
+    }
+    else {
+      this.showPage(SignupPasswordPage, {
+        organization: this.organization
+      });
+    }
   }
 
   private showNextOnReturn(event:any) {

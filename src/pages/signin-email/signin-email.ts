@@ -101,7 +101,19 @@ export class SigninEmailPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext", this.email.value);
-    if (this.email.value && this.email.value.length > 0) {
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else if (this.email.value.indexOf("@") == -1) {
+      this.showToast("Please enter a valid email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else {
       let email = this.email.value;
       this.showPage(SigninPasswordPage, {
         organization: this.organization,
