@@ -57,9 +57,9 @@
     </ion-content>
   </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
-  <ion-fab left bottom *ngIf="mobile && user == null">
-    <button ion-fab mini tappable color="dark" (click)="showIntercomMessenger($event)">
-      <ion-icon ios="ios-help" md="md-help"></ion-icon>
+  <ion-fab left bottom class="intercom" *ngIf="mobile && user == null">
+    <button ion-fab tappable color="dark" (click)="showIntercomMessenger($event)">
+      <img src="assets/images/intercom.svg"/>
     </button>
   </ion-fab>
 </ion-split-pane>

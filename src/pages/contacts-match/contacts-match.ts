@@ -52,7 +52,8 @@ export class ContactsMatchPage extends BasePrivatePage {
       description: null,
       phone: null,
       email: null,
-      address: null
+      address: null,
+      role: null
     };
     this.preselectMatchingColumns(this.columns, this.map);
   }
