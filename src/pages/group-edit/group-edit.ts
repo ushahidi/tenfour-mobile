@@ -176,7 +176,7 @@ export class GroupEditPage extends BasePrivatePage {
         }
         this.storage.saveGroup(this.organization, group).then((saved:any) => {
           loading.dismiss();
-          this.events.publish(EVENT_GROUP_ADDED, this.group.id);
+          this.events.publish(EVENT_GROUP_ADDED, group.id);
           this.hideModal({ group: group });
         });
       },
@@ -201,7 +201,7 @@ export class GroupEditPage extends BasePrivatePage {
       }
       this.storage.saveGroup(this.organization, group).then((saved:any) => {
         loading.dismiss();
-        this.events.publish(EVENT_GROUP_CHANGED, this.group.id);
+        this.events.publish(EVENT_GROUP_CHANGED, group.id);
         this.hideModal({ group: group });
       });
     },
@@ -219,7 +219,7 @@ export class GroupEditPage extends BasePrivatePage {
         handler: () => {
           let loading = this.showLoading("Removing...", true);
           this.api.deleteGroup(this.organization, this.group).then((deleted:any) => {
-            return this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
+            this.storage.removeGroup(this.organization, this.group).then((deleted:boolean) => {
               loading.dismiss();
               this.showToast("Group removed from organization");
               this.events.publish(EVENT_GROUP_DELETED, this.group.id);
