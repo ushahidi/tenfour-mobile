@@ -27,8 +27,6 @@ export class PersonSelectPage extends BasePrivatePage {
   groups:Group[] = null;
   show_groups:boolean = true;
   show_people:boolean = true;
-  limit:number = 20;
-  offset:number = 0;
   loading:boolean = false;
 
   constructor(
@@ -49,7 +47,6 @@ export class PersonSelectPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.limit = this.website ? 30 : 20;
   }
 
   ionViewWillEnter() {
@@ -99,17 +96,20 @@ export class PersonSelectPage extends BasePrivatePage {
   private loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
-      this.groups = this.getParameter<Group[]>("groups");
+      let selected = this.getParameter<Group[]>("groups");
       this.promiseFallback(cache,
         this.storage.getGroups(this.organization),
-        this.api.getGroups(this.organization, this.limit), 1).then((groups:Group[]) => {
+        this.api.getGroups(this.organization), 1).then((groups:Group[]) => {
+          this.groups = this.selectGroups(groups, selected);
           this.storage.saveGroups(this.organization, groups).then((saved:boolean) => {
-            this.updateGroups(groups);
-            resolve(groups);
+            resolve(this.groups);
+          },
+          (error:any) => {
+            resolve(this.groups);
           });
         },
         (error:any) => {
-          this.updateGroups([]);
+          this.groups = [];
           reject(error);
         });
     });
@@ -118,50 +118,57 @@ export class PersonSelectPage extends BasePrivatePage {
   private loadPeople(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadPeople", cache);
     return new Promise((resolve, reject) => {
-      this.offset = 0;
-      this.people = this.getParameter<Person[]>("people");
+      let selected = this.getParameter<Person[]>("people");
       this.promiseFallback(cache,
         this.storage.getPeople(this.organization),
         this.api.getPeople(this.organization), 2).then((people:Person[]) => {
+          this.people = this.selectPeople(people, selected);
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
-            this.updatePeople(people);
-            resolve(people);
+            resolve(this.people);
+          },
+          (error:any) => {
+            resolve(this.people);
           });
         },
         (error:any) => {
-          this.updatePeople([]);
+          this.people = [];
           reject(error);
         });
     });
   }
 
-  private updateGroups(groups:Group[]) {
-    if (this.groups && this.groups.length > 0) {
+  private selectGroups(groups:Group[], selected:Group[]):Group[] {
+    if (groups && groups.length > 0) {
       for (let group of groups) {
-        let previous = this.groups.filter(_group => _group.id == group.id);
-        if (previous && previous.length > 0) {
-          group.selected = true;
+        group.selected = false;
+        if (selected && selected.length > 0) {
+          for (let selection of selected) {
+            if (group.id === selection.id) {
+              group.selected = true;
+              continue;
+            }
+          }
         }
       }
     }
-    this.organization.groups = groups;
+    return groups;
   }
 
-  private updatePeople(people:Person[]) {
-    if (this.people && this.people.length > 0) {
+  private selectPeople(people:Person[], selected:Person[]) {
+    if (people && people.length > 0) {
       for (let person of people) {
-        let previous = this.people.filter(_person => _person.id == person.id);
-        if (previous && previous.length > 0) {
-          person.selected = true;
+        person.selected = false;
+        if (selected && selected.length > 0) {
+          for (let selection of selected) {
+            if (person.id === selection.id) {
+              person.selected = true;
+              continue;
+            }
+          }
         }
       }
     }
-    if (this.offset == 0) {
-      this.organization.people = people;
-    }
-    else {
-      this.organization.people = [...this.organization.people, ...people];
-    }
+    return people;
   }
 
   private cancelSelect(event:any) {
@@ -172,16 +179,16 @@ export class PersonSelectPage extends BasePrivatePage {
 
   private doneSelect(event:any) {
     let people = [];
-    if (this.organization.people && this.organization.people.length > 0) {
-      for (let person of this.organization.people) {
+    if (this.people && this.people.length > 0) {
+      for (let person of this.people) {
         if (person.selected == true) {
           people.push(person);
         }
       }
     }
     let groups = [];
-    if (this.organization.groups && this.organization.groups.length > 0) {
-      for (let group of this.organization.groups) {
+    if (this.groups && this.groups.length > 0) {
+      for (let group of this.groups) {
         if (group.selected == true) {
           groups.push(group);
         }
@@ -193,15 +200,15 @@ export class PersonSelectPage extends BasePrivatePage {
     });
   }
 
-  private selectAllGroups(selection:boolean) {
-    for (let group of this.organization.groups) {
-      group.selected = selection;
+  private selectAllGroups(selected:boolean) {
+    for (let group of this.groups) {
+      group.selected = selected;
     }
   }
 
-  private selectAllPeople(selection:boolean) {
-    for (let person of this.organization.people) {
-      person.selected = selection;
+  private selectAllPeople(selected:boolean) {
+    for (let person of this.people) {
+      person.selected = selected;
     }
   }
 
