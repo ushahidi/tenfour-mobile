@@ -27,9 +27,15 @@ page-person-edit {
       }
     }
   }
+  .phone {
+    .input-cover {
+      margin-left: 140px;
+    }
+  }
   .roles {
     border-bottom: 1px solid color($colors, dark) !important;
     ion-label {
+      font-size: 15px !important;
       margin-left: 0 !important;
       padding-left: 0 !important;
       ion-icon {
@@ -38,12 +44,16 @@ page-person-edit {
       }
     }
   }
-  .phone {
-    .input-cover {
-      margin-left: 140px;
-    }
-  }
   .groups {
     border-bottom: 1px solid color($colors, dark) !important;
+    ion-label {
+      font-size: 15px !important;
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      ion-icon {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
   }
 }
