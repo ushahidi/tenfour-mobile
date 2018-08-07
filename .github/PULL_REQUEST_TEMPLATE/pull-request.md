@@ -10,11 +10,8 @@ about: Request to merge changes from a branch.
 #### Description
 -
 
-#### How To Test
--
-
 #### Related Issues
-- ushahidi/tenfour-mobile#
+- ushahidi/tenfour-mobile/issues/
 
 #### Type Of Changes
 - [ ] Bug fix
