@@ -131,7 +131,7 @@ export class IntercomProvider {
             resolve(false);
           });
         }
-        else {
+        else if (this.intercomWeb && window.hasOwnProperty('Intercom')) {
           let attributes = {
             name: user.name,
             email: organization.email,
