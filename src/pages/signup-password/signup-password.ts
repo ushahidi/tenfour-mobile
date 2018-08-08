@@ -177,15 +177,21 @@ export class SignupPasswordPage extends BasePublicPage {
   private updateFirebase(organization:Organization, person:Person):Promise<string> {
     return new Promise((resolve, reject) => {
       this.firebase.getToken().then((token:string) => {
-        this.logger.info(this, "updateFirebase", token);
-        this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
-          this.logger.info(this, "updateFirebase", token, "Updated", updated);
-          resolve(token);
-        },
-        (error:any) => {
-          this.logger.error(this, "updateFirebase", "Failed", error);
+        if (token && token.length > 0) {
+          this.logger.info(this, "updateFirebase", token);
+          this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
+            this.logger.info(this, "updateFirebase", token, "Updated", updated);
+            resolve(token);
+          },
+          (error:any) => {
+            this.logger.error(this, "updateFirebase", token, "Failed", error);
+            resolve(null);
+          });
+        }
+        else {
+          this.logger.warn(this, "updateFirebase", "NULL");
           resolve(null);
-        });
+        }
       },
       (error:string) => {
         resolve(null);
