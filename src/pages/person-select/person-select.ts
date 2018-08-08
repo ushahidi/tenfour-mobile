@@ -27,8 +27,6 @@ export class PersonSelectPage extends BasePrivatePage {
   groups:Group[] = null;
   show_groups:boolean = true;
   show_people:boolean = true;
-  limit:number = 20;
-  offset:number = 0;
   loading:boolean = false;
 
   constructor(
@@ -45,11 +43,6 @@ export class PersonSelectPage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
-  }
-
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
-    this.limit = this.website ? 30 : 20;
   }
 
   ionViewDidLoad() {
