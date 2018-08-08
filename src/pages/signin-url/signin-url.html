@@ -1,17 +1,14 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-title>{{title}}</ion-title>
-    <ion-buttons right>
-      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
-    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading">
       <img class="banner" src="assets/images/logo-banner.png"/>
-      <h2>Let's get you signed in.</h2>
-      <p>Enter your organization's TenFour web address.</p>
+      <h2>Let's get you logged in</h2>
+      <p>Enter your organization's TenFour URL.</p>
     </ion-item>
     <ion-item color="input" class="input">
       <ion-label fixed>URL</ion-label>
@@ -19,8 +16,15 @@
       <ion-input #subdomain type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
     <ion-item no-lines class="other">
-      <h4>New to TenFour?</h4>
-      <button ion-button clear tappable color="primary" (click)="createOrganization($event)">Create an organization</button>
+      <button ion-button clear tappable color="primary" tappable detail-push (click)="findURL($event)">Help, I don't know my URL</button>
+    </ion-item>
+    <ion-item>
+      <ion-buttons right>
+        <button color="primary" #next ion-button text-only (click)="showNext($event)">Log in to TenFour</button>
+      </ion-buttons>
+    </ion-item>
+    <ion-item no-lines class="other">
+      <button ion-button clear tappable color="primary" tappable detail-push (click)="createOrganization($event)">New to TenFour, Sign up here</button>
     </ion-item>
   </ion-list>
 </ion-content>
