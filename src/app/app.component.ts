@@ -255,21 +255,64 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadDeepLinks");
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
-        if (deeplink) {
+        if (deeplink && deeplink.path && deeplink.path.length > 0) {
           this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
-          if (deeplink.path === '/organization/email/confirmation/') {
-            let email = deeplink.parameters['email'];
-            let code = deeplink.parameters['code'];
-            this.showSignupVerify(email, code);
+          if (deeplink.path === '/#signin') {
+            this.showSigninUrl();
           }
-          else if (deeplink.path === '/login/email') {
-             //SigninEmailPage
+          else if (deeplink.path === '/#signin/email') {
+            this.logger.warn(this, "loadDeepLinks", "SigninEmailPage");
           }
-          else if (deeplink.path === '/login/password') {
-             //SigninPasswordPage
+          else if (deeplink.path === '/#signin/password') {
+            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
           }
-          else if (deeplink.path === '/login/invite') {
-             //SignupPasswordPage
+          else if (deeplink.path === '/#signup') {
+             this.showSignupPage();
+          }
+          else if (deeplink.path === '/#signup/check') {
+            this.logger.warn(this, "loadDeepLinks", "SignupCheckPage");
+          }
+          else if (deeplink.path.startsWith('/#signup/verify')) {
+            this.logger.warn(this, "loadDeepLinks", "SignupVerifyPage");
+          }
+          else if (deeplink.path === '/#signup/owner') {
+            this.logger.warn(this, "loadDeepLinks", "SignupOwnerPage");
+          }
+          else if (deeplink.path === '/#signup/name') {
+            this.logger.warn(this, "loadDeepLinks", "SignupNamePage");
+          }
+          else if (deeplink.path === '/#signup/url') {
+            this.logger.warn(this, "loadDeepLinks", "SignupUrlPage");
+          }
+          else if (deeplink.path === '/#signup/password') {
+            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
+          }
+          else if (deeplink.path === '/#checkins' || deeplink.path === '/#checkins/') {
+             this.showCheckinList();
+          }
+          else if (deeplink.path.startsWith('/#checkins/')) {
+            this.logger.warn(this, "loadDeepLinks", "CheckinDetailsPage");
+          }
+          else if (deeplink.path === '/#groups' || deeplink.path === '/#groups/') {
+             this.showGroupList();
+          }
+          else if (deeplink.path.startsWith('/#groups/')) {
+            this.logger.warn(this, "loadDeepLinks", "GroupDetailsPage");
+          }
+          else if (deeplink.path === '/#people' || deeplink.path === '/#people/') {
+             this.showPersonList();
+          }
+          else if (deeplink.path.startsWith('/#people/')) {
+            this.logger.warn(this, "loadDeepLinks", "PersonDetailsPage");
+          }
+          else if (deeplink.path === '/#notifications') {
+             this.showNotificationList();
+          }
+          else if (deeplink.path === '/#settings') {
+             this.showSettingsList();
+          }
+          else if (deeplink.path === '/#profile') {
+             this.showPersonProfile();
           }
         }
       },
@@ -566,7 +609,6 @@ export class TenFourApp {
 
   private showSignupPage(event:any=null) {
     this.logger.info(this, "showSignupPage");
-
     location.assign(location.protocol
       + "//"
       + this.environment.getAppDomain()
