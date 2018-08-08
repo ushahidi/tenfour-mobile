@@ -98,6 +98,9 @@ export class GroupDetailsPage extends BasePrivatePage {
       }
       else if (this.hasParameter("group")){
         this.group = this.getParameter<Group>("group");
+        if (event) {
+          event.complete();
+        }
         resolve(this.group);
       }
       else if (this.hasParameter("group_id")) {
@@ -115,9 +118,15 @@ export class GroupDetailsPage extends BasePrivatePage {
         },
         (error:any) => {
           reject(error);
+          if (event) {
+            event.complete();
+          }
         });
       }
       else {
+        if (event) {
+          event.complete();
+        }
         reject("Group Not Provided");
       }
     });
