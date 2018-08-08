@@ -101,27 +101,51 @@ export class SignupUrlPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    let loading = this.showLoading("Checking...", true);
-    this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
-      this.logger.info(this, "showNext", organizations);
-      loading.dismiss();
-      if (organizations && organizations.length > 0) {
-        this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
-      }
-      else {
-        this.organization.subdomain = this.subdomain.value;
-        this.storage.setOrganization(this.organization).then((stored:boolean) => {
-          this.showPage(SignupPasswordPage, {
-            organization: this.organization
+    if (this.subdomain.value && this.subdomain.value.length == 0) {
+      this.showToast("Please enter your subdomain");
+      setTimeout(() => {
+        this.subdomain.setFocus();
+      }, 500);
+    }
+    else if (["www", "app", "staging", "dev"].indexOf(this.subdomain.value) > -1) {
+      let alert = this.showAlert("Invalid Domain", "Your domain cannot be one of the existing domains such as www or app, please enter another value.");
+      alert.onDidDismiss(data => {
+        setTimeout(() => {
+          this.subdomain.setFocus();
+        }, 500);
+      });
+    }
+    else if (/^[a-zA-Z0-9]*$/.test(this.subdomain.value) == false) {
+      let alert = this.showAlert("Invalid Domain", "Your domain cannot include any special characters such as .-_!?@$%^&*(), please enter another value.");
+      alert.onDidDismiss(data => {
+        setTimeout(() => {
+          this.subdomain.setFocus();
+        }, 500);
+      });
+    }
+    else {
+      let loading = this.showLoading("Checking...", true);
+      this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
+        this.logger.info(this, "showNext", organizations);
+        loading.dismiss();
+        if (organizations && organizations.length > 0) {
+          this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
+        }
+        else {
+          this.organization.subdomain = this.subdomain.value;
+          this.storage.setOrganization(this.organization).then((stored:boolean) => {
+            this.showPage(SignupPasswordPage, {
+              organization: this.organization
+            });
           });
-        });
-      }
-    },
-    (error:any) => {
-      this.logger.error(this, "showNext", error);
-      loading.dismiss();
-      this.showAlert("Organization URL", error);
-    });
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "showNext", error);
+        loading.dismiss();
+        this.showAlert("Organization URL", error);
+      });
+    }
   }
 
   private showNextOnReturn(event:any) {
