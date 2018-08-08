@@ -11,5 +11,5 @@ export const Environment:IEnvironment = {
   segmentApiKey: "",
   firebaseAppId: "",
   firebaseApiKey: "",
-  firebaseSenderId: ''
+  firebaseSenderId: '240600431570'
 };
