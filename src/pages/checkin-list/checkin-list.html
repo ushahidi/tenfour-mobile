@@ -5,7 +5,7 @@
     </button>
     <ion-title>Check-Ins</ion-title>
     <ion-buttons right *ngIf="user">
-      <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor()" (click)="createCheckin($event)">
+      <button #create ion-button icon-only [solid]="website == true ? 'true' : null" color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor()" (click)="createCheckin($event)">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
       </button>
     </ion-buttons>
