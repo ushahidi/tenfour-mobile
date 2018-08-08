@@ -100,12 +100,20 @@ export class SignupOwnerPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.organization.user_name = this.owner.value;
-    this.storage.setOrganization(this.organization).then((stored:boolean) => {
-      this.showPage(SignupNamePage, {
-        organization: this.organization
+    if (this.owner.value.length == 0) {
+      this.showToast("Please enter your name");
+      setTimeout(() => {
+        this.owner.setFocus();
+      }, 500);
+    }
+    else {
+      this.organization.user_name = this.owner.value;
+      this.storage.setOrganization(this.organization).then((stored:boolean) => {
+        this.showPage(SignupNamePage, {
+          organization: this.organization
+        });
       });
-    });
+    }
   }
 
   private showNextOnReturn(event:any) {

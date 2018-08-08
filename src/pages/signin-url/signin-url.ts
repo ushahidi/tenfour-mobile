@@ -79,7 +79,13 @@ export class SigninUrlPage extends BasePublicPage {
 
   private showNext(event:any=null) {
     this.logger.info(this, "showNext", this.subdomain.value);
-    if (this.subdomain.value && this.subdomain.value.length > 0) {
+    if (this.subdomain.value.length == 0) {
+      this.showToast("Please enter your domain");
+      setTimeout(() => {
+        this.subdomain.setFocus();
+      }, 500);
+    }
+    else {
       let subdomain = this.subdomain.value.toLowerCase();
       let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {

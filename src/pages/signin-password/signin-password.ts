@@ -126,7 +126,6 @@ export class SigninPasswordPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.loading = true;
     if (this.password.value == null || this.password.value.length == 0) {
       this.showToast("Please enter your password");
       setTimeout(() => {
@@ -134,6 +133,7 @@ export class SigninPasswordPage extends BasePublicPage {
       }, 500);
     }
     else {
+      this.loading = true;
       let loading = this.showLoading("Logging in...", true);
       let password = this.password.value;
       Promise.resolve()

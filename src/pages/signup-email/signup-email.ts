@@ -55,7 +55,19 @@ export class SignupEmailPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    if (this.email.value && this.email.value.length > 0) {
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else if (this.email.value.indexOf("@") == -1) {
+      this.showToast("Please enter a valid email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else {
       let loading = this.showLoading("Registering...", true);
       this.api.registerEmail(this.email.value).then((email:Email) => {
         loading.dismiss();

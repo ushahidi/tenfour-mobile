@@ -100,26 +100,34 @@ export class SignupNamePage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    let loading = this.showLoading("Loading...");
-    this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
-      loading.dismiss();
-      if (organizations && organizations.length > 0) {
-        this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
-      }
-      else {
-        this.organization.name = this.name.value;
-        this.storage.setOrganization(this.organization).then((stored:boolean) => {
-          this.showPage(SignupUrlPage, {
-            organization: this.organization
+    if (this.name.value.length == 0) {
+      this.showToast("Please enter the organization's name");
+      setTimeout(() => {
+        this.name.setFocus();
+      }, 500);
+    }
+    else {
+      let loading = this.showLoading("Loading...");
+      this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
+        loading.dismiss();
+        if (organizations && organizations.length > 0) {
+          this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
+        }
+        else {
+          this.organization.name = this.name.value;
+          this.storage.setOrganization(this.organization).then((stored:boolean) => {
+            this.showPage(SignupUrlPage, {
+              organization: this.organization
+            });
           });
-        });
-      }
-    },
-    (error:any) => {
-      this.logger.info(this, "showNext", error);
-      loading.dismiss();
-      this.showAlert("Organization Name", error);
-    });
+        }
+      },
+      (error:any) => {
+        this.logger.info(this, "showNext", error);
+        loading.dismiss();
+        this.showAlert("Organization Name", error);
+      });
+    }
   }
 
   private showNextOnReturn(event:any) {

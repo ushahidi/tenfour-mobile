@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Check-In</ion-title>
     <ion-buttons right>
-      <button ion-button color="primary" [disabled]="checkin.message == null || checkin.message.length == 0" (click)="showNext($event)" *ngIf="checkin">Next</button>
+      <button ion-button color="primary" (click)="showNext($event)" *ngIf="checkin">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -15,7 +15,7 @@
       <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     </ion-item>
     <ion-item text-wrap text-center no-lines color="white" class="textarea">
-      <ion-textarea text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message"
+      <ion-textarea #message text-center type="text" autocorrect="off" autocapitalize="true" placeholder="Write your question or message"
         (keypress)="onKeyPress($event)" [(ngModel)]="checkin.message"></ion-textarea>
     </ion-item>
   </ion-list>
