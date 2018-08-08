@@ -126,7 +126,6 @@ export class SigninPasswordPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.loading = true;
     if (this.password.value == null || this.password.value.length == 0) {
       this.showToast("Please enter your password");
       setTimeout(() => {
@@ -134,6 +133,7 @@ export class SigninPasswordPage extends BasePublicPage {
       }, 500);
     }
     else {
+      this.loading = true;
       let loading = this.showLoading("Logging in...", true);
       let password = this.password.value;
       Promise.resolve()
@@ -196,15 +196,21 @@ export class SigninPasswordPage extends BasePublicPage {
   private updateFirebase(organization:Organization, person:Person):Promise<string> {
     return new Promise((resolve, reject) => {
       this.firebase.getToken().then((token:string) => {
-        this.logger.info(this, "updateFirebase", token);
-        this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
-          this.logger.info(this, "updateFirebase", token, "Updated", updated);
-          resolve(token);
-        },
-        (error:any) => {
-          this.logger.error(this, "updateFirebase", "Failed", error);
+        if (token && token.length > 0) {
+          this.logger.info(this, "updateFirebase", token);
+          this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
+            this.logger.info(this, "updateFirebase", token, "Updated", updated);
+            resolve(token);
+          },
+          (error:any) => {
+            this.logger.error(this, "updateFirebase", token, "Failed", error);
+            resolve(null);
+          });
+        }
+        else {
+          this.logger.warn(this, "updateFirebase", "NULL");
           resolve(null);
-        });
+        }
       },
       (error:string) => {
         resolve(null);

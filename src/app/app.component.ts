@@ -274,7 +274,7 @@ export class TenFourApp {
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadDeepLinks", "onMatch", error);
+        this.logger.warn(this, "loadDeepLinks", "onMatch", error);
       });
       resolve(true);
     });
@@ -712,7 +712,7 @@ export class TenFourApp {
       this.logger.info(this, "showIntercomMessenger", shown);
     },
     (error:any) => {
-      this.logger.error(this, "showIntercomMessenger", error);
+      this.logger.warn(this, "showIntercomMessenger", error);
     });
   }
 
@@ -799,7 +799,7 @@ export class TenFourApp {
       this.logger.info(this, "badge", "Cleared", cleared);
     },
     (error:any) => {
-      this.logger.error(this, "badge", "Clear Failed", error);
+      this.logger.warn(this, "badge", "Clear Failed", error);
     });
   }
 
@@ -873,8 +873,21 @@ export class TenFourApp {
   }
 
   private upgradeToPro(event:any) {
-    this.logger.info(this, "upgradeToPro");
-    this.navController.push(SettingsPaymentsPage);
+    this.logger.info(this, "upgradeToPro", "SettingsListPage");
+    this.nav.setRoot(SettingsListPage, {
+      organization: this.organization,
+      user: this.user
+    }).then((loaded:any) => {
+      this.logger.info(this, "upgradeToPro", "SettingsPaymentsPage");
+      this.navController.push(SettingsPaymentsPage, {
+        organization: this.organization,
+        user: this.user
+      });
+      this.hideSideMenu();
+    },
+    (error:any) => {
+      this.logger.error(this, "upgradeToPro", error);
+    });
   }
 
   private locationHash():string {

@@ -1,12 +1,10 @@
 page-person-edit {
   .phone {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
   }
   .email {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
     ion-label {
       margin-left: 0 !important;
@@ -19,18 +17,7 @@ page-person-edit {
   }
   .address {
     ion-input {
-      border-bottom: 1px solid color($colors, dark);
     }
-    ion-label {
-      margin-left: 0 !important;
-      padding-left: 0 !important;
-      ion-icon {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-      }
-    }
-  }
-  .role {
     ion-label {
       margin-left: 0 !important;
       padding-left: 0 !important;
@@ -45,7 +32,28 @@ page-person-edit {
       margin-left: 140px;
     }
   }
+  .roles {
+    border-bottom: 1px solid color($colors, dark) !important;
+    ion-label {
+      font-size: 15px !important;
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      ion-icon {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
+  }
   .groups {
-
+    border-bottom: 1px solid color($colors, dark) !important;
+    ion-label {
+      font-size: 15px !important;
+      margin-left: 0 !important;
+      padding-left: 0 !important;
+      ion-icon {
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+      }
+    }
   }
 }

@@ -74,12 +74,12 @@ export class IntercomProvider {
             resolve(true);
           },
           (error:any) => {
-            this.logger.error(this, "showMessenger", "displayMessenger", error);
+            this.logger.warn(this, "showMessenger", "displayMessenger", error);
             resolve(false);
           });
         },
         (error:any) => {
-          this.logger.error(this, "showMessenger", error);
+          this.logger.warn(this, "showMessenger", error);
           resolve(false);
         });
       }
@@ -97,7 +97,7 @@ export class IntercomProvider {
           resolve(true);
         },
         (error:any) => {
-          this.logger.error(this, "hideMessenger", error);
+          this.logger.warn(this, "hideMessenger", error);
           resolve(false);
         });
       }
@@ -127,11 +127,11 @@ export class IntercomProvider {
             resolve(true);
           },
           (error:any) => {
-            this.logger.error(this, "trackLogin", "updateUser", attributes, error);
+            this.logger.warn(this, "trackLogin", "updateUser", attributes, error);
             resolve(false);
           });
         }
-        else {
+        else if (this.intercomWeb && window.hasOwnProperty('Intercom')) {
           let attributes = {
             name: user.name,
             email: organization.email,
@@ -163,7 +163,7 @@ export class IntercomProvider {
           resolve(true);
         },
         (error:any) => {
-          this.logger.error(this, "resetUser", error);
+          this.logger.warn(this, "resetUser", error);
           resolve(false);
         });
       }

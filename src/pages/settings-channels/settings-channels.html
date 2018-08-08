@@ -32,7 +32,7 @@
       </ion-label>
       <ion-toggle [disabled]="!organization || !organization.hasProPlan()" [(ngModel)]="organization.sms_enabled"></ion-toggle>
     </ion-item>
-    <ion-item color="white" no-lines>
+    <ion-item color="white" no-lines class="slack">
       <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
       <ion-label>
         <h2>Slack</h2>
@@ -41,11 +41,15 @@
     </ion-item>
     <ion-item color="white" class="webhook" [class.hidden]="organization.slack_enabled == false" *ngIf="organization && organization.hasProPlan()">
       <ion-icon color="white" ios="ios-chatboxes" md="md-chatboxes" item-left *ngIf="organization.slack_enabled"></ion-icon>
-      <ion-label *ngIf="organization.slack_enabled">Webhook</ion-label>
+      <ion-label *ngIf="organization.slack_enabled">
+        <h2>Webhook</h2>
+      </ion-label>
       <ion-input type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="https://" [(ngModel)]="organization.slack_webhook" *ngIf="organization.slack_enabled"></ion-input>
+      <button item-end ion-button clear icon-only color="grey" title="How to configure channels" *ngIf="organization.slack_enabled" (click)="showUrl('https://api.slack.com/incoming-webhooks', '_blank', $event)">
+        <ion-icon no-padding no-margin ios="ios-help-circle" md="md-help-circle"></ion-icon>
+      </button>
     </ion-item>
   </ion-list>
-  <!-- <button ion-button clear color="primary" (click)="showUrl(help, '_blank', $event)">How to configure channels</button> -->
   <div *ngIf="organization && !organization.hasProPlan()">
     <p text-center>This is a Pro feature</p>
     <p text-center *ngIf="user && user.isOwner() && !ios">

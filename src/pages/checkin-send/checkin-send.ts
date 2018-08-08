@@ -96,6 +96,11 @@ export class CheckinSendPage extends BasePrivatePage {
   private loadCheckin(cache:boolean=true):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.checkin = this.getParameter<Checkin>("checkin");
+      if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
+        if (this.organization && this.organization.hasFreePlan()) {
+          this.checkin.send_via = "app";
+        }
+      }
       resolve(this.checkin);
     });
   }
@@ -159,7 +164,10 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private sendCheckin(event:any) {
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
-      this.showToast("Please select how the Check-In will be sent");
+      this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
+    }
+    else if (this.checkin.recipientIds().length == 0) {
+      this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
     }
     else {
       let loading = this.showLoading("Sending...", true);
@@ -191,28 +199,44 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private showPopover(event:any) {
     this.logger.info(this, "showPopover", event, this.checkin.send_via);
-
     if (this.organization.hasFreePlan()) {
-      return this.upgradeToPro(event);
+      let popover = this.popoverController.create(SendViaComponent, {
+        send_via: this.checkin.send_via,
+        app_enabled: this.organization.app_enabled,
+        email_enabled: false,
+        sms_enabled: false,
+        slack_enabled: false,
+        on_changed:(send_via:any) => {
+          this.logger.info(this, "sendViaChanged", send_via);
+          this.checkin.send_via = send_via;
+        }
+      },{
+        showBackdrop: true,
+        enableBackdropDismiss: true
+      });
+      popover.present({
+        ev: event
+      });
     }
-
-    let popover = this.popoverController.create(SendViaComponent,
-      { send_via: this.checkin.send_via,
+    else {
+      let popover = this.popoverController.create(SendViaComponent, {
+        send_via: this.checkin.send_via,
         app_enabled: this.organization.app_enabled,
         email_enabled: this.organization.email_enabled,
-        // sms_enabled: this.organization.sms_enabled && this.organization.credits > 0,
         sms_enabled: this.organization.sms_enabled,
         slack_enabled: this.organization.slack_enabled,
         on_changed:(send_via:any) => {
-            this.logger.info(this, "sendViaChanged", send_via);
-            this.checkin.send_via = send_via;
-          }
-        },
-      { showBackdrop: true,
-        enableBackdropDismiss: true });
-    popover.present({
-      ev: event
-    });
+          this.logger.info(this, "sendViaChanged", send_via);
+          this.checkin.send_via = send_via;
+        }
+      },{
+        showBackdrop: true,
+        enableBackdropDismiss: true
+      });
+      popover.present({
+        ev: event
+      });
+    }
   }
 
   private countRecipients() {
@@ -221,12 +245,18 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
-
     if (this.ios) {
-      return;
+      let alert = this.showAlert("Visit Website", "Please login to the website to upgrade to TenFour Pro.");
+      alert.onDidDismiss(data => {
+        this.showUrl("https://app.tenfour.org", "_blank");
+      });
     }
-
-    this.navController.push(SettingsPaymentsPage);
+    else {
+      this.showModalOrPage(SettingsPaymentsPage, {
+        organization: this.organization,
+        user: this.user
+      });
+    }
   }
 
 }

@@ -50,6 +50,13 @@
         <ion-option value="">Leave Empty</ion-option>
       </ion-select>
     </ion-item>
+    <ion-item>
+      <ion-label>Role</ion-label>
+      <ion-select [(ngModel)] = "map.role" interface="popover">
+        <ion-option *ngFor="let column of columns" [value]="column">{{column}}</ion-option>
+        <ion-option value="">Leave Empty</ion-option>
+      </ion-select>
+    </ion-item>
     <!--
     <ion-item>
       <ion-label>Twitter</ion-label>

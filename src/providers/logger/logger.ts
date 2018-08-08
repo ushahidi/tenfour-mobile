@@ -1,6 +1,7 @@
 import { Injectable, isDevMode } from '@angular/core';
-
 import { Platform } from 'ionic-angular';
+
+import { Device } from '@ionic-native/device';
 import { IsDebug } from '@ionic-native/is-debug';
 
 @Injectable()
@@ -9,17 +10,22 @@ export class LoggerProvider {
   private enabled:boolean = true;
 
   constructor(
+    private device:Device,
     private isDebug:IsDebug,
     private platform:Platform) {
     this.platform.ready().then(() => {
       if (this.platform.is("cordova")) {
-        this.isDebug.getIsDebug().then((isDebug:boolean) => {
-          //TODO this isn't reliably returning correct value
-          this.enabled = isDebug;
-        },
-        (error:any) => {
-          this.enabled = false;
-        });
+        if (this.device.isVirtual) {
+          this.enabled = true;
+        }
+        else {
+          this.isDebug.getIsDebug().then((isDebug:boolean) => {
+            this.enabled = isDebug;
+          },
+          (error:any) => {
+            this.enabled = false;
+          });
+        }
       }
       else if (isDevMode()) {
         this.enabled = true;

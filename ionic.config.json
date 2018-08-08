@@ -1,6 +1,8 @@
 {
   "name": "tenfour",
-  "app_id": "",
+  "integrations": {
+    "cordova": {}
+  },
   "proxies": [
     {
       "path": "/api.tenfour.org",
@@ -19,8 +21,5 @@
       "proxyUrl": "https://maps.googleapis.com"
     }
   ],
-  "integrations": {
-    "cordova": {}
-  },
   "type": "ionic-angular"
 }

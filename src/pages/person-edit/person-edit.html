@@ -21,7 +21,7 @@
       <input style="display:none" type="file" (change)="onFileChanged($event)" #fileInput *ngIf="website == true">
     </ion-item>
     <ion-item color="white">
-      <ion-label floating>Name</ion-label>
+      <ion-label floating>Full Name</ion-label>
       <ion-input type="text" autocorrect="off" autocapitalize="words" autocomplete="off" (keypress)="onKeyPress($event)" [(ngModel)]="person.name"></ion-input>
     </ion-item>
     <ion-item color="white">
@@ -65,10 +65,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person && !person.isOwner() && user && user.isOwnerOrAdmin()">
-    <ion-item class="role" color="white">
-      <ion-label no-padding no-margin icon-only text-left>
-        <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
-      </ion-label>
+    <ion-item class="roles" color="white">
+      <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      <ion-label no-padding no-margin icon-only text-left color="grey">Roles</ion-label>
       <ion-select item-right interface="action-sheet" multiple="false" [selectOptions]="roleOptions" [(ngModel)]="person.role">
         <ion-option value="admin">Administrator</ion-option>
         <ion-option value="author">Author</ion-option>
@@ -78,8 +77,9 @@
     </ion-item>
   </ion-list>
   <ion-list *ngIf="person">
-    <ion-item color="white" class="groups" text-wrap tappable (click)="showPeopleSelect($event)">
+    <ion-item class="groups" color="white" text-wrap tappable (click)="showPeopleSelect($event)">
       <ion-icon ios="ios-people" md="md-people" item-left></ion-icon>
+      <ion-label no-padding no-margin icon-only text-left color="grey">Groups</ion-label>
       <div item-content class="content">{{person.groupNames()}}</div>
       <button ion-button clear item-right>
         <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>

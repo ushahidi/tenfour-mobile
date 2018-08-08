@@ -239,7 +239,7 @@ export class BasePage {
         this.content.resize();
       }
       else {
-        this.logger.error(this, "resizeContent", "NULL");
+        this.logger.warn(this, "resizeContent", "NULL");
       }
     }, delay);
   }
@@ -277,6 +277,22 @@ export class BasePage {
           reject(error2);
         });
       }
+    });
+  }
+
+  protected promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
+    return new Promise((resolve, reject) => {
+      var timer = setTimeout(() => {
+        reject("Promise Timeout");
+      }, milliseconds);
+      promise.then((result:any) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((error:any) => {
+        clearTimeout(timer);
+        reject(error);
+      });
     });
   }
 

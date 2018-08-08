@@ -157,7 +157,7 @@ export class CheckinTokenPage extends BasePage {
           this.logger.info(this, "loadAnswer", answerId, answer.answer);
         }
         else {
-          this.logger.error(this, "loadAnswer", answerId);
+          this.logger.warn(this, "loadAnswer", answerId);
         }
         resolve(this.answer);
       }

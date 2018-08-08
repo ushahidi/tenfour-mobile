@@ -26,6 +26,21 @@ ion-toolbar {
     max-height: 100%;
   }
 }
+ion-fab {
+  &.intercom {
+    bottom: 12px !important;
+    right: 12px !important;
+    button {
+      padding: 0;
+      width: 40px !important;
+      height: 40px !important;
+      img {
+        width: 23px !important;
+        height: 23px !important;
+      }
+    }
+  }
+}
 ion-item {
   ion-icon {
     color: color($colors, icon);
@@ -39,6 +54,22 @@ ion-item {
     ion-label {
       color: color($colors, black) !important;
     }
+  }
+  &.item-input-has-value, &:last-child {
+    border-bottom-color: color($colors, dark) !important;
+    box-shadow: none !important;
+    .item-inner {
+      border-bottom-color: color($colors, dark) !important;
+      box-shadow: none !important;
+    }
+  }
+  &.item-input-has-focus {
+    .item-inner {
+      border-bottom-color: color($colors, primary) !important;
+    }
+  }
+  &.item-input-has-focus:last-child {
+    border-bottom-color: color($colors, primary) !important;
   }
 }
 ion-menu {

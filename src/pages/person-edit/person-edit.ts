@@ -132,8 +132,15 @@ export class PersonEditPage extends BasePrivatePage {
           if (countries && countries.length > 0) {
             this.countryCodes = countries
               .map(country => country.country_code)
-              .filter((v, i, a) => a.indexOf(v) === i);
-            resolve();
+              .filter((v, i, a) => a.indexOf(v) === i)
+              .sort((n1, n2) => {
+                if (n1 < n2)
+                  return -1;
+                if (n1 > n2)
+                  return 1;
+                return 0;
+              });
+            resolve(true);
           }
           else {
             this.loadRegions(false).then(resolve);
@@ -144,8 +151,15 @@ export class PersonEditPage extends BasePrivatePage {
         this.api.getRegions(this.organization).then((regions:Region[]) => {
           this.countryCodes = regions
             .map(region => region.country_code)
-            .filter((v, i, a) => a.indexOf(v) === i);
-          resolve();
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort((n1, n2) => {
+              if (n1 < n2)
+                return -1;
+              if (n1 > n2)
+                return 1;
+              return 0;
+            });
+          resolve(true);
         });
       }
     });

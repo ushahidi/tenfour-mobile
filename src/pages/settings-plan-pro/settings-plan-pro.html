@@ -1,12 +1,14 @@
 <ion-header>
   <ion-navbar>
-    <ion-title>Payment Details</ion-title>
     <ion-buttons left>
       <button ion-button color="cancel" (click)="closeModal($event)">Cancel</button>
     </ion-buttons>
+    <ion-title>Payment Details</ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content padding>
-  <ion-spinner name="ios" *ngIf="iframe == null"></ion-spinner>
+  <div text-center class="spinner" *ngIf="iframe == null">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
   <iframe [src]="iframe" frameborder="0" *ngIf="iframe"></iframe>
 </ion-content>

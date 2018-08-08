@@ -10,6 +10,8 @@ import { AngularFireModule } from 'angularfire2';
 import { SegmentModule } from 'ngx-segment-analytics';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
 
+import { Environment as ENVIRONMENT } from "@app/env";
+
 import { HTTP } from '@ionic-native/http';
 import { AppVersion } from '@ionic-native/app-version';
 import { IsDebug } from '@ionic-native/is-debug';
@@ -219,27 +221,21 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({
-      apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
+      apiKey: ENVIRONMENT.segmentApiKey,
       debug: false
     }),
     AngularFireModule.initializeApp({
-      projectId: "tenfour-7322f",
-      apiKey: "AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI",
-      authDomain: "tenfour-7322f.firebaseapp.com",
-      databaseURL: "https://tenfour-7322f.firebaseio.com",
-      storageBucket: "tenfour-7322f.appspot.com",
-      messagingSenderId: '240600431570'
+      projectId: ENVIRONMENT.firebaseAppId,
+      apiKey: ENVIRONMENT.firebaseApiKey,
+      messagingSenderId: ENVIRONMENT.firebaseSenderId
     }),
     IntercomModule.forRoot(),
-    IonicModule.forRoot(TenFourApp,
-      {
-        scrollAssist: true,
-        autoFocusAssist: true
-      },
-      {
-        links: TenFourRoutes.ROUTES
-      }
-    )
+    IonicModule.forRoot(TenFourApp, {
+      scrollAssist: true,
+      autoFocusAssist: true
+    },{
+      links: TenFourRoutes.ROUTES
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [

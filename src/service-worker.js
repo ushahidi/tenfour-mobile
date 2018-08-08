@@ -25,9 +25,12 @@ self.toolbox.options.cache = {
 };
 self.toolbox.precache(
   [
+    './build/main.js',
+    './build/main.css',
+    './build/polyfills.js',
     'index.html',
     'manifest.json'
   ]
 );
-self.toolbox.router.any('/*', self.toolbox.cacheFirst);
+self.toolbox.router.any('/*', self.toolbox.networkFirst);
 self.toolbox.router.default = self.toolbox.networkFirst;

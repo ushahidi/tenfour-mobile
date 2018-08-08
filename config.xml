@@ -135,9 +135,8 @@
     <allow-navigation href="http://192.168.0.30:8100" />
     <allow-navigation href="http://192.168.178.192:8100" />
     <allow-navigation href="http://169.254.69.103:8100" />
-    <engine name="ios" spec="~4.5.4" />
+    <engine name="ios" spec="~4.5.5" />
     <engine name="android" spec="~6.4.0" />
-    <engine name="browser" spec="~5.0.3" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
@@ -178,10 +177,11 @@
     <plugin name="cordova-plugin-screen-orientation" spec="^2.0.2" />
     <plugin name="cordova-plugin-badge" spec="^0.8.7" />
     <plugin name="cordova-plugin-advanced-http" spec="^1.11.1" />
-    <plugin name="cordova-plugin-firebase" spec="^1.0.5" />
     <plugin name="cordova-android-support-gradle-release" spec="^1.4.4">
         <variable name="ANDROID_SUPPORT_VERSION" value="26.+" />
     </plugin>
-    <plugin name="cordova-plugin-intercom" spec="^6.0.0" />
+    <plugin name="cordova-plugin-intercom" spec="^6.1.0" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
+    <plugin name="cordova-plugin-firebase" spec="^1.0.5" />
+    <engine name="browser" spec="~5.0.3" />
 </widget>

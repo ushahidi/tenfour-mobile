@@ -98,12 +98,15 @@ export class SettingsSizesPage extends BasePrivatePage {
     this.logger.info(this, "doneEdit", "Size", this.organization.size)
     let loading = this.showLoading("Updating...", true);
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
-      this.storage.saveOrganization(organization).then(saved => {
-        loading.dismiss();
-        this.hideModal({
-          organization: organization
-        });
-      });
+      this.logger.info(this, "doneEdit", "Organization", organization);
+      Promise.all([
+        this.storage.setOrganization(organization),
+        this.storage.saveOrganization(organization)]).then(((saved:any[]) => {
+          loading.dismiss();
+          this.hideModal({
+            organization: organization
+          });
+        }));
     },
     (error:any) => {
       loading.dismiss();
