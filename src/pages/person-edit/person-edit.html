@@ -21,7 +21,7 @@
       <input style="display:none" type="file" (change)="onFileChanged($event)" #fileInput *ngIf="website == true">
     </ion-item>
     <ion-item color="white">
-      <ion-label floating>Name</ion-label>
+      <ion-label floating>Full Name</ion-label>
       <ion-input type="text" autocorrect="off" autocapitalize="words" autocomplete="off" (keypress)="onKeyPress($event)" [(ngModel)]="person.name"></ion-input>
     </ion-item>
     <ion-item color="white">
