@@ -98,7 +98,6 @@ export class PersonEditPage extends BasePrivatePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-
     return new Promise((resolve, reject) => {
       return this.loadOrganization(cache)
         .then((org) => { return this.loadUser(cache); })
@@ -263,11 +262,20 @@ export class PersonEditPage extends BasePrivatePage {
         contacts.push(this.saveContact(this.organization, person, contact));
       }
       Promise.all(contacts).then((updated:any) => {
-        this.storage.savePerson(this.organization, person).then((saved:any) => {
+        let saves = [];
+        if (this.profile) {
+          saves.push(this.storage.setUser(person));
+        }
+        saves.push(this.storage.savePerson(this.organization, person));
+        Promise.all(saves).then((saved:any) => {
           loading.dismiss();
           this.hideModal({
             person: person
           });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert(`Problem ${activity} Person`, error);
         });
       },
       (error:any) => {
