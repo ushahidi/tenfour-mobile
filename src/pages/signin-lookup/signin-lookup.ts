@@ -24,6 +24,8 @@ export class SigninLookupPage extends BasePublicPage {
 
   @ViewChild('email')
   email:TextInput;
+  sent:boolean = false;
+  sentToEmail:string;
 
   constructor(
       protected zone:NgZone,
@@ -50,5 +52,40 @@ export class SigninLookupPage extends BasePublicPage {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
   }
+  private showNext(event:any) {
+    this.logger.info(this, "showNext", this.email.value);
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else if (this.email.value.indexOf("@") == -1) {
+      this.showToast("Please enter a valid email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+    }
+    else {
+      this.sentToEmail = this.email.value;
+      let loading = this.showLoading("Sending recovery email...", true);
 
+      this.api.lookupOrganization(this.sentToEmail).then(() => {
+        this.sent = true;
+        loading.dismiss();
+      }, (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Sending Recovery email", error);
+      })
+    }
+  }
+
+  private showNextOnReturn(event:any) {
+    if (this.isKeyReturn(event)) {
+      this.hideKeyboard();
+      this.showNext(event);
+      return false;
+    }
+    return true;
+  }
 }

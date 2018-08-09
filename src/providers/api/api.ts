@@ -1468,4 +1468,15 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public lookupOrganization(email:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/organization/lookup`;
+      let params = {
+        email: email,
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      }, reject);
+    });
+  }
 }
