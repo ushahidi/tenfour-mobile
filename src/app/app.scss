@@ -26,6 +26,14 @@ ion-toolbar {
     max-height: 100%;
   }
 }
+ion-navbar {
+  ion-buttons {
+    .bar-button-solid {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+}
 ion-fab {
   &.intercom {
     bottom: 12px !important;
