@@ -284,7 +284,7 @@ export class ApiProvider extends HttpProvider {
 
   public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/create_organization`;
+      let url = `${this.api}/organization/create`;
       let params = {
         name: organization.name,
         email: organization.email,
@@ -1468,4 +1468,15 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public lookupOrganization(email:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/organization/lookup`;
+      let params = {
+        email: email,
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      }, reject);
+    });
+  }
 }

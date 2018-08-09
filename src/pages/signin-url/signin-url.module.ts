@@ -9,6 +9,9 @@ import { SigninEmailModule } from '../../pages/signin-email/signin-email.module'
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SignupEmailModule } from '../../pages/signup-email/signup-email.module';
 
+import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
+import { SigninLookupModule } from '../../pages/signin-lookup/signin-lookup.module';
+
 @NgModule({
   declarations: [
     SigninUrlPage,
@@ -16,13 +19,15 @@ import { SignupEmailModule } from '../../pages/signup-email/signup-email.module'
   imports: [
     SigninEmailModule,
     SignupEmailModule,
+    SigninLookupModule,
     IonicPageModule.forChild(SigninUrlPage),
   ],
   exports: [
     SigninUrlPage
   ],
   entryComponents: [
-    SigninUrlPage
+    SigninUrlPage,
+    SigninLookupPage
   ]
 })
 export class SigninUrlModule {}

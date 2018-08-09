@@ -6,6 +6,7 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
