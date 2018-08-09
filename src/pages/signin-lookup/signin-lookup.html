@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons right>
+      <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item text-wrap class="heading">
+      <img src="assets/images/logo-dots.png"/>
+      <h2>What's your email address?</h2>
+    </ion-item>
+    <ion-item color="input" class="input">
+      <ion-label fixed>Email</ion-label>
+      <ion-input #email type="email" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your email address" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+  </ion-list>
+</ion-content>
