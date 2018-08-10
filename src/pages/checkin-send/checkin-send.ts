@@ -137,6 +137,7 @@ export class CheckinSendPage extends BasePrivatePage {
          this.checkin.groups = data.groups;
        }
        this.countRecipients();
+       this.fillRecipientsSendVia();
      });
   }
 
@@ -209,6 +210,7 @@ export class CheckinSendPage extends BasePrivatePage {
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;
+          this.fillRecipientsSendVia();
         }
       },{
         showBackdrop: true,
@@ -228,6 +230,7 @@ export class CheckinSendPage extends BasePrivatePage {
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;
+          this.fillRecipientsSendVia();
         }
       },{
         showBackdrop: true,
@@ -241,6 +244,34 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private countRecipients() {
     this.checkin.waiting_count = this.checkin.recipientIds().length;
+  }
+
+  private fillRecipientsSendVia() {
+    let checkin_send_via = this.checkin.sendVia();
+
+    for (let recipient of this.checkin.recipients) {
+      let recipient_send_via = [];
+
+      for (let contact of recipient.contacts) {
+        if (contact.blocked) {
+          continue;
+        }
+
+        if (contact.type === 'phone' && checkin_send_via.indexOf('sms') > -1) {
+          recipient_send_via.push('sms');
+        }
+
+        if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
+          recipient_send_via.push('email');
+        }
+      }
+
+      if (checkin_send_via.indexOf('app') > -1) {
+        recipient_send_via.push('app');
+      }
+
+      recipient.send_via = recipient_send_via.join(',');
+    }
   }
 
   private upgradeToPro(event:any) {

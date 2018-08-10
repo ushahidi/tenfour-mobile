@@ -3,12 +3,22 @@ import { Column } from '../decorators/column';
 
 import { Model, TEXT, INTEGER, BOOLEAN, PRIMARY_KEY } from '../models/model';
 
+import { Contact } from '../models/contact';
+
 @Table("recipients")
 export class Recipient extends Model {
 
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+
+    if (data.contacts && data.contacts.length > 0) {
+      this.contacts = [];
+      for (let _contact of data.contacts) {
+        let contact = new Contact(_contact);
+        this.contacts.push(contact);
+      }
+    }
   }
 
   public newInstance<M extends Recipient>(data:any=null):Recipient {
@@ -72,4 +82,6 @@ export class Recipient extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
+  public contacts:Contact[] = [];
+  public send_via:string = null;
 }
