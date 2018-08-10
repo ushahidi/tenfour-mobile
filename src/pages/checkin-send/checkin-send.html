@@ -36,7 +36,8 @@
     <ion-item color="white" class="group" *ngFor="let group of checkin.groups">
       <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
       <h2>{{group.name}}</h2>
-      <h3>{{checkin.send_via | humanize}}</h3>
+      <h3 *ngIf="checkin.send_via">via {{checkin.send_via | humanize}}</h3>
+      <h3 *ngIf="!checkin.send_via">Will not receive the Check-In</h3>
       <button ion-button icon-only item-right clear color="black" tappable (click)="removeGroup(group)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
@@ -44,7 +45,8 @@
     <ion-item color="white" class="person" *ngFor="let recipient of checkin.recipients">
       <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
       <h2>{{recipient.name}}</h2>
-      <h3>{{recipient.send_via | humanize}}</h3>
+      <h3 *ngIf="recipient.send_via">via {{recipient.send_via | humanize}}</h3>
+      <h3 *ngIf="!recipient.send_via">Will not receive the Check-In</h3>
       <button ion-button icon-only item-right clear color="black" tappable (click)="removeRecipient(recipient)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
