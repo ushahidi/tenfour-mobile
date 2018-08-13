@@ -95,7 +95,7 @@ export class SigninUrlPage extends BasePublicPage {
           let organization:Organization = organizations[0];
           if (!this.redirectToOrganizationSubdomain(organization)) {
             this.storage.setOrganization(organization).then((stored:boolean) => {
-              this.showPage(SigninEmailPage, {
+              this.showModal(SigninEmailPage, {
                 organization: organization
               });
             });
@@ -134,7 +134,7 @@ export class SigninUrlPage extends BasePublicPage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    this.showPage(SignupEmailPage, {});
+    this.showModal(SignupEmailPage, {});
   }
 
   private showNextOnReturn(event:any) {
@@ -144,6 +144,10 @@ export class SigninUrlPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

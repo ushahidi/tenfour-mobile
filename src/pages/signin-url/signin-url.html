@@ -1,12 +1,11 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title>{{title}}</ion-title>
+    <ion-title>Log in to TenFour </ion-title>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading">
-      <img class="banner" src="assets/images/logo-banner.png"/>
       <h2>Let's get you logged in</h2>
       <p>Enter your organization's TenFour URL.</p>
     </ion-item>
@@ -19,12 +18,12 @@
       <button ion-button clear tappable color="primary" tappable detail-push (click)="findURL($event)">Help, I don't know my URL</button>
     </ion-item>
     <ion-item>
-      <ion-buttons right>
+      <ion-buttons>
         <button color="primary" #next ion-button text-only (click)="showNext($event)">Log in to TenFour</button>
       </ion-buttons>
     </ion-item>
     <ion-item no-lines class="other">
-      <button ion-button clear tappable color="primary" tappable detail-push (click)="createOrganization($event)">New to TenFour, Sign up here</button>
+      <button ion-button clear tappable color="primary" tappable detail-push (click)="createOrganization($event)"><h2>New to TenFour, Sign up here</h2></button>
     </ion-item>
   </ion-list>
 </ion-content>

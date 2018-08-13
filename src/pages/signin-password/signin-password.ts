@@ -255,4 +255,8 @@ export class SigninPasswordPage extends BasePublicPage {
     return true;
   }
 
+  private closeModal(event:any=null) {
+    this.hideModal();
+  }
+
 }

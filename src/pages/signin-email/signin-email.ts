@@ -115,7 +115,7 @@ export class SigninEmailPage extends BasePublicPage {
     }
     else {
       let email = this.email.value;
-      this.showPage(SigninPasswordPage, {
+      this.showModal(SigninPasswordPage, {
         organization: this.organization,
         email: email
       });
@@ -131,12 +131,8 @@ export class SigninEmailPage extends BasePublicPage {
     return true;
   }
 
-  private back(event:any) {
-    location.assign(location.protocol
-      + "//"
-      + this.environment.getAppDomain()
-      + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-      + "/");
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

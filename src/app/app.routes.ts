@@ -2,6 +2,7 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { OnboardListPage } from '../pages/onboard-list/onboard-list';
 
+import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
@@ -60,7 +61,8 @@ export class TenFourRoutes {
   static readonly ROUTES = [
     { component: SplashScreenPage, name: 'SplashScreenPage', segment: 'loading' },
 
-    { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin' },
+    { component: SigninPage, name: 'SigninPage', segment: 'signin' },
+    { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin/url' },
     { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email'},
     { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: ['SigninUrlPage'] },
     { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },

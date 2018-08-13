@@ -3,6 +3,7 @@ import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal
 
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
+import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';

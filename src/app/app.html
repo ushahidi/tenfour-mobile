@@ -39,6 +39,48 @@
       </p>
     </ion-content>
   </ion-menu>
+  <!---for backdrop --->
+  <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()" *ngIf="user == null">
+    <ion-header>
+      <ion-toolbar color="navbar">
+        <ion-buttons left>
+          <organization-logo item-left [image]="organization.profile_picture" *ngIf="organization"></organization-logo>
+        </ion-buttons>
+        <ion-title *ngIf="organization">{{organization.name}}</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content>
+      <ion-list *ngIf="organization && user">
+        <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showPersonList($event)">People</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showNotificationList($event)">Notifications</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="mobile" (click)="showIntercomMessenger($event)">Help</ion-item>
+      </ion-list>
+      <div *ngIf="organization && organization.hasFreePlan() && user && (user.isOwner() || user.isAdmin())">
+        <p text-center>You are using the free version of TenFour</p>
+        <p text-center *ngIf="user && user.isOwner() && !ios">
+          <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
+        </p>
+      </div>
+      <div *ngIf="organization && organization.hasProPlan() && user && (user.isOwner() || user.isAdmin())">
+        <p text-center *ngIf="organization.credits == 0">No credits remaining</p>
+        <p text-center *ngIf="organization.credits > 0">{{organization.credits}} credits remaining</p>
+        <p text-center *ngIf="user && user.isOwner() && !ios && organization.credits == 0">
+          <button ion-button color="primary" (click)="upgradeToPro($event)">Add SMS Credits</button>
+        </p>
+      </div>
+      <p text-center *ngIf="user">
+        <button ion-button block clear color="primary" (click)="userLogout($event)">Log out</button>
+      </p>
+      <p text-center *ngIf="environmentName && apiEndpoint">
+        <button ion-button block clear color="primary" (click)="showAlert(environmentName, apiEndpoint)">***{{environmentName}}***</button>
+      </p>
+    </ion-content>
+  </ion-menu>
+  <!--end backdrop --->
   <ion-menu #details [content]="content" persistent="true" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">
     <ion-header>
       <ion-toolbar color="navbar">

@@ -44,6 +44,7 @@ import { TenFourRoutes } from './app.routes';
 
 import { SplashScreenModule } from '../pages/splash-screen/splash-screen.module';
 
+import { SigninModule } from '../pages/signin/signin.module';
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
 import { SigninInviteModule } from '../pages/signin-invite/signin-invite.module';
@@ -168,9 +169,9 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     GroupListModule,
     GroupEditModule,
     GroupDetailsModule,
+    SigninModule,
     SigninUrlModule,
     SigninEmailModule,
-    SigninUrlModule,
     SigninInviteModule,
     SigninPasswordModule,
     SignupUrlModule,
