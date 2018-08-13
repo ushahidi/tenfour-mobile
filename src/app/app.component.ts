@@ -73,7 +73,8 @@ import {
   EVENT_CHECKIN_CREATED,
   EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
-  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
+  EVENT_SUBSCRIPTION_CHANGED,
+  EVENT_NOTIFICATIONS_CHANGED } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -99,6 +100,8 @@ export class TenFourApp {
 
   environmentName:string = null;
   apiEndpoint:string = null;
+
+  unreadNotificationsNumber:number = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -147,7 +150,7 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),
                 new Email(),
@@ -173,8 +176,9 @@ export class TenFourApp {
           .then(() => this.loadAnalytics())
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadWebApp())
+          .then(() => this.loadUnreadNotifications())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
@@ -369,16 +373,20 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
       });
+      this.events.subscribe(EVENT_NOTIFICATIONS_CHANGED, () => {
+        this.logger.info(this, "loadEvents", EVENT_NOTIFICATIONS_CHANGED);
+        this.loadUnreadNotifications();
+      })
       resolve(true);
     })
   }
 
-  private loadNotifications():Promise<boolean> {
+  private loadPushNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadNotifications");
+      this.logger.info(this, "loadPushNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
         if (loaded) {
-          this.logger.info(this, "loadNotifications", "Loaded");
+          this.logger.info(this, "loadPushNotifications", "Loaded");
           this.firebase.onNotification().subscribe((notification:any) => {
             if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
               this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
@@ -395,12 +403,12 @@ export class TenFourApp {
           resolve(true);
         }
         else {
-          this.logger.warn(this, "loadNotifications", "Not Loaded");
+          this.logger.warn(this, "loadPushNotifications", "Not Loaded");
           resolve(false);
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadNotifications", "Failed", error);
+        this.logger.error(this, "loadPushNotifications", "Failed", error);
         resolve(false);
       });
     });
@@ -949,6 +957,12 @@ export class TenFourApp {
 
   private hasRootPage() {
     return this.hasLocationHash() && this.locationHash() != "#/loading";
+  }
+
+  private loadUnreadNotifications() {
+    return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
+      this.unreadNotificationsNumber = notifications.length;
+    });
   }
 
 }
