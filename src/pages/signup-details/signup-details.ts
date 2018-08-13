@@ -6,24 +6,24 @@ import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
 
 import { Organization } from '../../models/organization';
-import { User } from '../../models/user';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'SignupUrlPage',
-  segment: 'signup/url',
-  defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage']
+  name: 'SignupDetailsPage',
+  segment: 'signup/details'
 })
 @Component({
-  selector: 'page-signup-url',
-  templateUrl: 'signup-url.html',
-  providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SignupPasswordPage ]
+  selector: 'page-signup-details',
+  templateUrl: 'signup-details.html',
 })
-export class SignupUrlPage extends BasePublicPage {
+export class SignupDetailsPage extends BasePublicPage {
 
+  @ViewChild('owner')
+  owner:TextInput;
+  @ViewChild('name')
+  name:TextInput;
   @ViewChild('subdomain')
   subdomain:TextInput;
 
@@ -44,7 +44,6 @@ export class SignupUrlPage extends BasePublicPage {
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
-
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
@@ -101,7 +100,25 @@ export class SignupUrlPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    if (this.subdomain.value && this.subdomain.value.length == 0) {
+    if (this.owner.value.length == 0) {
+      this.showToast("Please enter your name");
+      setTimeout(() => {
+        this.owner.setFocus();
+      }, 500);
+    }
+    else if (this.name.value.length == 0) {
+      this.showToast("Please enter the organization's name");
+      setTimeout(() => {
+        this.name.setFocus();
+      }, 500);
+      this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
+        loading.dismiss();
+        if (organizations && organizations.length > 0) {
+          this.showAlert("Organization Name Exists", "Sorry, the organization already exists. Please choose another name.");
+        }
+      });
+    }
+    else if (this.subdomain.value && this.subdomain.value.length == 0) {
       this.showToast("Please enter your subdomain");
       setTimeout(() => {
         this.subdomain.setFocus();
@@ -124,7 +141,6 @@ export class SignupUrlPage extends BasePublicPage {
       });
     }
     else {
-      let loading = this.showLoading("Checking...", true);
       this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
         this.logger.info(this, "showNext", organizations);
         loading.dismiss();
@@ -132,6 +148,8 @@ export class SignupUrlPage extends BasePublicPage {
           this.showAlert("Organization URL Exists", "Sorry, the organization already exists. Please choose another subdomain.");
         }
         else {
+          this.organization.name = this.name.value;
+          this.organization.user_name = this.owner.value;
           this.organization.subdomain = this.subdomain.value;
           this.storage.setOrganization(this.organization).then((stored:boolean) => {
             this.showModal(SignupPasswordPage, {
@@ -141,9 +159,9 @@ export class SignupUrlPage extends BasePublicPage {
         }
       },
       (error:any) => {
-        this.logger.error(this, "showNext", error);
+        this.logger.info(this, "showNext", error);
         loading.dismiss();
-        this.showAlert("Organization URL", error);
+        this.showAlert("Organization Details", error);
       });
     }
   }

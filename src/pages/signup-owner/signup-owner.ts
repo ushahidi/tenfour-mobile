@@ -109,7 +109,7 @@ export class SignupOwnerPage extends BasePublicPage {
     else {
       this.organization.user_name = this.owner.value;
       this.storage.setOrganization(this.organization).then((stored:boolean) => {
-        this.showPage(SignupNamePage, {
+        this.showModal(SignupNamePage, {
           organization: this.organization
         });
       });
@@ -123,6 +123,10 @@ export class SignupOwnerPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

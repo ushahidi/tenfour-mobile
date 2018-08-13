@@ -10,6 +10,7 @@ import { SigninInvitePage } from '../pages/signin-invite/signin-invite';
 
 import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
+import { SignupPage } from '../pages/signup/signup';
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
 import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
@@ -69,7 +70,8 @@ export class TenFourRoutes {
 
     { component: PasswordResetPage, name: 'PasswordResetPage', segment: 'signin/password/reset/:subdomain/:email/:token', defaultHistory: ['SigninUrlPage'] },
 
-    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup', defaultHistory: ['SigninUrlPage'] },
+    { component: SignupPage, name: 'SignupPage', segment: 'signup' },
+    { component: SignupEmailPage, name: 'SignupEmailPage', segment: 'signup/email', defaultHistory: ['SigninupPage'] },
     { component: SignupCheckPage, name: 'SignupCheckPage', segment: 'signup/check', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupVerifyPage, name: 'SignupVerifyPage', segment: 'signup/verify/:email/:code', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },
     { component: SignupOwnerPage, name: 'SignupOwnerPage', segment: 'signup/owner', defaultHistory: ['SigninUrlPage', 'SignupEmailPage'] },

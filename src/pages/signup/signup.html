@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <button ion-button icon-only menuToggle color="cancel">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Check-Ins</ion-title>
+    <ion-buttons right *ngIf="user">
+      <button>
+        <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-refresher>
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <ion-grid>
+    <ion-row>
+      <ion-col>
+        <div padding-top padding-left padding-right>
+          <ion-segment>
+            <ion-segment-button value="all">All Check-Ins</ion-segment-button>
+            <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0"></ion-badge></ion-segment-button>
+          </ion-segment>
+        </div>
+        <ion-list>
+          <ion-item class="empty" no-lines text-wrap margin-top>
+            <h2 text-center padding-top margin-top *ngIf="filter == 'all'">There currently are no Check-Ins...</h2>
+            <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins awaiting response...</h2>
+          </ion-item>
+          <ion-card margin-top margin-bottom color="card" [class.selected]="selected == true">
+            <ion-card-content text-center tappable (click)="onCardSelected($event)">
+              <h1>Tests for Ushahidi Reply with Yes or No.</h1>
+              <p>July 19th, 2018 <strong>ushahidi</strong></p>
+            </ion-card-content>
+            <ion-row no-padding no-margin>
+              <ion-col col-6 text-left no-padding no-margin>
+                <button ion-button clear color="primary" tappable (click)="onSendSelected($event)">Respond</button>
+              </ion-col>
+              <ion-col col-6 text-right no-padding no-margin>
+                <button ion-button clear color="primary" tappable (click)="onResendSelected($event)">Resend</button>
+              </ion-col>
+            </ion-row>
+          </ion-card>
+          <ion-card margin-top margin-bottom color="card" [class.selected]="selected == true">
+            <ion-card-content text-center tappable (click)="onCardSelected($event)">
+              <h1>Tests for Ushahidi Reply with Yes or No.</h1>
+              <p>July 19th, 2018 <strong>ushahidi</strong></p>
+            </ion-card-content>
+            <ion-row no-padding no-margin>
+              <ion-col col-6 text-left no-padding no-margin>
+                <button ion-button clear color="primary" tappable (click)="onSendSelected($event)">Respond</button>
+              </ion-col>
+              <ion-col col-6 text-right no-padding no-margin>
+                <button ion-button clear color="primary" tappable (click)="onResendSelected($event)">Resend</button>
+              </ion-col>
+            </ion-row>
+          </ion-card>
+        </ion-list>
+        <ion-infinite-scroll>
+          <ion-infinite-scroll-content></ion-infinite-scroll-content>
+        </ion-infinite-scroll>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

@@ -2,7 +2,7 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-import { SignupOwnerPage } from '../../pages/signup-owner/signup-owner';
+import { SignupDetailsPage } from '../../pages/signup-details/signup-details';
 
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
@@ -20,7 +20,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-signup-verify',
   templateUrl: 'signup-verify.html',
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
-  entryComponents:[ SignupOwnerPage ]
+  entryComponents:[ SignupDetailsPage ]
 })
 export class SignupVerifyPage extends BasePublicPage  {
 
@@ -132,11 +132,11 @@ export class SignupVerifyPage extends BasePublicPage  {
     });
   }
 
-  private showSignupOwner(event:any=null) {
+  private showSignupDetails(event:any=null) {
     let organization = new Organization({
       email: this.email
     });
-    this.showPage(SignupOwnerPage, {
+    this.showModal(SignupDetailsPage, {
       organization: organization
     });
   }

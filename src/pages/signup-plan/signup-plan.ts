@@ -105,13 +105,13 @@ export class SignupPlanPage extends BasePage {
   private showNext(event:any) {
     if (this.trial) {
       this.logger.info(this, "showNext", "SignupPasswordPage");
-      this.showPage(SignupPasswordPage, {
+      this.showModal(SignupPasswordPage, {
         organization: this.organization
       });
     }
     else {
       this.logger.info(this, "showNext", "SignupPaymentPage");
-      this.showPage(SignupPaymentPage, {
+      this.showModal(SignupPaymentPage, {
         organization: this.organization
       });
     }
@@ -129,6 +129,10 @@ export class SignupPlanPage extends BasePage {
 
   private needMore(event:any) {
     this.logger.info(this, "needMore");
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }
