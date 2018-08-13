@@ -777,7 +777,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
@@ -810,7 +810,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
