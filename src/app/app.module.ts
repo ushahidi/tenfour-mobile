@@ -51,6 +51,7 @@ import { SigninInviteModule } from '../pages/signin-invite/signin-invite.module'
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
 import { SignupModule } from '../pages/signup/signup.module';
+import { SignupDetailsModule } from '../pages/signup-details/signup-details.module';
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
 import { SignupVerifyModule } from '../pages/signup-verify/signup-verify.module';
@@ -176,6 +177,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SigninInviteModule,
     SigninPasswordModule,
     SignupModule,
+    SignupDetailsModule,
     SignupUrlModule,
     SignupEmailModule,
     SignupNameModule,
