@@ -73,7 +73,8 @@ import {
   EVENT_CHECKIN_CREATED,
   EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
-  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
+  EVENT_SUBSCRIPTION_CHANGED,
+  EVENT_CHECKINS_WAITING_CHANGED } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -99,6 +100,8 @@ export class TenFourApp {
 
   environmentName:string = null;
   apiEndpoint:string = null;
+
+  checkinsWaitingNumber:number = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -175,6 +178,7 @@ export class TenFourApp {
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
           .then(() => this.loadWebApp())
+          .then(() => this.loadCheckinsWaiting())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
@@ -368,6 +372,10 @@ export class TenFourApp {
       this.events.subscribe(EVENT_SUBSCRIPTION_CHANGED, (subscription, time) => {
         this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
+      });
+      this.events.subscribe(EVENT_CHECKINS_WAITING_CHANGED, (checkinsWaiting, time) => {
+        this.logger.info(this, "loadEvents", EVENT_CHECKINS_WAITING_CHANGED, checkinsWaiting, time);
+        this.loadCheckinsWaiting();
       });
       resolve(true);
     })
@@ -949,6 +957,12 @@ export class TenFourApp {
 
   private hasRootPage() {
     return this.hasLocationHash() && this.locationHash() != "#/loading";
+  }
+
+  private loadCheckinsWaiting() {
+    return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
+      this.checkinsWaitingNumber = checkins.length;
+    });
   }
 
 }
