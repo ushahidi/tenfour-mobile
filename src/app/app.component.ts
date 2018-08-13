@@ -73,7 +73,8 @@ import {
   EVENT_CHECKIN_CREATED,
   EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
-  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
+  EVENT_SUBSCRIPTION_CHANGED,
+  EVENT_NOTIFICATIONS_CHANGED } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -99,6 +100,8 @@ export class TenFourApp {
 
   environmentName:string = null;
   apiEndpoint:string = null;
+
+  unreadNotificationsNumber:number = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -175,6 +178,7 @@ export class TenFourApp {
           .then(() => this.loadEvents())
           .then(() => this.loadNotifications())
           .then(() => this.loadWebApp())
+          .then(() => this.loadUnreadNotifications())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
@@ -369,6 +373,10 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
       });
+      this.events.subscribe(EVENT_NOTIFICATIONS_CHANGED, () => {
+        this.logger.info(this, "loadEvents", EVENT_NOTIFICATIONS_CHANGED);
+        this.loadUnreadNotifications();
+      })
       resolve(true);
     })
   }
@@ -949,6 +957,12 @@ export class TenFourApp {
 
   private hasRootPage() {
     return this.hasLocationHash() && this.locationHash() != "#/loading";
+  }
+
+  private loadUnreadNotifications() {
+    return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
+      this.unreadNotificationsNumber = notifications.length;
+    });
   }
 
 }

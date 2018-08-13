@@ -994,6 +994,62 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public markAllNotificationsAsRead(organization:Organization, user:User):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}`;
+        let params = {
+          id: user.id,
+          name: user.name,
+          notifications: [] // this triggers the API to mark all as read
+        };
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          if (data && data.person) {
+            resolve(true);
+          }
+          else {
+            reject("Person Not Updated");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getUnreadNotifications(organization:Organization, user:User, limit:number=20, offset:number=0):Promise<Notification[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
+        let params = {
+          'unread': 1
+        };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.notifications) {
+            let notifications = [];
+            for (let _notification of data.notifications) {
+              let notification = new Notification(_notification);
+              notifications.push(notification);
+            }
+            resolve(notifications);
+          } else {
+            reject("Notifications not found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getAnswers(organization:Organization, id:number):Promise<Answer[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
