@@ -11,7 +11,10 @@
     <ion-item text-wrap text-center color="white">
       <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
       <h1>{{checkin.message}}</h1>
-      <h3>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</h3>
+      <h3>
+        <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
+        <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
+      </h3>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="checkin">
