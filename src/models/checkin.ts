@@ -293,4 +293,31 @@ export class Checkin extends Model {
     return false;
   }
 
+  public fillRecipientsSendVia() {
+    let checkin_send_via = this.sendVia();
+
+    for (let recipient of this.recipients) {
+      let recipient_send_via = [];
+
+      for (let contact of recipient.contacts) {
+        if (contact.blocked) {
+          continue;
+        }
+
+        if (contact.type === 'phone' && checkin_send_via.indexOf('sms') > -1) {
+          recipient_send_via.push('sms');
+        }
+
+        if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
+          recipient_send_via.push('email');
+        }
+      }
+
+      if (checkin_send_via.indexOf('app') > -1) {
+        recipient_send_via.push('app');
+      }
+
+      recipient.send_via = recipient_send_via.join(',');
+    }
+  }
 }
