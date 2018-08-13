@@ -150,7 +150,7 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),
                 new Email(),
@@ -176,7 +176,7 @@ export class TenFourApp {
           .then(() => this.loadAnalytics())
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadWebApp())
           .then(() => this.loadUnreadNotifications())
           .then(() => {
@@ -381,12 +381,12 @@ export class TenFourApp {
     })
   }
 
-  private loadNotifications():Promise<boolean> {
+  private loadPushNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadNotifications");
+      this.logger.info(this, "loadPushNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
         if (loaded) {
-          this.logger.info(this, "loadNotifications", "Loaded");
+          this.logger.info(this, "loadPushNotifications", "Loaded");
           this.firebase.onNotification().subscribe((notification:any) => {
             if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
               this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
@@ -403,12 +403,12 @@ export class TenFourApp {
           resolve(true);
         }
         else {
-          this.logger.warn(this, "loadNotifications", "Not Loaded");
+          this.logger.warn(this, "loadPushNotifications", "Not Loaded");
           resolve(false);
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadNotifications", "Failed", error);
+        this.logger.error(this, "loadPushNotifications", "Failed", error);
         resolve(false);
       });
     });
