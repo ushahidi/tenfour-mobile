@@ -162,12 +162,35 @@ export class CheckinSendPage extends BasePrivatePage {
     this.countRecipients();
   }
 
+  private showBillingAlert() {
+    if (this.user.isOwner()) {
+      this.showAlert("Not enough credits",
+        "Purchase more credits in billing in order to send your message",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Billing', handler: () => { this.upgradeToPro(null); } }
+        ]
+      );
+    } else {
+      this.showAlert("Not enough credits",
+        "Your organization owner will need to buy more before you can send via SMS",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Notify Owner', handler: () => { this.notifyOwner(); } }
+        ]
+      );
+    }
+  }
+
   private sendCheckin(event:any) {
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
       this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
     }
     else if (this.checkin.recipientIds().length == 0) {
       this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
+    }
+    else if (this.checkin.creditsRequired() > this.organization.credits) {
+      this.showBillingAlert();
     }
     else {
       let loading = this.showLoading("Sending...", true);
@@ -260,6 +283,15 @@ export class CheckinSendPage extends BasePrivatePage {
         user: this.user
       });
     }
+  }
+
+  private notifyOwner() {
+    this.logger.info(this, "notifyOwner");
+    // this.api.notifyOwner(this.organization, "The organization has insufficient credits to send a Check-In").then(() => {
+    //   this.showToast("The organization owner has been notified")
+    // }, (error) => {
+    //   this.showToast(error);
+    // });
   }
 
 }
