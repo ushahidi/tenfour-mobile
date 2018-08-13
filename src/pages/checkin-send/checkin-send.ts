@@ -287,11 +287,11 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private notifyOwner() {
     this.logger.info(this, "notifyOwner");
-    // this.api.notifyOwner(this.organization, "The organization has insufficient credits to send a Check-In").then(() => {
-    //   this.showToast("The organization owner has been notified")
-    // }, (error) => {
-    //   this.showToast(error);
-    // });
+    this.api.notifyPerson(this.organization, 'owner', "The organization has insufficient credits to send a Check-In").then(() => {
+      this.showToast("The organization owner has been notified")
+    }, (error) => {
+      this.showToast(error);
+    });
   }
 
 }

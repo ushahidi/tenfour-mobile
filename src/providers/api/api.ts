@@ -1479,4 +1479,24 @@ export class ApiProvider extends HttpProvider {
       }, reject);
     });
   }
+
+  public notifyPerson(organization:Organization, person:any, message:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person}/notify`;
+        let params = {
+          message: message
+        };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
 }
