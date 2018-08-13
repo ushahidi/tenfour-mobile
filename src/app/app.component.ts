@@ -74,6 +74,7 @@ import {
   EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED,
+  EVENT_CHECKINS_WAITING_CHANGED,
   EVENT_NOTIFICATIONS_CHANGED } from '../constants/events';
 
 @Component({
@@ -101,6 +102,7 @@ export class TenFourApp {
   environmentName:string = null;
   apiEndpoint:string = null;
 
+  checkinsWaitingNumber:number = null;
   unreadNotificationsNumber:number = null;
 
   @ViewChild(Nav)
@@ -178,6 +180,7 @@ export class TenFourApp {
           .then(() => this.loadEvents())
           .then(() => this.loadPushNotifications())
           .then(() => this.loadWebApp())
+          .then(() => this.loadCheckinsWaiting())
           .then(() => this.loadUnreadNotifications())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
@@ -372,6 +375,10 @@ export class TenFourApp {
       this.events.subscribe(EVENT_SUBSCRIPTION_CHANGED, (subscription, time) => {
         this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
+      });
+      this.events.subscribe(EVENT_CHECKINS_WAITING_CHANGED, (checkinsWaiting, time) => {
+        this.logger.info(this, "loadEvents", EVENT_CHECKINS_WAITING_CHANGED, checkinsWaiting, time);
+        this.loadCheckinsWaiting();
       });
       this.events.subscribe(EVENT_NOTIFICATIONS_CHANGED, () => {
         this.logger.info(this, "loadEvents", EVENT_NOTIFICATIONS_CHANGED);
@@ -959,6 +966,11 @@ export class TenFourApp {
     return this.hasLocationHash() && this.locationHash() != "#/loading";
   }
 
+  private loadCheckinsWaiting() {
+    return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
+      this.checkinsWaitingNumber = checkins.length;
+  }
+  
   private loadUnreadNotifications() {
     return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
       this.unreadNotificationsNumber = notifications.length;

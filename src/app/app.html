@@ -10,7 +10,7 @@
     </ion-header>
     <ion-content>
       <ion-list *ngIf="organization && user">
-        <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins<ion-badge item-end *ngIf="website == true && checkinsWaitingNumber > 0">{{checkinsWaitingNumber}}</ion-badge></ion-item>
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showPersonList($event)">People</ion-item>
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showNotificationList($event)">Notifications<ion-badge item-end *ngIf="website == true && unreadNotificationsNumber > 0">{{unreadNotificationsNumber}}</ion-badge></ion-item>
