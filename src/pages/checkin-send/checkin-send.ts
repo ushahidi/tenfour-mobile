@@ -137,7 +137,6 @@ export class CheckinSendPage extends BasePrivatePage {
          this.checkin.groups = data.groups;
        }
        this.countRecipients();
-       this.fillRecipientsSendVia();
      });
   }
 
@@ -163,12 +162,35 @@ export class CheckinSendPage extends BasePrivatePage {
     this.countRecipients();
   }
 
+  private showBillingAlert() {
+    if (this.user.isOwner()) {
+      this.showAlert("Not enough credits",
+        "Purchase more credits in billing in order to send your message",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Billing', handler: () => { this.upgradeToPro(null); } }
+        ]
+      );
+    } else {
+      this.showAlert("Not enough credits",
+        "Your organization owner will need to buy more before you can send via SMS",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Notify Owner', handler: () => { this.notifyOwner(); } }
+        ]
+      );
+    }
+  }
+
   private sendCheckin(event:any) {
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
       this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
     }
     else if (this.checkin.recipientIds().length == 0) {
       this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
+    }
+    else if (this.checkin.creditsRequired() > this.organization.credits) {
+      this.showBillingAlert();
     }
     else {
       let loading = this.showLoading("Sending...", true);
@@ -210,7 +232,7 @@ export class CheckinSendPage extends BasePrivatePage {
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;
-          this.fillRecipientsSendVia();
+          this.countRecipients();
         }
       },{
         showBackdrop: true,
@@ -230,7 +252,7 @@ export class CheckinSendPage extends BasePrivatePage {
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;
-          this.fillRecipientsSendVia();
+          this.countRecipients();
         }
       },{
         showBackdrop: true,
@@ -244,34 +266,7 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private countRecipients() {
     this.checkin.waiting_count = this.checkin.recipientIds().length;
-  }
-
-  private fillRecipientsSendVia() {
-    let checkin_send_via = this.checkin.sendVia();
-
-    for (let recipient of this.checkin.recipients) {
-      let recipient_send_via = [];
-
-      for (let contact of recipient.contacts) {
-        if (contact.blocked) {
-          continue;
-        }
-
-        if (contact.type === 'phone' && checkin_send_via.indexOf('sms') > -1) {
-          recipient_send_via.push('sms');
-        }
-
-        if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
-          recipient_send_via.push('email');
-        }
-      }
-
-      if (checkin_send_via.indexOf('app') > -1) {
-        recipient_send_via.push('app');
-      }
-
-      recipient.send_via = recipient_send_via.join(',');
-    }
+    this.checkin.fillRecipientsSendVia();
   }
 
   private upgradeToPro(event:any) {
@@ -288,6 +283,15 @@ export class CheckinSendPage extends BasePrivatePage {
         user: this.user
       });
     }
+  }
+
+  private notifyOwner() {
+    this.logger.info(this, "notifyOwner");
+    this.api.notifyPerson(this.organization, 'owner', "The organization has insufficient credits to send a Check-In").then(() => {
+      this.showToast("The organization owner has been notified")
+    }, (error) => {
+      this.showToast(error);
+    });
   }
 
 }

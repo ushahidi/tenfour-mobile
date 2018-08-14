@@ -239,22 +239,7 @@ export class Checkin extends Model {
   }
 
   public recipientIds():number[] {
-    let ids = [];
-    if (this.recipients && this.recipients.length > 0) {
-      for (let recipient of this.recipients) {
-        ids.push({id: recipient.user_id});
-      }
-    }
-    if (this.groups && this.groups.length > 0) {
-      for (let group of this.groups) {
-        if (group.member_ids && group.member_ids.length > 0) {
-          for (let user_id of group.member_ids.split(",")) {
-            ids.push({id: user_id});
-          }
-        }
-      }
-    }
-    return ids;
+    return this.flattenRecipients().map(r => r.id);
   }
 
   public sendVia() {
@@ -293,4 +278,67 @@ export class Checkin extends Model {
     return false;
   }
 
+  public fillRecipientsSendVia():void {
+    let checkin_send_via = this.sendVia();
+
+    for (let recipient of this.recipients) {
+      let recipient_send_via = [];
+
+      for (let contact of recipient.contacts) {
+        if (contact.blocked) {
+          continue;
+        }
+
+        if (contact.type === 'phone' && checkin_send_via.indexOf('sms') > -1) {
+          recipient_send_via.push('sms');
+        }
+
+        if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
+          recipient_send_via.push('email');
+        }
+      }
+
+      if (checkin_send_via.indexOf('app') > -1) {
+        recipient_send_via.push('app');
+      }
+
+      recipient.send_via = recipient_send_via.join(',');
+    }
+  }
+
+  private flattenRecipients():any[] {
+    let _recipients = {};
+
+    for (let recipient of this.recipients) {
+      _recipients[recipient.id] = recipient;
+    }
+
+    for (let group of this.groups) {
+      for (let recipient of group.members) {
+        _recipients[recipient.id] = recipient;
+      }
+    }
+
+    return (<any>Object).values(_recipients);
+  }
+
+  public creditsRequired():number {
+    let creditsRequired = 0;
+    let checkinSendVia = this.sendVia();
+    let _recipients = this.flattenRecipients();
+
+    for (let recipient of _recipients) {
+      for (let contact of recipient.contacts) {
+        if (contact.blocked) {
+          continue;
+        }
+
+        if (contact.type === 'phone' && checkinSendVia.indexOf('sms') > -1) {
+          creditsRequired++;
+        }
+      }
+    }
+
+    return creditsRequired;
+  }
 }

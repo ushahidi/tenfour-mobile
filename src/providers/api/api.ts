@@ -777,7 +777,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
@@ -810,7 +810,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
@@ -1533,6 +1533,26 @@ export class ApiProvider extends HttpProvider {
       this.httpPost(url, params).then((data:any) => {
         resolve(true);
       }, reject);
+    });
+  }
+
+  public notifyPerson(organization:Organization, person:any, message:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person}/notify`;
+        let params = {
+          message: message
+        };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
     });
   }
 }
