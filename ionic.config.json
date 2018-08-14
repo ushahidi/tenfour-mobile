@@ -21,5 +21,6 @@
       "proxyUrl": "https://maps.googleapis.com"
     }
   ],
-  "type": "ionic-angular"
+  "type": "ionic-angular",
+  "app_id": ""
 }

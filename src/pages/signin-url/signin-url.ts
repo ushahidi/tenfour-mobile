@@ -4,6 +4,7 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
+import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -135,6 +136,11 @@ export class SigninUrlPage extends BasePublicPage {
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
     this.showPage(SignupEmailPage, {});
+  }
+
+  private lookupOrganization(event:any) {
+    this.logger.info(this, "lookupOrganization");
+    this.showPage(SigninLookupPage, {});
   }
 
   private showNextOnReturn(event:any) {

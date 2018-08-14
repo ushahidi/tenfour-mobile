@@ -18,7 +18,8 @@ import { StorageProvider } from '../../providers/storage/storage';
 
 import {
   EVENT_CHECKIN_CREATED,
-  EVENT_CHECKIN_UPDATED } from '../../constants/events';
+  EVENT_CHECKIN_UPDATED,
+  EVENT_CHECKINS_WAITING_CHANGED } from '../../constants/events';
 
 @IonicPage({
   name: 'CheckinListPage',
@@ -222,6 +223,7 @@ export class CheckinListPage extends BasePrivatePage {
         this.api.getCheckinsWaiting(this.organization, this.user, 25), 1).then((checkins:Checkin[]) => {
           if (checkins && checkins.length > 0) {
             this.logger.info(this, "loadWaitingResponse", checkins.length);
+            this.events.publish(EVENT_CHECKINS_WAITING_CHANGED, checkins);
             this.badgeNumber = checkins.length;
             this.badge.setBadgeNumber(this.badgeNumber);
             if (showPopup == true) {

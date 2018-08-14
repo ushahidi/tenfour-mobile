@@ -18,6 +18,9 @@
       <h3 item-text item-right>.tenfour.org</h3>
       <ion-input #subdomain type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
+    <ion-item no-lines text-center>
+      <button ion-button clear tappable color="primary" (click)="lookupOrganization($event)">Forgot your domain?</button>
+    </ion-item>
     <ion-item no-lines class="other">
       <h4>New to TenFour?</h4>
       <button ion-button clear tappable color="primary" (click)="createOrganization($event)">Create an organization</button>

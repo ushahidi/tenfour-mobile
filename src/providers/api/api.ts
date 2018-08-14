@@ -284,7 +284,7 @@ export class ApiProvider extends HttpProvider {
 
   public createOrganization(organization:Organization, password:string, verificationCode:string):Promise<Organization> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/create_organization`;
+      let url = `${this.api}/organization/create`;
       let params = {
         name: organization.name,
         email: organization.email,
@@ -777,7 +777,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
@@ -810,7 +810,7 @@ export class ApiProvider extends HttpProvider {
           organization_id: organization.id,
           message: checkin.message,
           answers: checkin.answers,
-          recipients: checkin.recipientIds(),
+          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
           send_via: checkin.sendVia()
         };
         if (checkin.self_test_check_in) {
@@ -982,6 +982,62 @@ export class ApiProvider extends HttpProvider {
           }
           else {
             reject("Notifications Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public markAllNotificationsAsRead(organization:Organization, user:User):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}`;
+        let params = {
+          id: user.id,
+          name: user.name,
+          notifications: [] // this triggers the API to mark all as read
+        };
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          if (data && data.person) {
+            resolve(true);
+          }
+          else {
+            reject("Person Not Updated");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getUnreadNotifications(organization:Organization, user:User, limit:number=20, offset:number=0):Promise<Notification[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
+        let params = {
+          'unread': 1
+        };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.notifications) {
+            let notifications = [];
+            for (let _notification of data.notifications) {
+              let notification = new Notification(_notification);
+              notifications.push(notification);
+            }
+            resolve(notifications);
+          } else {
+            reject("Notifications not found");
           }
         },
         (error:any) => {
@@ -1468,4 +1524,35 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public lookupOrganization(email:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/organization/lookup`;
+      let params = {
+        email: email,
+      };
+      this.httpPost(url, params).then((data:any) => {
+        resolve(true);
+      }, reject);
+    });
+  }
+
+  public notifyPerson(organization:Organization, person:any, message:string):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person}/notify`;
+        let params = {
+          message: message
+        };
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
 }

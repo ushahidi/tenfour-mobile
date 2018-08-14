@@ -23,3 +23,7 @@ export let EVENT_CHECKIN_UPDATED:string = "checkin:updated";
 export let EVENT_CREDITS_CHANGED:string = "credits:changed";
 
 export let EVENT_SUBSCRIPTION_CHANGED:string = "subscription:changed";
+
+export let EVENT_CHECKINS_WAITING_CHANGED:string = "checkinswaiting:changed";
+
+export let EVENT_NOTIFICATIONS_CHANGED:string = "notifications:changed";

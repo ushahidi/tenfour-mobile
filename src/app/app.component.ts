@@ -6,6 +6,7 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
@@ -72,7 +73,9 @@ import {
   EVENT_CHECKIN_CREATED,
   EVENT_CHECKIN_UPDATED,
   EVENT_CREDITS_CHANGED,
-  EVENT_SUBSCRIPTION_CHANGED } from '../constants/events';
+  EVENT_SUBSCRIPTION_CHANGED,
+  EVENT_CHECKINS_WAITING_CHANGED,
+  EVENT_NOTIFICATIONS_CHANGED } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -98,6 +101,9 @@ export class TenFourApp {
 
   environmentName:string = null;
   apiEndpoint:string = null;
+
+  checkinsWaitingNumber:number = null;
+  unreadNotificationsNumber:number = null;
 
   @ViewChild(Nav)
   nav:Nav;
@@ -146,7 +152,7 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),
                 new Email(),
@@ -172,8 +178,10 @@ export class TenFourApp {
           .then(() => this.loadAnalytics())
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
-          .then(() => this.loadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => this.loadWebApp())
+          .then(() => this.loadCheckinsWaiting())
+          .then(() => this.loadUnreadNotifications())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
@@ -255,21 +263,64 @@ export class TenFourApp {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "loadDeepLinks");
       this.deeplinks.onMatch(this.navController).subscribe((deeplink:Deeplink) => {
-        if (deeplink) {
+        if (deeplink && deeplink.path && deeplink.path.length > 0) {
           this.logger.info(this, "loadDeepLinks", "onMatch", deeplink);
-          if (deeplink.path === '/organization/email/confirmation/') {
-            let email = deeplink.parameters['email'];
-            let code = deeplink.parameters['code'];
-            this.showSignupVerify(email, code);
+          if (deeplink.path === '/#signin') {
+            this.showSigninUrl();
           }
-          else if (deeplink.path === '/login/email') {
-             //SigninEmailPage
+          else if (deeplink.path === '/#signin/email') {
+            this.logger.warn(this, "loadDeepLinks", "SigninEmailPage");
           }
-          else if (deeplink.path === '/login/password') {
-             //SigninPasswordPage
+          else if (deeplink.path === '/#signin/password') {
+            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
           }
-          else if (deeplink.path === '/login/invite') {
-             //SignupPasswordPage
+          else if (deeplink.path === '/#signup') {
+             this.showSignupPage();
+          }
+          else if (deeplink.path === '/#signup/check') {
+            this.logger.warn(this, "loadDeepLinks", "SignupCheckPage");
+          }
+          else if (deeplink.path.startsWith('/#signup/verify')) {
+            this.logger.warn(this, "loadDeepLinks", "SignupVerifyPage");
+          }
+          else if (deeplink.path === '/#signup/owner') {
+            this.logger.warn(this, "loadDeepLinks", "SignupOwnerPage");
+          }
+          else if (deeplink.path === '/#signup/name') {
+            this.logger.warn(this, "loadDeepLinks", "SignupNamePage");
+          }
+          else if (deeplink.path === '/#signup/url') {
+            this.logger.warn(this, "loadDeepLinks", "SignupUrlPage");
+          }
+          else if (deeplink.path === '/#signup/password') {
+            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
+          }
+          else if (deeplink.path === '/#checkins' || deeplink.path === '/#checkins/') {
+             this.showCheckinList();
+          }
+          else if (deeplink.path.startsWith('/#checkins/')) {
+            this.logger.warn(this, "loadDeepLinks", "CheckinDetailsPage");
+          }
+          else if (deeplink.path === '/#groups' || deeplink.path === '/#groups/') {
+             this.showGroupList();
+          }
+          else if (deeplink.path.startsWith('/#groups/')) {
+            this.logger.warn(this, "loadDeepLinks", "GroupDetailsPage");
+          }
+          else if (deeplink.path === '/#people' || deeplink.path === '/#people/') {
+             this.showPersonList();
+          }
+          else if (deeplink.path.startsWith('/#people/')) {
+            this.logger.warn(this, "loadDeepLinks", "PersonDetailsPage");
+          }
+          else if (deeplink.path === '/#notifications') {
+             this.showNotificationList();
+          }
+          else if (deeplink.path === '/#settings') {
+             this.showSettingsList();
+          }
+          else if (deeplink.path === '/#profile') {
+             this.showPersonProfile();
           }
         }
       },
@@ -325,16 +376,24 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_SUBSCRIPTION_CHANGED, subscription, time);
         this.loadOrganization();
       });
+      this.events.subscribe(EVENT_CHECKINS_WAITING_CHANGED, (checkinsWaiting, time) => {
+        this.logger.info(this, "loadEvents", EVENT_CHECKINS_WAITING_CHANGED, checkinsWaiting, time);
+        this.loadCheckinsWaiting();
+      });
+      this.events.subscribe(EVENT_NOTIFICATIONS_CHANGED, () => {
+        this.logger.info(this, "loadEvents", EVENT_NOTIFICATIONS_CHANGED);
+        this.loadUnreadNotifications();
+      })
       resolve(true);
     })
   }
 
-  private loadNotifications():Promise<boolean> {
+  private loadPushNotifications():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadNotifications");
+      this.logger.info(this, "loadPushNotifications");
       this.firebase.initialize().then((loaded:boolean) => {
         if (loaded) {
-          this.logger.info(this, "loadNotifications", "Loaded");
+          this.logger.info(this, "loadPushNotifications", "Loaded");
           this.firebase.onNotification().subscribe((notification:any) => {
             if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
               this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
@@ -351,12 +410,12 @@ export class TenFourApp {
           resolve(true);
         }
         else {
-          this.logger.warn(this, "loadNotifications", "Not Loaded");
+          this.logger.warn(this, "loadPushNotifications", "Not Loaded");
           resolve(false);
         }
       },
       (error:any) => {
-        this.logger.error(this, "loadNotifications", "Failed", error);
+        this.logger.error(this, "loadPushNotifications", "Failed", error);
         resolve(false);
       });
     });
@@ -566,7 +625,6 @@ export class TenFourApp {
 
   private showSignupPage(event:any=null) {
     this.logger.info(this, "showSignupPage");
-
     location.assign(location.protocol
       + "//"
       + this.environment.getAppDomain()
@@ -906,6 +964,18 @@ export class TenFourApp {
 
   private hasRootPage() {
     return this.hasLocationHash() && this.locationHash() != "#/loading";
+  }
+
+  private loadCheckinsWaiting() {
+    return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
+      this.checkinsWaitingNumber = checkins.length;
+    });
+  }
+
+  private loadUnreadNotifications() {
+    return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
+      this.unreadNotificationsNumber = notifications.length;
+    });
   }
 
 }
