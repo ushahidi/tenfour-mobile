@@ -278,7 +278,7 @@ export class Checkin extends Model {
     return false;
   }
 
-  public fillRecipientsSendVia() {
+  public fillRecipientsSendVia():void {
     let checkin_send_via = this.sendVia();
 
     for (let recipient of this.recipients) {
@@ -306,7 +306,7 @@ export class Checkin extends Model {
     }
   }
 
-  private flattenRecipients() {
+  private flattenRecipients():any[] {
     let _recipients = {};
 
     for (let recipient of this.recipients) {
