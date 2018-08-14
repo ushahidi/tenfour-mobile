@@ -557,7 +557,7 @@ export class TenFourApp {
 
   private showSigninUrl(event:any=null) {
     this.logger.info(this, "showSigninUrl");
-    this.nav.setRoot(SigninUrlPage, { }).then((loaded:any) => {
+    this.nav.setRoot(SigninPage, { }).then((loaded:any) => {
       this.logger.info(this, "showSigninUrl", "Loaded");
       this.hideSideMenu();
       this.hideSplashScreen();
@@ -569,7 +569,6 @@ export class TenFourApp {
 
   private showSignupPage(event:any=null) {
     this.logger.info(this, "showSignupPage");
-
     location.assign(location.protocol
       + "//"
       + this.environment.getAppDomain()

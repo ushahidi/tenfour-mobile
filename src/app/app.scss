@@ -19,6 +19,14 @@
     color: color($colors, cancel) !important;
   }
 }
+ion-navbar {
+  ion-buttons {
+    .bar-button-solid {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+}
 ion-toolbar {
   organization-logo {
     margin-left: 5px;

@@ -77,6 +77,8 @@ export class SignupEmailPage extends BasePublicPage {
         this.storage.setOrganization(organization).then((stored:boolean) => {
           this.showModal(SignupCheckPage, {
             organization: organization
+          }, {
+            enableBackdropDismiss: false
           });
         });
       },

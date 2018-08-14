@@ -1,5 +1,5 @@
-<ion-split-pane #splitPane [enabled]="organization && user && (tablet == true || website == true || desktop == true)">
-  <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" (ionOpen)="loadMenu()">
+<ion-split-pane #splitPane [enabled]="tablet == true || website == true || desktop == true">
+  <ion-menu #menu [content]="content" side="left" type="reveal" *ngIf="user != null" swipeEnabled="false" (ionOpen)="loadMenu()">
     <ion-header>
       <ion-toolbar color="navbar">
         <ion-buttons left>
@@ -60,17 +60,7 @@
         <ion-item color="white">Help</ion-item>
       </ion-list>
       <div>
-        <p text-center>You are using the free version of TenFour</p>
-        <p text-center>
-          <button ion-button color="primary">Upgrade to TenFour Pro</button>
-        </p>
-      </div>
-      <div>
-        <p text-center>No credits remaining</p>
         <p text-center>10 credits remaining</p>
-        <p text-center>
-          <button ion-button color="primary">Add SMS Credits</button>
-        </p>
       </div>
       <p text-center>
         <button ion-button block clear color="primary">Log out</button>

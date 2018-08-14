@@ -118,6 +118,8 @@ export class SigninEmailPage extends BasePublicPage {
       this.showModal(SigninPasswordPage, {
         organization: this.organization,
         email: email
+      }, {
+        enableBackdropDismiss: false
       });
     }
   }

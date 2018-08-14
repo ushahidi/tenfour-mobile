@@ -97,6 +97,8 @@ export class SigninUrlPage extends BasePublicPage {
             this.storage.setOrganization(organization).then((stored:boolean) => {
               this.showModal(SigninEmailPage, {
                 organization: organization
+              }, {
+                enableBackdropDismiss: false
               });
             });
           }
@@ -134,7 +136,9 @@ export class SigninUrlPage extends BasePublicPage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    this.showModal(SignupEmailPage, {});
+    this.showModal(SignupEmailPage, {}, {
+      enableBackdropDismiss: false
+    });
   }
 
   private showNextOnReturn(event:any) {
@@ -148,6 +152,10 @@ export class SigninUrlPage extends BasePublicPage {
 
   private closeModal(event:any=null) {
     this.hideModal();
+  }
+
+  private findURL(event:any=null) {
+    this.logger.info(this, "findURL");
   }
 
 }

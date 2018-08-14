@@ -5,23 +5,21 @@
     </button>
     <ion-title>Check-Ins</ion-title>
     <ion-buttons right>
-      <button>
+      <button ion-button icon-only color="primary" icon-start [solid]="website == true ? 'true' : null">
         <ion-icon ios="ios-create-outline" md="md-create"></ion-icon>
+        <span *ngIf="website == true">Create</span>
       </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher>
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
   <ion-grid>
     <ion-row>
       <ion-col>
         <div padding-top padding-left padding-right>
           <ion-segment>
             <ion-segment-button value="all">All Check-Ins</ion-segment-button>
-            <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0"></ion-badge></ion-segment-button>
+            <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true">2</ion-badge></ion-segment-button>
           </ion-segment>
         </div>
         <ion-list>
@@ -58,9 +56,6 @@
             </ion-row>
           </ion-card>
         </ion-list>
-        <ion-infinite-scroll>
-          <ion-infinite-scroll-content></ion-infinite-scroll-content>
-        </ion-infinite-scroll>
       </ion-col>
     </ion-row>
   </ion-grid>
