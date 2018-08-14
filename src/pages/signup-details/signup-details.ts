@@ -111,6 +111,7 @@ export class SignupDetailsPage extends BasePublicPage {
       setTimeout(() => {
         this.name.setFocus();
       }, 500);
+      let loading = this.showLoading("Loading...");
       this.api.getOrganizations(null, this.name.value).then((organizations:Organization[]) => {
         loading.dismiss();
         if (organizations && organizations.length > 0) {
@@ -141,6 +142,7 @@ export class SignupDetailsPage extends BasePublicPage {
       });
     }
     else {
+      let loading = this.showLoading("Loading...");
       this.api.getOrganizations(this.subdomain.value).then((organizations:Organization[]) => {
         this.logger.info(this, "showNext", organizations);
         loading.dismiss();
@@ -159,6 +161,7 @@ export class SignupDetailsPage extends BasePublicPage {
         }
       },
       (error:any) => {
+        let loading = this.showLoading("Loading...");
         this.logger.info(this, "showNext", error);
         loading.dismiss();
         this.showAlert("Organization Details", error);
