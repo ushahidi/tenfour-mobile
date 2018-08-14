@@ -136,6 +136,8 @@ export class SignupUrlPage extends BasePublicPage {
           this.storage.setOrganization(this.organization).then((stored:boolean) => {
             this.showModal(SignupPasswordPage, {
               organization: this.organization
+            }, {
+              enableBackdropDismiss: false
             });
           });
         }

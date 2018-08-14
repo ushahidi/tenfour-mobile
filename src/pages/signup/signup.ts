@@ -41,7 +41,7 @@ export class SignupPage extends BasePublicPage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.showModal(SignupEmailPage, {
+    this.showModal(SignupEmailPage, {}, {
       enableBackdropDismiss: false
     });
   }

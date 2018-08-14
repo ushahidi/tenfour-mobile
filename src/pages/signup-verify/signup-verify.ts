@@ -138,6 +138,8 @@ export class SignupVerifyPage extends BasePublicPage  {
     });
     this.showModal(SignupDetailsPage, {
       organization: organization
+    }, {
+      enableBackdropDismiss: false
     });
   }
 
