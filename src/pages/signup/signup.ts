@@ -4,6 +4,8 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
+import { Organization } from '../../models/organization';
+
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { EnvironmentProvider } from '../../providers/environment/environment';
@@ -21,6 +23,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
 export class SignupPage extends BasePublicPage {
 
   enableBackdropDismiss:any = null;
+  organization:Organization = null;
 
   constructor(
       protected zone:NgZone,
@@ -41,7 +44,9 @@ export class SignupPage extends BasePublicPage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.showModal(SignupEmailPage, {}, {
+    this.showModal(SignupEmailPage, {
+      Organization: this.organization
+    }, {
       enableBackdropDismiss: false
     });
   }

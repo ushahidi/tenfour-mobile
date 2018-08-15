@@ -5,6 +5,8 @@ import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 import { SignupUrlPage } from '../../pages/signup-url/signup-url';
 
+import { Organization } from '../../models/organization';
+
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { EnvironmentProvider } from '../../providers/environment/environment';
@@ -23,6 +25,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
 export class SigninPage extends BasePublicPage {
 
   enableBackdropDismiss:any = null;
+  organization:Organization = null;
 
   constructor(
       protected zone:NgZone,
@@ -43,7 +46,9 @@ export class SigninPage extends BasePublicPage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    this.showModal(SigninUrlPage, {}, {
+    this.showModal(SigninUrlPage, {
+      organization: this.organization
+    }, {
       enableBackdropDismiss: false
     });
   }

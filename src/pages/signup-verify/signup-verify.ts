@@ -142,6 +142,10 @@ export class SignupVerifyPage extends BasePublicPage  {
       enableBackdropDismiss: false
     });
   }
+  
+  private closeModal(event:any=null) {
+    this.hideModal();
+  }
 
   private returnPrevious(event:any=null) {
     this.closePage();
