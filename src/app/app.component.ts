@@ -967,15 +967,19 @@ export class TenFourApp {
   }
 
   private loadCheckinsWaiting() {
-    return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
-      this.checkinsWaitingNumber = checkins.length;
-    });
+    if (this.organization && this.user) {
+      return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
+        this.checkinsWaitingNumber = checkins.length;
+      });
+    }
   }
 
   private loadUnreadNotifications() {
-    return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
-      this.unreadNotificationsNumber = notifications.length;
-    });
+    if (this.organization && this.user) {
+      return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
+        this.unreadNotificationsNumber = notifications.length;
+      });
+    }
   }
 
 }
