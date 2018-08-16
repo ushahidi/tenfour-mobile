@@ -563,4 +563,8 @@ export class PersonEditPage extends BasePrivatePage {
      });
   }
 
+  private onContactChanged(contact:any) {
+    this.logger.info(this, "onContactChanged", contact);
+    contact.blocked = false;
+  }
 }

@@ -617,6 +617,7 @@ export class ApiProvider extends HttpProvider {
           type: contact.type,
           contact: contact.contact,
           preferred: contact.preferred || 0,
+          blocked: contact.blocked ? 1 : 0,
           organization_id: person.organization_id
         };
         this.httpPut(url, params, token.access_token).then((data:any) => {
