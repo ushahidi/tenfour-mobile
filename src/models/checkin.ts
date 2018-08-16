@@ -239,7 +239,7 @@ export class Checkin extends Model {
   }
 
   public recipientIds():number[] {
-    return this.flattenRecipients().map(r => r.id);
+    return this.flattenRecipients().map(r => r.user_id ? r.user_id : r.id);
   }
 
   public sendVia() {
@@ -310,12 +310,13 @@ export class Checkin extends Model {
     let _recipients = {};
 
     for (let recipient of this.recipients) {
-      _recipients[recipient.id] = recipient;
+      _recipients[recipient.user_id] = recipient;
     }
 
     for (let group of this.groups) {
       for (let recipient of group.members) {
         _recipients[recipient.id] = recipient;
+        _recipients[recipient.id].user_id = recipient.id;
       }
     }
 

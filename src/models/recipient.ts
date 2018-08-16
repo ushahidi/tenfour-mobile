@@ -12,7 +12,7 @@ export class Recipient extends Model {
     super(data);
     this.copyInto(data);
 
-    if (data.contacts && data.contacts.length > 0) {
+    if (data && data.contacts && data.contacts.length > 0) {
       this.contacts = [];
       for (let _contact of data.contacts) {
         let contact = new Contact(_contact);
