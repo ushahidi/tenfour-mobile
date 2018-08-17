@@ -178,10 +178,10 @@ export class TenFourApp {
           .then(() => this.loadAnalytics())
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
-          .then(() => this.loadPushNotifications())
           .then(() => this.loadWebApp())
           .then(() => this.loadCheckinsWaiting())
           .then(() => this.loadUnreadNotifications())
+          .then(() => this.loadPushNotifications())
           .then(() => {
             this.logger.info(this, "constructor", "loadWebApp", "Loaded");
           });
