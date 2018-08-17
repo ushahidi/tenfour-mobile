@@ -147,8 +147,8 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
-        .then(() => { return this.updateFirebase(this.organization, this.person); })
         .then(() => {
+          this.updateFirebase(this.organization, this.person); // don't wait for this promise to resolve
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
           this.events.publish(EVENT_USER_AUTHENTICATED);
