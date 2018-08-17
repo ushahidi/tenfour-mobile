@@ -846,10 +846,16 @@ export class TenFourApp {
     this.splashScreen.hide();
   }
 
-  private hideSideMenu() {
-    if (this.tablet == false || this.website == false) {
-      this.menuController.close();
+  private hideSideMenu(force:boolean = false) {
+    if (force) {
+      return this.menuController.close();
     }
+
+    if (this.website || this.tablet) {
+      return;
+    }
+
+    this.menuController.close();
   }
 
   private clearBadgeCount() {
@@ -941,7 +947,7 @@ export class TenFourApp {
         organization: this.organization,
         user: this.user
       });
-      this.hideSideMenu();
+      this.hideSideMenu(true);
     },
     (error:any) => {
       this.logger.error(this, "upgradeToPro", error);
