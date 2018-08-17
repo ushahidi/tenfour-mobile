@@ -847,6 +847,7 @@ export class TenFourApp {
   }
 
   private hideSideMenu() {
+    this.logger.info(this, "hideSideMenu");
     if (this.tablet == false || this.website == false) {
       this.menuController.close();
     }
