@@ -39,7 +39,7 @@
   steps:
   - name: "build PWA client (dev)"
     service: builder
-    command: ENV=dev npm run ionic:build --prod --release
+    command: ENV=dev npm run ionic:build --debug
 
   - name: "deploy PWA client (dev)"
     service: awscli
