@@ -27,8 +27,8 @@ export class FirebaseProvider {
 
   public initialize():Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
-        this.platform.ready().then(() => {
+      this.platform.ready().then(() => {
+        if (this.platform.is("cordova")) {
           this.getToken().then((token:string) => {
             this.logger.info(this, "initialize", token);
             resolve(token != null);
@@ -37,20 +37,21 @@ export class FirebaseProvider {
             this.logger.warn(this, "initialize", error);
             resolve(false);
           });
-        });
-      } else {
-        navigator.serviceWorker.register('service-worker.js').then((registration) => {
-          this.firebaseMessaging.useServiceWorker(registration);
-          this.getToken().then((token:string) => {
-            this.logger.info(this, "initialize", token);
-            resolve(token != null);
-          },
-          (error:any) => {
-            this.logger.warn(this, "initialize", error);
-            resolve(false);
+        }
+        else {
+          navigator.serviceWorker.register('service-worker.js').then((registration) => {
+            this.firebaseMessaging.useServiceWorker(registration);
+            this.getToken().then((token:string) => {
+              this.logger.info(this, "initialize", token);
+              resolve(token != null);
+            },
+            (error:any) => {
+              this.logger.warn(this, "initialize", error);
+              resolve(false);
+            });
           });
-        });
-      }
+        }
+      });
     });
   }
 
