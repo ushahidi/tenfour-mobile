@@ -65,7 +65,7 @@ export class StorageProvider {
           resolve(true);
         },
         (error:any) => {
-          resolve(false);
+          reject(error);
         });
       }
     });
@@ -95,7 +95,7 @@ export class StorageProvider {
   public has(key:string):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.get(key).then((data:any) => {
-        if (data) {
+        if (data != null) {
           resolve(true);
         }
         else {
@@ -1479,14 +1479,26 @@ export class StorageProvider {
 
   public setSubscription(subscription:Subscription):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.set("subscription", JSON.stringify(subscription)).then((saved:any) => {
-        this.logger.info(this, "setSubscription", subscription, "Stored");
-        resolve(true);
-      },
-      (error:any) => {
-        this.logger.error(this, "setSubscription", subscription, "Failed", error);
-        resolve(false);
-      });
+      if (subscription) {
+        this.set("subscription", JSON.stringify(subscription)).then((saved:any) => {
+          this.logger.info(this, "setSubscription", subscription, "Stored");
+          resolve(true);
+        },
+        (error:any) => {
+          this.logger.error(this, "setSubscription", subscription, "Failed", error);
+          resolve(false);
+        });
+      }
+      else {
+        this.remove("subscription").then((removed:any) => {
+          this.logger.info(this, "setSubscription", "NULL", "Removed");
+          resolve(false);
+        },
+        (error:any) => {
+          this.logger.error(this, "setSubscription", "NULL", "Failed", error);
+          resolve(false);
+        });
+      }
     });
   }
 
