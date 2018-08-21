@@ -54,8 +54,8 @@
         </ion-card>
       </ion-col>
       <ion-col col-12 col-sm>
-        <h2 class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">Extra SMS Credits</h2>
-        <ion-card class="extra-sms-credits" [ngClass]="{'enabled' : organization && organization.hasProPlan()}">
+        <h2 class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">Extra SMS Credits</h2>
+          <ion-card class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">
           <ion-card-header>
             {{this.CREDIT_BUNDLE_RATE | currency}} USD per credit <span *ngIf="addCreditsRecurring">per month</span>
           </ion-card-header>

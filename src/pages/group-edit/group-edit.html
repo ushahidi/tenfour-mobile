@@ -37,7 +37,7 @@
     <ion-item color="white" *ngFor="let _person of group.members">
       <person-avatar item-left [initials]="_person.initials" [image]="_person.profile_picture" [large]="false"></person-avatar>
       <h2>{{_person.name}}</h2>
-      <button ion-button icon-only item-right clear color="black" tappable *ngIf="person && person.isOwnerOrAdmin()" (click)="removePerson(_person)">
+      <button ion-button icon-only item-right clear color="black" tappable *ngIf="user && user.isOwnerOrAdmin()" (click)="removePerson(_person)">
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
     </ion-item>

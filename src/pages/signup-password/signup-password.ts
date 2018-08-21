@@ -147,8 +147,9 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
-        .then(() => { return this.updateFirebase(this.organization, this.person); })
-        .then(() => {
+        .then((saved:boolean) => {
+          this.logger.info(this, "createOrganization", saved);
+          this.updateFirebase(this.organization, this.person); // don't wait for this promise to resolve
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
           this.events.publish(EVENT_USER_AUTHENTICATED);
@@ -177,15 +178,21 @@ export class SignupPasswordPage extends BasePublicPage {
   private updateFirebase(organization:Organization, person:Person):Promise<string> {
     return new Promise((resolve, reject) => {
       this.firebase.getToken().then((token:string) => {
-        this.logger.info(this, "updateFirebase", token);
-        this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
-          this.logger.info(this, "updateFirebase", token, "Updated", updated);
-          resolve(token);
-        },
-        (error:any) => {
-          this.logger.error(this, "updateFirebase", "Failed", error);
+        if (token && token.length > 0) {
+          this.logger.info(this, "updateFirebase", token);
+          this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
+            this.logger.info(this, "updateFirebase", token, "Updated", updated);
+            resolve(token);
+          },
+          (error:any) => {
+            this.logger.error(this, "updateFirebase", token, "Failed", error);
+            resolve(null);
+          });
+        }
+        else {
+          this.logger.warn(this, "updateFirebase", "NULL");
           resolve(null);
-        });
+        }
       },
       (error:string) => {
         resolve(null);
@@ -193,16 +200,26 @@ export class SignupPasswordPage extends BasePublicPage {
     });
   }
 
-  private saveChanges(organization:Organization, person:Person) {
-    organization.user_id = person.id;
-    organization.user_name = person.name;
-    let saves = [
-      this.storage.setOrganization(organization),
-      this.storage.setUser(person),
-      this.storage.saveOrganization(organization),
-      this.storage.savePerson(organization, person)
-    ];
-    return Promise.all(saves);
+  private saveChanges(organization:Organization, person:Person):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "saveChanges");
+      organization.user_id = person.id;
+      organization.user_name = person.name;
+      let saves = [
+        this.storage.setUser(person),
+        this.storage.setOrganization(organization),
+        this.storage.saveOrganization(organization),
+        this.storage.savePerson(organization, person)
+      ];
+      Promise.all(saves).then((saved:any) => {
+        this.logger.info(this, "saveChanges", "Saved");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.info(this, "saveChanges", "Failed", error);
+        reject(error);
+      });
+    });
   }
 
   private createOrganizationOnReturn(event:any) {

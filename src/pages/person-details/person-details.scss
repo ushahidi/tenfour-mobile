@@ -10,7 +10,9 @@ page-person-details {
     }
   }
   .contact {
-
+    .blocked {
+      text-decoration: line-through;
+    }
   }
   .role {
 

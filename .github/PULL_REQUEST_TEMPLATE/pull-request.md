@@ -11,7 +11,7 @@ about: Request to merge changes from a branch.
 -
 
 #### Related Issues
-- ushahidi/tenfour-mobile/issues/
+- ushahidi/tenfour-mobile#
 
 #### Type Of Changes
 - [ ] Bug fix
