@@ -967,22 +967,27 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getNotifications(organization:Organization, limit:number=20, offset:number=0):Promise<Notification[]> {
+  public getNotifications(organization:Organization, person:Person, limit:number=20, offset:number=0, unread:number=0):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/people/me`;
-        let params = { };
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person.id}/notifications`;
+        let params = {
+          limit: limit,
+          offset: offset,
+          unread: unread
+        };
         this.httpGet(url, params, token.access_token).then((data:any) => {
-          if (data && data.person && data.person.notifications) {
+          if (data && data.notifications) {
             let notifications = [];
-            for (let _notification of data.person.notifications) {
+            for (let _notification of data.notifications) {
               let notification = new Notification(_notification);
+              this.logger.info(this, "getNotifications", "Notification", notification);
               notifications.push(notification);
             }
             resolve(notifications);
           }
           else {
-            reject("Notifications Not Found");
+            resolve([]);
           }
         },
         (error:any) => {
@@ -1027,7 +1032,7 @@ export class ApiProvider extends HttpProvider {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
         let params = {
-          'unread': 1
+          unread: 1
         };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.notifications) {
@@ -1037,8 +1042,9 @@ export class ApiProvider extends HttpProvider {
               notifications.push(notification);
             }
             resolve(notifications);
-          } else {
-            reject("Notifications not found");
+          }
+          else {
+            resolve([]);
           }
         },
         (error:any) => {
