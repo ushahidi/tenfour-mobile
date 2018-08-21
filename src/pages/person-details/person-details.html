@@ -34,14 +34,14 @@
               [hidden]="contact.contact == null || contact.contact.length == 0"
               *ngFor="let contact of person.getPhones()">
       <ion-icon ios="ios-call-outline" md="md-call" item-left></ion-icon>
-      <div item-content class="content">{{contact.contact}}</div>
+      <div item-content class="content" [class.blocked]="contact.blocked">{{contact.contact}}</div>
     </ion-item>
     <ion-item detail-push tappable color="white" class="contact"
               (click)="emailContact(contact)"
               [hidden]="contact.contact == null || contact.contact.length == 0"
               *ngFor="let contact of person.getEmails()">
       <ion-icon ios="ios-mail-outline" md="md-mail" item-left></ion-icon>
-      <div item-content class="content">{{contact.contact}}</div>
+      <div item-content class="content" [class.blocked]="contact.blocked">{{contact.contact}}</div>
     </ion-item>
     <ion-item detail-push tappable color="white" class="contact"
               (click)="showAddress(contact)"

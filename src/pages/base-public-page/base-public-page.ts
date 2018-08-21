@@ -36,7 +36,7 @@ export class BasePublicPage extends BasePage {
     return new Promise((resolve, reject) => {
       this.storage.hasUser().then((hasUser:boolean) => {
         if (hasUser) {
-          this.logger.error(this, "ionViewCanEnter", "NO");
+          this.logger.warn(this, "ionViewCanEnter", "NO");
           setTimeout(() => {
             this.events.publish(EVENT_USER_REDIRECTED);
           }, 500);

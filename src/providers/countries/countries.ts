@@ -101,7 +101,7 @@ export class CountriesProvider {
             resolve(country);
           }
           else {
-            this.logger.error(this, "getCountry", countryCode, "Not Found");
+            this.logger.warn(this, "getCountry", countryCode, "Not Found");
             reject("Country Not Found");
           }
         });

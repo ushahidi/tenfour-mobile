@@ -4,6 +4,7 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
+import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -79,7 +80,13 @@ export class SigninUrlPage extends BasePublicPage {
 
   private showNext(event:any=null) {
     this.logger.info(this, "showNext", this.subdomain.value);
-    if (this.subdomain.value && this.subdomain.value.length > 0) {
+    if (this.subdomain.value.length == 0) {
+      this.showToast("Please enter your domain");
+      setTimeout(() => {
+        this.subdomain.setFocus();
+      }, 500);
+    }
+    else {
       let subdomain = this.subdomain.value.toLowerCase();
       let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
@@ -129,6 +136,11 @@ export class SigninUrlPage extends BasePublicPage {
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
     this.showPage(SignupEmailPage, {});
+  }
+
+  private lookupOrganization(event:any) {
+    this.logger.info(this, "lookupOrganization");
+    this.showPage(SigninLookupPage, {});
   }
 
   private showNextOnReturn(event:any) {

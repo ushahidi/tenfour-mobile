@@ -30,7 +30,7 @@ export class Organization extends Model {
               this.types = _settings.values.join(",");
             }
             else if (_settings.key == 'organization_size') {
-              this.size = _settings.values.toString();
+              this.size = _settings.values['size'];
             }
             else if (_settings.key == 'channels') {
               if (_settings.values.preferred) {

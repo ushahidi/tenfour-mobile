@@ -2,7 +2,7 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons right>
-      <button color="primary" ion-button text-only [disabled]="name.value.length == 0" (click)="showNext($event)">Next</button>
+      <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -14,10 +14,10 @@
     </ion-item>
     <ion-item color="input" class="input">
       <ion-label fixed>Name</ion-label>
-      <ion-input #name type="text" autocorrect="off" autocapitalize="words" placeholder="Organization's name" (keypress)="showNextOnReturn($event)"></ion-input>
+      <ion-input #name type="text" autocorrect="off" autocapitalize="words" autocomplete="off" placeholder="Your organization's name" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
     <ion-item text-wrap no-lines class="info">
-      <p>This will display within Checkin's menus, usually representing the name of your company or team.</p>
+      <p>This will display within Check-In's menus, usually representing the name of your company or team.</p>
     </ion-item>
   </ion-list>
 </ion-content>

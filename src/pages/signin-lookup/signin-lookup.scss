@@ -1,0 +1,18 @@
+page-signin-url {
+  ion-item {
+    img {
+      margin-top: 10px;
+      width: 50% !important;
+      max-width: 250px !important;
+    }
+    h3 {
+      color: color($colors, text);
+      margin: 0;
+      padding-bottom: 6px;
+      font-size: 1.0em !important;
+    }
+    button {
+      font-size: 1.0em !important;
+    }
+  }
+}

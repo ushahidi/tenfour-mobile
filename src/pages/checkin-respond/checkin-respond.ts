@@ -129,7 +129,7 @@ export class CheckinRespondPage extends BasePrivatePage {
       this.checkin = this.checkins[this.index];
     }
     else {
-      this.logger.error(this, "slideChanged", event, index);
+      this.logger.warn(this, "slideChanged", event, index);
     }
   }
 

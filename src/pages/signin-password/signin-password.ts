@@ -13,6 +13,7 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { FirebaseProvider } from '../../providers/firebase/firebase';
 
 import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
@@ -51,7 +52,8 @@ export class SigninPasswordPage extends BasePublicPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected firebase:FirebaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -124,7 +126,6 @@ export class SigninPasswordPage extends BasePublicPage {
 
   private showNext(event:any) {
     this.logger.info(this, "showNext");
-    this.loading = true;
     if (this.password.value == null || this.password.value.length == 0) {
       this.showToast("Please enter your password");
       setTimeout(() => {
@@ -132,6 +133,7 @@ export class SigninPasswordPage extends BasePublicPage {
       }, 500);
     }
     else {
+      this.loading = true;
       let loading = this.showLoading("Logging in...", true);
       let password = this.password.value;
       Promise.resolve()
@@ -140,7 +142,9 @@ export class SigninPasswordPage extends BasePublicPage {
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.loadSubscriptions(this.organization, this.person); })
         .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
-        .then(() => {
+        .then((saved:boolean) => {
+          this.logger.info(this, "showNext", saved);
+          this.updateFirebase(this.organization, this.person); // don't wait for this promise to resolve
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
           this.events.publish(EVENT_USER_AUTHENTICATED);
@@ -176,36 +180,74 @@ export class SigninPasswordPage extends BasePublicPage {
 
   private loadSubscriptions(organization:Organization, person:Person):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadSubscriptions");
       if (person && person.isOwner()) {
         this.api.getSubscriptions(organization).then((subscriptions:Subscription[]) => {
+          this.logger.info(this, "loadSubscriptions", "Loaded", subscriptions);
           resolve(subscriptions);
         },
         (error:any) => {
+          this.logger.error(this, "loadSubscriptions", "Failed", error);
           reject(error);
         });
       }
       else {
+        this.logger.info(this, "loadSubscriptions", "Not Owner");
         resolve([]);
       }
     });
   }
 
-  private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<any[]> {
-    let subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
-    organization.user_id = person.id;
-    organization.user_name = person.name;
-    organization.email = this.email;
-    let saves = [
-      this.storage.setOrganization(organization),
-      this.storage.setSubscription(subscription),
-      this.storage.setUser(person)
-    ];
-    if (this.mobile) {
-      saves.push(this.storage.saveOrganization(organization));
-      saves.push(this.storage.saveSubscription(organization, subscription));
-      saves.push(this.storage.savePerson(organization, person));
-    }
-    return Promise.all(saves);
+  private updateFirebase(organization:Organization, person:Person):Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "updateFirebase");
+      this.firebase.getToken().then((token:string) => {
+        if (token && token.length > 0) {
+          this.logger.info(this, "updateFirebase", token);
+          this.api.updateFirebase(organization, person, token).then((updated:boolean) => {
+            this.logger.info(this, "updateFirebase", token, "Updated", updated);
+            resolve(token);
+          },
+          (error:any) => {
+            this.logger.error(this, "updateFirebase", token, "Failed", error);
+            resolve(null);
+          });
+        }
+        else {
+          this.logger.warn(this, "updateFirebase", "NULL");
+          resolve(null);
+        }
+      },
+      (error:string) => {
+        resolve(null);
+      });
+    });
+  }
+
+  private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "saveChanges");
+      let subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
+      organization.user_id = person.id;
+      organization.user_name = person.name;
+      organization.email = this.email;
+      let saves = [
+        this.storage.setUser(person),
+        this.storage.setOrganization(organization),
+        this.storage.setSubscription(subscription),
+        this.storage.saveOrganization(organization),
+        this.storage.savePerson(organization, person),
+        this.storage.saveSubscription(organization, subscription)
+      ];
+      Promise.all(saves).then((saved:any) => {
+        this.logger.info(this, "saveChanges", "Saved");
+        resolve(true);
+      },
+      (error:any) => {
+        this.logger.info(this, "saveChanges", "Failed", error);
+        reject(error);
+      });
+    });
   }
 
   private resetPassword(event:any) {

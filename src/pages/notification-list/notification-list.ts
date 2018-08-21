@@ -11,6 +11,8 @@ import { Notification } from '../../models/notification';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_NOTIFICATIONS_CHANGED } from '../../constants/events';
+
 @IonicPage({
   name: 'NotificationListPage',
   segment: 'notifications'
@@ -45,10 +47,17 @@ export class NotificationListPage extends BasePrivatePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
+  ionViewDidLoad() {
+    super.ionViewDidLoad();
+    this.limit = this.website ? 20 : 10;
+  }
+
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((loaded:any) => {
+    this.loadUpdates(true)
+      // .then(this.markAllNotificationsAsRead)
+      .then((loaded:any) => {
       loading.dismiss();
     });
   }
@@ -65,6 +74,7 @@ export class NotificationListPage extends BasePrivatePage {
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.viewNotifications();
+    this.markAllNotificationsAsRead();
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -152,6 +162,14 @@ export class NotificationListPage extends BasePrivatePage {
     }
     this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
       this.logger.info(this, "viewNotifications", "Saved", saved);
+    });
+  }
+
+  private markAllNotificationsAsRead() {
+    this.logger.info(this, "markAllNotificationsAsRead");
+    this.api.markAllNotificationsAsRead(this.organization, this.user).then(() => {
+      this.logger.info(this, "markAllNotificationsAsRead", "done");
+      this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
     });
   }
 

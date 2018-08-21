@@ -1,5 +1,5 @@
-import { Component, NgZone } from '@angular/core';
-import { App, IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { Component, NgZone, ViewChild } from '@angular/core';
+import { App, IonicPage, Platform, TextInput, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
@@ -27,6 +27,9 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
   entryComponents:[ CheckinSendPage ]
 })
 export class CheckinEditPage extends BasePrivatePage {
+
+  @ViewChild('message')
+  message:TextInput;
 
   checkin:Checkin = null;
 
@@ -141,7 +144,13 @@ export class CheckinEditPage extends BasePrivatePage {
   }
 
   private showNext() {
-    if (this.checkin.hasBlankAnswers()) {
+    if (this.message.value.length == 0) {
+      this.showToast("Please enter your question or message");
+      setTimeout(() => {
+        this.message.setFocus();
+      }, 500);
+    }
+    else if (this.checkin.hasBlankAnswers()) {
       this.showAlert("Blank Answers", "Answers must have a value.");
     }
     else if (this.checkin.hasDuplicateAnswers()) {

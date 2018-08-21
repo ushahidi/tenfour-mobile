@@ -13,6 +13,11 @@ import { Group } from '../../models/group';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import {
+  EVENT_GROUP_ADDED,
+  EVENT_GROUP_CHANGED,
+  EVENT_GROUP_DELETED } from '../../constants/events';
+
 @IonicPage({
   name: 'GroupListPage',
   segment: 'groups'
@@ -47,6 +52,7 @@ export class GroupListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
+    this.limit = this.website ? 30 : 20;
   }
 
   ionViewWillEnter() {
@@ -64,6 +70,40 @@ export class GroupListPage extends BasePrivatePage {
         organization: this.organization.name
       });
     }
+    this.events.subscribe(EVENT_GROUP_ADDED, (groupId:number) => {
+      this.logger.info(this, EVENT_GROUP_ADDED, groupId);
+      this.loadGroups(false).then((groups:Group[]) => {
+        this.logger.info(this, EVENT_GROUP_ADDED, groupId, "Loaded");
+      },
+      (error:any) => {
+        this.logger.warn(this, EVENT_GROUP_ADDED, groupId, "Failed", error);
+      });
+    });
+    this.events.subscribe(EVENT_GROUP_CHANGED, (groupId:number) => {
+      this.logger.info(this, EVENT_GROUP_CHANGED, groupId);
+      this.loadGroups(false).then((groups:Group[]) => {
+        this.logger.info(this, EVENT_GROUP_CHANGED, groupId, "Loaded");
+      },
+      (error:any) => {
+        this.logger.warn(this, EVENT_GROUP_CHANGED, groupId, "Failed", error);
+      });
+    });
+    this.events.subscribe(EVENT_GROUP_DELETED, (groupId:number) => {
+      this.logger.info(this, EVENT_GROUP_DELETED, groupId);
+      this.loadGroups(false).then((groups:Group[]) => {
+        this.logger.info(this, EVENT_GROUP_DELETED, groupId, "Loaded");
+      },
+      (error:any) => {
+        this.logger.warn(this, EVENT_GROUP_DELETED, groupId, "Failed", error);
+      });
+    });
+  }
+
+  ionViewWillLeave() {
+    super.ionViewWillLeave();
+    this.events.unsubscribe(EVENT_GROUP_ADDED);
+    this.events.unsubscribe(EVENT_GROUP_CHANGED);
+    this.events.unsubscribe(EVENT_GROUP_DELETED);
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {

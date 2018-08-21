@@ -5,8 +5,9 @@
     </button>
     <ion-title>Groups</ion-title>
     <ion-buttons right *ngIf="user">
-      <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="createGroup($event)">
+      <button ion-button icon-start [solid]="website == true ? 'true' : null" color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="createGroup($event)">
         <ion-icon ios="ios-add" md="md-add"></ion-icon>
+        <span *ngIf="website == true">Add</span>
       </button>
     </ion-buttons>
   </ion-navbar>

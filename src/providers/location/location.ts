@@ -111,7 +111,7 @@ export class LocationProvider {
           }
         })
         .catch((error:any) => {
-          this.logger.error(this, "loadAddress", location, error);
+          this.logger.warn(this, "loadAddress", location, error);
           reject(error);
         });
       }
@@ -125,7 +125,7 @@ export class LocationProvider {
           .timeout(12000)
           .map(res => res.json())
           .catch((error:any) => {
-            this.logger.error(this, "loadAddress", error);
+            this.logger.warn(this, "loadAddress", error);
             return Observable.throw(error );
           })
           .subscribe((data:any) => {
@@ -139,7 +139,7 @@ export class LocationProvider {
             }
           },
           (error:any) => {
-            this.logger.error(this, "loadAddress", url, error);
+            this.logger.warn(this, "loadAddress", url, error);
             reject(error);
           });
       }
@@ -180,7 +180,7 @@ export class LocationProvider {
           }
         },
         (error:any) => {
-          this.logger.error(this, "searchAddress", url, error);
+          this.logger.warn(this, "searchAddress", url, error);
           resolve([]);
         });
     });

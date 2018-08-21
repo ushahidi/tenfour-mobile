@@ -2,20 +2,27 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons right>
-      <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
+      <button color="primary" ion-button text-only (click)="showNext($event)" *ngIf="!sent">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
+
     <ion-item text-wrap class="heading">
       <img src="assets/images/logo-dots.png"/>
-      <h2>Enter your email to sign up</h2>
-      <p>We do not send marketing or promotional emails.</p>
+      <h2 *ngIf="!sent">What's your email address?</h2>
+      <h2 *ngIf="sent">Check your email inbox.</h2>
     </ion-item>
-    <ion-item color="input" class="input">
+
+    <ion-item color="input" class="input" *ngIf="!sent">
       <ion-label fixed>Email</ion-label>
       <ion-input #email type="email" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your email address" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
+
+    <ion-item text-wrap no-lines class="info" *ngIf="sent">
+      <p>We sent an email to you at {{ sentToEmail }} with instructions for finding your organization's domain.</p>
+    </ion-item>
+
   </ion-list>
 </ion-content>

@@ -5,8 +5,12 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
+import { AngularFireModule } from 'angularfire2';
+
 import { SegmentModule } from 'ngx-segment-analytics';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
+
+import { Environment as ENVIRONMENT } from "@app/env";
 
 import { HTTP } from '@ionic-native/http';
 import { AppVersion } from '@ionic-native/app-version';
@@ -34,6 +38,7 @@ import { ScreenOrientation } from '@ionic-native/screen-orientation';
 import { Badge } from '@ionic-native/badge';
 import { Firebase } from '@ionic-native/firebase';
 import { IntercomModule } from 'ng-intercom';
+import { Intercom } from '@ionic-native/intercom';
 import { TenFourApp } from './app.component';
 import { TenFourRoutes } from './app.routes';
 
@@ -216,19 +221,21 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({
-      apiKey: 'ieZYKiegj7ctbK38BqQKPIwaCommytok',
+      apiKey: ENVIRONMENT.segmentApiKey,
       debug: false
     }),
+    AngularFireModule.initializeApp({
+      projectId: ENVIRONMENT.firebaseAppId,
+      apiKey: ENVIRONMENT.firebaseApiKey,
+      messagingSenderId: ENVIRONMENT.firebaseSenderId
+    }),
     IntercomModule.forRoot(),
-    IonicModule.forRoot(TenFourApp,
-      {
-        scrollAssist: true,
-        autoFocusAssist: true
-      },
-      {
-        links: TenFourRoutes.ROUTES
-      }
-    )
+    IonicModule.forRoot(TenFourApp, {
+      scrollAssist: true,
+      autoFocusAssist: true
+    },{
+      links: TenFourRoutes.ROUTES
+    })
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -260,6 +267,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     { provide: Sim, useClass: Sim },
     { provide: HTTP, useClass: HTTP },
     { provide: Firebase, useClass: Firebase },
+    { provide: Intercom, useClass: Intercom },
     { provide: ApiProvider, useClass: ApiProvider },
     { provide: LoggerProvider, useClass: LoggerProvider },
     { provide: CountriesProvider, useClass: CountriesProvider },

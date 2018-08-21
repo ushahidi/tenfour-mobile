@@ -98,7 +98,6 @@ export class PersonEditPage extends BasePrivatePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
-
     return new Promise((resolve, reject) => {
       return this.loadOrganization(cache)
         .then((org) => { return this.loadUser(cache); })
@@ -132,8 +131,15 @@ export class PersonEditPage extends BasePrivatePage {
           if (countries && countries.length > 0) {
             this.countryCodes = countries
               .map(country => country.country_code)
-              .filter((v, i, a) => a.indexOf(v) === i);
-            resolve();
+              .filter((v, i, a) => a.indexOf(v) === i)
+              .sort((n1, n2) => {
+                if (n1 < n2)
+                  return -1;
+                if (n1 > n2)
+                  return 1;
+                return 0;
+              });
+            resolve(true);
           }
           else {
             this.loadRegions(false).then(resolve);
@@ -144,8 +150,15 @@ export class PersonEditPage extends BasePrivatePage {
         this.api.getRegions(this.organization).then((regions:Region[]) => {
           this.countryCodes = regions
             .map(region => region.country_code)
-            .filter((v, i, a) => a.indexOf(v) === i);
-          resolve();
+            .filter((v, i, a) => a.indexOf(v) === i)
+            .sort((n1, n2) => {
+              if (n1 < n2)
+                return -1;
+              if (n1 > n2)
+                return 1;
+              return 0;
+            });
+          resolve(true);
         });
       }
     });
@@ -249,11 +262,20 @@ export class PersonEditPage extends BasePrivatePage {
         contacts.push(this.saveContact(this.organization, person, contact));
       }
       Promise.all(contacts).then((updated:any) => {
-        this.storage.savePerson(this.organization, person).then((saved:any) => {
+        let saves = [];
+        if (this.profile) {
+          saves.push(this.storage.setUser(person));
+        }
+        saves.push(this.storage.savePerson(this.organization, person));
+        Promise.all(saves).then((saved:any) => {
           loading.dismiss();
           this.hideModal({
             person: person
           });
+        },
+        (error:any) => {
+          loading.dismiss();
+          this.showAlert(`Problem ${activity} Person`, error);
         });
       },
       (error:any) => {
@@ -295,7 +317,7 @@ export class PersonEditPage extends BasePrivatePage {
             });
           },
           (error:any) => {
-            reject(error);
+            return reject('Invalid phone number or email formatting. User was not created.');
           });
         });
       }
@@ -541,4 +563,8 @@ export class PersonEditPage extends BasePrivatePage {
      });
   }
 
+  private onContactChanged(contact:any) {
+    this.logger.info(this, "onContactChanged", contact);
+    contact.blocked = false;
+  }
 }

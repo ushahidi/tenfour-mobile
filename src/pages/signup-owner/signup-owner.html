@@ -2,7 +2,7 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons right>
-      <button color="primary" ion-button text-only [disabled]="owner.value.length == 0" (click)="showNext($event)">Next</button>
+      <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -13,8 +13,8 @@
       <h2>What's your name?</h2>
     </ion-item>
     <ion-item color="input" class="input">
-      <ion-label fixed>Name</ion-label>
-      <ion-input #owner type="text" autocorrect="off" autocapitalize="words" placeholder="Your name" (keypress)="showNextOnReturn($event)"></ion-input>
+      <ion-label fixed>Full Name</ion-label>
+      <ion-input #owner type="text" autocorrect="off" autocapitalize="words" autocomplete="off" placeholder="Your full name" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
   </ion-list>
 </ion-content>

@@ -20,11 +20,11 @@
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Name</ion-label>
-      <ion-input type="text" (keypress)="onKeyPress($event)" [(ngModel)]="organization.name"></ion-input>
+      <ion-input type="text" autocorrect="off" autocapitalize="words" autocomplete="off" (keypress)="onKeyPress($event)" [(ngModel)]="organization.name"></ion-input>
     </ion-item>
     <ion-item color="white">
       <ion-label floating>Location</ion-label>
-      <ion-input type="text" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="organization.location"></ion-input>
+      <ion-input type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" (keypress)="onKeyPress($event)" (keyup)="searchAddress()" (ionFocus)="searchAddress()" [(ngModel)]="organization.location"></ion-input>
     </ion-item>
     <ion-item color="white" tappable (click)="selectLocation(location)" *ngFor="let location of locations">
       <ion-icon ios="ios-pin" md="md-pin" item-left></ion-icon>

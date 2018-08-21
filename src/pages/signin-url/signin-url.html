@@ -2,7 +2,7 @@
   <ion-navbar color="navbar">
     <ion-title>{{title}}</ion-title>
     <ion-buttons right>
-      <button color="primary" #next ion-button text-only [disabled]="subdomain.value.length == 0" (click)="showNext($event)">Next</button>
+      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -16,7 +16,10 @@
     <ion-item color="input" class="input">
       <ion-label fixed>URL</ion-label>
       <h3 item-text item-right>.tenfour.org</h3>
-      <ion-input #subdomain type="url" autocorrect="off" autocapitalize="none" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
+      <ion-input #subdomain type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item no-lines text-center>
+      <button ion-button clear tappable color="primary" (click)="lookupOrganization($event)">Forgot your domain?</button>
     </ion-item>
     <ion-item no-lines class="other">
       <h4>New to TenFour?</h4>
