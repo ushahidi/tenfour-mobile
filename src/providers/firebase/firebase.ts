@@ -39,6 +39,7 @@ export class FirebaseProvider {
           });
         }
         else {
+          this.logger.info(this, "initialize");
           navigator.serviceWorker.register('service-worker.js').then((registration) => {
             this.firebaseMessaging.useServiceWorker(registration);
             this.getToken().then((token:string) => {
@@ -108,6 +109,7 @@ export class FirebaseProvider {
   public getToken():Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
+        this.logger.info(this, "getToken");
         this.firebaseNative.getToken().then((token:string) => {
           this.logger.info(this, "getToken", token, "Fetched");
           this.storage.setFirebase(token).then((stored:boolean) => {
@@ -128,6 +130,7 @@ export class FirebaseProvider {
         });
       }
       else {
+        this.logger.info(this, "getToken");
         this.promiseTimeout(this.firebaseMessaging.getToken(), 2000).then((token:string) => {
           this.logger.info(this, "getToken", token, "Fetched");
           this.storage.setFirebase(token).then((stored:boolean) => {
@@ -293,6 +296,10 @@ export class FirebaseProvider {
       promise.then((result:any) => {
         clearTimeout(timer);
         resolve(result);
+      },
+      (error:any) => {
+        clearTimeout(timer);
+        reject(error);
       })
       .catch((error:any) => {
         clearTimeout(timer);
