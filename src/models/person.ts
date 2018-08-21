@@ -131,6 +131,9 @@ export class Person extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
+  @Column("source", TEXT)
+  public source:string = null;
+
   public selected:boolean = null;
 
   public contacts:Contact[] = [];
@@ -209,6 +212,10 @@ export class Person extends Model {
   }
 
   public needsInvite():boolean {
+    if (this.source && this.source.length && this.source !== 'local') {
+      return false;
+    }
+
     if (this.has_logged_in == false) {
       return this.hasEmails();
     }

@@ -262,4 +262,11 @@ export class PersonDetailsPage extends BasePrivatePage {
     });
   }
 
+  get canEdit() {
+    if (this.person.source && this.person.source.length && this.person.source !== 'local') {
+      return false;
+    }
+
+    return this.person.isMe() || this.user.isOwner() || this.user.isAdmin();
+  }
 }
