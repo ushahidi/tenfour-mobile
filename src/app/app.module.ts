@@ -107,6 +107,7 @@ import { CapitalizeModule } from '../pipes/capitalize/capitalize.module';
 import { TruncateModule } from '../pipes/truncate/truncate.module';
 import { HtmlParserModule } from '../pipes/html-parser/html-parser.module';
 import { HumanizeModule } from '../pipes/humanize/humanize.module';
+import { GroupByModule } from '../pipes/group-by/group-by.module';
 
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
@@ -218,6 +219,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     TruncateModule,
     HtmlParserModule,
     HumanizeModule,
+    GroupByModule,
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({

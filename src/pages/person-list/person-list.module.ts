@@ -9,6 +9,7 @@ import { PersonImportModule } from '../../pages/person-import/person-import.modu
 
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 import { PersonRowModule } from '../../components/person-row/person-row.module';
+import { GroupByModule } from '../../pipes/group-by/group-by.module';
 
 @NgModule({
   declarations: [
@@ -21,6 +22,7 @@ import { PersonRowModule } from '../../components/person-row/person-row.module';
     PersonDetailsModule,
     PersonInviteModule,
     PersonImportModule,
+    GroupByModule,
     IonicPageModule.forChild(PersonListPage),
   ],
   exports: [
