@@ -157,8 +157,11 @@ export class NotificationListPage extends BasePrivatePage {
     let promises = [];
 
     for (let notification of this.notifications) {
+      if (!notification.read_at) {
+        promises.push(this.api.markNotificationAsRead(this.organization, this.user, notification));
+      }
+
       notification.viewed_at = new Date();
-      promises.push(this.api.markNotificationAsRead(this.organization, this.user, notification));
     }
 
     this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
