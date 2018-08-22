@@ -72,7 +72,6 @@ export class NotificationListPage extends BasePrivatePage {
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.viewNotifications();
-    this.markAllNotificationsAsRead();
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -155,19 +154,18 @@ export class NotificationListPage extends BasePrivatePage {
 
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
+    let promises = [];
+
     for (let notification of this.notifications) {
       notification.viewed_at = new Date();
+      promises.push(this.api.markNotificationAsRead(this.organization, this.user, notification));
     }
-    this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
-      this.logger.info(this, "viewNotifications", "Saved", saved);
-    });
-  }
 
-  private markAllNotificationsAsRead() {
-    this.logger.info(this, "markAllNotificationsAsRead");
-    this.api.markAllNotificationsAsRead(this.organization, this.user).then(() => {
-      this.logger.info(this, "markAllNotificationsAsRead", "done");
-      this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+    this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
+      Promise.all(promises).then(() => {
+        this.logger.info(this, "viewNotifications", "Saved", saved);
+        this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+      });
     });
   }
 
