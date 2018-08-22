@@ -179,4 +179,12 @@ export class GroupDetailsPage extends BasePrivatePage {
     }
   }
 
+  get canEdit() {
+    if (this.group && this.group.source && this.group.source.length && this.group.source !== 'local') {
+      return false;
+    }
+
+    return this.user.isOwner() || this.user.isAdmin();
+  }
+
 }
