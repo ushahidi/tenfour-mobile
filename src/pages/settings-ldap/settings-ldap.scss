@@ -1,3 +1,11 @@
-page-settings-channels {
+page-settings-ldap {
 
+  ion-label {
+    min-width: 8em;
+  }
+
+  h2 {
+    font-weight: 500 !important;
+    color: color($colors, black) !important;
+  }
 }

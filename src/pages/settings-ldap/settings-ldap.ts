@@ -24,6 +24,13 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class SettingsLDAPPage extends BasePrivatePage {
 
   // help:string = "https://www.tenfour.org/support/configuring-how-to-send-checkins";
+  setting = {
+    enabled:      false,
+    url:          '',
+    base_dn:      '',
+    user_filter:  '',
+    group_filter: ''
+  };
 
   constructor(
       protected zone:NgZone,
@@ -65,6 +72,11 @@ export class SettingsLDAPPage extends BasePrivatePage {
       .then(() => { return this.loadUser(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
+
+        if (this.organization.ldap_settings && this.organization.ldap_settings.length) {
+          this.setting = JSON.parse(this.organization.ldap_settings);
+        }
+
         if (event) {
           event.complete();
         }
@@ -83,7 +95,22 @@ export class SettingsLDAPPage extends BasePrivatePage {
   }
 
   private doneEdit(event:any) {
+    if (this.setting.enabled) {
+      if (!this.setting.url) {
+        return this.showToast("Please specify the LDAP URL", 4000);
+      } else if (!this.setting.base_dn) {
+        return this.showToast("Please specify the base DN", 4000);
+      } else if (!this.setting.user_filter) {
+        return this.showToast("Please specify the user filter", 4000);
+      } else if (!this.setting.group_filter) {
+        return this.showToast("Please specify the group filter", 4000);
+      }
+    }
+
     let loading = this.showLoading("Updating...", true);
+
+    this.organization.ldap_settings = JSON.stringify(this.setting);
+
     this.api.updateOrganization(this.organization).then((organization:Organization) => {
       this.storage.setOrganization(organization).then(saved => {
         loading.dismiss();

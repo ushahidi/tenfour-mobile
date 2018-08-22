@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
+import { DateTimeModule } from '../../pipes/date-time/date-time.module';
+
 import { SettingsLDAPPage } from './settings-ldap';
 
 @NgModule({
@@ -8,6 +10,7 @@ import { SettingsLDAPPage } from './settings-ldap';
     SettingsLDAPPage,
   ],
   imports: [
+    DateTimeModule,
     IonicPageModule.forChild(SettingsLDAPPage),
   ],
   exports: [
