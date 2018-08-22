@@ -79,6 +79,9 @@ export class Organization extends Model {
             else if (_settings.key == 'plan_and_credits') {
               this.credits_extra = parseInt(_settings.values.monthlyCreditsExtra);
             }
+            else if (_settings.key == 'ldap') {
+              this.ldap_settings = JSON.stringify(_settings.values);
+            }
           }
           let settings = new Settings(_settings);
           settings.organization_id = this.id;
@@ -172,6 +175,9 @@ export class Organization extends Model {
 
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
+
+  @Column("ldap_settings", TEXT)
+  public ldap_settings:string = null;
 
   public settings:Settings[] = [];
 
