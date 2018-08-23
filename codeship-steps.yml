@@ -21,7 +21,7 @@
   steps:
   - name: "deploy .wellknown to staging"
     service: awscli
-    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client/.well-known/
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client-eu/.well-known/
 
   - type: serial
     steps:
@@ -31,7 +31,7 @@
 
     - name: "deploy PWA client (staging)"
       service: awscli
-      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client/
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client-eu/
 
 
 - type: serial
