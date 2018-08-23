@@ -2,7 +2,7 @@
   <ion-item color="white" detail-push tappable (click)="onRowSelected($event)">
     <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
     <h2>{{group.name}}
-      <ion-icon *ngIf="group.isExternal()" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
+      <ion-icon *ngIf="group.source && group.source.length && group.source !== 'local'" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
     </h2>
     <p>{{group.member_count || 0}} people</p>
   </ion-item>
