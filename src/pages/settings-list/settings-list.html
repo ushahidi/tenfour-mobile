@@ -37,5 +37,8 @@
       <span *ngIf="organization && organization.hasFreePlan()">Upgrade to TenFour Pro</span>
       <span *ngIf="organization && !organization.hasFreePlan()">Subscription Plans</span>
     </ion-item>
+    <ion-item *ngIf="user && user.isOwner() && organization && organization.hasProPlan()" color="white" tappable detail-push (click)="settingsLDAP($event)">
+      Active Directory (LDAP)
+    </ion-item>
   </ion-list>
 </ion-content>

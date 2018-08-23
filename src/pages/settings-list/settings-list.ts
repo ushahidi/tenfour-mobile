@@ -10,6 +10,7 @@ import { SettingsRegionsPage } from '../../pages/settings-regions/settings-regio
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../../pages/settings-channels/settings-channels';
 import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
+import { SettingsLDAPPage } from '../../pages/settings-ldap/settings-ldap';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -26,7 +27,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-list',
   templateUrl: 'settings-list.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage ]
+  entryComponents:[ SettingsEditPage, SettingsTypesPage, SettingsSizesPage, SettingsRegionsPage, SettingsRolesPage, SettingsPaymentsPage, SettingsChannelsPage, SettingsLDAPPage ]
 })
 export class SettingsListPage extends BasePrivatePage {
 
@@ -149,4 +150,10 @@ export class SettingsListPage extends BasePrivatePage {
     });
   }
 
+  private settingsLDAP(event:any) {
+    this.logger.info(this, "settingsLDAP");
+    this.showModal(SettingsLDAPPage, {
+      organization: this.organization,
+    });
+  }
 }

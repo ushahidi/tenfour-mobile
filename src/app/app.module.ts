@@ -97,6 +97,7 @@ import { SettingsRegionsModule } from '../pages/settings-regions/settings-region
 import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
+import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module';
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
@@ -208,6 +209,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SettingsRolesModule,
     SettingsPaymentsModule,
     SettingsChannelsModule,
+    SettingsLDAPModule,
     SettingsSizesModule,
     SettingsRegionsModule,
     UnsubscribePageModule,

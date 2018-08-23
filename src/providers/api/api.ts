@@ -350,6 +350,9 @@ export class ApiProvider extends HttpProvider {
       if (organization.slack_webhook && organization.slack_webhook.length > 0) {
         settings['channels']['slack']['webhook_url'] = organization.slack_webhook;
       }
+      if (organization.ldap_settings && organization.ldap_settings.length) {
+        settings['ldap'] = JSON.parse(organization.ldap_settings);
+      }
       let params = {
         id: organization.id,
         name: organization.name,
