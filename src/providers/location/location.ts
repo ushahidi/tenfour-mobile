@@ -84,7 +84,7 @@ export class LocationProvider {
 
   public lookupAddress(location:Location):Promise<string> {
     return new Promise((resolve, reject) => {
-        this.logger.info(this, "loadAddress");
+      this.logger.info(this, "loadAddress");
       if (this.platform.is("cordova")) {
         this.geocoder.reverseGeocode(location.latitude, location.longitude).then((results:NativeGeocoderReverseResult[]) => {
           this.logger.info(this, "loadAddress", location, results);
