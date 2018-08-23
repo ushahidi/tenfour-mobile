@@ -1,0 +1,26 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "K4L62494Y2.com.ushahidi.tenfour",
+        "paths": [
+          "/#signin",
+          "/#signin/*",
+          "/#signup",
+          "/#signup/*",
+          "/#checkins",
+          "/#checkins/*",
+          "/#groups",
+          "/#groups/*",
+          "/#people",
+          "/#people/*",
+          "/#notifications",
+          "/#settings",
+          "/#settings/*",
+          "/#profile",
+        ]
+      }
+    ]
+  }
+}
