@@ -263,7 +263,7 @@ export class PersonDetailsPage extends BasePrivatePage {
   }
 
   get canEdit() {
-    if (this.person.source && this.person.source.length && this.person.source !== 'local') {
+    if (this.person.isExternal()) {
       return false;
     }
 

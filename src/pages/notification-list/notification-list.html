@@ -155,6 +155,22 @@
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.isType('LDAPSyncSucceeded')">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Active Directory (LDAP) Sync Suceeded</strong>
+          You successfully synced with your server. This is a one-time notification.
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
+      <ion-card-content text-wrap *ngIf="notification.isType('LDAPSyncFailed')">
+        <organization-logo float-left margin-right [image]="organization.profile_picture"></organization-logo>
+        <h2>
+          <strong>Active Directory (LDAP) Sync Failed</strong>
+          {{notification.message}}
+        </h2>
+        <p>{{notification.created_at | dateTime}}</p>
+      </ion-card-content>
     </ion-card>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
