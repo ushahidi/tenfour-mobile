@@ -1,7 +1,10 @@
 <ion-item-sliding color="white">
   <ion-item color="white" detail-push tappable (click)="onRowSelected($event)">
     <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
-    <h2>{{person.name}} <img class="dots" [src]="dots" *ngIf="person.has_logged_in"></h2>
+    <h2>{{person.name}}
+      <img class="dots" [src]="dots" *ngIf="person.has_logged_in">
+      <ion-icon *ngIf="person.isExternal()" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
+    </h2>
   </ion-item>
   <ion-item-options side="right" *ngIf="user && user.isOwnerOrAdmin()">
     <button ion-button color="danger" (click)="onRemoveSelected()">

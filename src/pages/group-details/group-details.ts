@@ -180,7 +180,7 @@ export class GroupDetailsPage extends BasePrivatePage {
   }
 
   get canEdit() {
-    if (this.group && this.group.source && this.group.source.length && this.group.source !== 'local') {
+    if (this.group && this.group.isExternal()) {
       return false;
     }
 

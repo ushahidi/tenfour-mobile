@@ -76,4 +76,7 @@ export class Group extends Model {
     return ids;
   }
 
+  public isExternal():boolean {
+    return this.source && this.source.length && this.source !== 'local';
+  }
 }
