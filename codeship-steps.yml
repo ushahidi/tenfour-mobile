@@ -37,6 +37,10 @@
 - type: serial
   tag: develop
   steps:
+  - name: "deploy .wellknown to develop"
+    service: awscli
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-dev-client-eu/.well-known/
+
   - name: "build PWA client (dev)"
     service: builder
     command: ENV=dev npm run ionic:build --debug
