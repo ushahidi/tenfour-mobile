@@ -84,12 +84,12 @@ export class LocationProvider {
 
   public lookupAddress(location:Location):Promise<string> {
     return new Promise((resolve, reject) => {
-        this.logger.info(this, "loadAddress");
+      this.logger.info(this, "loadAddress");
       if (this.platform.is("cordova")) {
         this.geocoder.reverseGeocode(location.latitude, location.longitude).then((results:NativeGeocoderReverseResult[]) => {
           this.logger.info(this, "loadAddress", location, results);
-          if (results && results.length > 0) {
-            let result = results[0];
+          let result = this.getFirstResult(results);
+          if (result) {
             let address:any[] = [];
             if (result.thoroughfare) {
               address.push(result.thoroughfare);
@@ -224,6 +224,18 @@ export class LocationProvider {
         resolve(null);
       }
     });
+  }
+
+  private getFirstResult(results:any):any {
+    if (results) {
+      if (Array.isArray(results) && results.length > 0) {
+        return results[0];
+      }
+      if (typeof results === "object") {
+        return results;
+      }
+    }
+    return null;
   }
 
 }
