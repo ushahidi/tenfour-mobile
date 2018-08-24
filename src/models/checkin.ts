@@ -320,7 +320,7 @@ export class Checkin extends Model {
       }
     }
 
-    return (<any>Object).values(_recipients);
+    return Object.keys(_recipients).map((key) => { return _recipients[key]; });
   }
 
   public creditsRequired():number {
