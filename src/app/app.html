@@ -20,7 +20,7 @@
       </ion-list>
       <div *ngIf="organization && organization.hasFreePlan() && user && (user.isOwner() || user.isAdmin())">
         <p text-center>You are using the free version of TenFour</p>
-        <p text-center *ngIf="user && user.isOwner() && !ios">
+        <p text-center *ngIf="user && user.isOwner()">
           <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
         </p>
       </div>
