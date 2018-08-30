@@ -52,7 +52,7 @@
         </h2>
         <p>{{notification.created_at | dateTime}}</p>
       </ion-card-content>
-      <ion-card-content text-wrap *ngIf="notification.isType('CheckInReceived')">
+      <ion-card-content text-wrap *ngIf="notification.isType('CheckIn')">
         <person-avatar float-left margin-right [initials]="notification.person_initials" [image]="notification.person_picture" [large]="false"></person-avatar>
         <h2>
           You received a Check-In <strong *ngIf="notification.checkin_message">{{notification.checkin_message}}</strong>.
