@@ -23,7 +23,7 @@
     <ion-checkbox [(ngModel)]="slack_selected" item-right (ionChange)="onSlackChanged($event)" [disabled]="!slack_enabled"></ion-checkbox>
   </ion-item>
   <ion-item color="white">
-    <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+    <ion-icon ios="ios-call" md="md-call" item-left></ion-icon>
     <ion-label>Voice Call</ion-label>
     <ion-checkbox [(ngModel)]="voice_selected" item-right (ionChange)="onVoiceChanged($event)" [disabled]="!voice_enabled"></ion-checkbox>
   </ion-item>
