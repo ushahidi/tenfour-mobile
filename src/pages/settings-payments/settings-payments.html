@@ -12,10 +12,10 @@
       <ion-col col-12 col-sm>
         <h2 [class.activated]="organization && organization.hasFreePlan()">Free</h2>
         <ion-card [class.activated]="organization && organization.hasFreePlan()">
-          <ion-card-header>Free</ion-card-header>
+          <ion-card-header>Free!</ion-card-header>
           <ion-card-content>
             <ion-list class="features">
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
             </ion-list>
             <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
             <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="switchToFree($event)">Switch to TenFour free</button>
@@ -28,12 +28,12 @@
           <ion-card-header>{{PRO_FLAT_RATE | currency}} USD per month</ion-card-header>
           <ion-card-content>
             <ion-list class="features">
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>100 SMS credits per month</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>100 users included</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>$5 per month for every additional 25 users</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited email check-ins</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited Slack check-ins</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>100 SMS credits per month</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>100 users included</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>$5 per month for every additional 25 users</ion-item>
               <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
             </ion-list>
             <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
@@ -41,9 +41,9 @@
                 <ng-container *ngIf="organization.user_count == 1">person</ng-container>
                 <ng-container *ngIf="organization.user_count > 1">people</ng-container>
                 (Estimate)</ion-item>
-              <ion-item><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
-              <ion-item *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
-              <ion-item><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
+              <ion-item text-wrap><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
+              <ion-item text-wrap *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
+              <ion-item text-wrap><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
             </ion-list>
             <p text-center *ngIf="organization && organization.hasProPlan()">
               <button ion-button block clear color="secondary" (click)="updateBillingInfo($event)">Update your billing info</button>
@@ -61,19 +61,19 @@
           </ion-card-header>
           <ion-card-content>
             <ion-list class="features">
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
-              <!-- <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item> -->
-              <ion-item><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
+              <!-- <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item> -->
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
             </ion-list>
             <div *ngIf="organization && organization.hasProPlan()">
               <p>Add credits</p>
               <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
-              <ion-item color="white">
+              <ion-item text-wrap color="white">
                 <ion-label>Add extra credits immediately</ion-label>
                 <ion-checkbox [(ngModel)]="addCreditsImmediately"></ion-checkbox>
               </ion-item>
-              <ion-item color="white">
+              <ion-item text-wrap color="white">
                 <ion-label>Make this a recurring payment</ion-label>
                 <ion-checkbox [(ngModel)]="addCreditsRecurring"></ion-checkbox>
               </ion-item>
