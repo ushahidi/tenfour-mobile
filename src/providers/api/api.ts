@@ -330,6 +330,9 @@ export class ApiProvider extends HttpProvider {
 			    sms: {
             enabled: organization.sms_enabled == true
           },
+			    voice: {
+            enabled: organization.voice_enabled == true
+          },
 			    slack: {
             enabled: organization.slack_enabled == true
           }

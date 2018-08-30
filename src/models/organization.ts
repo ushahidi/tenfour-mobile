@@ -57,6 +57,12 @@ export class Organization extends Model {
               else {
                 this.sms_enabled = null;
               }
+              if (_settings.values.voice) {
+                this.voice_enabled = _settings.values.voice.enabled;
+              }
+              else {
+                this.voice_enabled = null;
+              }
               if (_settings.values.twitter) {
                 this.twitter_enabled = _settings.values.twitter.enabled;
               }
@@ -142,6 +148,9 @@ export class Organization extends Model {
 
   @Column("sms_enabled", BOOLEAN)
   public sms_enabled:boolean = null;
+
+  @Column("voice_enabled", BOOLEAN)
+  public voice_enabled:boolean = null;
 
   @Column("twitter_enabled", BOOLEAN)
   public twitter_enabled:boolean = null;
