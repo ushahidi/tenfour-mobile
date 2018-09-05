@@ -293,6 +293,10 @@ export class Checkin extends Model {
           recipient_send_via.push('sms');
         }
 
+        if (contact.type === 'phone' && checkin_send_via.indexOf('voice') > -1) {
+          recipient_send_via.push('voice');
+        }
+
         if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
           recipient_send_via.push('email');
         }
@@ -335,6 +339,10 @@ export class Checkin extends Model {
         }
 
         if (contact.type === 'phone' && checkinSendVia.indexOf('sms') > -1) {
+          creditsRequired++;
+        }
+
+        if (contact.type === 'phone' && checkinSendVia.indexOf('voice') > -1) {
           creditsRequired++;
         }
       }

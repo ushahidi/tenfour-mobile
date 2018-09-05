@@ -17,11 +17,11 @@ export class HumanizePipe implements PipeTransform {
       if (value.indexOf("slack") != -1) {
         pretty.push("Slack");
       }
-      if (value.indexOf("apponly") != -1) {
-        pretty.push("App Only");
-      }
       if (value.indexOf("app") != -1) {
         pretty.push("TenFour App");
+      }
+      if (value.indexOf("voice") != -1) {
+        pretty.push("Voice Call");
       }
     }
     return pretty.join(", ");
