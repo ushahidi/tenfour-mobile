@@ -10,17 +10,17 @@
     </ion-header>
     <ion-content>
       <ion-list *ngIf="organization && user">
-        <ion-item color="white">Check-Ins</ion-item>
-        <ion-item color="white">People</ion-item>
-        <ion-item color="white">Groups</ion-item>
-        <ion-item color="white">Notifications</ion-item>
-        <ion-item color="white">Settings</ion-item>
-        <ion-item color="white">Profile</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins<ion-badge item-end *ngIf="website == true && checkinsWaitingNumber > 0">{{checkinsWaitingNumber}}</ion-badge></ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showPersonList($event)">People</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showGroupList($event)">Groups</ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showNotificationList($event)">Notifications<ion-badge item-end *ngIf="unreadNotificationsNumber > 0">{{unreadNotificationsNumber}}</ion-badge></ion-item>
+        <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin()" (click)="showSettingsList($event)">Settings</ion-item>
+        <ion-item color="white" detail-push tappable (click)="showPersonProfile($event)">Profile</ion-item>
         <ion-item color="white" detail-push tappable *ngIf="mobile" (click)="showIntercomMessenger($event)">Help</ion-item>
       </ion-list>
       <div *ngIf="organization && organization.hasFreePlan() && user && (user.isOwner() || user.isAdmin())">
         <p text-center>You are using the free version of TenFour</p>
-        <p text-center *ngIf="user && user.isOwner() && !ios">
+        <p text-center *ngIf="user && user.isOwner()">
           <button ion-button color="primary" (click)="upgradeToPro($event)">Upgrade to TenFour Pro</button>
         </p>
       </div>

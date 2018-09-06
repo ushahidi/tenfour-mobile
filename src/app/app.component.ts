@@ -155,6 +155,7 @@ export class TenFourApp {
           .then(() => this.loadIntercom())
           .then(() => this.loadEvents())
           .then(() => this.loadDeepLinks())
+          .then(() => this.loadUnreadNotifications())
           .then(() => this.loadPushNotifications())
           .then(() => this.loadMobileApp([
                 new Organization(),

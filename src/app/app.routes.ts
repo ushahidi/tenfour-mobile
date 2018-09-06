@@ -56,6 +56,7 @@ import { SettingsRegionsPage } from '../pages/settings-regions/settings-regions'
 import { SettingsRolesPage } from '../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../pages/settings-channels/settings-channels';
+import { SettingsLDAPPage } from '../pages/settings-ldap/settings-ldap';
 
 import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
 
@@ -121,6 +122,7 @@ export class TenFourRoutes {
     { component: SettingsSizesPage, name: 'SettingsSizesPage', segment: 'settings/sizes', defaultHistory: ['SettingsListPage'] },
     { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
     { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsLDAPPage, name: 'SettingsLDAPPage', segment: 'settings/ldap', defaultHistory: ['SettingsListPage'] },
 
     { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' },
   ];

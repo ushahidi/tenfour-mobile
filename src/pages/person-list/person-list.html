@@ -20,9 +20,12 @@
     <ion-spinner name="ios"></ion-spinner>
   </div>
   <ion-list *ngIf="organization && organization.people">
-    <person-row [person]="person" [user]="user" [selected]="selected == person"
-                (rowSelected)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
-                *ngFor="let person of organization.people"></person-row>
+    <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
+      <ion-list-header>{{item.key}}</ion-list-header>
+      <person-row [person]="person" [user]="user" [selected]="selected == person"
+        (rowSelected)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
+        *ngFor="let person of item.values"></person-row>
+    </div>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>

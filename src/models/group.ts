@@ -52,6 +52,9 @@ export class Group extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
+  @Column("source", TEXT)
+  public source:string = null;
+
   public members:Person[] = [];
 
   public selected:boolean = null;
@@ -73,4 +76,7 @@ export class Group extends Model {
     return ids;
   }
 
+  public isExternal():boolean {
+    return this.source && this.source.length && this.source !== 'local';
+  }
 }

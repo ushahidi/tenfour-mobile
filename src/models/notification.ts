@@ -91,7 +91,7 @@ export class Notification extends Model {
 
   @Column("checkin_id", INTEGER)
   public checkin_id:number = null;
-  
+
   @Column("checkin_message", TEXT)
   public checkin_message:string = null;
 
@@ -145,5 +145,9 @@ export class Notification extends Model {
 
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
+
+  public isType(type:string):boolean {
+    return this.type && this.type.endsWith(type);
+  }
 
 }
