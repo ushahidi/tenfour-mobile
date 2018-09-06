@@ -1370,6 +1370,29 @@ export class StorageProvider {
     });
   }
 
+  public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      if (group && group.member_ids) {
+        let member_ids = group.member_ids.split(",").map(id => Number(id));
+        this.getPeople(organization, member_ids).then((people:Person[]) => {
+          group.members = people.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
+          });
+          resolve(group.members);
+        },
+        (error:any) => {
+          group.members = [];
+          resolve([]);
+        });
+      }
+      else {
+        resolve([]);
+      }
+    });
+  }
+
   // ########## SETTINGS ##########
 
   public saveSettings(organization:Organization, settings:Settings):Promise<boolean> {
