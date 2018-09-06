@@ -161,9 +161,11 @@ export class SignupPasswordPage extends BasePublicPage {
           else {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
-          this.showRootPage(OnboardListPage, {
-            organization: this.organization,
-            user: this.person
+          this.hideModals().then((hidden:boolean) => {
+            this.showRootPage(OnboardListPage, {
+              organization: this.organization,
+              user: this.person
+            });
           });
         })
         .catch((error:any) => {
