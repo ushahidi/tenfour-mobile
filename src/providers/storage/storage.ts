@@ -1337,7 +1337,7 @@ export class StorageProvider {
         id: id
       };
       this.provider.getModel<Group>(new Group(), where).then((group:Group) => {
-        if (group.member_ids) {
+        if (group && group.member_ids) {
           let member_ids = group.member_ids.split(",").map(id => Number(id));
           this.getPeople(organization, member_ids).then((people:Person[]) => {
             group.members = people;
@@ -1387,6 +1387,25 @@ export class StorageProvider {
       (error:any) => {
         resolve([]);
       });
+    });
+  }
+
+  public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      if (group && group.member_ids) {
+        let member_ids = group.member_ids.split(",").map(id => Number(id));
+        this.getPeople(organization, member_ids).then((people:Person[]) => {
+          group.members = people;
+          resolve(people);
+        },
+        (error:any) => {
+          group.members = [];
+          resolve([]);
+        });
+      }
+      else {
+        resolve([]);
+      }
     });
   }
 

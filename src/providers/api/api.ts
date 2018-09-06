@@ -1280,6 +1280,30 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/${group.id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.group) {
+            let group = new Group(data.group);
+            resolve(group.members);
+          }
+          else {
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getSubscriptions(organization:Organization):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
