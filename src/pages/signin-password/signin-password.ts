@@ -157,9 +157,11 @@ export class SigninPasswordPage extends BasePublicPage {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
           if (this.person.config_profile_reviewed && this.person.config_self_test_sent) {
-            this.showRootPage(CheckinListPage, {
-              organization: this.organization,
-              user: this.person
+            this.hideModals().then((hidden:boolean) => {
+              this.showRootPage(CheckinListPage, {
+                organization: this.organization,
+                user: this.person
+              });
             });
           }
           else {
@@ -273,6 +275,10 @@ export class SigninPasswordPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

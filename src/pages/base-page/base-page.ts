@@ -185,6 +185,21 @@ export class BasePage {
     return this.viewController.dismiss(data, options);
   }
 
+  protected hideModals():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      let modals = this.navController.getViews().filter((view:ViewController) => view.isOverlay);
+      if (modals.length > 0) {
+        let modal = modals.pop();
+        modal.dismiss().then(() => {
+          resolve(this.hideModals());
+        });
+      }
+      else {
+        resolve(true);
+      }
+    });
+  }
+
   protected showPage(page:any, params:any={}, options:any={}):Promise<any> {
     if (params) {
       params['modal'] = false;

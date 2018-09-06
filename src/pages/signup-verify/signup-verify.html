@@ -1,6 +1,11 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-title></ion-title>
+    <ion-buttons left>
+        <button ion-button icon-only (click)="closeModal($event)">
+            <ion-icon name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
@@ -13,7 +18,7 @@
       <p *ngIf="loading == false && verified == false">There was a problem verifying your email address.</p>
     </ion-item>
     <ion-item no-lines text-center class="action">
-      <button ion-button margin-bottom [block]="phone" color="primary" *ngIf="loading == false && verified == true" (click)="showSignupOwner($event)">Yes, that's the right address</button>
+      <button ion-button margin-bottom [block]="phone" color="primary" *ngIf="loading == false && verified == true" (click)="showSignupDetails($event)">Yes, that's the right address</button>
       <button ion-button margin-bottom [block]="phone" color="secondary" *ngIf="loading == false && verified == true" (click)="returnPrevious($event)">No, switch to another address</button>
       <button ion-button margin-bottom [block]="phone" color="secondary" *ngIf="loading == false && verified == false" (click)="returnPrevious($event)">Use a different address</button>
     </ion-item>

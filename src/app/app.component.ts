@@ -3,11 +3,14 @@ import { Platform, Events, Nav, SplitPane, NavController, ModalController, Modal
 
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
+import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
 import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
+import { SignupPage } from '../pages/signup/signup';
+import { SignupDetailsPage } from '../pages/signup-details/signup-details';
 import { SignupEmailPage } from '../pages/signup-email/signup-email';
 import { SignupCheckPage } from '../pages/signup-check/signup-check';
 import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
@@ -614,7 +617,7 @@ export class TenFourApp {
 
   private showSigninUrl(event:any=null) {
     this.logger.info(this, "showSigninUrl");
-    this.nav.setRoot(SigninUrlPage, { }).then((loaded:any) => {
+    this.nav.setRoot(SigninPage, { }).then((loaded:any) => {
       this.logger.info(this, "showSigninUrl", "Loaded");
       this.hideSideMenu();
       this.hideSplashScreen();
