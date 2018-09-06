@@ -70,9 +70,17 @@ export class PersonProfilePage extends PersonDetailsPage {
         });
       }
       else {
-        this.storage.getUser().then((user:User) => {
-          this.person = user;
-          resolve(this.person);
+        return this.storage.getUser().then((user) => {
+          let personId = user.id;
+          return this.promiseFallback(cache,
+            this.storage.getPerson(this.organization, personId),
+            this.api.getPerson(this.organization, personId)).then((person:Person) => {
+              this.person = person;
+              resolve(person);
+            });
+        },
+        (error:any) => {
+          resolve(null);
         });
       }
     });
