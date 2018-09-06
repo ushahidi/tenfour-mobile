@@ -59,14 +59,14 @@ export class Group extends Model {
 
   public selected:boolean = null;
 
-  loadMembers(people:Person[]) {
+  public loadMembers(people:Person[]) {
     if (this.member_ids) {
       let memberIds = this.member_ids.split(",");
       this.members = people.filter((person:Person) => { memberIds.indexOf(person.id.toString()) != -1});
     }
   }
 
-  memberIds():number[] {
+  public memberIds():number[] {
     let ids = [];
     if (this.members && this.members.length > 0) {
       for (let member of this.members) {
@@ -74,6 +74,18 @@ export class Group extends Model {
       }
     }
     return ids;
+  }
+
+  public isMember(person:Person):boolean {
+    if (person && this.member_ids) {
+      let memberIds = this.member_ids.split(",");
+      for (let memberId of memberIds) {
+        if (memberId === person.id.toString()) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   public isExternal():boolean {
