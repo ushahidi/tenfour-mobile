@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadGroup(false, $event)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="group && group.members">
@@ -26,4 +26,7 @@
       <h2>{{person.name}}</h2>
     </ion-item>
   </ion-list>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
 </ion-content>

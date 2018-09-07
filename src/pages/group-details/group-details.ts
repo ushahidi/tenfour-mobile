@@ -71,6 +71,7 @@ export class GroupDetailsPage extends BasePrivatePage {
       .then(() => this.loadOrganization(cache))
       .then(() => this.loadUser(cache))
       .then(() => this.loadGroup(cache))
+      .then(() => this.loadMembers(cache))
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -88,19 +89,13 @@ export class GroupDetailsPage extends BasePrivatePage {
       });
   }
 
-  private loadGroup(cache:boolean=true, event:any=null):Promise<Group> {
+  private loadGroup(cache:boolean=true):Promise<Group> {
     return new Promise((resolve, reject) => {
       if (cache && this.group) {
-        if (event) {
-          event.complete();
-        }
         resolve(this.group);
       }
       else if (this.hasParameter("group")){
         this.group = this.getParameter<Group>("group");
-        if (event) {
-          event.complete();
-        }
         resolve(this.group);
       }
       else if (this.hasParameter("group_id")) {
@@ -110,24 +105,31 @@ export class GroupDetailsPage extends BasePrivatePage {
           this.api.getGroup(this.organization, groupId)).then((group:Group) => {
             this.storage.saveGroup(this.organization, group).then((saved:any) => {
               this.group = group;
-              if (event) {
-                event.complete();
-              }
               resolve(group);
             });
         },
         (error:any) => {
           reject(error);
-          if (event) {
-            event.complete();
-          }
         });
       }
       else {
-        if (event) {
-          event.complete();
-        }
         reject("Group Not Provided");
+      }
+    });
+  }
+
+  private loadMembers(cache:boolean=true):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.group.member_count == this.group.members.length) {
+        resolve(this.group.members);
+      }
+      else {
+        this.promiseFallback(cache,
+          this.storage.getGroupMembers(this.organization, this.group),
+          this.api.getGroupMembers(this.organization, this.group), this.group.member_count).then((people:Person[]) => {
+            this.group.members = people;
+            resolve(this.group.members);
+          });
       }
     });
   }

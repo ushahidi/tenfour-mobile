@@ -1389,6 +1389,46 @@ export class StorageProvider {
       });
     });
   }
+  
+  public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      if (group && group.member_ids) {
+        let member_ids = group.member_ids.split(",").map(id => Number(id));
+        this.getPeople(organization, member_ids).then((people:Person[]) => {
+          group.members = people.sort((a, b) => {
+            if (a.name < b.name) return -1;
+            if (a.name > b.name) return 1;
+            return 0;
+          });
+          resolve(group.members);
+        },
+        (error:any) => {
+          group.members = [];
+          resolve([]);
+        });
+      }
+      else {
+        resolve([]);
+      }
+    });
+  }
+
+  public getGroupsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getGroups(organization, limit, offset).then((groups:Group[]) => {
+        let _groups = [];
+        for (let group of groups) {
+          if (group.isMember(person)) {
+            _groups.push(group);
+          }
+        }
+        resolve(_groups);
+      },
+      (error:any) => {
+        resolve([]);
+      });
+    });
+  }
 
   // ########## SETTINGS ##########
 
