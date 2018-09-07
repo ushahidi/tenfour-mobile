@@ -87,6 +87,7 @@ export class TenFourApp {
 
   zone:NgZone = null;
   rootPage:any = SplashScreenPage;
+
   organization:Organization = null;
   user:User = null;
 
@@ -99,8 +100,6 @@ export class TenFourApp {
   desktop:boolean = false;
 
   defaultLogo:string = "assets/images/logo-dots.png";
-
-  checkin:Checkin = null;
 
   environmentName:string = null;
   apiEndpoint:string = null;
@@ -349,7 +348,7 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_USER_UNAUTHORIZED, this.rootPage, this.locationHash());
         let alert = this.showAlert(
           "Not Authorized",
-          `You are not authorized to access this protected page, please login and try again.`);
+          "You are not authorized to access this protected page, please login and try again.");
         alert.onDidDismiss(data => {
           this.showSigninUrl();
         });
@@ -358,7 +357,7 @@ export class TenFourApp {
         this.logger.info(this, "loadEvents", EVENT_USER_REDIRECTED, this.rootPage, this.locationHash());
         let alert = this.showAlert(
           "Already Authenticated",
-          `You are trying to access a public page when you are already logged in, redirecting back to Check-Ins.`);
+          "You are trying to access a public page when you are already logged in, redirecting back to Check-Ins.");
         alert.onDidDismiss(data => {
           this.showCheckinList();
         });
@@ -369,7 +368,6 @@ export class TenFourApp {
       });
       this.events.subscribe(EVENT_CHECKIN_DETAILS, (data:any) => {
         this.logger.info(this, "loadEvents", EVENT_CHECKIN_DETAILS, data);
-        this.showCheckinDetails(data.checkin);
       });
       this.events.subscribe(EVENT_CREDITS_CHANGED, (credits) => {
         this.logger.info(this, "loadEvents", EVENT_CREDITS_CHANGED, credits);
@@ -850,10 +848,27 @@ export class TenFourApp {
     this.splashScreen.hide();
   }
 
+  private showSideMenu() {
+    this.logger.info(this, "showSideMenu");
+    if (this.tablet == false || this.website == false) {
+      this.menuController.open().then(() => {
+        this.logger.info(this, "showSideMenu", "Opened");
+      },
+      (error:any) => {
+        this.logger.warn(this, "showSideMenu", error);
+      });
+    }
+  }
+
   private hideSideMenu() {
     this.logger.info(this, "hideSideMenu");
     if (this.tablet == false || this.website == false) {
-      this.menuController.close();
+      this.menuController.close().then(() => {
+        this.logger.info(this, "hideSideMenu", "Closed");
+      },
+      (error:any) => {
+        this.logger.warn(this, "hideSideMenu", error);
+      });
     }
   }
 
@@ -863,75 +878,6 @@ export class TenFourApp {
     },
     (error:any) => {
       this.logger.warn(this, "badge", "Clear Failed", error);
-    });
-  }
-
-  private showCheckinDetails(checkin:Checkin) {
-    this.logger.info(this, "showCheckinDetails", checkin);
-    this.zone.run(() => {
-      this.checkin = checkin;
-    });
-  }
-
-  private hideCheckin() {
-    this.zone.run(() => {
-      this.checkin = null;
-    });
-  }
-
-  private editReply(reply:Reply, event:any) {
-    this.logger.info(this, "editReply");
-    if (reply.user_id == this.user.id) {
-      let modal = this.showModal(CheckinRespondPage, {
-        organization: this.organization,
-        checkins: [this.checkin],
-        checkin: this.checkin,
-        reply: reply
-      });
-      modal.onDidDismiss(data => {
-        this.logger.info(this, "editReply", "Modal", data);
-        if (data) {
-          if (data.canceled) {
-            this.logger.info(this, "editReply", "Modal", "Canceled");
-          }
-          else {
-            // TODO refresh the checkin list
-          }
-        }
-     });
-    }
-  }
-
-  private respondCheckin(event:any) {
-    this.logger.info(this, "sendReply");
-    let modal = this.showModal(CheckinRespondPage, {
-      organization: this.organization,
-      checkins: [this.checkin],
-      checkin: this.checkin
-    });
-    modal.onDidDismiss(data => {
-      this.logger.info(this, "sendReply", "Modal", data);
-      if (data) {
-        if (data.canceled) {
-          this.logger.info(this, "sendReply", "Modal", "Canceled");
-        }
-        else {
-          // TODO refresh the checkin list
-        }
-      }
-   });
-  }
-
-  private resendCheckin(event:any) {
-    this.logger.info(this, "resendCheckin");
-    let loading = this.showLoading("Resending...", true);
-    this.api.resendCheckin(this.organization, this.checkin).then((checkin:Checkin) => {
-      loading.dismiss();
-      this.showToast(`Check-In ${this.checkin.message} resent`);
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Resending Check-In", error);
     });
   }
 

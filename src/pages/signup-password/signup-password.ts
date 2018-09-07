@@ -149,11 +149,9 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
         .then((saved:boolean) => {
           this.logger.info(this, "createOrganization", saved);
-          this.updateFirebase(this.organization, this.person); // don't wait for this promise to resolve
+          this.updateFirebase(this.organization, this.person);
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
-          this.events.publish(EVENT_USER_AUTHENTICATED);
-          loading.dismiss();
           this.loading = false;
           if (this.person.name && this.person.name.length > 0) {
             this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
@@ -161,10 +159,15 @@ export class SignupPasswordPage extends BasePublicPage {
           else {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
-          this.hideModals().then((hidden:boolean) => {
+          this.hideModals().then(() => {
             this.showRootPage(OnboardListPage, {
               organization: this.organization,
               user: this.person
+            },{
+              animate: true,
+              direction: 'forward' }).then(() => {
+              loading.dismiss();
+              this.events.publish(EVENT_USER_AUTHENTICATED);
             });
           });
         })

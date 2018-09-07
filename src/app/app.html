@@ -1,6 +1,6 @@
-<ion-split-pane #splitPane [enabled]="tablet == true || website == true || desktop == true">
-  <ion-menu #menu [content]="content" side="left" type="reveal" *ngIf="user != null" swipeEnabled="false" (ionOpen)="loadMenu()">
-    <ion-header>
+<ion-split-pane #splitPane>
+  <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" [persistent]="website == true">
+    <ion-header *ngIf="user != null">
       <ion-toolbar color="navbar">
         <ion-buttons left>
           <organization-logo item-left [image]="organization.profile_picture" *ngIf="organization"></organization-logo>
@@ -8,7 +8,15 @@
         <ion-title *ngIf="organization">{{organization.name}}</ion-title>
       </ion-toolbar>
     </ion-header>
-    <ion-content>
+    <ion-header *ngIf="user == null">
+      <ion-toolbar color="navbar">
+        <ion-buttons left>
+          <organization-logo item-left><img src="assets/images/logo-dots.png"/></organization-logo>
+        </ion-buttons>
+        <ion-title>My Organization</ion-title>
+      </ion-toolbar>
+    </ion-header>
+    <ion-content *ngIf="user != null">
       <ion-list *ngIf="organization && user">
         <ion-item color="white" detail-push tappable (click)="showCheckinList($event)">Check-Ins<ion-badge item-end *ngIf="website == true && checkinsWaitingNumber > 0">{{checkinsWaitingNumber}}</ion-badge></ion-item>
         <ion-item color="white" detail-push tappable *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="showPersonList($event)">People</ion-item>
@@ -38,18 +46,7 @@
         <button ion-button block clear color="primary" (click)="showAlert(environmentName, apiEndpoint)">***{{environmentName}}***</button>
       </p>
     </ion-content>
-  </ion-menu>
-  <!---for backdrop --->
-  <ion-menu #menu [content]="content" side="left" type="reveal" swipeEnabled="false" *ngIf="user == null">
-    <ion-header>
-      <ion-toolbar color="navbar">
-        <ion-buttons left>
-          <organization-logo item-left><img src="assets/images/logo-dots.png"/></organization-logo>
-        </ion-buttons>
-        <ion-title>My Organization</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
+    <ion-content *ngIf="user == null">
       <ion-list>
         <ion-item color="white">Check-Ins</ion-item>
         <ion-item color="white">People</ion-item>
@@ -65,24 +62,6 @@
       <p text-center>
         <button ion-button block clear color="primary">Log out</button>
       </p>
-    </ion-content>
-  </ion-menu>
-  <!--end backdrop --->
-  <ion-menu #details [content]="content" persistent="true" side="right" type="reveal" swipeEnabled="false" *ngIf="checkin">
-    <ion-header>
-      <ion-toolbar color="navbar">
-        <ion-buttons left>
-          <button ion-button icon-only color="primary" (click)="hideCheckin()">
-            <ion-icon ios="ios-close" md="md-close"></ion-icon>
-          </button>
-        </ion-buttons>
-        <ion-title>Check-In</ion-title>
-      </ion-toolbar>
-    </ion-header>
-    <ion-content>
-      <checkin-details [checkin]="checkin" [user]="user"
-                       [canRespond]="checkin.canRespond(user)" [canResend]="checkin.canResend(user)"
-                       (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="user && checkin"></checkin-details>
     </ion-content>
   </ion-menu>
   <ion-nav main #content #rootNavController swipeBackEnabled="false" [root]="rootPage"></ion-nav>
