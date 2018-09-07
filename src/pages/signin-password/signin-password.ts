@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, App, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
@@ -41,6 +41,7 @@ export class SigninPasswordPage extends BasePublicPage {
   loading:boolean = false;
 
   constructor(
+      protected app:App,
       protected zone:NgZone,
       protected platform:Platform,
       protected navParams:NavParams,
@@ -144,11 +145,9 @@ export class SigninPasswordPage extends BasePublicPage {
         .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
         .then((saved:boolean) => {
           this.logger.info(this, "showNext", saved);
-          this.updateFirebase(this.organization, this.person); // don't wait for this promise to resolve
+          this.updateFirebase(this.organization, this.person);
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
-          this.events.publish(EVENT_USER_AUTHENTICATED);
-          loading.dismiss();
           this.loading = false;
           if (this.person.name && this.person.name.length > 0) {
             this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
@@ -157,17 +156,29 @@ export class SigninPasswordPage extends BasePublicPage {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
           if (this.person.config_profile_reviewed && this.person.config_self_test_sent) {
-            this.hideModals().then((hidden:boolean) => {
+            this.hideModals().then(() => {
               this.showRootPage(CheckinListPage, {
                 organization: this.organization,
                 user: this.person
+              },{
+                animate: true,
+                direction: 'forward' }).then(() => {
+                loading.dismiss();
+                this.events.publish(EVENT_USER_AUTHENTICATED);
               });
             });
           }
           else {
-            this.showRootPage(OnboardListPage, {
-              organization: this.organization,
-              user: this.person
+            this.hideModals().then(() => {
+              this.showRootPage(OnboardListPage, {
+                organization: this.organization,
+                user: this.person
+              },{
+                animate: true,
+                direction: 'forward' }).then(() => {
+                loading.dismiss();
+                this.events.publish(EVENT_USER_AUTHENTICATED);
+              });
             });
           }
         })

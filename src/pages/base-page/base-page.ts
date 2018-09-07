@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { Content, Events, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
+import { App, Content, Events, Platform, NavParams, Alert, AlertController, Toast, ToastController, Modal, ModalController, Loading, LoadingController, ActionSheet, ActionSheetController, NavController, ViewController } from 'ionic-angular';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { BrowserProvider } from '../../providers/browser/browser';
@@ -35,6 +35,7 @@ export class BasePage {
   protected desktop:boolean = false;
   protected modal:boolean = false;
 
+  protected app:App;
   protected zone:NgZone;
   protected events:Events;
 
@@ -62,6 +63,7 @@ export class BasePage {
     protected loadingController:LoadingController,
     protected actionController:ActionSheetController) {
     this.zone = _zone;
+    this.app = InjectorProvider.injector.get(App);
     this.logger = InjectorProvider.injector.get(LoggerProvider);
     this.network = InjectorProvider.injector.get(NetworkProvider);
     this.keyboard = InjectorProvider.injector.get(KeyboardProvider);
@@ -188,15 +190,18 @@ export class BasePage {
   protected hideModals():Promise<boolean> {
     return new Promise((resolve, reject) => {
       let modals = this.navController.getViews().filter((view:ViewController) => view.isOverlay);
-      if (modals.length > 0) {
-        let modal = modals.pop();
-        modal.dismiss().then(() => {
-          resolve(this.hideModals());
-        });
+      let dismisses = [];
+      for (let modal of modals) {
+        dismisses.push(modal.dismiss());
       }
-      else {
+      Promise.all(dismisses).then(() => {
+        this.logger.info(this, "hideModals", "Done");
         resolve(true);
-      }
+      },
+      (error:any) => {
+        this.logger.warn(this, "hideModals", error);
+        resolve(false);
+      });
     });
   }
 
@@ -208,7 +213,12 @@ export class BasePage {
   }
 
   protected showRootPage(page:any, params:any={}, options:any={}):Promise<any> {
-    return this.navController.setRoot(page, params, options);
+    if (this.viewController.isOverlay) {
+      return this.app.getRootNav().setRoot(page, params, options);
+    }
+    else {
+      return this.navController.setRoot(page, params, options);
+    }
   }
 
   protected closePage(data:any=null, options:any={}):Promise<any> {
@@ -312,7 +322,7 @@ export class BasePage {
   }
 
   protected isKeyReturn(event:any):boolean {
-    if (event && event.keyCode && event.keyCode == 13) {
+    if (event && event.keyCode && event.keyCode == this.KEYCODE_RETURN) {
       return true;
     }
     return false;
