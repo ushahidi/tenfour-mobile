@@ -1244,6 +1244,42 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getGroupsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups`;
+        let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.groups) {
+            let groups = [];
+            for (let _group of data.groups) {
+              let group = new Group(_group);
+              if (group.isMember(person)) {
+                groups.push(group);
+              }
+            }
+            resolve(groups);
+          }
+          else {
+            reject("Groups Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getSubscriptions(organization:Organization):Promise<Subscription[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
