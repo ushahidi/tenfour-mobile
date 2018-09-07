@@ -11,11 +11,16 @@ export class Group extends Model {
     super(data);
     this.copyInto(data);
     if (data && data.members) {
-      this.members = [];
+      let _members = [];
       for (let member of data.members) {
         let person = new Person(member);
-        this.members.push(person);
+        _members.push(person);
       }
+      this.members = _members.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
       this.member_count = this.members.length;
       this.member_ids = this.members.map((person:Person) => person.id).join(",");
     }
