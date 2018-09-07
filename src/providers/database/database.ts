@@ -338,7 +338,9 @@ export class DatabaseProvider {
           for (let i = 0; i < parameter.length; i++) {
             inClause.push("?");
           }
-          clause.push(`${column} IN (${inClause.join(', ')})`);
+          if (inClause.length > 0) {
+            clause.push(`${column} IN (${inClause.join(', ')})`);
+          }
         }
         else if (parameter && parameter.toString().indexOf("%") != -1){
           clause.push(`${column} LIKE ?`);
@@ -359,14 +361,21 @@ export class DatabaseProvider {
           clause.push(`${column} = ?`);
         }
       }
-      query.push(`WHERE ${clause.join(' AND ')}`);
+      if (clause.length > 0) {
+        query.push(`WHERE ${clause.join(' AND ')}`);
+      }
+      else {
+        query.push(`WHERE 1 == 0`);
+      }
     }
     if (order != null && Object.keys(order).length > 0) {
       let sort = [];
       for (let column in order) {
         sort.push(`${column} ${order[column]}`);
       }
-      query.push(`ORDER BY ${sort.join(', ')}`);
+      if (sort.length > 0) {
+        query.push(`ORDER BY ${sort.join(', ')}`);
+      }
     }
     if (limit != null) {
       query.push(`LIMIT ${limit}`);

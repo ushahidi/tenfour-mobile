@@ -431,9 +431,11 @@ export class StorageProvider {
         if (person) {
           Promise.all([
             this.getContacts(organization, person),
-            this.getCheckinsForPerson(organization, person)]).then((results:any[]) => {
+            this.getCheckinsForPerson(organization, person),
+            this.getGroupsForPerson(organization, person)]).then((results:any[]) => {
               person.contacts = results[0];
               person.checkins = results[1];
+              person.groups = results[2];
               resolve(person);
             },
             (error:any) => {
@@ -1317,7 +1319,7 @@ export class StorageProvider {
         this.getPeople(organization)]).then((results:any[]) => {
           let groups = <Group[]>results[0];
           let people = <Person[]>results[1];
-          for(let group of groups) {
+          for (let group of groups) {
             group.loadMembers(people);
           }
           resolve(groups);
@@ -1332,7 +1334,8 @@ export class StorageProvider {
     return new Promise((resolve, reject) => {
       let where = {
         organization_id: organization.id,
-        id: id };
+        id: id
+      };
       this.provider.getModel<Group>(new Group(), where).then((group:Group) => {
         if (group.member_ids) {
           let member_ids = group.member_ids.split(",").map(id => Number(id));
@@ -1407,6 +1410,23 @@ export class StorageProvider {
       else {
         resolve([]);
       }
+    });
+  }
+
+  public getGroupsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getGroups(organization, limit, offset).then((groups:Group[]) => {
+        let _groups = [];
+        for (let group of groups) {
+          if (group.isMember(person)) {
+            _groups.push(group);
+          }
+        }
+        resolve(_groups);
+      },
+      (error:any) => {
+        resolve([]);
+      });
     });
   }
 
