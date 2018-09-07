@@ -1370,6 +1370,23 @@ export class StorageProvider {
     });
   }
 
+  public getGroupsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getGroups(organization, limit, offset).then((groups:Group[]) => {
+        let _groups = [];
+        for (let group of groups) {
+          if (group.isMember(person)) {
+            _groups.push(group);
+          }
+        }
+        resolve(_groups);
+      },
+      (error:any) => {
+        resolve([]);
+      });
+    });
+  }
+  
   public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       if (group && group.member_ids) {
