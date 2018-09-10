@@ -33,7 +33,7 @@
     <ion-item *ngIf="user && user.isOwnerOrAdmin()" color="white" tappable detail-push (click)="contactsImport($event)">
       Import Contacts
     </ion-item>
-    <ion-item *ngIf="user && user.isOwner() && !ios" color="white" tappable detail-push (click)="settingsPayments($event)">
+    <ion-item *ngIf="user && user.isOwner()" color="white" tappable detail-push (click)="settingsPayments($event)">
       <span *ngIf="organization && organization.hasFreePlan()">Upgrade to TenFour Pro</span>
       <span *ngIf="organization && !organization.hasFreePlan()">Subscription Plans</span>
     </ion-item>

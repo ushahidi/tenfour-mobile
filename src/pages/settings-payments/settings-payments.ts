@@ -14,6 +14,7 @@ import { Person } from '../../models/person';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
 
@@ -57,7 +58,8 @@ export class SettingsPaymentsPage extends BasePrivatePage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected environment:EnvironmentProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
@@ -83,7 +85,6 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   ionViewWillLeave() {
     super.ionViewWillLeave();
-
     if (this.hashChangeFn) {
       window.removeEventListener("hashchange", this.hashChangeFn, false);
     }
@@ -196,13 +197,20 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private switchToPro(event:any) {
     this.logger.info(this, "switchToPro");
-    if (!this.hashChangeFn) {
-      this.hashChangeFn = this.hashChangeSwitchToPro.bind(this);
-      window.addEventListener("hashchange", this.hashChangeFn, false);
+    if (this.ios || this.android) {
+      let domain = this.environment.getAppDomain();
+      let url = `https://${domain}/#/settings/payments`;
+      this.showUrl(url, "_system");
     }
-    this.switchToProModal = this.showModal(SettingsPlanProPage, {
-      action: 'switchtopro'
-    });
+    else {
+      if (!this.hashChangeFn) {
+        this.hashChangeFn = this.hashChangeSwitchToPro.bind(this);
+        window.addEventListener("hashchange", this.hashChangeFn, false);
+      }
+      this.switchToProModal = this.showModal(SettingsPlanProPage, {
+        action: 'switchtopro'
+      });
+    }
   }
 
   private hashChangeUpdateBillingInfo() {
