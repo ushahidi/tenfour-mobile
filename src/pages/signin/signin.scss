@@ -1,0 +1,20 @@
+page-signin {
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
+  ion-list {
+    ion-item {
+      &.empty {
+        background-color: color($colors, cards) !important;
+      }
+    }
+  }
+  ion-segment {
+    ion-segment-button {
+      ion-badge {
+        margin-left: 5px;
+        border-radius: 10px !important;
+      }
+    }
+  }
+}

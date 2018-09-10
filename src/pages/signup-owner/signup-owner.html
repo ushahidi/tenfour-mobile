@@ -4,6 +4,11 @@
     <ion-buttons right>
       <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
     </ion-buttons>
+    <ion-buttons left>
+        <button ion-button icon-only (click)="closeModal($event)">
+            <ion-icon name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>

@@ -330,6 +330,9 @@ export class ApiProvider extends HttpProvider {
 			    sms: {
             enabled: organization.sms_enabled == true
           },
+			    voice: {
+            enabled: organization.voice_enabled == true
+          },
 			    slack: {
             enabled: organization.slack_enabled == true
           }
@@ -349,6 +352,9 @@ export class ApiProvider extends HttpProvider {
       }
       if (organization.slack_webhook && organization.slack_webhook.length > 0) {
         settings['channels']['slack']['webhook_url'] = organization.slack_webhook;
+      }
+      if (organization.ldap_settings && organization.ldap_settings.length) {
+        settings['ldap'] = JSON.parse(organization.ldap_settings);
       }
       let params = {
         id: organization.id,
@@ -967,22 +973,27 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getNotifications(organization:Organization, limit:number=20, offset:number=0):Promise<Notification[]> {
+  public getNotifications(organization:Organization, person:Person, limit:number=20, offset:number=0, unread:number=0):Promise<Notification[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/people/me`;
-        let params = { };
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${person.id}/notifications`;
+        let params = {
+          limit: limit,
+          offset: offset,
+          unread: unread
+        };
         this.httpGet(url, params, token.access_token).then((data:any) => {
-          if (data && data.person && data.person.notifications) {
+          if (data && data.notifications) {
             let notifications = [];
-            for (let _notification of data.person.notifications) {
+            for (let _notification of data.notifications) {
               let notification = new Notification(_notification);
+              this.logger.info(this, "getNotifications", "Notification", notification);
               notifications.push(notification);
             }
             resolve(notifications);
           }
           else {
-            reject("Notifications Not Found");
+            resolve([]);
           }
         },
         (error:any) => {
@@ -995,21 +1006,43 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public markAllNotificationsAsRead(organization:Organization, user:User):Promise<boolean> {
+  public markNotificationAsRead(organization:Organization, user:User, notification:Notification):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}`;
-        let params = {
-          id: user.id,
-          name: user.name,
-          notifications: [] // this triggers the API to mark all as read
-        };
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications/${notification.id}`;
+        let params = { };
         this.httpPut(url, params, token.access_token).then((data:any) => {
-          if (data && data.person) {
+          if (data && data.notification) {
             resolve(true);
           }
           else {
-            reject("Person Not Updated");
+            resolve(false);
+          }
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      },
+      (error:any) => {
+        resolve(false);
+      });
+    });
+  }
+
+  public markAllNotificationsAsRead(organization:Organization, user:User):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
+        let params = {
+          id: user.id,
+          name: user.name,
+        };
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          if (data && data.notifications) {
+            resolve(true);
+          }
+          else {
+            resolve(false);
           }
         },
         (error:any) => {
@@ -1027,7 +1060,7 @@ export class ApiProvider extends HttpProvider {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
         let params = {
-          'unread': 1
+          unread: 1
         };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data && data.notifications) {
@@ -1037,8 +1070,9 @@ export class ApiProvider extends HttpProvider {
               notifications.push(notification);
             }
             resolve(notifications);
-          } else {
-            reject("Notifications not found");
+          }
+          else {
+            resolve([]);
           }
         },
         (error:any) => {
@@ -1198,6 +1232,76 @@ export class ApiProvider extends HttpProvider {
         let params = { };
         this.httpDelete(url, params, token.access_token).then((data:any) => {
           resolve(data);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getGroupsForPerson(organization:Organization, person:Person, limit:number=null, offset:number=null):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups`;
+        let params = { };
+        if (limit != null) {
+          params['limit'] = limit;
+        }
+        if (offset != null) {
+          params['offset'] = offset;
+        }
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.groups) {
+            let groups = [];
+            for (let _group of data.groups) {
+              let group = new Group(_group);
+              if (group.isMember(person)) {
+                groups.push(group);
+              }
+            }
+            resolve(groups);
+          }
+          else {
+            reject("Groups Not Found");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getGroupMembers(organization:Organization, group:Group):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/groups/${group.id}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          if (data && data.group) {
+            let group = new Group(data.group);
+            if (group.members) {
+              let sorted = group.members.sort((a, b) => {
+                if (a.name < b.name) return -1;
+                if (a.name > b.name) return 1;
+                return 0;
+              });
+              resolve(sorted);
+            }
+            else {
+              resolve([]);
+            }
+          }
+          else {
+            resolve([]);
+          }
         },
         (error:any) => {
           reject(error);

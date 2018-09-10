@@ -5,12 +5,12 @@
     </ion-buttons>
     <ion-title>Group</ion-title>
     <ion-buttons right *ngIf="user">
-      <button ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="editGroup($event)">Edit</button>
+      <button ion-button icon-only color="primary" *ngIf="canEdit" (click)="editGroup($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-refresher (ionRefresh)="loadGroup(false, $event)">
+  <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <ion-list *ngIf="group && group.members">
@@ -26,4 +26,7 @@
       <h2>{{person.name}}</h2>
     </ion-item>
   </ion-list>
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
 </ion-content>

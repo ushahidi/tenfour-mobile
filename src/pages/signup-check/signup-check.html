@@ -1,5 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left>
+        <button ion-button icon-only (click)="closeModal($event)">
+            <ion-icon name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
     <ion-title></ion-title>
   </ion-navbar>
 </ion-header>
@@ -10,7 +15,7 @@
       <h2>Check your email inbox.</h2>
     </ion-item>
     <ion-item no-lines text-center class="action" *ngIf="canOpenEmail">
-      <button ion-button [block]="phone" color="primary" (click)="openMail($event)">Open Mail App</button>
+      <button ion-button block [block]="phone" color="primary" (click)="openMail($event)">Open Mail App</button>
     </ion-item>
     <ion-item text-wrap no-lines class="info" *ngIf="organization">
       <p>We sent an email to you at <strong>{{organization.email}}</strong> with instructions.</p>

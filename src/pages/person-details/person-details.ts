@@ -7,6 +7,7 @@ import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details'
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
+import { Group } from '../../models/group';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
@@ -77,6 +78,7 @@ export class PersonDetailsPage extends BasePrivatePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadPerson(cache); })
+      .then(() => { return this.loadGroups(cache); })
       .then(() => { return this.loadCheckins(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -122,14 +124,32 @@ export class PersonDetailsPage extends BasePrivatePage {
     });
   }
 
+  protected loadGroups(cache:boolean=true):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      if (this.person.groups == null || this.person.groups.length == 0) {
+        this.promiseFallback(cache,
+          this.storage.getGroupsForPerson(this.organization, this.person),
+          this.api.getGroupsForPerson(this.organization, this.person), 1).then((groups:Group[]) => {
+          this.person.groups = groups;
+          resolve(groups);
+        },
+        (error:any) => {
+          this.person.groups = [];
+          resolve([]);
+        });
+      }
+      else {
+        resolve(this.person.groups);
+      }
+    });
+  }
+
   protected loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
-      if (this.person.groups == null || this.person.groups.length == 0 ||
-          this.person.checkins == null || this.person.checkins.length == 0) {
+      if (this.person.checkins == null || this.person.checkins.length == 0) {
         this.promiseFallback(cache,
           this.storage.getPerson(this.organization, this.person.id),
           this.api.getPerson(this.organization, this.person.id)).then((person:Person) => {
-            this.person.groups = person.groups;
             this.person.checkins = person.checkins;
             this.person.replies = person.replies;
             resolve(this.person.checkins);
@@ -149,11 +169,9 @@ export class PersonDetailsPage extends BasePrivatePage {
   protected loadMore(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
       this.promiseFallback(true,
         this.storage.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset),
         this.api.getCheckinsForPerson(this.organization, this.person, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
-          this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Checkins", checkins);
           this.person.checkins = [...this.person.checkins, ...checkins];
           resolve(this.person.checkins);
         },
@@ -262,4 +280,11 @@ export class PersonDetailsPage extends BasePrivatePage {
     });
   }
 
+  get canEdit() {
+    if (this.person.isExternal()) {
+      return false;
+    }
+
+    return this.person.isMe() || this.user.isOwner() || this.user.isAdmin();
+  }
 }

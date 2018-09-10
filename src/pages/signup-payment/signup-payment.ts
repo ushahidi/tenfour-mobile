@@ -144,4 +144,8 @@ export class SignupPaymentPage extends BasePage {
     return true;
   }
 
+  private closeModal(event:any=null) {
+    this.hideModal();
+  }
+
 }

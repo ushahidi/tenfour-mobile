@@ -11,11 +11,16 @@ export class Group extends Model {
     super(data);
     this.copyInto(data);
     if (data && data.members) {
-      this.members = [];
+      let _members = [];
       for (let member of data.members) {
         let person = new Person(member);
-        this.members.push(person);
+        _members.push(person);
       }
+      this.members = _members.sort((a, b) => {
+        if (a.name < b.name) return -1;
+        if (a.name > b.name) return 1;
+        return 0;
+      });
       this.member_count = this.members.length;
       this.member_ids = this.members.map((person:Person) => person.id).join(",");
     }
@@ -52,18 +57,21 @@ export class Group extends Model {
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
 
+  @Column("source", TEXT)
+  public source:string = null;
+
   public members:Person[] = [];
 
   public selected:boolean = null;
 
-  loadMembers(people:Person[]) {
+  public loadMembers(people:Person[]) {
     if (this.member_ids) {
       let memberIds = this.member_ids.split(",");
       this.members = people.filter((person:Person) => { memberIds.indexOf(person.id.toString()) != -1});
     }
   }
 
-  memberIds():number[] {
+  public memberIds():number[] {
     let ids = [];
     if (this.members && this.members.length > 0) {
       for (let member of this.members) {
@@ -73,4 +81,19 @@ export class Group extends Model {
     return ids;
   }
 
+  public isMember(person:Person):boolean {
+    if (person && this.member_ids) {
+      let memberIds = this.member_ids.split(",");
+      for (let memberId of memberIds) {
+        if (memberId === person.id.toString()) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  public isExternal():boolean {
+    return this.source && this.source.length && this.source !== 'local';
+  }
 }

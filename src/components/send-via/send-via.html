@@ -7,19 +7,24 @@
     <ion-label>TenFour App</ion-label>
     <ion-checkbox [(ngModel)]="app_selected" item-right (ionChange)="onAppSelected($event)"></ion-checkbox>
   </ion-item>
-  <ion-item color="white" *ngIf="email_enabled">
+  <ion-item color="white">
     <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
     <ion-label>Email</ion-label>
-    <ion-checkbox [(ngModel)]="email_selected" item-right (ionChange)="onEmailChanged($event)"></ion-checkbox>
+    <ion-checkbox [(ngModel)]="email_selected" item-right (ionChange)="onEmailChanged($event)" [disabled]="!email_enabled"></ion-checkbox>
   </ion-item>
-  <ion-item color="white" *ngIf="sms_enabled">
+  <ion-item color="white">
     <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
     <ion-label>SMS</ion-label>
-    <ion-checkbox [(ngModel)]="sms_selected" item-right (ionChange)="onSmsChanged($event)"></ion-checkbox>
+    <ion-checkbox [(ngModel)]="sms_selected" item-right (ionChange)="onSmsChanged($event)" [disabled]="!sms_enabled"></ion-checkbox>
   </ion-item>
-  <ion-item color="white" *ngIf="slack_enabled">
+  <ion-item color="white">
     <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
     <ion-label>Slack</ion-label>
-    <ion-checkbox [(ngModel)]="slack_selected" item-right (ionChange)="onSlackChanged($event)"></ion-checkbox>
+    <ion-checkbox [(ngModel)]="slack_selected" item-right (ionChange)="onSlackChanged($event)" [disabled]="!slack_enabled"></ion-checkbox>
+  </ion-item>
+  <ion-item color="white">
+    <ion-icon ios="ios-call" md="md-call" item-left></ion-icon>
+    <ion-label>Voice Call</ion-label>
+    <ion-checkbox [(ngModel)]="voice_selected" item-right (ionChange)="onVoiceChanged($event)" [disabled]="!voice_enabled"></ion-checkbox>
   </ion-item>
 </ion-list>
