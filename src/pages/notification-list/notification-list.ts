@@ -155,18 +155,19 @@ export class NotificationListPage extends BasePrivatePage {
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
     let promises = [];
-
     for (let notification of this.notifications) {
       if (!notification.read_at) {
         promises.push(this.api.markNotificationAsRead(this.organization, this.user, notification));
       }
-
       notification.viewed_at = new Date();
     }
-
     this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
       Promise.all(promises).then(() => {
         this.logger.info(this, "viewNotifications", "Saved", saved);
+        this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+      },
+      (error:any) => {
+        this.logger.warn(this, "viewNotifications", "Failed", error);
         this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
       });
     });
