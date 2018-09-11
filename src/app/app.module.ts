@@ -123,6 +123,7 @@ import { GroupRowModule } from '../components/group-row/group-row.module';
 import { CheckinReplyModule } from '../components/checkin-reply/checkin-reply.module';
 import { CheckinRespondComponentModule } from '../components/checkin-respond/checkin-respond.module';
 import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
+import { CheckinBadgesModule } from '../components/checkin-badges/checkin-badges.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -168,6 +169,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     CheckinReplyModule,
     CheckinDetailModule,
     CheckinRespondComponentModule,
+    CheckinBadgesModule,
     PersonRowModule,
     GroupRowModule,
     GroupListModule,
