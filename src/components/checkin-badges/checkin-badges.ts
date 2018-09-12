@@ -12,41 +12,54 @@ export class CheckinBadgesComponent {
   @Input()
   checkin:Checkin = null;
 
-  constructor() {
-  }
-
-  protected gridAnswers():Answer[] {
-    let _answers = [];
-    if (this.checkin && this.checkin.answers) {
-      for (let answer of this.checkin.answers) {
-        if (this.checkin.waiting_count > 0) {
-          _answers.push(answer);
-        }
-        else if (answer.replies > 0) {
-          _answers.push(answer);
-        }
-      }
-    }
-    return _answers;
-  }
-
-  protected gridColumns(answer:Answer):number {
+  protected badges():any {
+    let _badges = [];
     if (this.checkin) {
-      if (this.checkin.waiting_count > 0) {
-        let repliesCount = answer ? answer.replies + 1 : 0;
-        let answersCount = this.checkin.answers ? this.checkin.answers.length : 0;
-        let sentCount = this.checkin.replies ? this.checkin.replies.length : 0;
-        let waitingCount = this.checkin.waiting_count;
-        return Math.round((repliesCount / (answersCount + sentCount + waitingCount)) * 12);
+      if (this.checkin.answers) {
+        for (let answer of this.checkin.answers) {
+          if (this.checkin.waiting_count > 0) {
+            _badges.push({
+              color: answer.color,
+              number: answer.replies || 0,
+              columns: 1,
+              text: answer.answer
+            });
+          }
+          else if (answer.replies > 0) {
+            _badges.push({
+              color: answer.color,
+              number: answer.replies || 0,
+              columns: 1,
+              text: answer.answer
+            });
+          }
+        }
       }
-      else {
-        let repliesCount = answer ? answer.replies + 1 : 0;
-        let answersCount = this.checkin.answers.filter((answer) => answer.replies > 0).length;
-        let sentCount = this.checkin.replies ? this.checkin.replies.length : 0;
-        return Math.round((repliesCount / (answersCount + sentCount)) * 12);
+      if (this.checkin.otherReplies().length > 0) {
+        _badges.push({
+          color: "#777777",
+          number: this.checkin.otherReplies().length || 0,
+          columns: 1,
+          text: "Other Response"
+        });
+      }
+      if (this.checkin.waiting_count > 0) {
+        _badges.push({
+          color: "#CCCCCC",
+          number: this.checkin.waiting_count || 0,
+          columns: 1,
+          text: "No Response"
+        });
+      }
+      let total = 0;
+      for (let badge of _badges) {
+        total = total + badge.number + 1;
+      }
+      for (let badge of _badges) {
+        badge.columns = Math.round(((badge.number + 1) / total) * 12);
       }
     }
-    return 0;
+    return _badges;
   }
 
 }
