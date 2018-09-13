@@ -1,10 +1,8 @@
 <ion-card margin-top margin-bottom color="card" [class.selected]="selected == true">
-  <ion-card-content text-center>
-    <div tappable (click)="onCardSelected($event)">
-      <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
-      <h1>{{checkin.message}}</h1>
-      <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
-    </div>
+  <ion-card-content text-center tappable (click)="onCardSelected($event)">
+    <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
+    <h1>{{checkin.message}}</h1>
+    <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
     <checkin-badges [checkin]="checkin" *ngIf="checkin"></checkin-badges>
   </ion-card-content>
   <ion-row no-padding no-margin *ngIf="(hasSendSelected && checkin.canRespond(user)) || (hasResendSelected && checkin.canResend(user))">

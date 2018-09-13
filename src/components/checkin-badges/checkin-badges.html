@@ -14,7 +14,7 @@
       [attr.col-10]="badge.columns == 10 ? '' : null"
       [attr.col-11]="badge.columns == 11 ? '' : null"
       [attr.col-12]="badge.columns == 12 ? '' : null">
-      <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text" tappable (click)="showPopover($event, badge)">{{badge.number}}</ion-badge>
+      <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text">{{badge.number}}</ion-badge>
     </ion-col>
   </ion-row>
 </ion-grid>
