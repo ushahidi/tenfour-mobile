@@ -64,11 +64,12 @@
       <ion-input item-right type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" placeholder="street address" (keypress)="onKeyPress($event)" [(ngModel)]="contact.contact"></ion-input>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="person && !person.isOwner() && user && user.isOwnerOrAdmin()">
+  <ion-list *ngIf="person && (!person.isOwner() || user.isOwner()) && user && user.isOwnerOrAdmin() && (user.id != person.id)">
     <ion-item class="roles" color="white">
       <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
       <ion-label no-padding no-margin icon-only text-left color="grey">Roles</ion-label>
-      <ion-select item-right interface="action-sheet" multiple="false" [selectOptions]="roleOptions" [(ngModel)]="person.role">
+      <ion-select item-right interface="action-sheet" multiple="false" [selectOptions]="roleOptions" [(ngModel)]="person.role" (ngModelChange)="showTransferOwnerWarning()" >
+        <ion-option *ngIf="user.isOwner()" value="owner">Owner</ion-option>
         <ion-option value="admin">Administrator</ion-option>
         <ion-option value="author">Author</ion-option>
         <ion-option value="viewer">Viewer</ion-option>
