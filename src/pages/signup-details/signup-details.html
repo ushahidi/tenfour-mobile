@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title></ion-title>
+    <ion-buttons left>
+        <button ion-button icon-only (click)="closeModal($event)">
+            <ion-icon name="arrow-back"></ion-icon>
+        </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list>
+    <ion-item color="input" class="input">
+      <ion-label fixed>Name</ion-label>
+      <ion-input #owner type="text" autocorrect="off" autocapitalize="words" autocomplete="off" placeholder="Your full name" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item color="input" class="input">
+      <ion-label fixed>Organization</ion-label>
+      <ion-input #name type="text" autocorrect="off" autocapitalize="words" autocomplete="off" placeholder="Your organization's name" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item color="input" class="input">
+      <ion-label fixed>URL</ion-label>
+      <h3 item-text item-right>.tenfour.org</h3>
+      <ion-input #subdomain type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your domain here" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item no-lines text-center class="action">
+      <button ion-button text-only block color="primary" (click)="showNext($event)">Next</button>
+    </ion-item>
+  </ion-list>
+</ion-content>

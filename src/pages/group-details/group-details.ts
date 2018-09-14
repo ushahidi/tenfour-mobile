@@ -71,6 +71,7 @@ export class GroupDetailsPage extends BasePrivatePage {
       .then(() => this.loadOrganization(cache))
       .then(() => this.loadUser(cache))
       .then(() => this.loadGroup(cache))
+      .then(() => this.loadMembers(cache))
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -132,6 +133,22 @@ export class GroupDetailsPage extends BasePrivatePage {
     });
   }
 
+  private loadMembers(cache:boolean=true):Promise<Person[]> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.group.member_count == this.group.members.length) {
+        resolve(this.group.members);
+      }
+      else {
+        this.promiseFallback(cache,
+          this.storage.getGroupMembers(this.organization, this.group),
+          this.api.getGroupMembers(this.organization, this.group), this.group.member_count).then((people:Person[]) => {
+          this.group.members = people;
+          resolve(this.group.members);
+        });
+      }
+    });
+  }
+
   private editGroup(event:any) {
     this.logger.info(this, "editGroup");
     let modal = this.showModal(GroupEditPage, {
@@ -177,6 +194,13 @@ export class GroupDetailsPage extends BasePrivatePage {
         person: person
       });
     }
+  }
+
+  get canEdit() {
+    if (this.group && this.group.isExternal()) {
+      return false;
+    }
+    return this.user.isOwner() || this.user.isAdmin();
   }
 
 }

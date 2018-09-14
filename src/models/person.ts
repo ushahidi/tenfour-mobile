@@ -211,8 +211,12 @@ export class Person extends Model {
     return false;
   }
 
+  public isExternal():boolean {
+    return this.person_type === 'external';
+  }
+
   public needsInvite():boolean {
-    if (this.source && this.source.length && this.source !== 'local') {
+    if (this.isExternal()) {
       return false;
     }
 

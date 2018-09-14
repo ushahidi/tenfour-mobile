@@ -44,11 +44,14 @@ import { TenFourRoutes } from './app.routes';
 
 import { SplashScreenModule } from '../pages/splash-screen/splash-screen.module';
 
+import { SigninModule } from '../pages/signin/signin.module';
 import { SigninUrlModule } from '../pages/signin-url/signin-url.module';
 import { SigninEmailModule } from '../pages/signin-email/signin-email.module';
 import { SigninInviteModule } from '../pages/signin-invite/signin-invite.module';
 import { SigninPasswordModule } from '../pages/signin-password/signin-password.module';
 
+import { SignupModule } from '../pages/signup/signup.module';
+import { SignupDetailsModule } from '../pages/signup-details/signup-details.module';
 import { SignupEmailModule } from '../pages/signup-email/signup-email.module';
 import { SignupCheckModule } from '../pages/signup-check/signup-check.module';
 import { SignupVerifyModule } from '../pages/signup-verify/signup-verify.module';
@@ -97,6 +100,7 @@ import { SettingsRegionsModule } from '../pages/settings-regions/settings-region
 import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.module';
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
+import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module';
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
@@ -107,6 +111,7 @@ import { CapitalizeModule } from '../pipes/capitalize/capitalize.module';
 import { TruncateModule } from '../pipes/truncate/truncate.module';
 import { HtmlParserModule } from '../pipes/html-parser/html-parser.module';
 import { HumanizeModule } from '../pipes/humanize/humanize.module';
+import { GroupByModule } from '../pipes/group-by/group-by.module';
 
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
@@ -168,11 +173,13 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     GroupListModule,
     GroupEditModule,
     GroupDetailsModule,
+    SigninModule,
     SigninUrlModule,
     SigninEmailModule,
-    SigninUrlModule,
     SigninInviteModule,
     SigninPasswordModule,
+    SignupModule,
+    SignupDetailsModule,
     SignupUrlModule,
     SignupEmailModule,
     SignupNameModule,
@@ -207,6 +214,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SettingsRolesModule,
     SettingsPaymentsModule,
     SettingsChannelsModule,
+    SettingsLDAPModule,
     SettingsSizesModule,
     SettingsRegionsModule,
     UnsubscribePageModule,
@@ -218,6 +226,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     TruncateModule,
     HtmlParserModule,
     HumanizeModule,
+    GroupByModule,
     BrowserAnimationsModule,
     NgxLocalStorageModule.forRoot(),
     SegmentModule.forRoot({

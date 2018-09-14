@@ -4,6 +4,7 @@ import { IonicPage, TextInput, Platform, NavParams, NavController, ViewControlle
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 
 import { SignupCheckPage } from '../../pages/signup-check/signup-check';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
 import { Email } from '../../models/email';
 import { Organization } from '../../models/organization';
@@ -20,7 +21,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-signup-email',
   templateUrl: 'signup-email.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SignupCheckPage ]
+  entryComponents:[ SignupCheckPage]
 })
 export class SignupEmailPage extends BasePublicPage {
 
@@ -74,8 +75,10 @@ export class SignupEmailPage extends BasePublicPage {
         let organization = new Organization({});
         organization.email = this.email.value;
         this.storage.setOrganization(organization).then((stored:boolean) => {
-          this.showPage(SignupCheckPage, {
+          this.showModal(SignupCheckPage, {
             organization: organization
+          }, {
+            enableBackdropDismiss: false
           });
         });
       },
@@ -93,6 +96,15 @@ export class SignupEmailPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private signinToOrganization(event:any) {
+    this.logger.info(this, "signinToOrganization");
+    this.showModal(SigninUrlPage, {});
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }
