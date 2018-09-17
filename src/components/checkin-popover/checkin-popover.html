@@ -1,0 +1,7 @@
+<ion-list>
+  <ion-list-header>
+    <h2>{{title}}</h2>
+  </ion-list-header>
+  <ion-item *ngFor="let person of people">{{person.name}}</ion-item>
+  <ion-item *ngIf="people && people.length == 0">Nobody</ion-item>
+</ion-list>
