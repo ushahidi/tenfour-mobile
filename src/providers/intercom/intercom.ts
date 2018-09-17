@@ -37,6 +37,7 @@ export class IntercomProvider {
         require('./intercom.loader')();
         let settings = {
           app_id: this.environment.getIntercomAppId(),
+          product: 'tenfour',
           alignment: 'left',
           widget: {
             "activator": "#intercom"
