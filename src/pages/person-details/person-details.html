@@ -77,7 +77,7 @@
     <ion-list-header>
       <h2>Responses</h2>
     </ion-list-header>
-    <checkin-reply [reply]="reply" [user]="user"
+    <checkin-reply [reply]="reply" [user]="user" (replyClicked)="showCheckinDetailsForReply(reply, $event)"
       *ngFor="let reply of person.replies"></checkin-reply>
   </ion-list>
   <!-- <ion-infinite-scroll *ngIf="person && person.checkins && person.checkins.length >= limit" (ionInfinite)="loadMore($event)">
