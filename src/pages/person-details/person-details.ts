@@ -269,6 +269,17 @@ export class PersonDetailsPage extends BasePrivatePage {
     }
   }
 
+  protected showCheckinDetailsForReply(reply:Reply, event:any=null) {
+    this.logger.info(this, "showCheckinDetailsForReply", reply);
+
+    this.showModalOrPage(CheckinDetailsPage, {
+      organization: this.organization,
+      user: this.user,
+      person: this.person,
+      checkin_id: reply.checkin_id
+    });
+  }
+
   protected showCheckinDetails(checkin:Checkin, event:any=null) {
     this.logger.info(this, "showCheckinDetails", checkin);
     this.showModalOrPage(CheckinDetailsPage, {

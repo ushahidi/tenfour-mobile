@@ -1,4 +1,4 @@
-  <ion-item color="white" [attr.detail-push]="reply.user_id == user.id ? 'true' : null" [attr.tappable]="reply.user_id == user.id ? 'true' : null">
+  <ion-item color="white" [attr.detail-push]="reply.user_id == user.id ? 'true' : null" [attr.tappable]="reply.user_id == user.id ? 'true' : null"  (click)="onReplyClicked($event)">
     <person-avatar item-left [color]="answer ? answer.color : '#FFF'" [initials]="reply.user_initials" [image]="reply.user_picture" [large]="false"></person-avatar>
     <ion-grid no-padding>
       <ion-row no-padding>
