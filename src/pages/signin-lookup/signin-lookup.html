@@ -2,7 +2,7 @@
   <ion-navbar color="navbar">
     <ion-title></ion-title>
     <ion-buttons right>
-      <button color="primary" ion-button text-only (click)="showNext($event)" *ngIf="!sent">Next</button>
+      <button color="primary" ion-button text-only [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="!sent">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

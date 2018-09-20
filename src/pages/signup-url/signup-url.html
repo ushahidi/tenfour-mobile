@@ -1,13 +1,13 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button icon-only (click)="closeModal($event)">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons right>
-      <button color="primary" #next ion-button text-only (click)="showNext($event)">Next</button>
-    </ion-buttons>
-    <ion-buttons left>
-        <button ion-button icon-only (click)="closeModal($event)">
-            <ion-icon name="arrow-back"></ion-icon>
-        </button>
+      <button color="primary" #next ion-button text-only [solid]="website == true ? 'true' : null" (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
