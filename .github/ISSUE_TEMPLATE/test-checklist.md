@@ -58,12 +58,14 @@ about: A series of tests for ensure things are functioning properly.
 - [ ] If Organization has deleted, all Check-Ins and Users are deleted as well
 - [ ] User can edit Organization Size
 - [ ] User can view Active Channels
-- [ ] User can edit Active Channels
+- [ ] User can edit Active Channels (SMS, Email, Slack, App, Voice)
 - [ ] User can Import Contacts
+- [ ] User can configure and sync Contacts via LDAP
 - [ ] user can see Subscription Plans
 - [ ] user can Upgrade Organization to Pro-Account
 - [ ] User can add extra SMS Bundle
 - [ ] User can downgrade to Freemium
+
 
 ### Profile
 - [ ] User can View Details of their Profile
