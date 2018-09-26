@@ -16,13 +16,13 @@ export class KeyboardProvider {
   }
 
   public show() {
-    if (this.platform.is("cordova")) {
+    if (this.platform.is("cordova") && typeof this.keyboard.show === 'function') {
       this.keyboard.show();
     }
   }
 
   public hide() {
-    if (this.platform.is("cordova")) {
+    if (this.platform.is("cordova") && typeof this.keyboard.close === 'function') {
       this.keyboard.close();
     }
   }
