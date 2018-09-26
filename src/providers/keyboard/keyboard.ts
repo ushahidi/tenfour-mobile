@@ -23,7 +23,7 @@ export class KeyboardProvider {
 
   public hide() {
     if (this.platform.is("cordova")) {
-      this.keyboard.close();
+      this.keyboard.hide();
     }
   }
 
