@@ -1,11 +1,16 @@
 <ion-header>
   <ion-navbar color="navbar">
     <ion-title>Log in to TenFour</ion-title>
+    <ion-buttons right>
+      <button color="primary" #next ion-button text-only [solid]="website == true ? 'true' : null" (click)="showNext($event)">Next</button>
+    </ion-buttons>
   </ion-navbar>
 </ion-header>
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading">
+      <img src="assets/images/logo-dots.png"/>
+      <h2>Let's get you logged in</h2>
       <p>Enter your organization's TenFour URL.</p>
     </ion-item>
     <ion-item color="input" class="input">
@@ -17,11 +22,6 @@
       <button ion-button clear block tappable color="primary" tappable (click)="lookupOrganization($event)">
         <h2>Help, I don't know my URL</h2>
       </button>
-    </ion-item>
-    <ion-item no-lines text-center class="action">
-      <button #next ion-button text-only block color="primary" (click)="showNext($event)">Log in to TenFour</button>
-    </ion-item>
-    <ion-item no-lines class="other">
       <button ion-button clear block tappable color="primary" tappable (click)="createOrganization($event)">
         <h2>New to TenFour, Sign up here</h2>
       </button>

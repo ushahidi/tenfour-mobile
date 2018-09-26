@@ -9,6 +9,9 @@ export class Reply extends Model {
   constructor(data:any=null) {
     super(data);
     this.copyInto(data);
+    if (data && data.check_in_id) {
+      this.checkin_id = data.check_in_id;
+    }
     if (data && data.location_geo && data.location_geo.location) {
       this.latitude = data.location_geo.location.lat;
       this.longitude = data.location_geo.location.lng;
