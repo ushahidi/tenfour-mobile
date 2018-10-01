@@ -4,6 +4,8 @@ import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { User } from '../../models/user';
 
+import { LoggerProvider } from '../../providers/logger/logger';
+
 @Component({
   selector: 'checkin-reply',
   templateUrl: 'checkin-reply.html'
@@ -19,7 +21,14 @@ export class CheckinReplyComponent {
   @Input()
   user:User;
 
-  constructor() {
+  @Output()
+  replyClicked = new EventEmitter();
+
+  constructor(private logger:LoggerProvider) {
   }
 
+  onReplyClicked(event:any) {
+    this.logger.info(this, "onReplyClicked");
+    this.replyClicked.emit(this.reply);
+  }
 }
