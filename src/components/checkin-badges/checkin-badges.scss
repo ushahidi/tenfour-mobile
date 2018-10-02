@@ -1,8 +1,14 @@
 checkin-badges {
-  ion-badge {
-    width: 100%;
-    font-size: 16px;
-    margin-top: 6px;
-    border-radius: 2px !important;
+  .badges {
+    padding-top: 10px;
+    .badge {
+      display: inline-block;
+      ion-badge {
+        width: calc(100% - 10px);
+        font-size: 16px;
+        margin-right: 5px;
+        border-radius: 2px !important;
+      }
+    }
   }
 }
