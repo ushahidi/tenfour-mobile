@@ -1,20 +1,5 @@
-<ion-grid *ngIf="checkin">
-  <ion-row>
-    <ion-col *ngFor="let badge of getBadges()"
-      [attr.col-0]="badge.columns == 0 ? '' : null"
-      [attr.col-1]="badge.columns == 1 ? '' : null"
-      [attr.col-2]="badge.columns == 2 ? '' : null"
-      [attr.col-3]="badge.columns == 3 ? '' : null"
-      [attr.col-4]="badge.columns == 4 ? '' : null"
-      [attr.col-5]="badge.columns == 5 ? '' : null"
-      [attr.col-6]="badge.columns == 6 ? '' : null"
-      [attr.col-7]="badge.columns == 7 ? '' : null"
-      [attr.col-8]="badge.columns == 8 ? '' : null"
-      [attr.col-9]="badge.columns == 9 ? '' : null"
-      [attr.col-10]="badge.columns == 10 ? '' : null"
-      [attr.col-11]="badge.columns == 11 ? '' : null"
-      [attr.col-12]="badge.columns == 12 ? '' : null">
-      <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text">{{badge.number}}</ion-badge>
-    </ion-col>
-  </ion-row>
-</ion-grid>
+<div class="badges" *ngIf="checkin">
+  <div class="badge" [style.width]="badge.percentage*100 + '%'" *ngFor="let badge of getBadges()">
+    <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text">{{badge.number}}</ion-badge>
+  </div>
+</div>
