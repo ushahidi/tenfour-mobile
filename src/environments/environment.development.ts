@@ -6,7 +6,7 @@ export const Environment:IEnvironment = {
   apiEndpoint: 'https://api.dev.tenfour.org',
   clientId: "1",
   clientSecret: "T7913s89oGgJ478J73MRHoO2gcRRLQ",
-  intercomAppId: "qhvguo6z",
+  intercomAppId: "hnmleyf3",
   segmentAppId: "zyqqcTkGmM",
   segmentApiKey: "ieZYKiegj7ctbK38BqQKPIwaCommytok",
   firebaseAppId: "tenfour-7322f",
