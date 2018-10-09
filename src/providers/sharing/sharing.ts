@@ -14,12 +14,15 @@ export class SharingProvider {
     private logger:LoggerProvider) {
   }
 
-  public share(subject:string, message:string=null, file:string=null, url:string=null) {
+  public share(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
     if (this.platform.is("cordova")) {
       return this.socialSharing.share(message, subject, file, url);
     }
     else {
-      // TODO add sharing option for the web
+      let url = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message)}`;
+      this.logger.info(this, "share", "Subject", subject, "Message", message, "URL", url);
+      window.open(url, '_blank');
+      return Promise.resolve(true);
     }
   }
 
