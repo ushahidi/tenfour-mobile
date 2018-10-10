@@ -4,7 +4,7 @@
       <button ion-button color="cancel" (click)="closeModal($event)">Close</button>
     </ion-buttons>
     <ion-title></ion-title>
-    <ion-buttons right *ngIf="user && mobile">
+    <ion-buttons right *ngIf="user">
       <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="shareCheckin($event)">
         <ion-icon ios="ios-share-outline" md="md-share"></ion-icon>
       </button>
