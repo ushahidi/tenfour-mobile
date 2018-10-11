@@ -1,9 +1,11 @@
 
 <ion-item color="white" detail-push tappable (click)="onRowClicked($event)">
   <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
-  <h2 item-content>{{person.name}}
-    <img class="dots" [src]="dots" *ngIf="person.has_logged_in">
-    <ion-icon *ngIf="person.person_type === 'external'" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
-  </h2>
+  <ion-label>
+    <h2>{{person.name}}
+      <img class="dots" [src]="dots" *ngIf="person.has_logged_in">
+      <ion-icon *ngIf="person.person_type === 'external'" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
+    </h2>
+  </ion-label>
   <ion-checkbox clear item-right [(ngModel)]="selected" (ionChange)="onRowSelected($event)"></ion-checkbox>
 </ion-item>
