@@ -16,13 +16,16 @@ export class GroupRowComponent {
   user:Person;
 
   @Input()
+  selectable:boolean = false;
+
+  @Input()
   selected:boolean = false;
 
   @Output()
   rowSelected = new EventEmitter();
 
   @Output()
-  removeSelected = new EventEmitter();
+  rowClicked = new EventEmitter();
 
   hasRowSelected:boolean = false;
 
@@ -33,15 +36,14 @@ export class GroupRowComponent {
 
   ngOnInit() {
     this.hasRowSelected = this.rowSelected && this.rowSelected.observers.length > 0;
-    this.hasRemoveSelected = this.removeSelected && this.removeSelected.observers.length > 0;
+  }
+
+  onRowClicked(event:any) {
+    this.rowClicked.emit();
   }
 
   onRowSelected(event:any) {
     this.rowSelected.emit();
-  }
-
-  onRemoveSelected(event:any) {
-    this.removeSelected.emit();
   }
 
 }
