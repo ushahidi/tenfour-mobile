@@ -13,23 +13,25 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-    <ion-toolbar>
-     <ion-grid>
-      <ion-row align-items-center justify-content-start>
-       <ion-col col-7 col-sm-6 text-left>
-        <ion-searchbar start placeholder="Search..." [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
-       </ion-col>
-       <ion-col col-5 col-sm-6 text-right>
-        <button ion-button clear (click)="showPopover($event)">
-         Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
-        </button>
-        <button ion-button icon-only clear>
-         <ion-checkbox [(ngModel)]="selection" (ionChange)="changeSelection($event)"></ion-checkbox>
-        </button>
-       </ion-col>
-      </ion-row>
-     </ion-grid>
-    </ion-toolbar>
+
+  <ion-toolbar>
+   <ion-grid>
+    <ion-row align-items-center justify-content-start>
+     <ion-col col-7 col-sm-6 text-left>
+      <ion-searchbar start placeholder="Search..." [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
+     </ion-col>
+     <ion-col col-5 col-sm-6 text-right>
+      <button ion-button clear (click)="showPopover($event)">
+       Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
+      </button>
+      <button ion-button icon-only clear>
+       <ion-checkbox [(ngModel)]="selection" (ionChange)="changeSelection($event)"></ion-checkbox>
+      </button>
+     </ion-col>
+    </ion-row>
+   </ion-grid>
+  </ion-toolbar>
+
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
@@ -39,8 +41,8 @@
   <ion-list *ngIf="organization && organization.people">
     <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
       <ion-list-header>{{item.key}}</ion-list-header>
-      <person-row [person]="person" [user]="user" [selected]="selected == person"
-        (rowSelected)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
+      <person-row [person]="person" [user]="user"
+        (rowClicked)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
         *ngFor="let person of item.values"></person-row>
     </div>
   </ion-list>

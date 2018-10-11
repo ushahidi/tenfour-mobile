@@ -14,7 +14,7 @@ export class PersonRowComponent {
   @Input()
   user:Person;
 
-  @Input()
+  // @Input()
   selected:boolean = false;
 
   @Output()
@@ -23,8 +23,10 @@ export class PersonRowComponent {
   @Output()
   removeSelected = new EventEmitter();
 
-  hasRowSelected:boolean = false;
+  @Output()
+  rowClicked = new EventEmitter();
 
+  hasRowSelected:boolean = false;
   hasRemoveSelected:boolean = false;
 
   dots:string =  "assets/images/logo-dots.png";
@@ -38,11 +40,17 @@ export class PersonRowComponent {
   }
 
   onRowSelected(event:any) {
-    this.rowSelected.emit();
+    console.log('onRowSelected');
+    this.rowSelected.emit(this.selected);
   }
 
   onRemoveSelected(event:any) {
     this.removeSelected.emit();
+  }
+
+  onRowClicked(event:any) {
+    console.log('onRowClicked');
+    this.rowClicked.emit();
   }
 
 }
