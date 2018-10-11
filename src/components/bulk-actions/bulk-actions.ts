@@ -43,6 +43,7 @@ export class BulkActionsComponent extends BasePage {
       people: this.people,
       organization: this.organization
     });
+    this.viewController.dismiss();
   }
 
 }
