@@ -13,6 +13,23 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
+    <ion-toolbar>
+     <ion-grid>
+      <ion-row align-items-center justify-content-start>
+       <ion-col col-7 col-sm-6 text-left>
+        <ion-searchbar start placeholder="Search..." [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
+       </ion-col>
+       <ion-col col-5 col-sm-6 text-right>
+        <button ion-button clear (click)="showPopover($event)">
+         Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
+        </button>
+        <button ion-button icon-only clear>
+         <ion-checkbox [(ngModel)]="selection" (ionChange)="changeSelection($event)"></ion-checkbox>
+        </button>
+       </ion-col>
+      </ion-row>
+     </ion-grid>
+    </ion-toolbar>
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>

@@ -386,7 +386,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getPeople(organization:Organization, limit:number=null, offset:number=null):Promise<Person[]> {
+  public getPeople(organization:Organization, limit:number=null, offset:number=null, filter:String=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people`;
@@ -396,6 +396,9 @@ export class ApiProvider extends HttpProvider {
         }
         if (offset != null) {
           params['offset'] = offset;
+        }
+        if (filter != null) {
+          params['filter'] = filter;
         }
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let people = [];

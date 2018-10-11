@@ -32,6 +32,7 @@ export class PersonListPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
+  filter:String = '';
 
   constructor(
       protected zone:NgZone,
@@ -99,8 +100,8 @@ export class PersonListPage extends BasePrivatePage {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       this.promiseFallback(cache,
-        this.storage.getPeople(this.organization, null, this.limit, this.offset),
-        this.api.getPeople(this.organization, this.limit, this.offset), 2).then((people:Person[]) => {
+        this.storage.getPeople(this.organization, null, this.limit, this.offset, this.filter),
+        this.api.getPeople(this.organization, this.limit, this.offset, this.filter), 2).then((people:Person[]) => {
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.organization.people = people;
             resolve(people);
@@ -305,6 +306,11 @@ export class PersonListPage extends BasePrivatePage {
         });
       }
     });
+  }
+
+  private onFilter($event) {
+    this.logger.info(this, "onFilter", this.filter);
+    this.loadUpdates(false);
   }
 
 }
