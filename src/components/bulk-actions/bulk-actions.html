@@ -1,7 +1,7 @@
 <ion-list>
-  <ion-list-header>Actions</ion-list-header>
-  <button ion-item (click)="addToGroup()">Add to a Group</button>
-  <button ion-item (click)="close()">Change Role</button>
-  <button ion-item (click)="close()">Send Invite</button>
-  <button ion-item (click)="close()">Remove People</button>
+  <ion-list-header>{{people.length}} Selected</ion-list-header>
+  <button ion-item [disabled]="!people.length" (click)="addToGroup()">Add to a Group</button>
+  <button ion-item [disabled]="!people.length" (click)="close()">Change Role</button>
+  <button ion-item [disabled]="!people.length" (click)="close()">Send Invite</button>
+  <button ion-item [disabled]="!people.length" (click)="close()">Remove People</button>
 </ion-list>

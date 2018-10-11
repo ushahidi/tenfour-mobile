@@ -34,7 +34,8 @@ export class PersonListPage extends BasePrivatePage {
   limit:number = 20;
   offset:number = 0;
   filter:String = '';
-  selectedPeople:Person[] = null;
+  selectedPeople:Person[] = [];
+  selectAll:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -107,6 +108,9 @@ export class PersonListPage extends BasePrivatePage {
         this.api.getPeople(this.organization, this.limit, this.offset, this.filter), 2).then((people:Person[]) => {
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.organization.people = people;
+            this.organization.people.forEach(person => {
+              person.selected = !!this.selectedPeople.find(selectedPerson => { return selectedPerson.id === person.id; });
+            });
             resolve(people);
           });
         },
@@ -318,6 +322,18 @@ export class PersonListPage extends BasePrivatePage {
 
   private onPersonSelected(person, $event) {
     this.logger.info(this, "onPersonSelected", person.selected);
+
+    if (!person.selected) {
+      this.selectedPeople = this.selectedPeople.filter(selectedPerson => {
+        return selectedPerson.id !== person.id;
+      });
+    } else {
+      if (!this.selectedPeople.find(selectedPerson => {
+        return selectedPerson.id === person.id;
+      })) {
+        this.selectedPeople.push(person);
+      }
+    }
   }
 
   private showActionsPopover($event) {
@@ -329,5 +345,20 @@ export class PersonListPage extends BasePrivatePage {
     }).present({
       ev: $event
     });
+  }
+
+  private onChangeSelectAll($event) {
+    this.logger.info(this, "onChangeSelectAll", this.selectAll);
+
+    if (this.selectAll) {
+      this.organization.people.forEach(person => {
+        person.selected = true;
+      });
+    } else {
+      this.organization.people.forEach(person => {
+        person.selected = false;
+      })
+      this.selectedPeople.length = 0;
+    }
   }
 }
