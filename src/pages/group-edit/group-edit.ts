@@ -207,7 +207,7 @@ export class GroupEditPage extends BasePrivatePage {
     },
     (error:any) => {
       loading.dismiss();
-      this.showAlert("Problem Updatig Group", error);
+      this.showAlert("Problem Updating Group", error);
     });
   }
 

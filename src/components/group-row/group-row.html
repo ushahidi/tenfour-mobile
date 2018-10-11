@@ -6,5 +6,5 @@
     </h2>
     <p>{{group.member_count || 0}} people</p>
   </ion-label>
-  <ion-checkbox *ngIf="selectable" clear item-right [(ngModel)]="selected" (ionChange)="onRowSelected($event)"></ion-checkbox>
+  <ion-checkbox *ngIf="isSelectable" clear item-right [(ngModel)]="group.selected" (ionChange)="onRowSelected($event)"></ion-checkbox>
 </ion-item>

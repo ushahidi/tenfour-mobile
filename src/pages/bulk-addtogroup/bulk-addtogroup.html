@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Add to Group</ion-title>
     <ion-buttons right>
-      <button ion-button (click)="addToGroup($event)">
+      <button ion-button (click)="addPeopleToGroups($event)">
         Save
       </button>
     </ion-buttons>
@@ -15,6 +15,7 @@
   <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
+  <h2 *ngIf="loading == false">{{people.length}} Selected</h2>
   <ion-list *ngIf="organization && organization.groups">
     <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>

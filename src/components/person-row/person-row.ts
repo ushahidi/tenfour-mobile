@@ -14,9 +14,6 @@ export class PersonRowComponent {
   @Input()
   user:Person;
 
-  // // @Input()
-  // selected:boolean = false;
-
   @Output()
   rowSelected = new EventEmitter();
 

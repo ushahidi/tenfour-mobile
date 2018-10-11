@@ -11,6 +11,8 @@ import { Group } from '../../models/group';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import { EVENT_GROUP_CHANGED } from '../../constants/events';
+
 @IonicPage({
   name: 'BulkAddToGroupPage',
 })
@@ -23,7 +25,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 export class BulkAddToGroupPage extends BasePrivatePage {
 
   loading:boolean = false;
-  people:Person[];
+  people:Person[] = [];
   organization:Organization;
 
   constructor(
@@ -56,6 +58,8 @@ export class BulkAddToGroupPage extends BasePrivatePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
+
+    this.people = this.navParams.get('people');
   }
 
   ionViewWillLeave() {
@@ -99,5 +103,33 @@ export class BulkAddToGroupPage extends BasePrivatePage {
     });
   }
 
+  private addPeopleToGroups() {
+    this.logger.info(this, "addPeopleToGroups");
 
+    let loading = this.showLoading("Saving...", true);
+    let promises = [];
+
+    this.organization.groups.forEach(group => {
+        if (group.selected) {
+          this.people.forEach(person => { group.members.push(person); });
+
+          promises.push(new Promise((resolve, reject) => {
+            this.api.updateGroup(this.organization, group).then((updatedGroup:Group) => {
+              this.storage.saveGroup(this.organization, updatedGroup).then((saved:any) => {
+                this.events.publish(EVENT_GROUP_CHANGED, updatedGroup.id);
+                resolve();
+              });
+            }, reject);
+          }));
+        }
+    });
+
+    Promise.all(promises).then(() => {
+        loading.dismiss();
+        this.hideModal();
+    },(error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Adding Selected People to Groups", error);
+    });
+  }
 }

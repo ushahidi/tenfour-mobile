@@ -18,9 +18,6 @@ export class GroupRowComponent {
   @Input()
   selectable:boolean = false;
 
-  @Input()
-  selected:boolean = false;
-
   @Output()
   rowSelected = new EventEmitter();
 
@@ -44,6 +41,10 @@ export class GroupRowComponent {
 
   onRowSelected(event:any) {
     this.rowSelected.emit();
+  }
+
+  get isSelectable() {
+    return this.selectable && !this.group.isExternal();
   }
 
 }
