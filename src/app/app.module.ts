@@ -104,6 +104,8 @@ import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module'
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
+import { BulkAddToGroupModule } from '../pages/bulk-addtogroup/bulk-addtogroup.module';
+
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
 import { TitleizeModule } from '../pipes/titleize/titleize.module';
@@ -223,6 +225,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SettingsSizesModule,
     SettingsRegionsModule,
     UnsubscribePageModule,
+    BulkAddToGroupModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,
