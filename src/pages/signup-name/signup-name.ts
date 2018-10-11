@@ -116,8 +116,10 @@ export class SignupNamePage extends BasePublicPage {
         else {
           this.organization.name = this.name.value;
           this.storage.setOrganization(this.organization).then((stored:boolean) => {
-            this.showPage(SignupUrlPage, {
+            this.showModal(SignupUrlPage, {
               organization: this.organization
+            }, {
+              enableBackdropDismiss: false
             });
           });
         }
@@ -137,6 +139,10 @@ export class SignupNamePage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

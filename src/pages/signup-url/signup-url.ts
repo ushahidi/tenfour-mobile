@@ -134,8 +134,10 @@ export class SignupUrlPage extends BasePublicPage {
         else {
           this.organization.subdomain = this.subdomain.value;
           this.storage.setOrganization(this.organization).then((stored:boolean) => {
-            this.showPage(SignupPasswordPage, {
+            this.showModal(SignupPasswordPage, {
               organization: this.organization
+            }, {
+              enableBackdropDismiss: false
             });
           });
         }
@@ -155,6 +157,10 @@ export class SignupUrlPage extends BasePublicPage {
       return false;
     }
     return true;
+  }
+
+  private closeModal(event:any=null) {
+    this.hideModal();
   }
 
 }

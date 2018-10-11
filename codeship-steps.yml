@@ -3,7 +3,7 @@
   steps:
   - name: "deploy .wellknown to production"
     service: awscli
-    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-production-client/.well-known/
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-production-client/.well-known/ --content-type application/json
 
   - type: serial
     steps:
@@ -21,7 +21,7 @@
   steps:
   - name: "deploy .wellknown to staging"
     service: awscli
-    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client/.well-known/
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-staging-client-eu/.well-known/ --content-type application/json
 
   - type: serial
     steps:
@@ -31,12 +31,16 @@
 
     - name: "deploy PWA client (staging)"
       service: awscli
-      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client/
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-staging-client-eu/
 
 
 - type: serial
   tag: develop
   steps:
+  - name: "deploy .wellknown to develop"
+    service: awscli
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-dev-client-eu/.well-known/ --content-type application/json 
+
   - name: "build PWA client (dev)"
     service: builder
     command: ENV=dev npm run ionic:build --debug

@@ -18,7 +18,7 @@
           "/#notifications",
           "/#settings",
           "/#settings/*",
-          "/#profile",
+          "/#profile"
         ]
       }
     ]

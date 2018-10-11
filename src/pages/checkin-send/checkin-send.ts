@@ -229,6 +229,7 @@ export class CheckinSendPage extends BasePrivatePage {
         email_enabled: false,
         sms_enabled: false,
         slack_enabled: false,
+        voice_enabled: false,
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;
@@ -249,6 +250,7 @@ export class CheckinSendPage extends BasePrivatePage {
         email_enabled: this.organization.email_enabled,
         sms_enabled: this.organization.sms_enabled,
         slack_enabled: this.organization.slack_enabled,
+        voice_enabled: this.organization.voice_enabled,
         on_changed:(send_via:any) => {
           this.logger.info(this, "sendViaChanged", send_via);
           this.checkin.send_via = send_via;

@@ -19,6 +19,14 @@
     color: color($colors, cancel) !important;
   }
 }
+ion-navbar {
+  ion-buttons {
+    .bar-button-solid {
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+  }
+}
 ion-toolbar {
   organization-logo {
     margin-left: 5px;
@@ -274,4 +282,12 @@ ion-list {
 
 .toast-md .toast-wrapper {
   padding-left: 40px; // because of intercom button
+}
+
+@for $i from 2 to 5 {
+  ion-modal:nth-of-type(#{$i}) {
+    ion-backdrop {
+      opacity: 0.0 !important;
+    }
+  }
 }

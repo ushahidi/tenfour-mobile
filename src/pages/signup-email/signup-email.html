@@ -1,8 +1,13 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <ion-title></ion-title>
+    <ion-buttons left>
+      <button ion-button icon-only (click)="closeModal($event)">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>Sign up to TenFour</ion-title>
     <ion-buttons right>
-      <button color="primary" ion-button text-only (click)="showNext($event)">Next</button>
+      <button color="primary" #next ion-button text-only [solid]="website == true ? 'true' : null" (click)="showNext($event)">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -10,12 +15,15 @@
   <ion-list>
     <ion-item text-wrap class="heading">
       <img src="assets/images/logo-dots.png"/>
-      <h2>Enter your email to sign up</h2>
+      <h2>Let's get you signed up</h2>
       <p>We do not send marketing or promotional emails.</p>
     </ion-item>
     <ion-item color="input" class="input">
       <ion-label fixed>Email</ion-label>
       <ion-input #email type="email" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your email address" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item no-lines class="other">
+      <button ion-button clear tappable color="primary" tappable detail-push (click)="signinToOrganization($event)"><h2>Already have a TenFour account, Log in here</h2></button>
     </ion-item>
   </ion-list>
 </ion-content>

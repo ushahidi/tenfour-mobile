@@ -57,6 +57,12 @@ export class Organization extends Model {
               else {
                 this.sms_enabled = null;
               }
+              if (_settings.values.voice) {
+                this.voice_enabled = _settings.values.voice.enabled;
+              }
+              else {
+                this.voice_enabled = null;
+              }
               if (_settings.values.twitter) {
                 this.twitter_enabled = _settings.values.twitter.enabled;
               }
@@ -78,6 +84,9 @@ export class Organization extends Model {
             }
             else if (_settings.key == 'plan_and_credits') {
               this.credits_extra = parseInt(_settings.values.monthlyCreditsExtra);
+            }
+            else if (_settings.key == 'ldap') {
+              this.ldap_settings = JSON.stringify(_settings.values);
             }
           }
           let settings = new Settings(_settings);
@@ -140,6 +149,9 @@ export class Organization extends Model {
   @Column("sms_enabled", BOOLEAN)
   public sms_enabled:boolean = null;
 
+  @Column("voice_enabled", BOOLEAN)
+  public voice_enabled:boolean = null;
+
   @Column("twitter_enabled", BOOLEAN)
   public twitter_enabled:boolean = null;
 
@@ -172,6 +184,9 @@ export class Organization extends Model {
 
   @Column("updated_at", TEXT)
   public updated_at:Date = null;
+
+  @Column("ldap_settings", TEXT)
+  public ldap_settings:string = null;
 
   public settings:Settings[] = [];
 

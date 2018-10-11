@@ -55,9 +55,7 @@ export class NotificationListPage extends BasePrivatePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
-    this.loadUpdates(true)
-      // .then(this.markAllNotificationsAsRead)
-      .then((loaded:any) => {
+    this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
     });
   }
@@ -74,7 +72,6 @@ export class NotificationListPage extends BasePrivatePage {
   ionViewWillLeave() {
     super.ionViewWillLeave();
     this.viewNotifications();
-    this.markAllNotificationsAsRead();
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {
@@ -106,7 +103,7 @@ export class NotificationListPage extends BasePrivatePage {
       this.offset = 0;
       this.promiseFallback(cache,
         this.storage.getNotifications(this.organization, this.limit, this.offset),
-        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+        this.api.getNotifications(this.organization, this.user, this.limit, this.offset), 1).then((notifications:Notification[]) => {
           this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
             this.notifications = notifications;
             resolve(notifications);
@@ -129,16 +126,16 @@ export class NotificationListPage extends BasePrivatePage {
       this.offset = this.offset + this.limit;
       this.promiseFallback(true,
         this.storage.getNotifications(this.organization, this.limit, this.offset),
-        this.api.getNotifications(this.organization, this.limit, this.offset), 1).then((notifications:Notification[]) => {
+        this.api.getNotifications(this.organization, this.user, this.limit, this.offset), 1).then((notifications:Notification[]) => {
           this.storage.saveNotifications(this.organization, notifications).then((saved:boolean) => {
-            this.notifications = notifications;
+            this.notifications = [...this.notifications, ...notifications];
             if (event) {
               event.complete();
             }
             resolve(notifications);
           },
           (error:any) => {
-            this.notifications = notifications;
+            this.notifications = [...this.notifications, ...notifications];
             if (event) {
               event.complete();
             }
@@ -157,19 +154,22 @@ export class NotificationListPage extends BasePrivatePage {
 
   private viewNotifications() {
     this.logger.info(this, "viewNotifications");
+    let promises = [];
     for (let notification of this.notifications) {
+      if (!notification.read_at) {
+        promises.push(this.api.markNotificationAsRead(this.organization, this.user, notification));
+      }
       notification.viewed_at = new Date();
     }
     this.storage.saveNotifications(this.organization, this.notifications).then((saved:boolean) => {
-      this.logger.info(this, "viewNotifications", "Saved", saved);
-    });
-  }
-
-  private markAllNotificationsAsRead() {
-    this.logger.info(this, "markAllNotificationsAsRead");
-    this.api.markAllNotificationsAsRead(this.organization, this.user).then(() => {
-      this.logger.info(this, "markAllNotificationsAsRead", "done");
-      this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+      Promise.all(promises).then(() => {
+        this.logger.info(this, "viewNotifications", "Saved", saved);
+        this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+      },
+      (error:any) => {
+        this.logger.warn(this, "viewNotifications", "Failed", error);
+        this.events.publish(EVENT_NOTIFICATIONS_CHANGED);
+      });
     });
   }
 

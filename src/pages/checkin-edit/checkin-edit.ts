@@ -132,6 +132,10 @@ export class CheckinEditPage extends BasePrivatePage {
       send_via.push('slack');
     }
 
+    if (this.organization.hasProPlan() && this.organization.voice_enabled) {
+      send_via.push('voice');
+    }
+
     this.checkin.send_via = send_via.join(',');
     this.addDefaults();
   }

@@ -113,7 +113,7 @@ export class IntercomProvider {
         if (this.platform.is("cordova")) {
           let attributes = {
             name: user.name,
-            email: organization.email,
+            email: user.hasEmails() ? user.getEmails()[0].contact : undefined,
             created_at: user.created_at,
             user_id: user.id ? 'tf' + user.id : null,
             company: {
@@ -134,7 +134,7 @@ export class IntercomProvider {
         else if (this.intercomWeb && window.hasOwnProperty('Intercom')) {
           let attributes = {
             name: user.name,
-            email: organization.email,
+            email: user.hasEmails() ? user.getEmails()[0].contact : undefined,
             created_at: user.created_at,
             user_id: user.id ? 'tf' + user.id : undefined,
             company: {

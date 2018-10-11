@@ -1,0 +1,5 @@
+<div class="badges" *ngIf="checkin">
+  <div class="badge" [style.width]="badge.percentage*100 + '%'" *ngFor="let badge of getBadges()">
+    <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text">{{badge.number}}</ion-badge>
+  </div>
+</div>

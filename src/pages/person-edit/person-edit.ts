@@ -251,17 +251,27 @@ export class PersonEditPage extends BasePrivatePage {
   private savePersonAndContacts(activity:string, event:any) {
     let loading = this.showLoading(`${activity}...`, true);
     this.savePerson(this.organization, this.person).then((person:Person) => {
-      let contacts = [];
-      for (let contact of this.person.getPhones()) {
-        contacts.push(this.saveContact(this.organization, person, contact));
+      let promises = [];
+
+      if (person.role === 'owner' && person.id !== this.user.id) {
+        // has just transferred ownership, need to update local user
+        // cannot save contacts for the person, because we just lost priviledge
+        promises.push(this.api.getPerson(this.organization).then((me:Person) => {
+          return this.storage.setUser(me);
+        }));
+      } else {
+        for (let contact of this.person.getPhones()) {
+          promises.push(this.saveContact(this.organization, person, contact));
+        }
+        for (let contact of this.person.getEmails()) {
+          promises.push(this.saveContact(this.organization, person, contact));
+        }
+        for (let contact of this.person.getAddresses()) {
+          promises.push(this.saveContact(this.organization, person, contact));
+        }
       }
-      for (let contact of this.person.getEmails()) {
-        contacts.push(this.saveContact(this.organization, person, contact));
-      }
-      for (let contact of this.person.getAddresses()) {
-        contacts.push(this.saveContact(this.organization, person, contact));
-      }
-      Promise.all(contacts).then((updated:any) => {
+
+      Promise.all(promises).then((updated:any) => {
         let saves = [];
         if (this.profile) {
           saves.push(this.storage.setUser(person));
@@ -566,5 +576,12 @@ export class PersonEditPage extends BasePrivatePage {
   private onContactChanged(contact:any) {
     this.logger.info(this, "onContactChanged", contact);
     contact.blocked = false;
+  }
+
+  private showTransferOwnerWarning() {
+    this.logger.info(this, "showTransferOwnerWarning");
+    if (this.person.role === 'owner') {
+      this.showAlert('Warning', 'If you transfer ownership to this person, you may lose your privileges.');
+    }
   }
 }
