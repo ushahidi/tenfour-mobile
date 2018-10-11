@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, Modal } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController, Modal } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
@@ -7,6 +7,7 @@ import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
+import { BulkActionsComponent } from '../../components/bulk-actions/bulk-actions';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -45,6 +46,7 @@ export class PersonListPage extends BasePrivatePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected popoverController:PopoverController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -313,4 +315,12 @@ export class PersonListPage extends BasePrivatePage {
     this.loadUpdates(false);
   }
 
+  private showActionsPopover($event) {
+    this.logger.info(this, 'showActionsPopover');
+
+    let popover = this.popoverController.create(BulkActionsComponent);
+    popover.present({
+      ev: $event
+    });
+  }
 }
