@@ -238,7 +238,7 @@ export class BasePage {
   }
 
   protected showShare(subject:string, message:string=null, file:string=null, url:string=null):Promise<any> {
-    return this.sharing.share(message, subject, file, url);
+    return this.sharing.share(subject, message, file, url);
   }
 
   protected showOfflineAlert():Alert {
