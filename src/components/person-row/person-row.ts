@@ -14,8 +14,8 @@ export class PersonRowComponent {
   @Input()
   user:Person;
 
-  // @Input()
-  selected:boolean = false;
+  // // @Input()
+  // selected:boolean = false;
 
   @Output()
   rowSelected = new EventEmitter();
@@ -40,8 +40,11 @@ export class PersonRowComponent {
   }
 
   onRowSelected(event:any) {
-    console.log('onRowSelected');
-    this.rowSelected.emit(this.selected);
+    this.rowSelected.emit();
+  }
+
+  get isSelectable() {
+    return !this.person.isExternal();
   }
 
   onRemoveSelected(event:any) {

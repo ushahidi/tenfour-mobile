@@ -34,6 +34,7 @@ export class PersonListPage extends BasePrivatePage {
   limit:number = 20;
   offset:number = 0;
   filter:String = '';
+  selectedPeople:Person[] = null;
 
   constructor(
       protected zone:NgZone,
@@ -315,14 +316,17 @@ export class PersonListPage extends BasePrivatePage {
     this.loadUpdates(false);
   }
 
+  private onPersonSelected(person, $event) {
+    this.logger.info(this, "onPersonSelected", person.selected);
+  }
+
   private showActionsPopover($event) {
     this.logger.info(this, 'showActionsPopover');
 
-    let popover = this.popoverController.create(BulkActionsComponent, {
+    this.popoverController.create(BulkActionsComponent, {
       organization: this.organization,
-      people: []
-    });
-    popover.present({
+      people: this.selectedPeople
+    }).present({
       ev: $event
     });
   }

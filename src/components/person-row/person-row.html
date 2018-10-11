@@ -7,5 +7,5 @@
       <ion-icon *ngIf="person.person_type === 'external'" ios="ios-cloud-outline" md="md-cloud-outline"></ion-icon>
     </h2>
   </ion-label>
-  <ion-checkbox clear item-right [(ngModel)]="selected" (ionChange)="onRowSelected($event)"></ion-checkbox>
+  <ion-checkbox *ngIf="isSelectable" clear item-right [(ngModel)]="person.selected" (ionChange)="onRowSelected($event)"></ion-checkbox>
 </ion-item>
