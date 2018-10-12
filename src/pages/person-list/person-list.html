@@ -20,7 +20,7 @@
      <ion-col col-7 col-sm-6 text-left>
       <ion-searchbar start placeholder="Search..." [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
      </ion-col>
-     <ion-col col-5 col-sm-6 text-right>
+     <ion-col col-5 col-sm-6 text-right *ngIf="user && user.isOwnerOrAdmin()">
       <button ion-button clear (click)="showActionsPopover($event)">
        Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
       </button>
@@ -41,7 +41,7 @@
   <ion-list *ngIf="organization && organization.people">
     <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
       <ion-list-header>{{item.key}}</ion-list-header>
-      <person-row [person]="person" [user]="user" [selectable]=true
+      <person-row [person]="person" [user]="user" [selectable]="user && user.isOwnerOrAdmin()"
         (rowSelected)="onPersonSelected(person, $event)"
         (rowClicked)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
         *ngFor="let person of item.values"></person-row>

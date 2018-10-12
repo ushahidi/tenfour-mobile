@@ -24,7 +24,7 @@
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
     </ion-item>
     <ion-list *ngIf="organization && organization.groups">
-      <group-row [group]="group" [user]="user" [selectable]=true
+      <group-row [group]="group" [user]="user" [selectable]="user && user.isOwnerOrAdmin()"
                  (rowClicked)="showGroup(group)"
                  *ngFor="let group of organization.groups"></group-row>
     </ion-list>
