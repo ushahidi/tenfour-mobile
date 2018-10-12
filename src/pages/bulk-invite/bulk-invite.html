@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" *ngIf="modal == true" (click)="hideModal($event)">Close</button>
+    </ion-buttons>
+    <ion-title>Invite via Email</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <div text-center class="spinner" *ngIf="loading == true && (organization == null)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+  <multi-avatar *ngIf="!loading && people" [people]="people"></multi-avatar>
+  <button ion-button block color="primary" (click)="invite($event)">Send Invite via Email</button>
+</ion-content>
