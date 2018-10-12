@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
 import { BulkAddToGroupModule } from '../../pages/bulk-addtogroup/bulk-addtogroup.module';
+import { BulkChangeRoleModule } from '../../pages/bulk-changerole/bulk-changerole.module';
 
 import { BulkActionsComponent } from './bulk-actions';
 
@@ -11,6 +12,7 @@ import { BulkActionsComponent } from './bulk-actions';
   ],
   imports: [
     BulkAddToGroupModule,
+    BulkChangeRoleModule,
     IonicPageModule.forChild(BulkActionsComponent),
   ],
   exports: [

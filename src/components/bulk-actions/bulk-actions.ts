@@ -3,8 +3,9 @@ import { IonicPage, Button, Platform, NavParams, NavController, ViewController, 
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { BulkAddToGroupPage } from '../../pages/bulk-addtogroup/bulk-addtogroup';
-import { Person } from '../../models/person';
+import { BulkChangeRolePage } from '../../pages/bulk-changerole/bulk-changerole';
 
+import { Person } from '../../models/person';
 import { Organization } from '../../models/organization';
 
 import { StorageProvider } from '../../providers/storage/storage';
@@ -40,6 +41,14 @@ export class BulkActionsComponent extends BasePage {
 
   private addToGroup() {
     this.showModalOrPage(BulkAddToGroupPage, {
+      people: this.people,
+      organization: this.organization
+    });
+    this.viewController.dismiss();
+  }
+
+  private changeRole() {
+    this.showModalOrPage(BulkChangeRolePage, {
       people: this.people,
       organization: this.organization
     });

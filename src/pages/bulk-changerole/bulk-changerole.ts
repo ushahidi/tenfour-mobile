@@ -6,27 +6,25 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
-import { Group } from '../../models/group';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
-import { EVENT_GROUP_CHANGED } from '../../constants/events';
-
 @IonicPage({
-  name: 'BulkAddToGroupPage',
+  name: 'BulkChangeRolePage',
 })
 @Component({
-  selector: 'bulk-addtogroup',
-  templateUrl: 'bulk-addtogroup.html',
+  selector: 'bulk-changerole',
+  templateUrl: 'bulk-changerole.html',
   providers: [ ApiProvider, StorageProvider ],
   entryComponents:[ ]
 })
-export class BulkAddToGroupPage extends BasePrivatePage {
+export class BulkChangeRolePage extends BasePrivatePage {
 
   loading:boolean = false;
   people:Person[] = [];
   organization:Organization;
+  role:string = 'multiple';
 
   constructor(
       protected zone:NgZone,
@@ -69,7 +67,6 @@ export class BulkAddToGroupPage extends BasePrivatePage {
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     return Promise.resolve()
-      .then(() => this.loadGroups(cache))
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -87,41 +84,26 @@ export class BulkAddToGroupPage extends BasePrivatePage {
       });
   }
 
-  private loadGroups(cache:boolean=true):Promise<any> {
-    this.logger.info(this, "loadGroups", cache);
-    return new Promise((resolve, reject) => {
-      this.promiseFallback(cache,
-        this.storage.getGroups(this.organization),
-        this.api.getGroups(this.organization), 1).then((groups:Group[]) => {
-          this.organization.groups = groups;
-          resolve(groups);
-        },
-        (error:any) => {
-          this.organization.groups = [];
-          reject(error);
-        });
-    });
-  }
-
-  private addPeopleToGroups() {
-    this.logger.info(this, "addPeopleToGroups");
+  private changeRole() {
+    this.logger.info(this, "changeRole");
 
     let loading = this.showLoading("Saving...", true);
     let promises = [];
 
-    this.organization.groups.forEach(group => {
-        if (group.selected) {
-          this.people.forEach(person => { group.members.push(person); });
-
-          promises.push(new Promise((resolve, reject) => {
-            this.api.updateGroup(this.organization, group).then((updatedGroup:Group) => {
-              this.storage.saveGroup(this.organization, updatedGroup).then((saved:any) => {
-                this.events.publish(EVENT_GROUP_CHANGED, updatedGroup.id);
-                resolve();
-              });
-            }, reject);
-          }));
+    this.people.forEach(person => {
+        if (this.role === 'multiple') {
+          return;
         }
+
+        person.role = this.role;
+
+        promises.push(new Promise((resolve, reject) => {
+          this.api.updatePerson(this.organization, person).then((person:Person) => {
+            return this.storage.savePerson(this.organization, person).then((saved:any) => {
+              resolve(person);
+            }, reject);
+          }, reject);
+        }));
     });
 
     Promise.all(promises).then(() => {
@@ -129,11 +111,11 @@ export class BulkAddToGroupPage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Added ' + this.people.length + ' people to ' + promises.length + ' groups');  
+          this.showToast('Updated the role of ' + this.people.length + ' people');
         }
     },(error:any) => {
       loading.dismiss();
-      this.showAlert("Problem Adding Selected People to Groups", error);
+      this.showAlert("Problem Changing Roles", error);
     });
   }
 }
