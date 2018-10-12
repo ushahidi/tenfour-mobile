@@ -2,6 +2,6 @@
   <ion-list-header>{{people.length}} Selected</ion-list-header>
   <button ion-item [disabled]="!people.length" (click)="addToGroup()">Add to a Group</button>
   <button ion-item [disabled]="!people.length" (click)="changeRole()">Change Role</button>
-  <button ion-item [disabled]="!people.length" (click)="close()">Send Invite</button>
-  <button ion-item [disabled]="!people.length" (click)="close()">Remove People</button>
+  <button ion-item [disabled]="!people.length" (click)="sendInvite()">Send Invite</button>
+  <button ion-item [disabled]="!people.length" (click)="remove()">Remove People</button>
 </ion-list>

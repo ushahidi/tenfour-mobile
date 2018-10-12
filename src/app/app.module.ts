@@ -106,6 +106,7 @@ import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
 import { BulkAddToGroupModule } from '../pages/bulk-addtogroup/bulk-addtogroup.module';
 import { BulkChangeRoleModule } from '../pages/bulk-changerole/bulk-changerole.module';
+import { BulkRemoveModule } from '../pages/bulk-remove/bulk-remove.module';
 
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
@@ -230,6 +231,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     UnsubscribePageModule,
     BulkAddToGroupModule,
     BulkChangeRoleModule,
+    BulkRemoveModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,

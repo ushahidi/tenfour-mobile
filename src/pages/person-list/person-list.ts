@@ -339,10 +339,17 @@ export class PersonListPage extends BasePrivatePage {
   private showActionsPopover($event) {
     this.logger.info(this, 'showActionsPopover');
 
-    this.popoverController.create(BulkActionsComponent, {
+    let popover = this.popoverController.create(BulkActionsComponent, {
       organization: this.organization,
       people: this.selectedPeople
-    }).present({
+    });
+
+    popover.onDidDismiss(data => {
+      this.logger.info(this, 'showActionsPopover', 'onDidDismiss');
+      this.loadUpdates();
+    });
+
+    popover.present({
       ev: $event
     });
   }
