@@ -118,6 +118,7 @@ import { GroupByModule } from '../pipes/group-by/group-by.module';
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
+import { MultiAvatarModule } from '../components/multi-avatar/multi-avatar.module';
 import { CheckinCardModule } from '../components/checkin-card/checkin-card.module';
 import { CheckinDetailModule } from '../components/checkin-details/checkin-details.module';
 import { PersonRowModule } from '../components/person-row/person-row.module';
@@ -166,6 +167,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     ReactiveFormsModule,
     SplashScreenModule,
     PersonAvatarModule,
+    MultiAvatarModule,
     OrganizationLogoModule,
     ColorPickerModule,
     SendViaModule,

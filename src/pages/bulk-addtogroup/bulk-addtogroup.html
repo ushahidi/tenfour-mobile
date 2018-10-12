@@ -15,7 +15,7 @@
   <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
-  <h2 *ngIf="loading == false">{{people.length}} Selected</h2>
+  <multi-avatar *ngIf="!loading && people" [people]="people"></multi-avatar>
   <ion-list *ngIf="organization && organization.groups">
     <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
