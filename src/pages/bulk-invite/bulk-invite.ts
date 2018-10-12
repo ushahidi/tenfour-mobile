@@ -83,6 +83,17 @@ export class BulkInvitePage extends BasePrivatePage {
       });
   }
 
+  private get peopleWithoutEmail() {
+    return this.people.filter(person => {
+      return !person.hasEmails();
+    });
+  }
+
+  private get peopleWithEmail() {
+    return this.people.filter(person => {
+      return person.hasEmails();
+    });
+  }
 
   private invite() {
     this.logger.info(this, "invite");
@@ -91,6 +102,10 @@ export class BulkInvitePage extends BasePrivatePage {
     let promises = [];
 
     this.people.forEach(person => {
+      if (!person.hasEmails()) {
+        return;
+      }
+
       promises.push(this.api.invitePerson(this.organization, person));
     });
 
@@ -99,7 +114,7 @@ export class BulkInvitePage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Invited ' + this.people.length + ' people to the organization');
+          this.showToast('Invited ' + promises.length + ' people to the organization');
         }
     },(error:any) => {
       loading.dismiss();

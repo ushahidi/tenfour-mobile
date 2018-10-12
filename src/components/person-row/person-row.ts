@@ -14,6 +14,9 @@ export class PersonRowComponent {
   @Input()
   user:Person;
 
+  @Input()
+  selectable:boolean = false;
+
   @Output()
   rowSelected = new EventEmitter();
 
@@ -41,7 +44,7 @@ export class PersonRowComponent {
   }
 
   get isSelectable() {
-    return !this.person.isExternal();
+    return !this.person.isExternal() && this.selectable;
   }
 
   onRemoveSelected(event:any) {

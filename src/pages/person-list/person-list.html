@@ -41,7 +41,8 @@
   <ion-list *ngIf="organization && organization.people">
     <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
       <ion-list-header>{{item.key}}</ion-list-header>
-      <person-row [person]="person" [user]="user" (rowSelected)="onPersonSelected(person, $event)"
+      <person-row [person]="person" [user]="user" [selectable]=true
+        (rowSelected)="onPersonSelected(person, $event)"
         (rowClicked)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
         *ngFor="let person of item.values"></person-row>
     </div>

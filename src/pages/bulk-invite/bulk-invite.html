@@ -6,10 +6,22 @@
     <ion-title>Invite via Email</ion-title>
   </ion-navbar>
 </ion-header>
-<ion-content>
+<ion-content padding>
   <div text-center class="spinner" *ngIf="loading == true && (organization == null)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
   <multi-avatar *ngIf="!loading && people" [people]="people"></multi-avatar>
-  <button ion-button block color="primary" (click)="invite($event)">Send Invite via Email</button>
+
+  <ion-list *ngIf="people.length">
+      <ion-item color="white" detail-push *ngFor="let person of peopleWithoutEmail">
+        <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
+        <ion-label>
+          <h2>{{person.name}}</h2>
+          <p *ngIf="person.hasEmails()">{{person.getEmails()[0].contact}}</p>
+          <p *ngIf="!person.hasEmails()"><ion-icon name="close"></ion-icon> Has no email in profile &mdash; will not be invited</p>
+        </ion-label>
+      </ion-item>
+  </ion-list>
+
+  <button ion-button block color="primary" [disabled]="peopleWithEmail.length == 0" (click)="invite($event)">Send Invite via Email</button>
 </ion-content>
