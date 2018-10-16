@@ -84,6 +84,31 @@ export class BulkChangeRolePage extends BasePrivatePage {
       });
   }
 
+  private save() {
+    this.logger.info(this, "save");
+
+    if (this.people.find(person => {
+      return person.id === this.user.id;
+    })) {
+      let buttons = [
+        {
+          text: 'Continue',
+          handler: this.changeRole.bind(this)
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            this.logger.info(this, "save", "Cancelled");
+          }
+        }
+      ];
+      this.showConfirm("Change Role", "This operation will change your role.", buttons);
+    } else {
+      this.changeRole();
+    }
+  }
+
   private changeRole() {
     this.logger.info(this, "changeRole");
 
