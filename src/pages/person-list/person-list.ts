@@ -321,7 +321,7 @@ export class PersonListPage extends BasePrivatePage {
   }
 
   private onPersonSelected(person, $event) {
-    this.logger.info(this, "onPersonSelected", person.selected);
+    // this.logger.info(this, "onPersonSelected", person);
 
     if (!person.selected) {
       this.selectedPeople = this.selectedPeople.filter(selectedPerson => {

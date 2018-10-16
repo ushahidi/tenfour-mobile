@@ -1,5 +1,5 @@
 
-<ion-item color="white" detail-push tappable (click)="onRowClicked($event)">
+<ion-item [color]="person.selected ? 'primary' : 'white'" detail-push tappable (click)="onRowClicked($event)">
   <person-avatar item-left [initials]="person.initials" [image]="person.profile_picture" [large]="false"></person-avatar>
   <ion-label>
     <h2>{{person.name}}
