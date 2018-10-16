@@ -360,6 +360,7 @@ export class PersonListPage extends BasePrivatePage {
     if (this.selectAll) {
       this.organization.people.forEach(person => {
         person.selected = true;
+        this.selectedPeople.push(person);
       });
     } else {
       this.organization.people.forEach(person => {
