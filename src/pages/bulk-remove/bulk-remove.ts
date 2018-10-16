@@ -99,7 +99,14 @@ export class BulkRemovePage extends BasePrivatePage {
         }
       }
     ];
-    this.showConfirm("Remove People", "Are you sure you want to remove this people?", buttons);
+
+    if (this.people.find(person => {
+      return person.id === this.user.id;
+    })) {
+      this.showConfirm("Remove People", "Warning: This operation will also remove your account", buttons);
+    } else {
+      this.showConfirm("Remove People", "Are you sure you want to remove these people?", buttons);
+    }
   }
 
   private remove() {
