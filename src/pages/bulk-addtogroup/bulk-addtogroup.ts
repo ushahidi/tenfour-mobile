@@ -129,7 +129,11 @@ export class BulkAddToGroupPage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Added ' + this.people.length + ' people to ' + promises.length + ' groups');  
+          this.showToast('Added ' +
+            this.people.length + ' ' +
+            (this.people.length==1?'person':'people') +
+            ' to ' + promises.length + ' ' +
+            (promises.length==1?'group':'groups'));
         }
     },(error:any) => {
       loading.dismiss();

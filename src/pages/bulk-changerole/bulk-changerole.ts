@@ -136,7 +136,7 @@ export class BulkChangeRolePage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Updated the role of ' + this.people.length + ' people');
+          this.showToast('Updated the role of ' + this.people.length + ' ' + (this.people.length==1?'person':'people'));
         }
     },(error:any) => {
       loading.dismiss();

@@ -133,7 +133,9 @@ export class BulkRemovePage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Removed ' + this.people.length + ' people from the organization');
+          this.showToast('Removed ' + this.people.length + ' ' +
+            (this.people.length==1?'person':'people') +
+            ' from the organization');
         }
     },(error:any) => {
       loading.dismiss();

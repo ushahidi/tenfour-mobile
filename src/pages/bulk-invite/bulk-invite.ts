@@ -114,7 +114,9 @@ export class BulkInvitePage extends BasePrivatePage {
         this.hideModal();
 
         if (promises.length) {
-          this.showToast('Invited ' + promises.length + ' people to the organization');
+          this.showToast('Invited ' + promises.length + ' ' +
+          (promises.length==1?'person':'people') +
+          ' to the organization');
         }
     },(error:any) => {
       loading.dismiss();
