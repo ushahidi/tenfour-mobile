@@ -25,7 +25,7 @@
        Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
       </button>
       <button ion-button icon-only clear>
-       <ion-checkbox [(ngModel)]="selectAll" (ionChange)="onChangeSelectAll($event)"></ion-checkbox>
+       <ion-checkbox [class.indeterminate]=selectAllIndeterminate [(ngModel)]="selectAll" (ionChange)="onChangeSelectAll($event)"></ion-checkbox>
       </button>
      </ion-col>
     </ion-row>
