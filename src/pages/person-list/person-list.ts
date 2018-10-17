@@ -354,6 +354,16 @@ export class PersonListPage extends BasePrivatePage {
     });
   }
 
+  get selectAllIndeterminate() {
+    if (this.selectedPeople.length === 0) {
+      return false;
+    } else {
+      return !!this.organization.people.find(person => {
+        return !person.selected;
+      });
+    }
+  }
+
   private onChangeSelectAll($event) {
     this.logger.info(this, "onChangeSelectAll", this.selectAll);
 
