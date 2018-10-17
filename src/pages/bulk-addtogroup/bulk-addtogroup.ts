@@ -44,10 +44,6 @@ export class BulkAddToGroupPage extends BasePrivatePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
-  }
-
   ionViewWillEnter() {
     super.ionViewWillEnter();
     let loading = this.showLoading("Loading...");
@@ -60,10 +56,6 @@ export class BulkAddToGroupPage extends BasePrivatePage {
     super.ionViewDidEnter();
 
     this.people = this.navParams.get('people');
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
   }
 
   private loadUpdates(cache:boolean=true, event:any=null) {

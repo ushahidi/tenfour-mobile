@@ -41,46 +41,10 @@ export class BulkRemovePage extends BasePrivatePage {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
-  ionViewDidLoad() {
-    super.ionViewDidLoad();
-  }
-
-  ionViewWillEnter() {
-    super.ionViewWillEnter();
-    let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((loaded:any) => {
-      loading.dismiss();
-    });
-  }
-
   ionViewDidEnter() {
     super.ionViewDidEnter();
 
     this.people = this.navParams.get('people');
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
-  }
-
-  private loadUpdates(cache:boolean=true, event:any=null) {
-    this.loading = true;
-    return Promise.resolve()
-      .then(() => {
-        this.logger.info(this, "loadUpdates", "Loaded");
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-      })
-      .catch((error:any) => {
-        this.logger.error(this, "loadUpdates", "Failed", error);
-        if (event) {
-          event.complete();
-        }
-        this.loading = false;
-        this.showToast(error);
-      });
   }
 
   private confirm() {
