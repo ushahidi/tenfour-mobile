@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" *ngIf="modal == true" (click)="hideModal($event)">Close</button>
+    </ion-buttons>
+    <ion-title>Change Role</ion-title>
+    <ion-buttons right>
+      <button ion-button (click)="save($event)">
+        Save
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content padding>
+  <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+  <multi-avatar *ngIf="!loading && people" [people]="people"></multi-avatar>
+  <ion-list>
+    <ion-item class="roles" color="white">
+      <ion-icon ios="ios-key-outline" md="md-key" item-left></ion-icon>
+      <ion-label no-padding no-margin icon-only text-left color="grey">Roles</ion-label>
+      <ion-select item-right interface="action-sheet" multiple="false" [(ngModel)]="role">
+        <ion-option value="multiple">Multiple</ion-option>
+        <ion-option value="admin">Administrator</ion-option>
+        <ion-option value="author">Author</ion-option>
+        <ion-option value="viewer">Viewer</ion-option>
+        <ion-option value="responder">Reply Only</ion-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+</ion-content>
