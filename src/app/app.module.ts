@@ -104,6 +104,11 @@ import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module'
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
+import { BulkAddToGroupModule } from '../pages/bulk-addtogroup/bulk-addtogroup.module';
+import { BulkChangeRoleModule } from '../pages/bulk-changerole/bulk-changerole.module';
+import { BulkInviteModule } from '../pages/bulk-invite/bulk-invite.module';
+import { BulkRemoveModule } from '../pages/bulk-remove/bulk-remove.module';
+
 import { DateTimeModule } from '../pipes/date-time/date-time.module';
 import { TimeAgoModule } from '../pipes/time-ago/time-ago.module';
 import { TitleizeModule } from '../pipes/titleize/titleize.module';
@@ -116,6 +121,7 @@ import { GroupByModule } from '../pipes/group-by/group-by.module';
 import { SendViaModule } from '../components/send-via/send-via.module';
 import { ColorPickerModule } from '../components/color-picker/color-picker.module';
 import { PersonAvatarModule } from '../components/person-avatar/person-avatar.module';
+import { MultiAvatarModule } from '../components/multi-avatar/multi-avatar.module';
 import { CheckinCardModule } from '../components/checkin-card/checkin-card.module';
 import { CheckinDetailModule } from '../components/checkin-details/checkin-details.module';
 import { PersonRowModule } from '../components/person-row/person-row.module';
@@ -125,6 +131,7 @@ import { CheckinRespondComponentModule } from '../components/checkin-respond/che
 import { OrganizationLogoModule } from '../components/organization-logo/organization-logo.module';
 import { CheckinBadgesModule } from '../components/checkin-badges/checkin-badges.module';
 import { CheckinPopoverModule } from '../components/checkin-popover/checkin-popover.module';
+import { BulkActionsModule } from '../components/bulk-actions/bulk-actions.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -163,6 +170,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     ReactiveFormsModule,
     SplashScreenModule,
     PersonAvatarModule,
+    MultiAvatarModule,
     OrganizationLogoModule,
     ColorPickerModule,
     SendViaModule,
@@ -222,6 +230,10 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SettingsSizesModule,
     SettingsRegionsModule,
     UnsubscribePageModule,
+    BulkAddToGroupModule,
+    BulkChangeRoleModule,
+    BulkInviteModule,
+    BulkRemoveModule,
     DateTimeModule,
     DateTimeModule,
     TimeAgoModule,

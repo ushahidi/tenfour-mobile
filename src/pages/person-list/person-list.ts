@@ -1,5 +1,5 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, Modal } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController, Modal } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
@@ -7,6 +7,7 @@ import { PersonEditPage } from '../../pages/person-edit/person-edit';
 import { PersonInvitePage } from '../../pages/person-invite/person-invite';
 import { PersonImportPage } from '../../pages/person-import/person-import';
 import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
+import { BulkActionsComponent } from '../../components/bulk-actions/bulk-actions';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -32,6 +33,9 @@ export class PersonListPage extends BasePrivatePage {
   loading:boolean = false;
   limit:number = 20;
   offset:number = 0;
+  filter:String = '';
+  selectedPeople:Person[] = [];
+  selectAll:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -44,6 +48,7 @@ export class PersonListPage extends BasePrivatePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected popoverController:PopoverController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -99,10 +104,13 @@ export class PersonListPage extends BasePrivatePage {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       this.promiseFallback(cache,
-        this.storage.getPeople(this.organization, null, this.limit, this.offset),
-        this.api.getPeople(this.organization, this.limit, this.offset), 2).then((people:Person[]) => {
+        this.storage.getPeople(this.organization, null, this.limit, this.offset, this.filter),
+        this.api.getPeople(this.organization, this.limit, this.offset, this.filter), 2).then((people:Person[]) => {
           this.storage.savePeople(this.organization, people).then((saved:boolean) => {
             this.organization.people = people;
+            this.organization.people.forEach(person => {
+              person.selected = !!this.selectedPeople.find(selectedPerson => { return selectedPerson.id === person.id; });
+            });
             resolve(people);
           });
         },
@@ -307,4 +315,58 @@ export class PersonListPage extends BasePrivatePage {
     });
   }
 
+  private onFilter($event) {
+    this.logger.info(this, "onFilter", this.filter);
+    this.loadUpdates(false);
+  }
+
+  private onPersonSelected(person, $event) {
+    // this.logger.info(this, "onPersonSelected", person);
+
+    if (!person.selected) {
+      this.selectedPeople = this.selectedPeople.filter(selectedPerson => {
+        return selectedPerson.id !== person.id;
+      });
+    } else {
+      if (!this.selectedPeople.find(selectedPerson => {
+        return selectedPerson.id === person.id;
+      })) {
+        this.selectedPeople.push(person);
+      }
+    }
+  }
+
+  private showActionsPopover($event) {
+    this.logger.info(this, 'showActionsPopover');
+
+    let popover = this.popoverController.create(BulkActionsComponent, {
+      organization: this.organization,
+      people: this.selectedPeople
+    });
+
+    popover.onDidDismiss(data => {
+      this.logger.info(this, 'showActionsPopover', 'onDidDismiss');
+      this.loadUpdates();
+    });
+
+    popover.present({
+      ev: $event
+    });
+  }
+
+  private onChangeSelectAll($event) {
+    this.logger.info(this, "onChangeSelectAll", this.selectAll);
+
+    if (this.selectAll) {
+      this.organization.people.forEach(person => {
+        person.selected = true;
+        this.selectedPeople.push(person);
+      });
+    } else {
+      this.organization.people.forEach(person => {
+        person.selected = false;
+      })
+      this.selectedPeople.length = 0;
+    }
+  }
 }

@@ -263,7 +263,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
       message.push(`No Response - ${pending.join(", ")}`);
     }
     let image = this.checkin.user_picture;
-    let website = `https://${this.organization.subdomain}.tenfour.org/checkins/${this.checkin.id}`;
+    let website = `https://${this.organization.subdomain}.tenfour.org/#checkins/${this.checkin.id}`;
     this.logger.info(this, "shareCheckin", subject, message.join(" "), image, website);
     this.showShare(subject, message.join(" "), image, website);
   }
