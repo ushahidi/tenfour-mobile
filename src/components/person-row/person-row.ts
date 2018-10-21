@@ -15,7 +15,7 @@ export class PersonRowComponent {
   user:Person;
 
   @Input()
-  selected:boolean = false;
+  selectable:boolean = false;
 
   @Output()
   rowSelected = new EventEmitter();
@@ -23,8 +23,10 @@ export class PersonRowComponent {
   @Output()
   removeSelected = new EventEmitter();
 
-  hasRowSelected:boolean = false;
+  @Output()
+  rowClicked = new EventEmitter();
 
+  hasRowSelected:boolean = false;
   hasRemoveSelected:boolean = false;
 
   dots:string =  "assets/images/logo-dots.png";
@@ -41,8 +43,17 @@ export class PersonRowComponent {
     this.rowSelected.emit();
   }
 
+  get isSelectable() {
+    return !this.person.isExternal() && this.selectable;
+  }
+
   onRemoveSelected(event:any) {
     this.removeSelected.emit();
+  }
+
+  onRowClicked(event:any) {
+    console.log('onRowClicked');
+    this.rowClicked.emit();
   }
 
 }
