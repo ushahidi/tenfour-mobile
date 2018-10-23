@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <button ion-button icon-only menuToggle color="cancel">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title *ngIf="user && person">Welcome to TenFour {{person.name}} </ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
+          *ngIf="(user.isOwnerOrAdmin() && user.config_people_invited == false) || user.config_profile_reviewed == false || user.config_self_test_sent == false">Skip</button>
+  <img src="assets/images/check-in-zero.png"/>
+  <h2>What is a Check-in?</h2>
+  <p>'Check-in' is what we call our messages in TenFour.<br>Sending a test check-in to yourself means you can see what a check-in will look like.</p>
+  <div padding-left padding-right padding-bottom>
+    <button ion-button color="primary" (click)="taskSendCheckin($event)"
+      *ngIf="(user.isOwnerOrAdmin() == false || user.config_people_invited == true) && user.config_profile_reviewed == true && user.config_self_test_sent == true">Send My First Test Check In</button>
+  </div>
+</ion-content>

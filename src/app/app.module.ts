@@ -101,6 +101,7 @@ import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.modu
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
 import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module';
+import { SettingsTutorialPageModule } from '../pages/settings-tutorial/settings-tutorial.module';
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
