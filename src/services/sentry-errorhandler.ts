@@ -6,7 +6,21 @@ Raven
     .config(ENVIRONMENT.sentryDSN,
             {
             release: ENVIRONMENT.release,
+            environment: ENVIRONMENT.environmentName,
             dataCallback: data => {
+                if (data.message) {
+                    data.message = data.message.replace(/"Authorization":"(.*?)"/, '"Authorization":"****"');
+                    data.message = data.message.replace(/"client_secret":"(.*?)"/, '"client_secret":"****"');
+                    data.message = data.message.replace(/"password":"(.*?)"/, '"password":"****"');
+                    data.message = data.message.replace(/"accessToken":"(.*?)"/, '"accessToken":"****"');
+                }
+
+                if (data.fingerprint && data.fingerprint[0]) {
+                    data.fingerprint[0] = data.fingerprint[0].replace(/"Authorization":"(.*?)"/, '"Authorization":"****"');
+                    data.fingerprint[0] = data.fingerprint[0].replace(/"client_secret":"(.*?)"/, '"client_secret":"****"');
+                    data.fingerprint[0] = data.fingerprint[0].replace(/"password":"(.*?)"/, '"password":"****"');
+                    data.fingerprint[0] = data.fingerprint[0].replace(/"accessToken":"(.*?)"/, '"accessToken":"****"');
+                }
 
                 if (data.culprit) {
                     data.culprit = data.culprit.substring(data.culprit.lastIndexOf('/'));
