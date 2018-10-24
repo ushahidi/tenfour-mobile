@@ -11,4 +11,5 @@ export interface IEnvironment {
   firebaseApiKey:string;
   firebaseSenderId:string;
   sentryDSN:string;
+  release?:string;
 }
