@@ -298,4 +298,12 @@ export class PersonDetailsPage extends BasePrivatePage {
 
     return this.person.isMe() || this.user.isOwner() || this.user.isAdmin();
   }
+
+  private skipAhead(event:any) {
+    this.logger.info(this, "skipAhead");
+    this.showRootPage(PersonDetailsPage, {
+      organization: this.organization,
+      user: this.user
+    });
+  }
 }

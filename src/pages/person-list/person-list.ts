@@ -379,4 +379,12 @@ export class PersonListPage extends BasePrivatePage {
       this.selectedPeople.length = 0;
     }
   }
+
+  private skipAhead(event:any) {
+    this.logger.info(this, "skipAhead");
+    this.showRootPage(PersonListPage, {
+      organization: this.organization,
+      user: this.user
+    });
+  }
 }

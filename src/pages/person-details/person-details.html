@@ -17,6 +17,19 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <!-- profile zero state-->
+  <ion-list *ngIf="person && user">
+    <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
+            *ngIf="(user.config_profile_reviewed == false)">Skip</button>
+    <img src="assets/images/profile-zero.png"/>
+    <h2>Update Your Profile</h2>
+    <p>'Keeping contact details up to date is important to help you reach your people when you need it most.</p>
+    <div padding-left padding-right padding-bottom>
+      <button ion-button color="primary" (click)="editPerson($event)"
+        *ngIf="(user.config_profile_reviewed == true)">Update My Profile</button>
+    </div>
+  </ion-list>
+  <!--end of zero state-->
   <ion-list *ngIf="person">
     <ion-item color="white" class="profile" text-center text-wrap>
       <person-avatar item-center [initials]="person.initials" [image]="person.profile_picture" [large]="true"></person-avatar>

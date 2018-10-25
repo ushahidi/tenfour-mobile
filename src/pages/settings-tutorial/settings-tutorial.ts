@@ -2,8 +2,8 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
-import { CheckinTestModule } from '../../pages/checkin-test/checkin-test.module';
-import { CheckinListModule } from '../../pages/checkin-list/checkin-list.module';
+import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';

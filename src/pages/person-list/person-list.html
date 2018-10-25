@@ -37,6 +37,17 @@
   </ion-refresher>
   <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.people == null || organization.people.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
+    <!--add zero state-->
+    <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
+            *ngIf="(user.isOwnerOrAdmin() && user.config_people_invited == false)">Skip</button>
+    <img src="assets/images/add-people-zero.png"/>
+    <h2>Adding People</h2>
+    <p>'You'll need a persons email address or phone number. You can also import a spreadsheet.</p>
+    <div padding-left padding-right padding-bottom>
+      <button ion-button color="primary" (click)="addPerson($event)"
+        *ngIf="(user.isOwnerOrAdmin() == false || user.config_people_invited == true)">Add People To TenFour</button>
+    </div>
+    <!--end of zero state-->
   </div>
   <ion-list *ngIf="organization && organization.people">
     <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
