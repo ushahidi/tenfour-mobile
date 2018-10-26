@@ -1,7 +1,6 @@
 import { IEnvironment } from './environment.interface';
 
 export const Environment:IEnvironment = {
-  release: 'v1.0.0-cycle.8',
   environmentName: 'Production Environment',
   appDomain: 'app.tenfour.org',
   apiEndpoint: 'https://api.tenfour.org',

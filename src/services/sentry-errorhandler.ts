@@ -5,7 +5,7 @@ import { Environment as ENVIRONMENT } from "@app/env";
 Raven
     .config(ENVIRONMENT.sentryDSN,
             {
-            release: ENVIRONMENT.release,
+            release: require('../version').version,
             environment: ENVIRONMENT.environmentName,
             dataCallback: data => {
                 if (data.message) {
