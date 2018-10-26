@@ -159,6 +159,8 @@ import { EnvironmentProvider } from '../providers/environment/environment';
 import { IntercomProvider } from '../providers/intercom/intercom';
 import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
 
+import { SentryErrorHandler } from '../services/sentry-errorhandler';
+
 @NgModule({
   declarations: [
     TenFourApp
@@ -316,7 +318,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     { provide: BadgeProvider, useClass: BadgeProvider },
     { provide: EnvironmentProvider, useClass: EnvironmentProvider },
     { provide: IntercomProvider, useClass: IntercomProvider },
-    { provide: ErrorHandler, useClass: IonicErrorHandler },
+    { provide: ErrorHandler, useClass: SentryErrorHandler },
     { provide: ThumbnailProvider, useClass: ThumbnailProvider },
   ]
 })

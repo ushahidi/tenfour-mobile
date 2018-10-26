@@ -62,4 +62,8 @@ export class EnvironmentProvider {
     return this.environment.firebaseSenderId;
   }
 
+  public getSentryDSN():string {
+    return this.environment.sentryDSN;
+  }
+
 }
