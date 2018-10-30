@@ -10,15 +10,33 @@
   <ion-grid>
     <ion-row>
       <ion-col col-12 col-sm>
-        <h2 [class.activated]="organization && organization.hasFreePlan()">Free</h2>
-        <ion-card [class.activated]="organization && organization.hasFreePlan()">
-          <ion-card-header>Free!</ion-card-header>
+        <h2 class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">Extra SMS Credits</h2>
+          <ion-card class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">
+          <ion-card-header>
+            {{this.CREDIT_BUNDLE_RATE | currency}} USD per credit <span *ngIf="addCreditsRecurring">per month</span>
+          </ion-card-header>
           <ion-card-content>
             <ion-list class="features">
-              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
+              <!-- <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item> -->
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
             </ion-list>
-            <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
-            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="switchToFree($event)">Switch to TenFour free</button>
+            <div *ngIf="organization && organization.hasProPlan()">
+              <p>Add credits</p>
+              <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
+              <ion-item text-wrap color="white">
+                <ion-label>Add extra credits immediately</ion-label>
+                <ion-checkbox [(ngModel)]="addCreditsImmediately"></ion-checkbox>
+              </ion-item>
+              <ion-item text-wrap color="white">
+                <ion-label>Make this a recurring payment</ion-label>
+                <ion-checkbox [(ngModel)]="addCreditsRecurring"></ion-checkbox>
+              </ion-item>
+              <p *ngIf="updatedCreditsCost">Cost: {{updatedCreditsCost | currency}} <span *ngIf="addCreditsRecurring">per month</span></p>
+            </div>
+            <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
+            <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>
           </ion-card-content>
         </ion-card>
       </ion-col>
@@ -54,33 +72,15 @@
         </ion-card>
       </ion-col>
       <ion-col col-12 col-sm>
-        <h2 class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">Extra SMS Credits</h2>
-          <ion-card class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">
-          <ion-card-header>
-            {{this.CREDIT_BUNDLE_RATE | currency}} USD per credit <span *ngIf="addCreditsRecurring">per month</span>
-          </ion-card-header>
+        <h2 [class.activated]="organization && organization.hasFreePlan()">Free</h2>
+        <ion-card [class.activated]="organization && organization.hasFreePlan()">
+          <ion-card-header>Free!</ion-card-header>
           <ion-card-content>
             <ion-list class="features">
-              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>1 credit = 1 text message in the United States</ion-item>
-              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>International credits vary</ion-item>
-              <!-- <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Renewed every month</ion-item> -->
-              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Ensure you always have enough credits to reach your team in an emergency</ion-item>
+              <ion-item text-wrap><ion-icon name="checkmark-circle" item-start></ion-icon>Unlimited in-app check-ins</ion-item>
             </ion-list>
-            <div *ngIf="organization && organization.hasProPlan()">
-              <p>Add credits</p>
-              <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="50" (keyup)="onCreditsChange($event)" (change)="onCreditsChange($event)" [(ngModel)]="updatedCredits"></ion-input>
-              <ion-item text-wrap color="white">
-                <ion-label>Add extra credits immediately</ion-label>
-                <ion-checkbox [(ngModel)]="addCreditsImmediately"></ion-checkbox>
-              </ion-item>
-              <ion-item text-wrap color="white">
-                <ion-label>Make this a recurring payment</ion-label>
-                <ion-checkbox [(ngModel)]="addCreditsRecurring"></ion-checkbox>
-              </ion-item>
-              <p *ngIf="updatedCreditsCost">Cost: {{updatedCreditsCost | currency}} <span *ngIf="addCreditsRecurring">per month</span></p>
-            </div>
-            <button ion-button block disabled color="primary" *ngIf="organization && !organization.hasProPlan()">TenFour Pro Only</button>
-            <button ion-button block color="primary" *ngIf="organization && organization.hasProPlan()" (click)="addCredits($event)">Add SMS Credits</button>
+            <button ion-button icon-left outline block disabled color="primary" *ngIf="organization && organization.hasFreePlan()"><ion-icon name="checkmark"></ion-icon> You are on free plan</button>
+            <button ion-button block color="primary" *ngIf="organization && !organization.hasFreePlan()" (click)="switchToFree($event)">Switch to TenFour free</button>
           </ion-card-content>
         </ion-card>
       </ion-col>
