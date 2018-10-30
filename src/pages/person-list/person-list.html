@@ -47,6 +47,12 @@
         *ngFor="let person of item.values"></person-row>
     </div>
   </ion-list>
+  <ion-list *ngIf="organization && (!organization.people || !organization.people.length) && !loading">
+    <ion-item class="empty" no-lines text-wrap margin-top>
+      <h2 text-center padding-top margin-top>No people found...</h2>
+    </ion-item>
+  </ion-list>
+
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
