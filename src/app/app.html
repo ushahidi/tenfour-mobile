@@ -43,7 +43,7 @@
         <button ion-button block clear color="primary" (click)="userLogout($event)">Log out</button>
       </p>
       <p text-center *ngIf="environmentName && apiEndpoint">
-        <button ion-button block clear color="primary" (click)="showAlert(environmentName, apiEndpoint)">***{{environmentName}}***</button>
+        <button ion-button block clear color="primary" (click)="showAlert(environmentName + ' ' + version, apiEndpoint)">***{{environmentName}}***</button>
       </p>
     </ion-content>
     <ion-content *ngIf="user == null">

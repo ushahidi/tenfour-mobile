@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" *ngIf="modal == true" (click)="hideModal($event)">Close</button>
+    </ion-buttons>
+    <ion-title>Add to Group</ion-title>
+    <ion-buttons right>
+      <button ion-button (click)="addPeopleToGroups($event)">
+        Save
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content padding>
+  <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+  <multi-avatar *ngIf="!loading && people" [people]="people"></multi-avatar>
+  <ion-list *ngIf="organization && organization.groups">
+    <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
+      <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
+    </ion-item>
+    <ion-list *ngIf="organization && organization.groups">
+      <group-row [group]="group" [user]="user" [selectable]=true
+                 *ngFor="let group of organization.groups"></group-row>
+    </ion-list>
+  </ion-list>
+</ion-content>

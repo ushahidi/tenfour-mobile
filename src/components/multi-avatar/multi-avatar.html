@@ -1,0 +1,14 @@
+<div class="person-avatar-container">
+  <person-avatar
+    *ngFor="let person of people.slice(0, maxAvatars)"
+    [initials]="person.initials"
+    [image]="person.profile_picture"
+    [large]="true"></person-avatar>
+  <div
+    *ngIf="people.length > maxAvatars && people.length < 1000"
+    class="additional-people-circle">
+    +{{people.length - maxAvatars}}
+  </div>
+</div>
+
+<h2>{{people.length}} Selected</h2>

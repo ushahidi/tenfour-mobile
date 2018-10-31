@@ -103,6 +103,7 @@ export class TenFourApp {
 
   environmentName:string = null;
   apiEndpoint:string = null;
+  version:string = null;
 
   checkinsWaitingNumber:number = null;
   unreadNotificationsNumber:number = null;
@@ -208,6 +209,7 @@ export class TenFourApp {
 
   private loadEnvironment():Promise<boolean> {
     return new Promise((resolve, reject) => {
+      this.version = require('../version').version;
       if (this.environment.isProduction() == false) {
         this.environmentName = this.environment.getEnvironmentName();
         this.apiEndpoint = this.environment.getApiEndpoint();

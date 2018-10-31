@@ -387,7 +387,7 @@ export class StorageProvider {
     });
   }
 
-  public getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null):Promise<Person[]> {
+  public getPeople(organization:Organization, ids:number[]=null, limit:number=null, offset:number=null, filter:String=null):Promise<Person[]> {
     return new Promise((resolve, reject) => {
       let where = { };
       if (organization) {
@@ -395,6 +395,9 @@ export class StorageProvider {
       }
       if (ids) {
         where["id"] = ids;
+      }
+      if (filter) {
+        where["name"] = '%' + filter + '%';
       }
       let order = { name: "ASC" };
       this.provider.getModels<Person>(new Person(), where, order, limit, offset).then((people:Person[]) => {

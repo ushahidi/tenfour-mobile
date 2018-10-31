@@ -482,6 +482,9 @@ export class HttpProvider {
         else if (message.toString().indexOf("Timeout") != -1) {
           return "The request has timed out";
         }
+        else if (message.toString().substring(0,1) !== "[" && message.toString().substring(0,1) !== "{") {
+          return message.toString();
+        }
         else {
           let json = JSON.parse(message);
           if (json['errors']) {
