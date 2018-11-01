@@ -5,7 +5,7 @@
     </button>
     <ion-title>People</ion-title>
     <ion-buttons right *ngIf="user">
-      <button ion-button icon-start [solid]="website == true ? 'true' : null" color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="addPeople($event)">
+      <button ion-button icon-start [solid]="website == true ? 'true' : null" color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="addPerson($event)">
         <ion-icon ios="md-add" md="md-add"></ion-icon>
         <span *ngIf="website == true">Add</span>
       </button>
