@@ -112,5 +112,8 @@ export class SignupCheckPage extends BasePublicPage {
     this.logger.info(this, "openMail");
     this.mailer.openEmail();
   }
-
+  
+  private closeModal(event:any) {
+    this.hideModal();
+  }
 }
