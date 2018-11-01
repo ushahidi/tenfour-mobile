@@ -38,7 +38,7 @@ export class FirebaseProvider {
             resolve(false);
           });
         }
-        else {
+        else if ('serviceWorker' in navigator) {
           this.logger.info(this, "initialize");
           navigator.serviceWorker.register('service-worker.js').then((registration) => {
             this.firebaseMessaging.useServiceWorker(registration);
@@ -51,6 +51,10 @@ export class FirebaseProvider {
               resolve(false);
             });
           });
+        }
+        else {
+          this.logger.warn(this, "initialize", "navigator does not support service workers");
+          resolve(false);
         }
       });
     });
