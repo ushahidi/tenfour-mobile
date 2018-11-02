@@ -434,18 +434,10 @@ export class TenFourApp {
         this.storage.getUser().then((user:User) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
-          if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            if (this.hasRootPage() == false) {
-              this.showCheckinList();
-            }
-            resolve(true);
+          if (this.hasRootPage() == false) {
+            this.showCheckinList();
           }
-          else {
-            if (this.hasRootPage() == false) {
-              this.showOnboardList(user);
-            }
-            resolve(true);
-          }
+          resolve(true);
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
@@ -481,16 +473,9 @@ export class TenFourApp {
             this.organization = organization;
             this.storage.getUser().then((user:User) => {
               this.logger.info(this, "loadMobileApp", "User", user);
-              if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-                this.user = user;
-                this.showCheckinList();
-                resolve(true);
-              }
-              else {
-                this.logger.info(this, "loadMobileApp", "User", "None");
-                this.showOnboardList(user);
-                resolve(true);
-              }
+              this.user = user;
+              this.showCheckinList();
+              resolve(true);
             },
             (error:any) => {
               this.logger.info(this, "loadMobileApp", "User", "None");

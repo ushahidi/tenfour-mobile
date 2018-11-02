@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -24,7 +24,7 @@ import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
   selector: 'page-signin-invite',
   templateUrl: 'signin-invite.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ OnboardListPage ]
+  entryComponents:[ CheckinListPage ]
 })
 export class SigninInvitePage extends BasePublicPage {
 
@@ -210,7 +210,7 @@ export class SigninInvitePage extends BasePublicPage {
           else {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
-          this.showRootPage(OnboardListPage, {});
+          this.showRootPage(CheckinListPage, {});
         })
         .catch((error) => {
           this.logger.error(this, "acceptInitation", error);
@@ -240,7 +240,7 @@ export class SigninInvitePage extends BasePublicPage {
     }
     return true;
   }
-  
+
   private closeModal(event:any=null) {
     this.hideModal();
   }
