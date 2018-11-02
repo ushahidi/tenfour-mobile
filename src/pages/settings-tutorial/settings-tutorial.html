@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button icon-only menuToggle *ngIf="modal == false" color="cancel">
+        <ion-icon name="menu"></ion-icon>
+      </button>
+      <button ion-button color="cancel" *ngIf="modal == true" (click)="hideModal($event)">Close</button>
+    </ion-buttons>
+    <ion-title>Setup Tutorial</ion-title>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-segment [(ngModel)]="tutorial">
+    <ion-segment-button value="checkins">Check-Ins</ion-segment-button>
+    <ion-segment-button value="people">People</ion-segment-button>
+    <ion-segment-button value="groups">Groups</ion-segment-button>
+    <ion-segment-button value="profile">Profile</ion-segment-button>
+  </ion-segment>
+  <div class="zero-state" [ngSwitch]="tutorial">
+    <div *ngSwitchCase="'checkins'">
+      <img src="assets/images/zero-check-in.png"/>
+      <h2>What is a Check-In?</h2>
+      <h6>'Check-In' is what we call our messages in TenFour.</h6>
+      <h6 *ngIf="user.config_self_test_sent == false">Sending a test Check-In to yourself means you can see what a Check-In will look like.</h6>
+      <button ion-button color="primary" (click)="testCheckin($event)"
+        *ngIf="user.config_self_test_sent == false">Send A Test Check-In</button>
+      <button ion-button color="primary" (click)="createCheckin($event)"
+        *ngIf="user.config_self_test_sent == true && (user.isOwner() || user.isAdmin() || user.isAuthor())">Send A Check-In</button>
+    </div>
+    <div *ngSwitchCase="'people'">
+      <img src="assets/images/zero-add-people.png"/>
+      <h2>Adding People</h2>
+      <h6>You'll need a person's email address or phone number. You can also import a spreadsheet.</h6>
+      <button ion-button color="primary" (click)="addPerson($event)"
+        *ngIf="user.isOwner() || user.isAdmin()">Add People To TenFour</button>
+    </div>
+    <div *ngSwitchCase="'groups'">
+      <img src="assets/images/zero-add-group.png"/>
+      <h2>Adding Groups</h2>
+      <h6>Easiest way to send Check-Ins to the same group of people.</h6>
+      <button ion-button color="primary" (click)="createGroup($event)"
+        *ngIf="user.isOwner() || user.isAdmin()">Add A Group To TenFour</button>
+    </div>
+    <div *ngSwitchCase="'profile'">
+      <img src="assets/images/zero-edit-profile.png"/>
+      <h2>Update Your Profile</h2>
+      <h6>Keeping contact details up to date is important to help you reach your people when you need it most.</h6>
+      <button ion-button color="primary" (click)="editProfile($event)"
+        *ngIf="user.config_profile_reviewed == true">Update My Profile</button>
+    </div>
+  </div>
+</ion-content>

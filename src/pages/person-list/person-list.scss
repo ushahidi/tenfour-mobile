@@ -3,7 +3,16 @@
 }
 
 page-person-list {
-
+  ion-content {
+    background-color: color($colors, cards) !important;
+  }
+  ion-list {
+    ion-item {
+      &.empty {
+        background-color: color($colors, cards) !important;
+      }
+    }
+  }
   ion-toolbar ion-checkbox.indeterminate {
       $indeterminate: color($colors, primary);
 

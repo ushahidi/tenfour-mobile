@@ -13,8 +13,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-
-  <ion-toolbar>
+  <ion-toolbar *ngIf="loading == true || (loading == false && filter.length > 0) || (loading == false && filter.length == 0 && organization && organization.people && organization.people.length > 0)">
    <ion-grid>
     <ion-row align-items-center justify-content-start>
      <ion-col col-7 col-sm-6 text-left>
@@ -31,14 +30,23 @@
     </ion-row>
    </ion-grid>
   </ion-toolbar>
-
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
   <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.people == null || organization.people.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
+  <div class="zero-state" *ngIf="loading == false && filter == '' && organization && organization.people && organization.people.length == 0">
+    <img src="assets/images/zero-add-people.png"/>
+    <h2>Adding People</h2>
+    <h6>You'll need a person's email address or phone number. You can also import a spreadsheet.</h6>
+    <button ion-button color="primary" (click)="addPerson($event)"
+      *ngIf="(user.isOwnerOrAdmin() == true || user.config_people_invited == false)">Add People To TenFour</button>
+  </div>
   <ion-list *ngIf="organization && organization.people">
+    <ion-item class="empty" no-lines text-wrap margin-top *ngIf="loading == false && filter.length > 0 && organization.people.length == 0">
+      <h2 text-center padding-top margin-top>There are no people with {{filter}}...</h2>
+    </ion-item>
     <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
       <ion-list-header>{{item.key}}</ion-list-header>
       <person-row [person]="person" [user]="user" [selectable]="user && user.isOwnerOrAdmin()"

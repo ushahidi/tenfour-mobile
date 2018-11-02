@@ -379,4 +379,5 @@ export class PersonListPage extends BasePrivatePage {
       this.selectedPeople.length = 0;
     }
   }
+
 }

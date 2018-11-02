@@ -298,4 +298,5 @@ export class PersonDetailsPage extends BasePrivatePage {
 
     return this.person.isMe() || this.user.isOwner() || this.user.isAdmin();
   }
+
 }

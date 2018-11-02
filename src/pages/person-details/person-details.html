@@ -17,6 +17,13 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
+  <!-- <div class="zero-state" *ngIf="profile == true">
+    <img src="assets/images/zero-edit-profile.png"/>
+    <h2>Update Your Profile</h2>
+    <h6>Keeping contact details up to date is important to help you reach your people when you need it most.</h6>
+    <button ion-button color="primary" (click)="editPerson($event)"
+      *ngIf="user.config_profile_reviewed == true">Update My Profile</button>
+  </div> -->
   <ion-list *ngIf="person">
     <ion-item color="white" class="profile" text-center text-wrap>
       <person-avatar item-center [initials]="person.initials" [image]="person.profile_picture" [large]="true"></person-avatar>
