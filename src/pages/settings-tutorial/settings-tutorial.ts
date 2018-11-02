@@ -2,12 +2,15 @@ import { Component, NgZone } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
+import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
-import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
+import { PersonEditPage } from '../../pages/person-edit/person-edit';
+import { GroupEditPage } from '../../pages/group-edit/group-edit';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
+import { Group } from '../../models/group';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -21,12 +24,13 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-tutorial',
   templateUrl: 'settings-tutorial.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ CheckinTestPage, CheckinListPage ]
+  entryComponents:[ CheckinTestPage, CheckinEditPage, PersonEditPage, GroupEditPage ]
 })
 
 export class SettingsTutorialPage extends BasePrivatePage {
 
   loading:boolean = false;
+  tutorial:string = "checkins";
 
   constructor(
       protected zone:NgZone,
@@ -80,7 +84,17 @@ export class SettingsTutorialPage extends BasePrivatePage {
       });
   }
 
-  private taskSendCheckin(event:any) {
+  private createCheckin(event:any) {
+    let modal = this.showModal(CheckinEditPage, {
+      organization: this.organization,
+      user: this.user
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "createCheckin", "Modal", data);
+    });
+  }
+
+  private testCheckin(event:any) {
     this.logger.info(this, "taskSendCheckin");
     let modal = this.showModal(CheckinTestPage, {
       organization: this.organization,
@@ -97,11 +111,39 @@ export class SettingsTutorialPage extends BasePrivatePage {
     });
   }
 
-  private skipAhead(event:any) {
-    this.logger.info(this, "skipAhead");
-    this.showRootPage(CheckinListPage, {
+  private addPerson() {
+    this.logger.info(this, "addPerson");
+    let modal = this.showModal(PersonEditPage, {
       organization: this.organization,
       user: this.user
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "addPerson", "Modal", data);
+    });
+  }
+
+  private createGroup(event:any) {
+    this.logger.info(this, "createGroup");
+    let modal = this.showModal(GroupEditPage, {
+      organization: this.organization,
+      person: this.user
+    });
+    modal.onDidDismiss((data:any) => {
+      this.logger.info(this, "createGroup", data);
+    });
+  }
+
+  protected editProfile(event:any) {
+    this.logger.info(this, "editProfile");
+    let modal = this.showModal(PersonEditPage, {
+      organization: this.organization,
+      user: this.user,
+      person: this.user,
+      person_id: this.user.id,
+      profile: true
+    });
+    modal.onDidDismiss((data:any) => {
+      this.logger.info(this, "editProfile", "Modal", data);
     });
   }
 

@@ -40,8 +40,8 @@
     <ion-item *ngIf="user && user.isOwner() && organization && organization.hasProPlan()" color="white" tappable detail-push (click)="settingsLDAP($event)">
       Active Directory (LDAP)
     </ion-item>
-    <ion-item color="white" tappable detail-push (click)="tutorial($event)">
-      Set-up Tutorial
+    <ion-item color="white" tappable detail-push (click)="settingsTutorial($event)">
+      Setup Tutorial
     </ion-item>
   </ion-list>
 </ion-content>

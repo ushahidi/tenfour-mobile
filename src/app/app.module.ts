@@ -230,6 +230,7 @@ import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
     SettingsLDAPModule,
     SettingsSizesModule,
     SettingsRegionsModule,
+    SettingsTutorialModule,
     UnsubscribePageModule,
     BulkAddToGroupModule,
     BulkChangeRoleModule,
