@@ -12,47 +12,38 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content (swipe)="swipeEvent($event)">
+<ion-content padding (swipe)="swipeEvent($event)">
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <ion-grid>
-    <ion-row>
-      <ion-col>
-        <div padding-top padding-left padding-right *ngIf="loading == false && checkins.length > 0">
-          <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
-            <ion-segment-button value="all">All Check-Ins</ion-segment-button>
-            <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
-          </ion-segment>
-        </div>
-        <div text-center class="spinner" *ngIf="loading == true && checkins.length == 0">
-          <ion-spinner name="ios"></ion-spinner>
-        </div>
-        <div class="zero-state" *ngIf="loading == false && checkins.length == 0">
-          <button ion-button clear color="primary" tappable (click)="skipAhead($event)"
-                  *ngIf="(user.isOwnerOrAdmin() && user.config_people_invited == false) || user.config_profile_reviewed == false || user.config_self_test_sent == false">Skip</button>
-          <img src="assets/images/zero-check-in.png"/>
-          <h2>What is a Check-In?</h2>
-          <h6>'Check-In' is what we call our messages in TenFour.</h6>
-          <h6 *ngIf="user.config_self_test_sent == false">Sending a test Check-In to yourself means you can see what a Check-In will look like.</h6>
-          <button ion-button color="primary" (click)="testCheckin($event)"
-            *ngIf="user.config_self_test_sent == false">Send A Test Check-In</button>
-          <button ion-button color="primary" (click)="createCheckin($event)"
-            *ngIf="user.config_self_test_sent == true && (user.isOwner() || user.isAdmin() || user.isAuthor())">Send A Check-In</button>
-        </div>
-        <ion-list *ngIf="checkins">
-          <ion-item class="empty" no-lines text-wrap margin-top *ngIf="loading == false && checkins.length == 0">
-            <!-- <h2 text-center padding-top margin-top *ngIf="filter == 'all'">There currently are no Check-Ins...</h2> -->
-            <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins awaiting response...</h2>
-          </ion-item>
-          <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
-                        (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)" (resendSelected)="resendCheckin(checkin)"
-                        *ngFor="let checkin of checkins"></checkin-card>
-        </ion-list>
-        <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-          <ion-infinite-scroll-content></ion-infinite-scroll-content>
-        </ion-infinite-scroll>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div padding-left padding-right *ngIf="(filter == 'all' && checkins.length > 0) || filter == 'waiting'">
+    <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
+      <ion-segment-button value="all">All Check-Ins</ion-segment-button>
+      <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
+    </ion-segment>
+  </div>
+  <div text-center class="spinner" *ngIf="loading == true && (checkins == null || checkins.length == 0)">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+  <div class="zero-state" *ngIf="loading == false && filter == 'all' && checkins.length == 0">
+    <img src="assets/images/zero-check-in.png"/>
+    <h2>What is a Check-In?</h2>
+    <h6>'Check-In' is what we call our messages in TenFour.</h6>
+    <h6 *ngIf="user.config_self_test_sent == false">Sending a test Check-In to yourself means you can see what a Check-In will look like.</h6>
+    <button ion-button color="primary" (click)="testCheckin($event)"
+      *ngIf="user.config_self_test_sent == false">Send A Test Check-In</button>
+    <button ion-button color="primary" (click)="createCheckin($event)"
+      *ngIf="user.config_self_test_sent == true && (user.isOwner() || user.isAdmin() || user.isAuthor())">Send A Check-In</button>
+  </div>
+  <ion-list *ngIf="checkins">
+    <ion-item class="empty" no-lines text-wrap margin-top *ngIf="loading == false && checkins.length == 0">
+      <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins awaiting response...</h2>
+    </ion-item>
+    <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
+                  (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)" (resendSelected)="resendCheckin(checkin)"
+                  *ngFor="let checkin of checkins"></checkin-card>
+  </ion-list>
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 </ion-content>
