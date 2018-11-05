@@ -9,7 +9,7 @@
     <ion-title *ngIf="profile == false">Person</ion-title>
     <ion-title *ngIf="profile == true">Profile</ion-title>
     <ion-buttons right *ngIf="user && person">
-      <button tappable ion-button color="primary" *ngIf="canEdit" (click)="editPerson($event)">Edit</button>
+      <button tappable ion-button color="primary" [solid]="website == true ? 'true' : null" *ngIf="canEdit" (click)="editPerson($event)">Edit</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
@@ -17,12 +17,11 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <!-- <div class="zero-state" *ngIf="profile == true">
+  <!-- <div class="zero-state" padding-bottom margin-bottom *ngIf="profile == true && user.config_profile_reviewed == false">
     <img src="assets/images/zero-edit-profile.png"/>
     <h2>Update Your Profile</h2>
     <h6>Keeping contact details up to date is important to help you reach your people when you need it most.</h6>
-    <button ion-button color="primary" (click)="editPerson($event)"
-      *ngIf="user.config_profile_reviewed == true">Update My Profile</button>
+    <button ion-button margin-bottom color="primary" (click)="editPerson($event)">Update My Profile</button>
   </div> -->
   <ion-list *ngIf="person">
     <ion-item color="white" class="profile" text-center text-wrap>

@@ -3,7 +3,6 @@ import { IonicPage, App, TextInput, Platform, NavParams, NavController, ViewCont
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
-import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -26,7 +25,7 @@ import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
   selector: 'page-signin-password',
   templateUrl: 'signin-password.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ CheckinListPage, OnboardListPage ]
+  entryComponents:[ CheckinListPage ]
 })
 export class SigninPasswordPage extends BasePublicPage {
 
@@ -155,32 +154,17 @@ export class SigninPasswordPage extends BasePublicPage {
           else {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
-          if (this.person.config_profile_reviewed && this.person.config_self_test_sent) {
-            this.hideModals().then(() => {
-              this.showRootPage(CheckinListPage, {
-                organization: this.organization,
-                user: this.person
-              },{
-                animate: true,
-                direction: 'forward' }).then(() => {
-                loading.dismiss();
-                this.events.publish(EVENT_USER_AUTHENTICATED);
-              });
+          this.hideModals().then(() => {
+            this.showRootPage(CheckinListPage, {
+              organization: this.organization,
+              user: this.person
+            },{
+              animate: true,
+              direction: 'forward' }).then(() => {
+              loading.dismiss();
+              this.events.publish(EVENT_USER_AUTHENTICATED);
             });
-          }
-          else {
-            this.hideModals().then(() => {
-              this.showRootPage(OnboardListPage, {
-                organization: this.organization,
-                user: this.person
-              },{
-                animate: true,
-                direction: 'forward' }).then(() => {
-                loading.dismiss();
-                this.events.publish(EVENT_USER_AUTHENTICATED);
-              });
-            });
-          }
+          });
         })
         .catch((error:any) => {
           this.logger.error(this, "showNext", error);

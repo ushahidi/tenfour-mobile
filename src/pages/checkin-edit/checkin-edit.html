@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Check-In</ion-title>
     <ion-buttons right>
-      <button ion-button color="primary" (click)="showNext($event)" *ngIf="checkin">Next</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="checkin">Next</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

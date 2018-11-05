@@ -6,8 +6,8 @@
     <ion-title *ngIf="editing == true">Edit Group</ion-title>
     <ion-title *ngIf="editing == false">Add Group</ion-title>
     <ion-buttons right>
-      <button ion-button color="primary" *ngIf="editing == true" (click)="updateGroup($event)">Save</button>
-      <button ion-button color="primary" *ngIf="editing == false" (click)="createGroup($event)">Create</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" *ngIf="editing == true" (click)="updateGroup($event)">Save</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" *ngIf="editing == false" (click)="createGroup($event)">Create</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
