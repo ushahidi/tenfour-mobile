@@ -3,6 +3,7 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupDetailsPage } from '../../pages/signup-details/signup-details';
+import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
@@ -157,8 +158,11 @@ export class SignupVerifyPage extends BasePublicPage  {
     this.hideModal();
   }
 
-  private returnPrevious(event:any=null) {
-    this.closePage();
+  private createOrganization(event:any) {
+    this.logger.info(this, "createOrganization");
+    this.showModal(SignupEmailPage, {}, {
+      enableBackdropDismiss: false
+    });
   }
 
 }
