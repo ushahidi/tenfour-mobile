@@ -48,6 +48,16 @@ export class SignupVerifyPage extends BasePublicPage  {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+
+    if (!this.navParams.get('inModal')) {
+      this.loading=true;
+      return this.modalController.create(SignupVerifyPage, {
+        inModal: true,
+        email: this.getParameter('email'),
+        code: this.getParameter('code')
+      }, {enableBackdropDismiss: false}).present();
+    }
+
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -142,7 +152,7 @@ export class SignupVerifyPage extends BasePublicPage  {
       enableBackdropDismiss: false
     });
   }
-  
+
   private closeModal(event:any=null) {
     this.hideModal();
   }
