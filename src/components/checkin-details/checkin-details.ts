@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter  } from '@angular/core';
 
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
+import { Reply } from '../../models/reply';
 
 @Component({
   selector: 'checkin-details',
@@ -27,6 +28,9 @@ export class CheckinDetailsComponent {
   @Output()
   resendClicked = new EventEmitter();
 
+  @Output()
+  replyClicked = new EventEmitter();
+
   constructor() {
   }
 
@@ -39,6 +43,10 @@ export class CheckinDetailsComponent {
 
   onResendClicked(event:any) {
     this.resendClicked.emit();
+  }
+
+  onReplyClicked(reply:Reply, event:any) {
+    this.replyClicked.emit(reply);
   }
 
 }
