@@ -13,11 +13,11 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-toolbar *ngIf="loading == true || (loading == false && filter.length > 0) || (loading == false && filter.length == 0 && organization && organization.people && organization.people.length > 1)">
+  <ion-toolbar>
    <ion-grid>
     <ion-row align-items-center justify-content-start>
      <ion-col col-7 col-sm-6 text-left>
-      <ion-searchbar start placeholder="Search..." [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
+      <ion-searchbar start placeholder="Search..." [debounce]="250" [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
      </ion-col>
      <ion-col col-5 col-sm-6 text-right *ngIf="user && user.isOwnerOrAdmin()">
       <button ion-button clear (click)="showActionsPopover($event)">
@@ -33,32 +33,29 @@
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.people == null || organization.people.length == 0)">
+  <div text-center class="spinner" *ngIf="loading == true">
     <ion-spinner name="ios"></ion-spinner>
   </div>
-  <div class="zero-state" *ngIf="loading == false && filter == '' && organization && organization.people && organization.people.length <= 1">
+  <div class="zero-state" *ngIf="loading == false && filter.length == 0 && organization && organization.people && organization.people.length <= 1">
     <img src="assets/images/zero-add-people.png"/>
     <h2>Adding People</h2>
     <h6>You'll need a person's email address or phone number. You can also import a spreadsheet.</h6>
     <button ion-button color="primary" (click)="addPerson($event)"
       *ngIf="user.isOwner() || user.isAdmin()">Add People To TenFour</button>
   </div>
-  <ion-list *ngIf="organization && organization.people && organization.people.length > 1">
-    <ion-item class="empty" no-lines text-wrap margin-top *ngIf="loading == false && filter.length > 0 && organization.people.length == 0">
-      <h2 text-center padding-top margin-top>There are no people with {{filter}}...</h2>
+  <ion-list *ngIf="organization && organization.people && loading == false">
+    <ion-item class="empty" no-lines text-wrap margin-top *ngIf="filter.length > 0 && organization.people.length == 0">
+      <h2 text-center padding-top margin-top>There are no people with <i>{{filter}}</i>...</h2>
     </ion-item>
-    <div *ngFor="let item of organization.people | groupBy:'name':firstCharacter:true">
-      <ion-list-header>{{item.key}}</ion-list-header>
-      <person-row [person]="person" [user]="user" [selectable]="user && user.isOwnerOrAdmin()"
-        (rowSelected)="onPersonSelected(person, $event)"
-        (rowClicked)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
-        *ngFor="let person of item.values"></person-row>
+    <div *ngIf="filter.length > 0 || (filter.length == 0 && organization.people.length > 1)">
+      <div *ngFor="let grouping of organization.people | groupBy:'name':firstCharacter:true">
+        <ion-list-header>{{grouping.key}}</ion-list-header>
+        <person-row [person]="person" [user]="user" [selectable]="user && user.isOwnerOrAdmin()"
+          (rowSelected)="onPersonSelected(person, $event)"
+          (rowClicked)="showPerson(person, $event)" (removeSelected)="removePerson(person, $event)"
+          *ngFor="let person of grouping.values"></person-row>
+      </div>
     </div>
-  </ion-list>
-  <ion-list *ngIf="organization && (!organization.people || !organization.people.length) && !loading">
-    <ion-item class="empty" no-lines text-wrap margin-top>
-      <h2 text-center padding-top margin-top>No people found...</h2>
-    </ion-item>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
