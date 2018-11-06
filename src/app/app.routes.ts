@@ -1,7 +1,5 @@
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
-import { OnboardListPage } from '../pages/onboard-list/onboard-list';
-
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
@@ -86,8 +84,6 @@ export class TenFourRoutes {
     { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
     { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
     { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
-
-    { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 
     { component: CheckinListPage, name: 'CheckinListPage', segment: 'checkins' },
     { component: CheckinEditPage, name: 'CheckinEditPage', segment: 'checkins/edit', defaultHistory: ['CheckinListPage'] },

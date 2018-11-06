@@ -17,8 +17,6 @@ import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
-import { OnboardListPage } from '../pages/onboard-list/onboard-list';
-
 import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
@@ -636,20 +634,6 @@ export class TenFourApp {
       (error:any) => {
         this.logger.error(this, "showSignupVerify", error);
       });
-  }
-
-  private showOnboardList(user:User=null) {
-    this.logger.info(this, "showOnboardList");
-    this.nav.setRoot(OnboardListPage, {
-      organization: this.organization,
-      user: user
-    }).then((loaded:any) => {
-      this.logger.info(this, "showOnboardList", "Loaded");
-      this.hideSplashScreen();
-    },
-    (error:any) => {
-      this.logger.error(this, "showOnboardList", error);
-    });
   }
 
   private showCheckinList(event:any=null) {
