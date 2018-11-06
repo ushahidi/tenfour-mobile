@@ -14,13 +14,13 @@
   <ion-list-header *ngIf="answer.replies > 0">
     <h2>{{answer.answer}}</h2>
   </ion-list-header>
-  <checkin-reply [reply]="reply" [answer]="answer" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
+  <checkin-reply [reply]="reply" [answer]="answer" [user]="user" (click)="onReplyClicked(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
 </ion-list>
 <ion-list *ngIf="checkin.otherReplies().length > 0">
   <ion-list-header>
     <h2>Other Response</h2>
   </ion-list-header>
-  <checkin-reply [reply]="reply" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.otherReplies()"></checkin-reply>
+  <checkin-reply [reply]="reply" [user]="user" (click)="onReplyClicked(reply, $event)" *ngFor="let reply of checkin.otherReplies()"></checkin-reply>
 </ion-list>
 <ion-list *ngIf="checkin.recipientsPending().length">
   <ion-list-header>

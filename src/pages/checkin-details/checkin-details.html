@@ -17,5 +17,6 @@
   </ion-refresher>
   <checkin-details [checkin]="checkin" [user]="user"
                    [canRespond]="checkin.canRespond(user)" [canResend]="checkin.canResend(user)"
-                   (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)" *ngIf="checkin && user"></checkin-details>
+                   (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)"
+                   (replyClicked)="editReply($event)" *ngIf="checkin && user"></checkin-details>
 </ion-content>
