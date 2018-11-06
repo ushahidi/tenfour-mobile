@@ -157,7 +157,7 @@ export class GroupEditPage extends BasePrivatePage {
 
   private createGroup(event:any) {
     this.logger.info(this, "createGroup");
-    if (this.group.name.length == 0) {
+    if (!this.group.name || this.group.name.length == 0) {
       this.showAlert("Group Name Required", "Please enter the name of the group.");
     }
     else if (this.group.members.length == 0) {
