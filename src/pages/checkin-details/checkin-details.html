@@ -18,5 +18,5 @@
   <checkin-details [checkin]="checkin" [user]="user"
                    [canRespond]="checkin.canRespond(user)" [canResend]="checkin.canResend(user)"
                    (respondClicked)="respondCheckin($event)" (resendClicked)="resendCheckin($event)"
-                   (replyClicked)="editReply(reply, $event)" *ngIf="checkin && user"></checkin-details>
+                   (replyClicked)="editReply($event)" *ngIf="checkin && user"></checkin-details>
 </ion-content>
