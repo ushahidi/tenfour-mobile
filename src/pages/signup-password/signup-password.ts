@@ -8,6 +8,7 @@ import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Token } from '../../models/token';
+import { Subscription } from '../../models/subscription';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -114,6 +115,26 @@ export class SignupPasswordPage extends BasePublicPage {
     });
   }
 
+  private loadSubscriptions(organization:Organization, person:Person):Promise<Subscription[]> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadSubscriptions");
+      if (person && person.isOwner()) {
+        this.api.getSubscriptions(organization).then((subscriptions:Subscription[]) => {
+          this.logger.info(this, "loadSubscriptions", "Loaded", subscriptions);
+          resolve(subscriptions);
+        },
+        (error:any) => {
+          this.logger.error(this, "loadSubscriptions", "Failed", error);
+          reject(error);
+        });
+      }
+      else {
+        this.logger.info(this, "loadSubscriptions", "Not Owner");
+        resolve([]);
+      }
+    });
+  }
+
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
     if (this.password.value === "") {
@@ -146,7 +167,8 @@ export class SignupPasswordPage extends BasePublicPage {
         .then((organization:Organization) => { this.organization = organization; return this.api.userLogin(organization, organization.email, this.password.value); })
         .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
-        .then((organization:Organization) => { this.organization = organization; return this.saveChanges(this.organization, this.person); })
+        .then((organization:Organization) => { this.organization = organization; return this.loadSubscriptions(this.organization, this.person); })
+        .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
         .then((saved:boolean) => {
           this.logger.info(this, "createOrganization", saved);
           this.updateFirebase(this.organization, this.person);
@@ -205,16 +227,19 @@ export class SignupPasswordPage extends BasePublicPage {
     });
   }
 
-  private saveChanges(organization:Organization, person:Person):Promise<boolean> {
+  private saveChanges(organization:Organization, person:Person, subscriptions:Subscription[]):Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.logger.info(this, "saveChanges");
+      let subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
       organization.user_id = person.id;
       organization.user_name = person.name;
       let saves = [
         this.storage.setUser(person),
         this.storage.setOrganization(organization),
+        this.storage.setSubscription(subscription),
         this.storage.saveOrganization(organization),
-        this.storage.savePerson(organization, person)
+        this.storage.savePerson(organization, person),
+        this.storage.saveSubscription(organization, subscription)
       ];
       Promise.all(saves).then((saved:any) => {
         this.logger.info(this, "saveChanges", "Saved");
