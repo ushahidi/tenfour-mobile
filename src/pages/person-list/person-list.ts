@@ -4,9 +4,6 @@ import { IonicPage, Platform, NavParams, NavController, ViewController, ModalCon
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonDetailsPage } from '../../pages/person-details/person-details';
 import { PersonEditPage } from '../../pages/person-edit/person-edit';
-import { PersonInvitePage } from '../../pages/person-invite/person-invite';
-import { PersonImportPage } from '../../pages/person-import/person-import';
-import { ContactsImportPage } from '../../pages/contacts-import/contacts-import';
 import { BulkActionsComponent } from '../../components/bulk-actions/bulk-actions';
 
 import { Organization } from '../../models/organization';
@@ -24,7 +21,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-person-list',
   templateUrl: 'person-list.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ PersonDetailsPage, PersonEditPage, PersonInvitePage, PersonImportPage ]
+  entryComponents:[ PersonDetailsPage, PersonEditPage ]
 })
 export class PersonListPage extends BasePrivatePage {
 
@@ -140,42 +137,6 @@ export class PersonListPage extends BasePrivatePage {
     });
   }
 
-  private addPeople(event:any) {
-    this.logger.info(this, "addPeople");
-    let buttons = [];
-    buttons.push({
-      text: 'Add Person',
-      handler: () => {
-        this.addPerson();
-      }
-    });
-    buttons.push({
-      text: 'Invite Person',
-      handler: () => {
-        this.invitePerson();
-      }
-    });
-    if (this.mobile) {
-      buttons.push({
-        text: 'Import People',
-        handler: () => {
-          this.importPerson();
-        }
-      });
-    }
-    buttons.push({
-      text: 'Import Contacts',
-      handler: () => {
-        this.importContacts();
-      }
-    });
-    buttons.push({
-      text: 'Cancel',
-      role: 'cancel'
-    });
-    this.showActionSheet(null, buttons);
-  }
-
   private addPerson() {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonEditPage, {
@@ -186,51 +147,11 @@ export class PersonListPage extends BasePrivatePage {
       this.logger.info(this, "addPerson", "Modal", data);
       if (data) {
         let loading = this.showLoading("Loading...");
-        this.loadPeople(true).then((finished:any) => {
+        this.loadPeople(false).then((finished:any) => {
           loading.dismiss();
-          if (data.person) {
-            this.showPerson(this.organization.people.find((p) => { return p.id === data.person.id; }));
+          if (data.person && data.person.name) {
+            this.showToast(`Added ${data.person.name}`);
           }
-        },
-        (error:any) => {
-          loading.dismiss();
-        });
-      }
-    });
-  }
-
-  private invitePerson() {
-    this.logger.info(this, "invitePerson");
-    let modal = this.showModal(PersonInvitePage, {
-      organization: this.organization,
-      user: this.user
-    });
-    modal.onDidDismiss(data => {
-      this.logger.info(this, "invitePerson", "Modal", data);
-      if (data) {
-        let loading = this.showLoading("Loading...");
-        this.loadPeople(true).then((finished:any) => {
-          loading.dismiss();
-        },
-        (error:any) => {
-          loading.dismiss();
-        });
-      }
-    });
-  }
-
-  private importPerson() {
-    this.logger.info(this, "importPerson");
-    let modal = this.showModal(PersonImportPage, {
-      organization: this.organization,
-      user: this.user
-    });
-    modal.onDidDismiss(data => {
-      this.logger.info(this, "importPerson", "Modal", data);
-      if (data) {
-        let loading = this.showLoading("Loading...");
-        this.loadPeople(true).then((finished:any) => {
-          loading.dismiss();
         },
         (error:any) => {
           loading.dismiss();
