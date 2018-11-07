@@ -216,26 +216,6 @@ export class PersonListPage extends BasePrivatePage {
     });
   }
 
-  private importContacts() {
-    this.logger.info(this, "importContacts");
-    let modal = this.showModal(ContactsImportPage, {
-      organization: this.organization,
-      user: this.user
-    });
-    modal.onDidDismiss(data => {
-      this.logger.info(this, "importContacts", "Modal", data);
-      if (data) {
-        let loading = this.showLoading("Loading...");
-        this.loadPeople(true).then((finished:any) => {
-          loading.dismiss();
-        },
-        (error:any) => {
-          loading.dismiss();
-        });
-      }
-    });
-  }
-
   private onFilter($event) {
     this.logger.info(this, "onFilter", this.filter);
     this.loading = true;
