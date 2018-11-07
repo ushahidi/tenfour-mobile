@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons right *ngIf="checkin">
-      <button ion-button color="primary"  (click)="sendCheckin($event)">Send</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="sendCheckin($event)">Send</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

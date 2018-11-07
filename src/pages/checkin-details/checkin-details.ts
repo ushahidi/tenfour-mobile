@@ -200,7 +200,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
    });
   }
 
-  private editReply(reply:Reply, event:any) {
+  private editReply(reply:Reply) {
     this.logger.info(this, "editReply");
     if (reply.user_id == this.user.id) {
       let modal = this.showModal(CheckinRespondPage, {

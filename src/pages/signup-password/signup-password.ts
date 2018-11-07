@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-import { OnboardListPage } from '../../pages/onboard-list/onboard-list';
+import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -24,7 +24,7 @@ import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
   selector: 'page-signup-password',
   templateUrl: 'signup-password.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ OnboardListPage ]
+  entryComponents:[ CheckinListPage ]
 })
 export class SignupPasswordPage extends BasePublicPage {
 
@@ -160,7 +160,7 @@ export class SignupPasswordPage extends BasePublicPage {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
           this.hideModals().then(() => {
-            this.showRootPage(OnboardListPage, {
+            this.showRootPage(CheckinListPage, {
               organization: this.organization,
               user: this.person
             },{

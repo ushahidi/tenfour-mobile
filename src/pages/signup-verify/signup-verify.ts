@@ -1,8 +1,9 @@
 import { Component, NgZone } from '@angular/core';
-import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, Modal, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupDetailsPage } from '../../pages/signup-details/signup-details';
+import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 
 import { Organization } from '../../models/organization';
 import { Email } from '../../models/email';
@@ -28,6 +29,7 @@ export class SignupVerifyPage extends BasePublicPage  {
   code:string = null;
   loading:boolean = false;
   verified:boolean = false;
+  verifyModal:Modal;
 
   constructor(
       protected zone:NgZone,
@@ -48,6 +50,16 @@ export class SignupVerifyPage extends BasePublicPage  {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+
+    if (!this.navParams.get('inModal')) {
+      this.loading=true;
+      this.verifyModal = this.showModal(SignupVerifyPage, {
+        inModal: true,
+        email: this.getParameter('email'),
+        code: this.getParameter('code')
+      }, {enableBackdropDismiss: false});
+    }
+
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -133,6 +145,8 @@ export class SignupVerifyPage extends BasePublicPage  {
   }
 
   private showSignupDetails(event:any=null) {
+    this.logger.info(this, "showSignupDetails");
+    this.dismissVerifyModal();
     let organization = new Organization({
       email: this.email
     });
@@ -142,13 +156,25 @@ export class SignupVerifyPage extends BasePublicPage  {
       enableBackdropDismiss: false
     });
   }
-  
+
   private closeModal(event:any=null) {
     this.hideModal();
   }
 
-  private returnPrevious(event:any=null) {
-    this.closePage();
+  private createOrganization(event:any) {
+    this.logger.info(this, "createOrganization");
+    this.dismissVerifyModal();
+    this.showModal(SignupEmailPage, {}, {
+      enableBackdropDismiss: false
+    });
+  }
+
+  private dismissVerifyModal() {
+    if (this.verifyModal) {
+      this.verifyModal.dismiss();
+    } else {
+      this.hideModal();
+    }
   }
 
 }

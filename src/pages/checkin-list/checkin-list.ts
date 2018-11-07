@@ -5,6 +5,7 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { CheckinEditPage } from '../../pages/checkin-edit/checkin-edit';
 import { CheckinDetailsPage } from '../../pages/checkin-details/checkin-details';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
+import { CheckinTestPage } from '../../pages/checkin-test/checkin-test';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -29,7 +30,7 @@ import {
   selector: 'page-checkin-list',
   templateUrl: 'checkin-list.html',
   providers: [ ApiProvider, StorageProvider, BadgeProvider ],
-  entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage ]
+  entryComponents:[ CheckinEditPage, CheckinDetailsPage, CheckinRespondPage, CheckinTestPage ]
 })
 export class CheckinListPage extends BasePrivatePage {
 
@@ -315,6 +316,23 @@ export class CheckinListPage extends BasePrivatePage {
             this.logger.error(this, "createCheckin", "loadCheckins", error);
           });
         }
+      }
+    });
+  }
+
+  private testCheckin(event:any) {
+    this.logger.info(this, "testCheckin");
+    let modal = this.showModal(CheckinTestPage, {
+      organization: this.organization,
+      user: this.user
+    });
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "testCheckin", "Modal", data);
+      if (data) {
+        this.user.config_self_test_sent = true;
+      }
+      else {
+        this.user.config_self_test_sent = false;
       }
     });
   }

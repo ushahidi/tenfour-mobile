@@ -1,7 +1,5 @@
 import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
-import { OnboardListPage } from '../pages/onboard-list/onboard-list';
-
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
 import { SigninEmailPage } from '../pages/signin-email/signin-email';
@@ -57,6 +55,7 @@ import { SettingsRolesPage } from '../pages/settings-roles/settings-roles';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 import { SettingsChannelsPage } from '../pages/settings-channels/settings-channels';
 import { SettingsLDAPPage } from '../pages/settings-ldap/settings-ldap';
+import { SettingsTutorialPage } from '../pages/settings-tutorial/settings-tutorial';
 
 import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
 
@@ -85,8 +84,6 @@ export class TenFourRoutes {
     { component: SignupPlanPage, name: 'SignupPlanPage', segment: 'signup/plan', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
     { component: SignupPaymentPage, name: 'SignupPaymentPage', segment: 'signup/payment', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
     { component: SignupPasswordPage, name: 'SignupPasswordPage', segment: 'signup/password', defaultHistory: ['SigninUrlPage', 'SignupEmailPage', 'SignupOwnerPage', 'SignupNamePage', 'SignupUrlPage'] },
-
-    { component: OnboardListPage, name: 'OnboardListPage', segment: 'onboarding' },
 
     { component: CheckinListPage, name: 'CheckinListPage', segment: 'checkins' },
     { component: CheckinEditPage, name: 'CheckinEditPage', segment: 'checkins/edit', defaultHistory: ['CheckinListPage'] },
@@ -123,6 +120,7 @@ export class TenFourRoutes {
     { component: SettingsTypesPage, name: 'SettingsTypesPage', segment: 'settings/types', defaultHistory: ['SettingsListPage'] },
     { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
     { component: SettingsLDAPPage, name: 'SettingsLDAPPage', segment: 'settings/ldap', defaultHistory: ['SettingsListPage'] },
+    { component: SettingsTutorialPage, name: 'SettingsTutorialPage', segment: 'settings/tutorial', defaultHistory: ['SettingsListPage'] },
 
     { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' },
   ];

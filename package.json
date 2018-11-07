@@ -22,7 +22,10 @@
   },
   "config": {
     "ionic_copy": "./config/copy.config.js",
-    "ionic_webpack": "./config/webpack.config.js"
+    "ionic_webpack": "./config/webpack.config.js",
+    "ionic_source_map_type": "source-map",
+    "ionic_generate_source_map": true,
+    "ionic_move_source_maps": true
   },
   "dependencies": {
     "@angular/animations": "^5.0.3",
@@ -119,7 +122,7 @@
     "@angular/cli": "^6.0.1",
     "@ionic/app-scripts": "^3.1.11",
     "@types/es6-promise": "^3.3.0",
-    "@types/jasmine": "^2.8.7",
+    "@types/jasmine": "=2.8.9",
     "@types/node": "^8.0.45",
     "angular2-template-loader": "^0.6.2",
     "html-loader": "^0.5.1",
