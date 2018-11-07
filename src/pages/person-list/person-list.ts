@@ -317,17 +317,24 @@ export class PersonListPage extends BasePrivatePage {
 
   private onFilter($event) {
     this.logger.info(this, "onFilter", this.filter);
-    this.loadUpdates(false);
+    this.loading = true;
+    this.loadPeople(false).then((people:Person[]) => {
+      this.loading = false;
+    },
+    (error:any) => {
+      this.loading = false;
+      this.showToast(error);
+    });
   }
 
   private onPersonSelected(person, $event) {
-    // this.logger.info(this, "onPersonSelected", person);
-
+    this.logger.info(this, "onPersonSelected", person);
     if (!person.selected) {
       this.selectedPeople = this.selectedPeople.filter(selectedPerson => {
         return selectedPerson.id !== person.id;
       });
-    } else {
+    }
+    else {
       if (!this.selectedPeople.find(selectedPerson => {
         return selectedPerson.id === person.id;
       })) {
@@ -338,17 +345,14 @@ export class PersonListPage extends BasePrivatePage {
 
   private showActionsPopover($event) {
     this.logger.info(this, 'showActionsPopover');
-
     let popover = this.popoverController.create(BulkActionsComponent, {
       organization: this.organization,
       people: this.selectedPeople
     });
-
     popover.onDidDismiss(data => {
       this.logger.info(this, 'showActionsPopover', 'onDidDismiss');
       this.loadUpdates();
     });
-
     popover.present({
       ev: $event
     });
@@ -357,7 +361,8 @@ export class PersonListPage extends BasePrivatePage {
   get selectAllIndeterminate() {
     if (this.selectedPeople.length === 0) {
       return false;
-    } else {
+    }
+    else {
       return !!this.organization.people.find(person => {
         return !person.selected;
       });
@@ -366,13 +371,13 @@ export class PersonListPage extends BasePrivatePage {
 
   private onChangeSelectAll($event) {
     this.logger.info(this, "onChangeSelectAll", this.selectAll);
-
     if (this.selectAll) {
       this.organization.people.forEach(person => {
         person.selected = true;
         this.selectedPeople.push(person);
       });
-    } else {
+    }
+    else {
       this.organization.people.forEach(person => {
         person.selected = false;
       })
