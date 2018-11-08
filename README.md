@@ -55,13 +55,8 @@ ionic cordova platform rm browser
 #### Add Platforms
 ```
 ionic cordova platform add ios --buildConfig=build.json
-ionic cordova platform add android@6.4.0 --buildConfig=build.json
+ionic cordova platform add android --buildConfig=build.json
 ionic cordova platform add browser
-```
-#### Add Plugins
-```
-cordova plugin rm cordova-plugin-nativestorage
-cordova plugin add cordova-plugin-nativestorage@2.2.2
 ```
 #### Debug iOS
 ```
