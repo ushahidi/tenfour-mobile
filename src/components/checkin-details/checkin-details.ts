@@ -3,12 +3,15 @@ import { Component, Input, Output, EventEmitter  } from '@angular/core';
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
 import { Reply } from '../../models/reply';
+import { Recipient } from '../../models/recipient';
 
 @Component({
   selector: 'checkin-details',
   templateUrl: 'checkin-details.html'
 })
 export class CheckinDetailsComponent {
+
+  filter:String = '';
 
   @Input()
   checkin:Checkin;
@@ -49,4 +52,11 @@ export class CheckinDetailsComponent {
     this.replyClicked.emit(reply);
   }
 
+  private isRecipientFiltered(name:string) {
+    if (!this.filter || this.filter === '') {
+      return false;
+    }
+
+    return name.toLowerCase().indexOf(this.filter.toLowerCase()) == -1;
+  }
 }
