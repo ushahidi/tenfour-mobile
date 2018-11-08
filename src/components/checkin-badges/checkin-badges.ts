@@ -61,7 +61,7 @@ export class CheckinBadgesComponent {
       }
       let zeros = 0;
       let values = 0;
-      let width = 80;
+      let width = 60;
       let responses = 0;
       for (let badge of _badges) {
         if (badge.number == 0) {
