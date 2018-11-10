@@ -62,9 +62,9 @@ ionic cordova platform add browser
 ```
 cordova run ios --list
 ENV=prod ionic cordova run ios --livereload --consolelogs --device --buildConfig=build.json
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 11.4"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 11.4"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 11.3"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
 ```
 #### Debug Android
 ```
