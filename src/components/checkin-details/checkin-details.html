@@ -10,7 +10,7 @@
     <button ion-button text-only item-right clear color="primary" tappable *ngIf="canResend" (click)="onResendClicked($event)">Resend</button>
   </ion-item>
 </ion-list>
-<ion-list *ngIf="checkin.recipients.length > 0">
+<ion-list *ngIf="checkin.recipients.length > ENABLE_FILTER_AFTER_RECIPIENT_COUNT">
   <ion-list-header>
     <ion-searchbar start placeholder="Search..." [debounce]="250" [(ngModel)]="filter"></ion-searchbar>
   </ion-list-header>

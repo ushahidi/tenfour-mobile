@@ -12,6 +12,7 @@ import { Recipient } from '../../models/recipient';
 export class CheckinDetailsComponent {
 
   filter:String = '';
+  ENABLE_FILTER_AFTER_RECIPIENT_COUNT:number = 10;
 
   @Input()
   checkin:Checkin;
@@ -54,6 +55,10 @@ export class CheckinDetailsComponent {
 
   private isRecipientFiltered(name:string) {
     if (!this.filter || this.filter === '') {
+      return false;
+    }
+
+    if (!name) {
       return false;
     }
 
