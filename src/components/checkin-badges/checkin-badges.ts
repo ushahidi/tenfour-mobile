@@ -29,7 +29,6 @@ export class CheckinBadgesComponent {
         for (let answer of this.checkin.answers) {
           if (this.checkin.waiting_count > 0) {
             _badges.push({
-              columns: 1,
               color: answer.color,
               number: answer.replies || 0,
               text: answer.answer,
@@ -38,7 +37,6 @@ export class CheckinBadgesComponent {
           }
           else if (answer.replies > 0) {
             _badges.push({
-              columns: 1,
               color: answer.color,
               number: answer.replies || 0,
               text: answer.answer,
@@ -49,7 +47,6 @@ export class CheckinBadgesComponent {
       }
       if (this.checkin.otherReplies().length > 0) {
         _badges.push({
-          columns: 1,
           text: this.RESPONSE_OTHER,
           color: this.RESPONSE_OTHER_COLOR,
           number: this.checkin.otherReplies().length || 0
@@ -57,18 +54,33 @@ export class CheckinBadgesComponent {
       }
       if (this.checkin.waiting_count > 0) {
         _badges.push({
-          columns: 1,
           text: this.RESPONSE_NONE,
           color: this.RESPONSE_NONE_COLOR,
           number: this.checkin.waiting_count || 0
         });
       }
-      let total = 0;
+      let zeros = 0;
+      let values = 0;
+      let width = 60;
+      let responses = 0;
       for (let badge of _badges) {
-        total = total + badge.number + 1;
+        if (badge.number == 0) {
+          zeros = zeros + 1;
+        }
+        else {
+          values = values + 1;
+        }
+        responses = responses + badge.number;
       }
       for (let badge of _badges) {
-        badge.percentage = (badge.number + 1) / total;
+        if (badge.number == 0) {
+          badge.width = `${width}px`;
+        }
+        else {
+          let percentage = (badge.number / responses * 100);
+          let pixels = values > 0 ? zeros*(width/values) : zeros*width;
+          badge.width = `calc(${percentage}% - ${pixels}px)`;
+        }
       }
     }
     return _badges;
