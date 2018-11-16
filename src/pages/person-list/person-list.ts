@@ -272,17 +272,20 @@ export class PersonListPage extends BasePrivatePage {
 
   private onChangeSelectAll($event) {
     this.logger.info(this, "onChangeSelectAll", this.selectAll);
-    if (this.selectAll) {
-      this.organization.people.forEach(person => {
-        person.selected = true;
-        this.selectedPeople.push(person);
-      });
-    }
-    else {
+
+    if (this.selectAllIndeterminate || !this.selectAll) {
       this.organization.people.forEach(person => {
         person.selected = false;
       })
       this.selectedPeople.length = 0;
+      this.selectAll = false;
+      $event.checked = false;
+    }
+    else {
+      this.organization.people.forEach(person => {
+        person.selected = true;
+        this.selectedPeople.push(person);
+      });
     }
   }
 
