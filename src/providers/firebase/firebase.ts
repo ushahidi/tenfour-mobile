@@ -1,203 +1,191 @@
 import { Injectable } from '@angular/core';
-import { Platform } from 'ionic-angular';
+import { Platform, Events } from 'ionic-angular';
 
 import { Observable } from "rxjs/Observable"
 import 'rxjs/add/observable/of';
 
+import { Environment as ENVIRONMENT } from "@app/env";
+
 import { Firebase as FirebaseNative } from '@ionic-native/firebase';
-import { FirebaseApp as FirebaseWeb } from 'angularfire2';
+
+import firebase from 'firebase/app';
 import 'firebase/messaging';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
 
+import {
+  EVENT_CHECKIN_DETAILS,
+  EVENT_CHECKIN_CREATED,
+  EVENT_CHECKIN_UPDATED,
+  EVENT_FIREBASE_TOKEN } from '../../constants/events';
+
 @Injectable()
 export class FirebaseProvider {
 
-  private firebaseMessaging:any = null;
+  private firebaseWeb:any = null;
+  private token:string = null;
 
   constructor(
     private platform:Platform,
+    private events:Events,
     private firebaseNative:FirebaseNative,
-    private firebaseWeb:FirebaseWeb,
     private logger:LoggerProvider,
     private storage:StorageProvider) {
-    this.firebaseMessaging = firebaseWeb.messaging();
+    firebase.initializeApp({
+      projectId: ENVIRONMENT.firebaseAppId,
+      apiKey: ENVIRONMENT.firebaseApiKey,
+      messagingSenderId: ENVIRONMENT.firebaseSenderId
+    });
+    this.firebaseWeb = firebase.messaging();
   }
 
   public initialize():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
-        if (this.platform.is("cordova")) {
-          this.getToken().then((token:string) => {
-            this.logger.info(this, "initialize", token);
-            resolve(token != null);
-          },
-          (error:any) => {
-            this.logger.warn(this, "initialize", error);
-            resolve(false);
-          });
-        }
-        else if ('serviceWorker' in navigator) {
-          this.logger.info(this, "initialize");
-          navigator.serviceWorker.register('service-worker.js').then((registration) => {
-            this.firebaseMessaging.useServiceWorker(registration);
-            this.getToken().then((token:string) => {
-              this.logger.info(this, "initialize", token);
-              resolve(token != null);
-            },
-            (error:any) => {
-              this.logger.warn(this, "initialize", error);
-              resolve(false);
-            });
-          });
-        }
-        else {
-          this.logger.warn(this, "initialize", "navigator does not support service workers");
-          resolve(false);
-        }
-      });
-    });
-  }
-
-  public hasPermission():Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
-        this.firebaseNative.hasPermission().then((data:any) => {
-          this.logger.info(this, "hasPermission", data);
-          resolve(data && data.isEnabled);
-        },
-        (error:any) => {
-          this.logger.warn(this, "hasPermission", error);
-          resolve(false);
-        });
-      }
-      else {
-        this.firebaseMessaging.getToken().then((token:any) => {
-          this.logger.info(this, "hasPermission", token != null);
+        this.getToken().then((token:string) => {
           resolve(token != null);
         },
         (error:any) => {
-          this.logger.warn(this, "hasPermission", error);
           resolve(false);
         });
-      }
-    });
-  }
-
-  public requestPermission():Promise<any> {
-    return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
-        this.firebaseNative.grantPermission().then((permission:any) => {
-          this.logger.info(this, "requestPermission", permission);
-          resolve(permission);
-        },
-        (error:any) => {
-          this.logger.warn(this, "requestPermission", error);
-          resolve(null);
-        });
-      }
-      else {
-        this.firebaseMessaging.requestPermission().then((permission:any) => {
-          this.logger.info(this, "requestPermission", permission);
-          resolve(permission);
-        },
-        (error:any) => {
-          this.logger.warn(this, "requestPermission", error);
-          resolve(null);
-        });
-      }
+      });
     });
   }
 
   public getToken():Promise<string> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
-        this.logger.info(this, "getToken");
-        this.firebaseNative.getToken().then((token:string) => {
-          this.logger.info(this, "getToken", token, "Fetched");
-          this.storage.setFirebase(token).then((stored:boolean) => {
-            resolve(token);
-          },
-          (error:any) => {
-            resolve(token);
-          });
-        },
-        (error:any) => {
-          this.logger.warn(this, "getToken", "Failed", error);
-          this.storage.removeFirebase().then((removed:boolean) => {
+        this.firebaseNative.grantPermission()
+          .then((permission:any) => {
+            this.logger.info(this, "getToken", "permission", permission);
+            return this.firebaseNative.getToken();
+          })
+          .then((token:string) => {
+            this.logger.info(this, "getToken", "token", token);
+            this.token = token;
+            return this.storage.setFirebase(token);
+          })
+          .then((stored:boolean) => {
+            this.logger.info(this, "getToken", "storage", stored);
+            this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
+            resolve(this.token);
+          })
+          .catch((error:any) => {
+            this.logger.error(this, "getToken", error);
             resolve(null);
-          },
-          (error:any) => {
-            resolve(null);
           });
+      }
+      else if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+          this.logger.info(this, "getToken", "serviceWorker", registration);
+          this.firebaseWeb.useServiceWorker(registration);
+          this.firebaseWeb.requestPermission()
+            .then((permission:any) => {
+              this.logger.info(this, "getToken", "permission", permission);
+              return this.firebaseWeb.getToken();
+            })
+            .then((token:string) => {
+              this.logger.info(this, "getToken", "token", token);
+              this.token = token;
+              return this.storage.setFirebase(token);
+            })
+            .then((stored:boolean) => {
+              this.logger.info(this, "getToken", "storage", stored);
+              this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
+              resolve(this.token);
+            })
+            .catch((error:any) => {
+              this.logger.error(this, "getToken", error);
+              resolve(null);
+            });
         });
       }
       else {
-        this.logger.info(this, "getToken");
-        this.promiseTimeout(this.firebaseMessaging.getToken(), 2000).then((token:string) => {
-          this.logger.info(this, "getToken", token, "Fetched");
-          this.storage.setFirebase(token).then((stored:boolean) => {
-            resolve(token);
-          },
-          (error:any) => {
-            resolve(token);
-          });
-        },
-        (error:any) => {
-          this.logger.warn(this, "getToken", "Failed", error);
-          this.storage.removeFirebase().then((removed:boolean) => {
-            resolve(null);
-          },
-          (error:any) => {
-            resolve(null);
-          });
-        });
+        this.logger.warn(this, "getToken", "Browser does not support notifications");
+        resolve(null);
       }
     });
   }
 
-  public freshToken():Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (this.platform.is("cordova")) {
-        this.firebaseNative.onTokenRefresh().subscribe((token:string) => {
-          this.logger.info(this, "freshToken", token, "Refreshed");
-          this.storage.setFirebase(token).then((stored:boolean) => {
-            resolve(token);
-          },
-          (error:any) => {
-            resolve(null);
-          });
-        });
-      }
-      else {
-        this.firebaseMessaging.onTokenRefresh().subscribe((token:string) => {
-          this.logger.info(this, "freshToken", token, "Refreshed");
-          this.storage.setFirebase(token).then((stored:boolean) => {
-            resolve(token);
-          },
-          (error:any) => {
-            resolve(null);
-          });
-        });
-      }
-    });
-  }
-
-  public onNotification():Observable<any> {
+  public subscribeNotifications() {
     if (this.platform.is("cordova")) {
+      this.logger.info(this, "subscribeNotifications", "cordova");
       this.firebaseNative.onNotificationOpen().subscribe((data:any) => {
-        this.logger.info(this, "onNotification", data);
-        return Observable.of(data);
+        this.logger.info(this, "subscribeNotifications", data);
+        if (data && data.notification) {
+          this.publishEvent(data.notification);
+        }
+      });
+      this.firebaseNative.onTokenRefresh().subscribe(() => {
+        this.logger.info(this, "subscribeNotifications", "onTokenRefresh");
+        this.firebaseNative.getToken()
+          .then((token:string) => {
+            this.logger.info(this, "subscribeNotifications", "onTokenRefresh", "getToken", token);
+            this.token = token;
+            return this.storage.setFirebase(token);
+          })
+          .then((stored:boolean) => {
+            this.logger.info(this, "subscribeNotifications", "onTokenRefresh", "setFirebase", stored);
+            this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
+          })
+          .catch((error:any) => {
+            this.logger.error(this, "subscribeNotifications", "onTokenRefresh", "getToken", error);
+          });
+      });
+    }
+    else if ('serviceWorker' in navigator) {
+      this.logger.info(this, "subscribeNotifications", "serviceWorker");
+      this.firebaseWeb.onMessage((data:any) => {
+        this.logger.info(this, "subscribeNotifications", "onMessage", data);
+        if (data && data.notification) {
+          this.publishEvent(data.notification);
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "subscribeNotifications", "onMessage", error);
+      });
+      this.firebaseWeb.onTokenRefresh(() => {
+        this.logger.info(this, "subscribeNotifications", "onTokenRefresh");
+        this.firebaseNative.getToken()
+          .then((token:string) => {
+            this.logger.info(this, "subscribeNotifications", "onTokenRefresh", "getToken", token);
+            this.token = token;
+            return this.storage.setFirebase(token);
+          })
+          .then((stored:boolean) => {
+            this.logger.info(this, "subscribeNotifications", "onTokenRefresh", "setFirebase", stored);
+            this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
+          })
+          .catch((error:any) => {
+            this.logger.error(this, "subscribeNotifications", "onTokenRefresh", "getToken", error);
+          });
+      },
+      (error:any) => {
+        this.logger.error(this, "subscribeNotifications", "onTokenRefresh", error);
       });
     }
     else {
-      this.firebaseMessaging.onMessage((data:any) => {
-        this.logger.info(this, "onNotification", data);
-        return Observable.of(data);
-      });
+      this.logger.info(this, "subscribeNotifications", "Browser does not support notifications");
     }
-    return Observable.of(null);
+  }
+
+  public publishEvent(notification:any) {
+    if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
+      this.logger.info(this, "publishEvent", EVENT_CHECKIN_CREATED, notification);
+      this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+    }
+    else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
+      this.logger.info(this, "publishEvent", EVENT_CHECKIN_UPDATED, notification);
+      this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+    }
+    else if (notification && notification['type'] == EVENT_CHECKIN_DETAILS) {
+      this.logger.info(this, "publishEvent", EVENT_CHECKIN_DETAILS, notification);
+      this.events.publish(EVENT_CHECKIN_DETAILS, notification['checkin_id']);
+    }
+    else {
+      this.logger.warn(this, "publishEvent", "Notification", notification);
+    }
   }
 
   public logUser(userId:string, properties:any=null):Promise<boolean> {
@@ -226,7 +214,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.logger.info(this, "logUser", userId, "Skipped");
+        this.logger.warn(this, "logUser", userId, "Skipped");
         resolve(false);
       }
     });
@@ -246,7 +234,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.logger.info(this, "logPage", page, "Skipped");
+        this.logger.warn(this, "logPage", page, "Skipped");
         resolve(false);
       }
     });
@@ -266,7 +254,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.logger.info(this, "logEvent", event, "Skipped");
+        this.logger.warn(this, "logEvent", event, "Skipped");
         resolve(false);
       }
     });
@@ -286,7 +274,7 @@ export class FirebaseProvider {
         });
       }
       else {
-        this.logger.info(this, "logError", message, "Skipped");
+        this.logger.warn(this, "logError", message, "Skipped");
         resolve(false);
       }
     });
