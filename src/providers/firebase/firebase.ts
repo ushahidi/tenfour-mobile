@@ -32,23 +32,40 @@ export class FirebaseProvider {
     private firebaseNative:FirebaseNative,
     private logger:LoggerProvider,
     private storage:StorageProvider) {
-    firebase.initializeApp({
-      projectId: ENVIRONMENT.firebaseAppId,
-      apiKey: ENVIRONMENT.firebaseApiKey,
-      messagingSenderId: ENVIRONMENT.firebaseSenderId
-    });
-    this.firebaseWeb = firebase.messaging();
   }
 
   public initialize():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
-        this.getToken().then((token:string) => {
-          resolve(token != null);
-        },
-        (error:any) => {
+        if (this.platform.is("cordova")) {
+          this.getToken().then((token:string) => {
+            resolve(token != null);
+          },
+          (error:any) => {
+            resolve(false);
+          });
+        }
+        else if ('serviceWorker' in navigator) {
+          firebase.initializeApp({
+            projectId: ENVIRONMENT.firebaseAppId,
+            apiKey: ENVIRONMENT.firebaseApiKey,
+            messagingSenderId: ENVIRONMENT.firebaseSenderId
+          });
+          this.firebaseWeb = firebase.messaging();
+          navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+            this.logger.info(this, "getToken", "serviceWorker", registration);
+            this.firebaseWeb.useServiceWorker(registration);
+            this.getToken().then((token:string) => {
+              resolve(token != null);
+            },
+            (error:any) => {
+              resolve(false);
+            });
+          });
+        }
+        else {
           resolve(false);
-        });
+        }
       });
     });
   }
@@ -77,29 +94,25 @@ export class FirebaseProvider {
           });
       }
       else if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-          this.logger.info(this, "getToken", "serviceWorker", registration);
-          this.firebaseWeb.useServiceWorker(registration);
-          this.firebaseWeb.requestPermission()
-            .then((permission:any) => {
-              this.logger.info(this, "getToken", "permission", permission);
-              return this.firebaseWeb.getToken();
-            })
-            .then((token:string) => {
-              this.logger.info(this, "getToken", "token", token);
-              this.token = token;
-              return this.storage.setFirebase(token);
-            })
-            .then((stored:boolean) => {
-              this.logger.info(this, "getToken", "storage", stored);
-              this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
-              resolve(this.token);
-            })
-            .catch((error:any) => {
-              this.logger.error(this, "getToken", error);
-              resolve(null);
-            });
-        });
+        this.firebaseWeb.requestPermission()
+          .then((permission:any) => {
+            this.logger.info(this, "getToken", "permission", permission);
+            return this.firebaseWeb.getToken();
+          })
+          .then((token:string) => {
+            this.logger.info(this, "getToken", "token", token);
+            this.token = token;
+            return this.storage.setFirebase(token);
+          })
+          .then((stored:boolean) => {
+            this.logger.info(this, "getToken", "storage", stored);
+            this.events.publish(EVENT_FIREBASE_TOKEN, this.token);
+            resolve(this.token);
+          })
+          .catch((error:any) => {
+            this.logger.error(this, "getToken", error);
+            resolve(null);
+          });
       }
       else {
         this.logger.warn(this, "getToken", "Browser does not support notifications");

@@ -9,7 +9,8 @@ firebase.initializeApp({
 });
 const firebaseMessaging = firebase.messaging();
 firebaseMessaging.setBackgroundMessageHandler(function(payload) {
-  console.log('Firebase setBackgroundMessageHandler', payload);
+  console.log('Firebase setBackgroundMessageHandler');
+  console.log(payload);
   let notificationTitle = "Notification Received";
   const notificationOptions = {
     icon: '/assets/images/logo-dots.png',
@@ -25,21 +26,20 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('notificationclick', function(e) {
   console.log('ServiceWorker notificationclick');
-  var notification = e.notification;
-  var primaryKey = notification.data.primaryKey;
-  var action = e.action;
-  if (action === 'close') {
-    notification.close();
-  }
-  else {
-    notification.close();
-  }
+  // var notification = e.notification;
+  // var primaryKey = notification.data.primaryKey;
+  // var action = e.action;
+  // if (action === 'close') {
+  //   notification.close();
+  // }
+  // else {
+  //   notification.close();
+  // }
 });
 self.addEventListener('notificationclose', function(e) {
   console.log('ServiceWorker notificationclose');
-  var notification = e.notification;
-  var primaryKey = notification.data.primaryKey;
-  console.log('Closed notification: ' + primaryKey);
+  // var notification = e.notification;
+  // var primaryKey = notification.data.primaryKey;
 });
 self.toolbox.options.cache = {
   name: 'ionic-cache'
