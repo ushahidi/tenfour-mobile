@@ -11,17 +11,24 @@
     <ion-item text-wrap class="heading">
       <img src="assets/images/logo-dots.png"/>
       <h2>Let's get you logged in</h2>
-      <p>Enter your organization's TenFour URL.</p>
+      <p *ngIf="title">{{title}}</p>
     </ion-item>
     <ion-item color="input" class="input">
       <ion-label fixed>URL</ion-label>
       <h3 item-text item-right>.tenfour.org</h3>
+      <button item-right ion-button clear tappable color="primary" tappable (click)="lookupOrganization($event)">Lookup</button>
       <ion-input #subdomain type="url" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="domain" (keypress)="showNextOnReturn($event)"></ion-input>
     </ion-item>
+    <ion-item color="input" class="input">
+      <ion-label fixed>Email</ion-label>
+      <ion-input #email type="email" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your email address" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
+    <ion-item color="input" class="input">
+      <ion-label fixed>Password</ion-label>
+      <button item-right ion-button clear tappable color="primary" tappable (click)="resetPassword($event)">Reset</button>
+      <ion-input #password type="password" autocorrect="off" autocapitalize="off" autocomplete="off" placeholder="Your password" (keypress)="showNextOnReturn($event)"></ion-input>
+    </ion-item>
     <ion-item no-lines class="other">
-      <button ion-button clear block tappable color="primary" tappable (click)="lookupOrganization($event)">
-        <h2>Help, I don't know my URL</h2>
-      </button>
       <button ion-button clear block tappable color="primary" tappable (click)="createOrganization($event)">
         <h2>New to TenFour, Sign up here</h2>
       </button>

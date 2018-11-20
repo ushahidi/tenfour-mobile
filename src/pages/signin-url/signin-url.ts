@@ -27,7 +27,12 @@ export class SigninUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
+  @ViewChild('email')
+  email:TextInput;
+  @ViewChild('password')
+  password:TextInput;
   title:string = null;
+  organization:Organization = null;
 
   constructor(
       protected zone:NgZone,
@@ -59,7 +64,7 @@ export class SigninUrlPage extends BasePublicPage {
     let organizationSubdomain = this.parseOrganizationSubdomain();
     if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
-      this.showNext();
+      // this.showNext();
     }
   }
 
@@ -85,55 +90,95 @@ export class SigninUrlPage extends BasePublicPage {
       setTimeout(() => {
         this.subdomain.setFocus();
       }, 500);
+      return;
     }
-    else {
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+      return;
+    }
+    if (this.password.value.length == 0) {
+      this.showToast("Please enter your password");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
+      return;
+    }
+    // else {
+    //   let subdomain = this.subdomain.value.toLowerCase();
+    //   let loading = this.showLoading("Searching...", true);
+    //   this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
+    //     this.logger.info(this, "showNext", organizations);
+    //     loading.dismiss();
+    //     if (organizations && organizations.length > 0) {
+    //       let organization:Organization = organizations[0];
+    //       if (!this.redirectToOrganizationSubdomain(organization)) {
+    //         this.storage.setOrganization(organization).then((stored:boolean) => {
+    //           this.showModal(SigninEmailPage, {
+    //             organization: organization
+    //           }, {
+    //             enableBackdropDismiss: false
+    //           });
+    //         });
+    //       }
+    //     }
+    //     else {
+    //       this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
+    //     }
+    //   },
+    //   (error:any) => {
+    //     this.logger.error(this, "showNext", error);
+    //     loading.dismiss();
+    //     this.showAlert("Problem Finding Organization", error);
+    //   });
+    // }
+  }
+
+  private loadOrganization():Promise<Organization> {
+    this.logger.info(this, "loadOrganization");
+    return new Promise((resolve, reject) => {
       let subdomain = this.subdomain.value.toLowerCase();
       let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
-        this.logger.info(this, "showNext", organizations);
+        this.logger.info(this, "loadOrganization", organizations);
         loading.dismiss();
         if (organizations && organizations.length > 0) {
-          let organization:Organization = organizations[0];
-          if (!this.redirectToOrganizationSubdomain(organization)) {
-            this.storage.setOrganization(organization).then((stored:boolean) => {
-              this.showModal(SigninEmailPage, {
-                organization: organization
-              }, {
-                enableBackdropDismiss: false
-              });
-            });
-          }
+          this.organization = organizations[0];
+          resolve(this.organization);
         }
         else {
-          this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
+          this.showAlert("Organization not found", "Sorry, organization \"" + this.subdomain.value + "\" does not exist.");
+          reject();
         }
-      },
-      (error:any) => {
-        this.logger.error(this, "showNext", error);
+      }, (error:any) => {
+        this.logger.error(this, "loadOrganization", error);
         loading.dismiss();
         this.showAlert("Problem Finding Organization", error);
+        reject();
       });
-    }
+    });
   }
 
-  private redirectToOrganizationSubdomain(organization:Organization):boolean {
-    if (this.website) {
-      let appDomain = this.environment.getAppDomain();
-      let extension = '.' + appDomain.replace('app.', '');
-      let locationSubdomain = location.hostname.replace(extension, '');
-      let subdomain = this.subdomain.value.toLowerCase();
-      if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
-        location.assign(location.protocol
-          + "//"
-          + subdomain
-          + extension
-          + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-          + "/");
-        return true;
-      }
-    }
-    return false;
-  }
+  // private redirectToOrganizationSubdomain(organization:Organization):boolean {
+  //   if (this.website) {
+  //     let appDomain = this.environment.getAppDomain();
+  //     let extension = '.' + appDomain.replace('app.', '');
+  //     let locationSubdomain = location.hostname.replace(extension, '');
+  //     let subdomain = this.subdomain.value.toLowerCase();
+  //     if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
+  //       location.assign(location.protocol
+  //         + "//"
+  //         + subdomain
+  //         + extension
+  //         + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+  //         + "/");
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
@@ -144,7 +189,40 @@ export class SigninUrlPage extends BasePublicPage {
 
   private lookupOrganization(event:any) {
     this.logger.info(this, "lookupOrganization");
-    this.showPage(SigninLookupPage, {});
+    this.showModal(SigninLookupPage, {});
+  }
+
+  private resetPassword(event:any) {
+    this.logger.info(this, "resetPassword");
+    if (this.subdomain.value.length == 0) {
+      this.showToast("Please enter your domain");
+      setTimeout(() => {
+        this.subdomain.setFocus();
+      }, 500);
+      return;
+    }
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+      return;
+    }
+    this.loadOrganization().then((organization:Organization) => {
+      let title = "Check Your Inbox";
+      let message = `If your email address ${this.email.value} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
+      let loading = this.showLoading("Resetting...", true);
+      this.api.resetPassword(this.organization.subdomain, this.email.value).then((reset:any) => {
+        this.logger.info(this, "resetPassword", reset);
+        loading.dismiss();
+        this.showAlert(title, message);
+      },
+      (error:any) => {
+        this.logger.error(this, "resetPassword", error);
+        loading.dismiss();
+        this.showAlert(title, message);
+      });
+    }, () => {});
   }
 
   private showNextOnReturn(event:any) {
