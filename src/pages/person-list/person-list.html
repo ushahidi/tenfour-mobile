@@ -16,10 +16,10 @@
   <ion-toolbar>
    <ion-grid>
     <ion-row align-items-center justify-content-start>
-     <ion-col col-7 col-sm-6 text-left>
+     <ion-col col-6 text-left>
       <ion-searchbar start placeholder="Search..." [debounce]="250" [(ngModel)]="filter" (ionInput)="onFilter($event)"></ion-searchbar>
      </ion-col>
-     <ion-col col-5 col-sm-6 text-right *ngIf="user && user.isOwnerOrAdmin()">
+     <ion-col col-6 text-right *ngIf="user && user.isOwnerOrAdmin()">
       <button ion-button clear (click)="showActionsPopover($event)">
        Actions &nbsp; <ion-icon ios="md-arrow-dropdown" md="md-arrow-dropdown"></ion-icon>
       </button>
