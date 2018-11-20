@@ -10,9 +10,9 @@ import {} from 'jasmine';
 import { SigninUrlPage } from './signin-url';
 import { SigninUrlModule } from './signin-url.module';
 
-import { SigninEmailModule } from '../../pages/signin-email/signin-email.module';
+// import { SigninEmailModule } from '../../pages/signin-email/signin-email.module';
 import { SignupEmailModule } from '../../pages/signup-email/signup-email.module';
-import { SignupPasswordModule } from '../../pages/signup-password/signup-password.module';
+// import { SignupPasswordModule } from '../../pages/signup-password/signup-password.module';
 
 import { ApiProvider } from '../../providers/api/api';
 

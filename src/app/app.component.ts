@@ -5,8 +5,9 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
-import { SigninEmailPage } from '../pages/signin-email/signin-email';
-import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+// import { SigninEmailPage } from '../pages/signin-email/signin-email';
+// import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import {SigninTokenPage} from '../pages/signin-token/signin-token';
 import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
 import { SignupPage } from '../pages/signup/signup';
@@ -272,12 +273,9 @@ export class TenFourApp {
           if (deeplink.path === '/#signin') {
             this.showSigninUrl();
           }
-          else if (deeplink.path === '/#signin/email') {
-            this.logger.warn(this, "loadDeepLinks", "SigninEmailPage");
-          }
-          else if (deeplink.path === '/#signin/password') {
-            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
-          }
+          // else if (deeplink.path.startsWith('/#signin/token')) {
+          //   this.showSigninTokenPage();
+          // }
           else if (deeplink.path === '/#signup') {
              this.showSignupPage();
           }

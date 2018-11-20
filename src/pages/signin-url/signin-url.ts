@@ -2,7 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-import { SigninEmailPage } from '../../pages/signin-email/signin-email';
+// import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
 
@@ -22,7 +22,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
   selector: 'page-signin-url',
   templateUrl: 'signin-url.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SigninEmailPage, SignupEmailPage ]
+  entryComponents:[ SignupEmailPage ]
 })
 export class SigninUrlPage extends BasePublicPage {
 
@@ -63,6 +63,11 @@ export class SigninUrlPage extends BasePublicPage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+
+    if (this.navParams.get('token')) {
+      this.logger.info(this, 'token', this.navParams.get('token'));
+    }
+
     let organizationSubdomain = this.parseOrganizationSubdomain();
     if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
@@ -117,6 +122,7 @@ export class SigninUrlPage extends BasePublicPage {
       .then((token:Token) => {
         this.logger.info(this, "showNext", token);
         this.loginToOrganizationSubdomain(this.organization, token);
+        // TODO handle return false from above (in case of mobile app)
       })
       .catch((error:any) => {
         this.logger.error(this, "showNext", error);
@@ -158,7 +164,7 @@ export class SigninUrlPage extends BasePublicPage {
           + subdomain
           + extension
           + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-          + "/#/signin/"
+          + "/#/signin/token/"
           + encodeURIComponent(token.access_token));
         return true;
       }
