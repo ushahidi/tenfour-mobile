@@ -5,8 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
-import { AngularFireModule } from 'angularfire2';
-
 import { SegmentModule } from 'ngx-segment-analytics';
 import { NgxLocalStorageModule } from 'ngx-localstorage';
 
@@ -249,11 +247,6 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     SegmentModule.forRoot({
       apiKey: ENVIRONMENT.segmentApiKey,
       debug: false
-    }),
-    AngularFireModule.initializeApp({
-      projectId: ENVIRONMENT.firebaseAppId,
-      apiKey: ENVIRONMENT.firebaseApiKey,
-      messagingSenderId: ENVIRONMENT.firebaseSenderId
     }),
     IntercomModule.forRoot(),
     IonicModule.forRoot(TenFourApp, {
