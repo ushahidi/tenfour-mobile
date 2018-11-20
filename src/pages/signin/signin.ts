@@ -57,8 +57,7 @@ export class SigninPage extends BasePublicPage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.showModal(SigninUrlPage, {
-      organization: this.organization,
-      token: this.navParams.get('token')
+      organization: this.organization
     }, {
       enableBackdropDismiss: false
     });

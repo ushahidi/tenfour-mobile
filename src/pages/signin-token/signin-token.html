@@ -6,9 +6,7 @@
 <ion-content>
   <ion-list>
     <ion-item text-wrap class="heading">
-      <person-avatar item-center [image]="logo" [large]="true" *ngIf="organization && organization.profile_picture == null"></person-avatar>
-      <person-avatar item-center [image]="organization.profile_picture" [large]="true" *ngIf="organization && organization.profile_picture != null"></person-avatar>
-      <h2>Logging in...</h2>
+      <h2>Loading...</h2>
     </ion-item>
   </ion-list>
   <div text-center class="spinner" *ngIf="loading == true">

@@ -5,6 +5,7 @@ import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 // import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
+import { SigninTokenPage } from '../../pages/signin-token/signin-token';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -121,8 +122,14 @@ export class SigninUrlPage extends BasePublicPage {
       .then(() => { return this.api.userLogin(this.organization, this.email.value, this.password.value); })
       .then((token:Token) => {
         this.logger.info(this, "showNext", token);
-        this.loginToOrganizationSubdomain(this.organization, token);
-        // TODO handle return false from above (in case of mobile app)
+
+        if (!this.loginToOrganizationSubdomain(this.organization, token)) {
+          this.loading = false;
+          loading.dismiss();
+          this.showPage(SigninTokenPage, {
+            token: JSON.stringify(token)
+          })
+        }
       })
       .catch((error:any) => {
         this.logger.error(this, "showNext", error);
@@ -165,7 +172,7 @@ export class SigninUrlPage extends BasePublicPage {
           + extension
           + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
           + "/#/signin/token/"
-          + encodeURIComponent(token.access_token));
+          + encodeURIComponent(JSON.stringify(token)));
         return true;
       }
     }
