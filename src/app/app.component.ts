@@ -5,7 +5,7 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
-import {SigninTokenPage} from '../pages/signin-token/signin-token';
+import { SigninTokenPage} from '../pages/signin-token/signin-token';
 import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
 import { SignupPage } from '../pages/signup/signup';
