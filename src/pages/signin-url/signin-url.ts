@@ -126,7 +126,9 @@ export class SigninUrlPage extends BasePublicPage {
         if (!this.loginToOrganizationSubdomain(this.organization, token)) {
           this.loading = false;
           loading.dismiss();
-          this.showPage(SigninTokenPage, {
+          this.hideModal();
+          this.showRootPage(SigninTokenPage, {
+            organization: this.organization,
             token: JSON.stringify(token)
           })
         }

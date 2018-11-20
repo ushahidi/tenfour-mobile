@@ -3,7 +3,7 @@ import { IonicPage, App, TextInput, Platform, NavParams, NavController, ViewCont
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
-import { SigninPage } from '../signin/signin';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -31,7 +31,6 @@ import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 })
 export class SigninTokenPage extends BasePublicPage {
 
-  organizationSubdomain:String = '';
   organization:Organization = null;
   person:Person = null;
   token:Token = null;
@@ -62,20 +61,22 @@ export class SigninTokenPage extends BasePublicPage {
     super.ionViewWillEnter();
     let loading = this.showLoading("Logging in...");
 
-    this.organizationSubdomain = this.parseOrganizationSubdomain();
-
     try {
       this.token = this.navParams.get('token') ? <Token>JSON.parse(this.navParams.get('token')) : null;
     } catch (e) {
       this.logger.error(this, e);
     }
 
-    if (!this.token || !this.organizationSubdomain || this.organizationSubdomain.length == 0) {
+    if (!this.token) {
       loading.dismiss();
-      this.showRootPage(SigninPage, {});
-    } else {
-      this.loadUpdates(true).then((loaded:any) => {
+      return this.showRootPage(SigninUrlPage, {});
+    }
 
+    Promise.resolve()
+      .then(() => this.loadUpdates())
+      .then(() => this.userLogout())
+      .then(() => this.authWithToken())
+      .then(() => {
         if (this.person.name && this.person.name.length > 0) {
           this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
         }
@@ -94,17 +95,43 @@ export class SigninTokenPage extends BasePublicPage {
             this.events.publish(EVENT_USER_AUTHENTICATED);
           });
         });
-
-      }, (error:any) => {
+      })
+      .catch((error:any) => {
+        this.logger.error(this, error);
         loading.dismiss();
-        this.showRootPage(SigninPage, {});
+        this.showRootPage(SigninUrlPage, {});
       });
-    }
+  }
+
+  private userLogout(event:any=null) {
+    this.logger.info(this, "userLogout");
+    let removes = [
+      this.api.removeToken(this.organization),
+      this.storage.removeFirebase(),
+      this.storage.removeOrganization(),
+      this.storage.removeUser(),
+      this.storage.removeOrganizations(),
+      this.storage.removeSubscriptions(),
+      this.storage.removeNotifications(),
+      this.storage.removeCheckins(),
+      this.storage.removeAnswers(),
+      this.storage.removeReplies(),
+      this.storage.removeRecipients(),
+      this.storage.removeGroups(),
+      this.storage.removeEmails(),
+      this.storage.removePeople(),
+      this.storage.removeContacts(),
+    ];
+    return Promise.all(removes);
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+  }
+
+  ionViewCanEnter():Promise<boolean> {
+    return Promise.resolve(true);
   }
 
   private parseOrganizationSubdomain() {
@@ -115,7 +142,7 @@ export class SigninTokenPage extends BasePublicPage {
         let subdomain = hostname.replace('.' + appDomain, '');
         if (subdomain !== 'app') {
           this.logger.info(this, 'Subdomain', subdomain);
-          return subdomain;
+          return subdomain.toLowerCase();
         }
       }
     }
@@ -127,7 +154,6 @@ export class SigninTokenPage extends BasePublicPage {
 
     return Promise.resolve()
       .then(() => { return this.loadOrganization(); })
-      .then(() => { return this.authWithToken(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -146,24 +172,35 @@ export class SigninTokenPage extends BasePublicPage {
   private loadOrganization():Promise<Organization> {
     this.logger.info(this, "loadOrganization");
     return new Promise((resolve, reject) => {
-      let subdomain = this.organizationSubdomain.toLowerCase();
-      this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
-        this.logger.info(this, "loadOrganization", organizations);
-        if (organizations && organizations.length > 0) {
-          this.organization = organizations[0];
-          resolve(this.organization);
+
+      if (this.hasParameter("organization")) {
+        this.organization = this.getParameter<Organization>("organization");
+        resolve(this.organization);
+      } else {
+        let organizationSubdomain = this.parseOrganizationSubdomain();
+
+        if (!organizationSubdomain) {
+          reject();
         }
-        else {
-          reject('Organization not found.');
-        }
-      }, (error:any) => {
-        this.logger.error(this, "loadOrganization", error);
-        reject();
-      });
+
+        this.api.getOrganizations(organizationSubdomain).then((organizations:Organization[]) => {
+          this.logger.info(this, "loadOrganization", organizations);
+          if (organizations && organizations.length > 0) {
+            this.organization = organizations[0];
+            resolve(this.organization);
+          }
+          else {
+            reject('Organization not found.');
+          }
+        }, (error:any) => {
+          this.logger.error(this, "loadOrganization", error);
+          reject();
+        });
+      }
     });
   }
 
-  private authWithToken() {
+  private authWithToken():Promise<any> {
     this.logger.info(this, "authWithToken");
 
     return new Promise((resolve, reject) => {
