@@ -112,7 +112,7 @@ export class SigninUrlPage extends BasePublicPage {
     let loading = this.showLoading("Logging in...", true);
 
     Promise.resolve()
-      .then(() => { this.loadOrganization(); })
+      .then(() => { return this.loadOrganization(); })
       .then(() => { return this.api.userLogin(this.organization, this.email.value, this.password.value); })
       .then((token:Token) => {
         this.logger.info(this, "showNext", token);
@@ -130,20 +130,17 @@ export class SigninUrlPage extends BasePublicPage {
     this.logger.info(this, "loadOrganization");
     return new Promise((resolve, reject) => {
       let subdomain = this.subdomain.value.toLowerCase();
-      let loading = this.showLoading("Searching...", true);
       this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
         this.logger.info(this, "loadOrganization", organizations);
-        loading.dismiss();
         if (organizations && organizations.length > 0) {
           this.organization = organizations[0];
           resolve(this.organization);
         }
         else {
-          reject();
+          reject('Organization not found.');
         }
       }, (error:any) => {
         this.logger.error(this, "loadOrganization", error);
-        loading.dismiss();
         reject();
       });
     });
@@ -197,10 +194,10 @@ export class SigninUrlPage extends BasePublicPage {
       }, 500);
       return;
     }
+    let loading = this.showLoading("Resetting...", true);
     this.loadOrganization().then((organization:Organization) => {
       let title = "Check Your Inbox";
       let message = `If your email address ${this.email.value} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
-      let loading = this.showLoading("Resetting...", true);
       this.api.resetPassword(this.organization.subdomain, this.email.value).then((reset:any) => {
         this.logger.info(this, "resetPassword", reset);
         loading.dismiss();
@@ -211,7 +208,9 @@ export class SigninUrlPage extends BasePublicPage {
         loading.dismiss();
         this.showAlert(title, message);
       });
-    }, () => {
+    }, (error) => {
+      this.logger.error(this, "resetPassword", error);
+      loading.dismiss();
       this.showAlert("Organization not found", "Sorry, organization \"" + this.subdomain.value + "\" does not exist.");
     });
   }
