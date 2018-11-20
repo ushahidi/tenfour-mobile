@@ -2,7 +2,6 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-// import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
 import { SigninTokenPage } from '../../pages/signin-token/signin-token';

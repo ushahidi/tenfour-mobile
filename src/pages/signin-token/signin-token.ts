@@ -34,7 +34,6 @@ export class SigninTokenPage extends BasePublicPage {
   organization:Organization = null;
   person:Person = null;
   token:Token = null;
-  // email:string = null;
   logo:string = "assets/images/logo-dots.png";
   loading:boolean = true;
 

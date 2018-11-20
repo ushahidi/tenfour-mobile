@@ -2,8 +2,6 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
-// import { SigninEmailPage } from '../pages/signin-email/signin-email';
-// import { SigninPasswordPage } from '../pages/signin-password/signin-password';
 import { SigninInvitePage } from '../pages/signin-invite/signin-invite';
 import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 import { SigninTokenPage } from '../pages/signin-token/signin-token';
@@ -66,10 +64,7 @@ export class TenFourRoutes {
     { component: SplashScreenPage, name: 'SplashScreenPage', segment: 'loading' },
 
     { component: SigninPage, name: 'SigninPage', segment: 'signin' },
-    // { component: SigninUrlPage, name: 'SigninUrlPage', segment: 'signin/url' },
-    // { component: SigninEmailPage, name: 'SigninEmailPage', segment: 'signin/email'},
     { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: ['SigninUrlPage'] },
-    // { component: SigninPasswordPage, name: 'SigninPasswordPage', segment: 'signin/password', defaultHistory: ['SigninUrlPage', 'SigninEmailPage'] },
     { component: SigninTokenPage, name: 'SigninTokenPage', segment: 'signin/token/:token' },
     { component: SigninLookupPage, name: 'SigninLookupPage', segment: 'signin/lookup', defaultHistory: ['SigninUrlPage'] },
 

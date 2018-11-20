@@ -3,9 +3,6 @@ import { IonicPageModule } from 'ionic-angular';
 
 import { SigninUrlPage } from './signin-url';
 
-// import { SigninEmailPage } from '../../pages/signin-email/signin-email';
-// import { SigninEmailModule } from '../../pages/signin-email/signin-email.module';
-
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SignupEmailModule } from '../../pages/signup-email/signup-email.module';
 
@@ -17,7 +14,6 @@ import { SigninLookupModule } from '../../pages/signin-lookup/signin-lookup.modu
     SigninUrlPage,
   ],
   imports: [
-    // SigninEmailModule,
     SignupEmailModule,
     SigninLookupModule,
     IonicPageModule.forChild(SigninUrlPage),
