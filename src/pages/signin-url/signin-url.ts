@@ -8,6 +8,7 @@ import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
+import { Token } from '../../models/token';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -33,6 +34,7 @@ export class SigninUrlPage extends BasePublicPage {
   password:TextInput;
   title:string = null;
   organization:Organization = null;
+  loading:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -64,7 +66,6 @@ export class SigninUrlPage extends BasePublicPage {
     let organizationSubdomain = this.parseOrganizationSubdomain();
     if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
-      // this.showNext();
     }
   }
 
@@ -106,34 +107,23 @@ export class SigninUrlPage extends BasePublicPage {
       }, 500);
       return;
     }
-    // else {
-    //   let subdomain = this.subdomain.value.toLowerCase();
-    //   let loading = this.showLoading("Searching...", true);
-    //   this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
-    //     this.logger.info(this, "showNext", organizations);
-    //     loading.dismiss();
-    //     if (organizations && organizations.length > 0) {
-    //       let organization:Organization = organizations[0];
-    //       if (!this.redirectToOrganizationSubdomain(organization)) {
-    //         this.storage.setOrganization(organization).then((stored:boolean) => {
-    //           this.showModal(SigninEmailPage, {
-    //             organization: organization
-    //           }, {
-    //             enableBackdropDismiss: false
-    //           });
-    //         });
-    //       }
-    //     }
-    //     else {
-    //       this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
-    //     }
-    //   },
-    //   (error:any) => {
-    //     this.logger.error(this, "showNext", error);
-    //     loading.dismiss();
-    //     this.showAlert("Problem Finding Organization", error);
-    //   });
-    // }
+
+    this.loading = true;
+    let loading = this.showLoading("Logging in...", true);
+
+    Promise.resolve()
+      .then(() => { this.loadOrganization(); })
+      .then(() => { return this.api.userLogin(this.organization, this.email.value, this.password.value); })
+      .then((token:Token) => {
+        this.logger.info(this, "showNext", token);
+        this.loginToOrganizationSubdomain(this.organization, token);
+      })
+      .catch((error:any) => {
+        this.logger.error(this, "showNext", error);
+        this.loading = false;
+        loading.dismiss();
+        this.showAlert("Login Unsuccessful", "Invalid domain, email or password, please try again.");
+      });
   }
 
   private loadOrganization():Promise<Organization> {
@@ -149,36 +139,35 @@ export class SigninUrlPage extends BasePublicPage {
           resolve(this.organization);
         }
         else {
-          this.showAlert("Organization not found", "Sorry, organization \"" + this.subdomain.value + "\" does not exist.");
           reject();
         }
       }, (error:any) => {
         this.logger.error(this, "loadOrganization", error);
         loading.dismiss();
-        this.showAlert("Problem Finding Organization", error);
         reject();
       });
     });
   }
 
-  // private redirectToOrganizationSubdomain(organization:Organization):boolean {
-  //   if (this.website) {
-  //     let appDomain = this.environment.getAppDomain();
-  //     let extension = '.' + appDomain.replace('app.', '');
-  //     let locationSubdomain = location.hostname.replace(extension, '');
-  //     let subdomain = this.subdomain.value.toLowerCase();
-  //     if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
-  //       location.assign(location.protocol
-  //         + "//"
-  //         + subdomain
-  //         + extension
-  //         + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-  //         + "/");
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
+  private loginToOrganizationSubdomain(organization:Organization, token:Token):boolean {
+    if (this.website) {
+      let appDomain = this.environment.getAppDomain();
+      let extension = '.' + appDomain.replace('app.', '');
+      let locationSubdomain = location.hostname.replace(extension, '');
+      let subdomain = this.subdomain.value.toLowerCase();
+      if (subdomain !== locationSubdomain && 'localhost' !== locationSubdomain) {
+        location.assign(location.protocol
+          + "//"
+          + subdomain
+          + extension
+          + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
+          + "/#/signin/"
+          + encodeURIComponent(token.access_token));
+        return true;
+      }
+    }
+    return false;
+  }
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
@@ -222,7 +211,9 @@ export class SigninUrlPage extends BasePublicPage {
         loading.dismiss();
         this.showAlert(title, message);
       });
-    }, () => {});
+    }, () => {
+      this.showAlert("Organization not found", "Sorry, organization \"" + this.subdomain.value + "\" does not exist.");
+    });
   }
 
   private showNextOnReturn(event:any) {
