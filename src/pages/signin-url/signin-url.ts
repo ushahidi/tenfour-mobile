@@ -136,7 +136,10 @@ export class SigninUrlPage extends BasePublicPage {
         this.logger.error(this, "showNext", error);
         this.loading = false;
         loading.dismiss();
-        this.showAlert("Login Unsuccessful", "Invalid domain, email or password, please try again.");
+        if (error === 'invalid_credentials') {
+          error = "Invalid email and/or password. Please try again.";
+        }
+        this.showAlert("Login Unsuccessful", error);
       });
   }
 
@@ -151,7 +154,7 @@ export class SigninUrlPage extends BasePublicPage {
           resolve(this.organization);
         }
         else {
-          reject('Organization not found.');
+          reject('Sorry, that organization does\'t exist.');
         }
       }, (error:any) => {
         this.logger.error(this, "loadOrganization", error);
