@@ -1,5 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Slides, Platform, NavParams, NavController, ViewController, ModalController, Modal, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 import { SigninUrlPage } from '../../pages/signin-url/signin-url';
@@ -34,6 +34,8 @@ export class CheckinTokenPage extends BasePage {
   answer:string = null;
   loading:boolean = false;
 
+  tokenModal:Modal;
+
   constructor(
     protected zone:NgZone,
     protected platform:Platform,
@@ -52,6 +54,17 @@ export class CheckinTokenPage extends BasePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+
+    if (!this.navParams.get('inModal')) {
+      this.loading=true;
+      this.tokenModal = this.showModal(CheckinTokenPage, {
+        inModal: true,
+        token: this.getParameter('token'),
+        answer_id: this.getParameter('answer_id'),
+        checkin_id: this.getParameter('checkin_id')
+      }, {enableBackdropDismiss: false});
+    }
+
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((finished:any) => {
       this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
