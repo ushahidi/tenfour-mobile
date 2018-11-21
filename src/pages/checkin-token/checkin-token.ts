@@ -33,6 +33,7 @@ export class CheckinTokenPage extends BasePage {
   token:string = null;
   answer:string = null;
   loading:boolean = false;
+  inModal:boolean = false;
 
   tokenModal:Modal;
 
@@ -66,6 +67,7 @@ export class CheckinTokenPage extends BasePage {
     }
 
     let loading = this.showLoading("Loading...");
+    this.inModal = this.navParams.get('inModal');
     this.loadUpdates(false).then((finished:any) => {
       this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
@@ -231,6 +233,7 @@ export class CheckinTokenPage extends BasePage {
   }
 
   private showNextPage(event:any=null) {
+    this.hideModal();
     if (this.organization && this.user) {
       this.showRootPage(CheckinListPage, {
         organization: this.organization,
@@ -238,7 +241,7 @@ export class CheckinTokenPage extends BasePage {
       });
     }
     else {
-      this.showRootPage(SigninUrlPage);
+      this.showModal(SigninUrlPage);
     }
   }
 
