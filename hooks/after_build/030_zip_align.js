@@ -10,21 +10,20 @@ function puts(error, stdout, stderr) {
   console.log(stdout);
 }
 
-function runZipAlign() {
-  process.stdout.write('runZipAlign');
-  var input = "platforms/android/app/build/outputs/apk/release/app-release.apk";
-  var output = "platforms/android/app/build/outputs/apk/release/TenFour.apk";
+function runZipAlign(input, output) {
   if (fs.existsSync(root + "/" + input)) {
+    process.stdout.write("runZipAlign" + input + " aligning..." + '\n');
     var command = "./zipalign -f -v 4 " + input + " " + output;
     process.stdout.write(command);
     exec(command, puts);
-    process.stdout.write("runZipAlign APK " + output + " aligned");
+    process.stdout.write("runZipAlign APK " + output + " aligned" + '\n');
   }
   else {
-    process.stdout.write("runZipAlign APK " + input + " does not exist");
+    process.stdout.write("runZipAlign APK " + input + " not found" + '\n');
   }
 }
 
 if (platform === 'android') {
-  runZipAlign();
+  runZipAlign("platforms/android/build/outputs/apk/release/android-release.apk", "platforms/android/build/outputs/apk/release/TenFour.apk");
+  runZipAlign("platforms/android/app/build/outputs/apk/release/app-release.apk", "platforms/android/app/build/outputs/apk/release/TenFour.apk");
 }
