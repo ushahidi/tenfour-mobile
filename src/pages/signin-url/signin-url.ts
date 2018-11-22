@@ -35,6 +35,7 @@ export class SigninUrlPage extends BasePublicPage {
   title:string = null;
   organization:Organization = null;
   loading:boolean = false;
+  domain:string = this.environment.getAppDomain();
 
   constructor(
       protected zone:NgZone,
