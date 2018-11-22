@@ -49,7 +49,7 @@ export class SignupEmailPage extends BasePublicPage {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
 
-    this.showBackButton = this.navParams.get('showBackButton');
+    this.showBackButton = this.getParameter<boolean>("showBackButton");
 
     if (this.hasParameter('email')) {
       this.email.value = decodeURIComponent(this.getParameter('email'));
