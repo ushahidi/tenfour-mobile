@@ -330,6 +330,7 @@ export class CheckinListPage extends BasePrivatePage {
       this.logger.info(this, "testCheckin", "Modal", data);
       if (data) {
         this.user.config_self_test_sent = true;
+        this.loadUpdates();
       }
       else {
         this.user.config_self_test_sent = false;

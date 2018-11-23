@@ -55,7 +55,7 @@ ionic cordova platform rm browser
 #### Add Platforms
 ```
 ionic cordova platform add ios --buildConfig=build.json
-ionic cordova platform add android --buildConfig=build.json
+ionic cordova platform add android@6.4.0 --buildConfig=build.json
 ionic cordova platform add browser
 ```
 #### Debug iOS
@@ -87,6 +87,7 @@ ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 #### Release Android
 ```
+sdkmanager --update
 ENV=prod ionic cordova prepare android --prod --release --buildConfig=build.json
 ENV=prod ionic cordova build android --device --prod --release --buildConfig=build.json
 ```

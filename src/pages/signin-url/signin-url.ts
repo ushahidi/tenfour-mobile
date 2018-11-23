@@ -35,6 +35,7 @@ export class SigninUrlPage extends BasePublicPage {
   title:string = null;
   organization:Organization = null;
   loading:boolean = false;
+  domain:string = this.environment.getAppDomain();
 
   constructor(
       protected zone:NgZone,
@@ -125,7 +126,7 @@ export class SigninUrlPage extends BasePublicPage {
         if (!this.loginToOrganizationSubdomain(this.organization, token)) {
           this.loading = false;
           loading.dismiss();
-          this.hideModal();
+          this.hideModals();
           this.showRootPage(SigninTokenPage, {
             organization: this.organization,
             token: JSON.stringify(token)
