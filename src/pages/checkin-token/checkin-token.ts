@@ -33,7 +33,6 @@ export class CheckinTokenPage extends BasePage {
   token:string = null;
   answer:string = null;
   loading:boolean = false;
-  inModal:boolean = false;
 
   tokenModal:Modal;
 
@@ -56,10 +55,10 @@ export class CheckinTokenPage extends BasePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
 
-    if (!this.navParams.get('inModal')) {
+    if (!this.navParams.get('modal')) {
       this.loading=true;
       this.tokenModal = this.showModal(CheckinTokenPage, {
-        inModal: true,
+        // modal: true,
         token: this.getParameter('token'),
         answer_id: this.getParameter('answer_id'),
         checkin_id: this.getParameter('checkin_id')
@@ -67,7 +66,7 @@ export class CheckinTokenPage extends BasePage {
     }
 
     let loading = this.showLoading("Loading...");
-    this.inModal = this.navParams.get('inModal');
+    // this.modal = this.navParams.get('modal');
     this.loadUpdates(false).then((finished:any) => {
       this.logger.info(this, "ionViewDidLoad", "loadUpdates", "Loaded");
       loading.dismiss();
