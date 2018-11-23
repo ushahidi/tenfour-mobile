@@ -15,7 +15,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @IonicPage({
   name: 'SignupVerifyPage',
   segment: 'signup/verify/:email/:code',
-  defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
+  defaultHistory: []
 })
 @Component({
   selector: 'page-signup-verify',
