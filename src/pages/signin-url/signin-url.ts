@@ -186,7 +186,9 @@ export class SigninUrlPage extends BasePublicPage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    this.showModal(SignupEmailPage, {}, {
+    this.showModal(SignupEmailPage, {
+      showBackButton: true
+    }, {
       enableBackdropDismiss: false
     });
   }
