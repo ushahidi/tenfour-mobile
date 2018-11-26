@@ -15,7 +15,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @IonicPage({
   name: 'SignupVerifyPage',
   segment: 'signup/verify/:email/:code',
-  defaultHistory: ['SigninUrlPage', 'SignupEmailPage']
+  defaultHistory: []
 })
 @Component({
   selector: 'page-signup-verify',
@@ -51,10 +51,9 @@ export class SignupVerifyPage extends BasePublicPage  {
   ionViewWillEnter() {
     super.ionViewWillEnter();
 
-    if (!this.navParams.get('inModal')) {
+    if (!this.modal) {
       this.loading=true;
       this.verifyModal = this.showModal(SignupVerifyPage, {
-        inModal: true,
         email: this.getParameter('email'),
         code: this.getParameter('code')
       }, {enableBackdropDismiss: false});
