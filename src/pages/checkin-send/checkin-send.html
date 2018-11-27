@@ -5,7 +5,7 @@
         <ion-icon ios="ios-arrow-round-back" md="md-arrow-back"></ion-icon>
       </button>
     </ion-buttons>
-    <ion-title>Check-In</ion-title>
+    <ion-title>Create Check-In</ion-title>
     <ion-buttons right *ngIf="checkin">
       <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="sendCheckin($event)">Send</button>
     </ion-buttons>
@@ -13,16 +13,49 @@
 </ion-header>
 <ion-content>
   <ion-list *ngIf="checkin">
-    <ion-item text-wrap text-center color="white">
-      <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
-      <h1>{{checkin.message}}</h1>
-      <h3>
-        <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
-        <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
-      </h3>
+    <ion-item text-wrap>
+      <ion-label stacked>Ask a question...</ion-label>
+      <!-- <ion-input readonly="true">xx {{checkin.message}}</ion-input> -->
+      <ion-label>{{checkin.message}}</ion-label>
+    </ion-item>
+    <ion-item text-wrap>
+      <ion-label stacked>Answers</ion-label>
+      <ion-label>
+        <span class="answer" *ngFor="let answer of checkin.answers">
+          <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
+          {{answer.answer}}
+        </span>
+      </ion-label>
+     <ion-icon name="arrow-dropdown" item-end></ion-icon>
+    </ion-item>
+    <ion-item text-wrap>
+      <ion-label stacked>Send via</ion-label>
+      <ion-label>{{checkin.send_via | humanize}}</ion-label>
+      <ion-icon name="arrow-dropdown" item-end></ion-icon>
+    </ion-item>
+    <ion-item text-wrap>
+      <ion-label stacked>Send to</ion-label>
+      <ion-label>Add people or groups</ion-label>
+      <ion-icon name="arrow-dropdown" item-end></ion-icon>
+    </ion-item>
+
+
+          <!-- <h3>
+            <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
+            <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
+          </h3> -->
+
+
+  </ion-list>
+
+  <ion-list>
+    <ion-item>
+      <ion-label>Save this check-in to re-use later</ion-label>
+      <ion-checkbox checked="false" item-end></ion-checkbox>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="checkin">
+
+  <!-- <ion-list *ngIf="checkin">
     <ion-list-header>
       <h2>Send Via</h2>
     </ion-list-header>
@@ -59,5 +92,6 @@
         <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
       </button>
     </ion-item>
-  </ion-list>
+  </ion-list> -->
+
 </ion-content>
