@@ -4,6 +4,7 @@ import { IonicPage, Select, Platform, NavParams, NavController, ViewController, 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
+import { CheckinAnswersPage } from '../../pages/checkin-answers/checkin-answers';
 
 import { SendViaComponent } from '../../components/send-via/send-via';
 
@@ -109,6 +110,13 @@ export class CheckinSendPage extends BasePrivatePage {
     this.logger.info(this, "cancelEdit");
     this.hideModal({
       canceled: true
+    });
+  }
+
+  private editAnswers() {
+    this.logger.info(this, "editAnswers");
+    let modal = this.showModal(CheckinAnswersPage, {
+      checkin: this.checkin
     });
   }
 
