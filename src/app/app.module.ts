@@ -73,6 +73,7 @@ import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 import { CheckinTokenModule } from '../pages/checkin-token/checkin-token.module';
 import { CheckinAnswersModule } from '../pages/checkin-answers/checkin-answers.module';
+import { CheckinChannelsModule } from '../pages/checkin-channels/checkin-channels.module';
 
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
@@ -208,6 +209,7 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     CheckinDetailsModule,
     CheckinRespondModule,
     CheckinAnswersModule,
+    CheckinChannelsModule,
     ContactsImportModule,
     ContactsMatchModule,
     NotificationListModule,

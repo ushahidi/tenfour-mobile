@@ -12,7 +12,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <ion-list *ngIf="checkin">
+  <ion-list *ngIf="organization && checkin">
     <ion-item text-wrap>
       <ion-label stacked>Ask a question...</ion-label>
       <!-- <ion-input readonly="true">xx {{checkin.message}}</ion-input> -->
@@ -29,14 +29,13 @@
       <ion-label *ngIf="!checkin.answers.length">
         Don't ask for a response.
       </ion-label>
-
-     <!-- <ion-icon name="arrow-dropdown" item-end></ion-icon> -->
-   </button>
-    <ion-item text-wrap>
+    </button>
+    <button ion-item text-wrap (click)="editChannels()">
       <ion-label stacked>Send via</ion-label>
-      <ion-label>{{checkin.send_via | humanize}}</ion-label>
-      <ion-icon name="arrow-dropdown" item-end></ion-icon>
-    </ion-item>
+      <ion-label *ngIf="checkin.send_via.length">{{checkin.send_via | humanize}}</ion-label>
+      <ion-label *ngIf="!checkin.send_via.length">Don't send the check-in</ion-label>
+      <!-- <ion-icon name="arrow-dropdown" item-end></ion-icon> -->
+    </button>
     <ion-item text-wrap>
       <ion-label stacked>Send to</ion-label>
       <ion-label>Add people or groups</ion-label>

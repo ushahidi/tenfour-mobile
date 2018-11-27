@@ -5,6 +5,7 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
 import { CheckinAnswersPage } from '../../pages/checkin-answers/checkin-answers';
+import { CheckinChannelsPage } from '../../pages/checkin-channels/checkin-channels';
 
 import { SendViaComponent } from '../../components/send-via/send-via';
 
@@ -120,6 +121,16 @@ export class CheckinSendPage extends BasePrivatePage {
     });
   }
 
+  private editChannels() {
+    this.logger.info(this, "editChannels");
+
+    let modal = this.showModal(CheckinChannelsPage, {
+      checkin: this.checkin,
+      organization: this.organization,
+      user: this.user
+    });
+  }
+
   private addPerson() {
     this.logger.info(this, "addPerson");
     let modal = this.showModal(PersonSelectPage, {
@@ -228,51 +239,51 @@ export class CheckinSendPage extends BasePrivatePage {
     }
   }
 
-  private showPopover(event:any) {
-    this.logger.info(this, "showPopover", event, this.checkin.send_via);
-    if (this.organization.hasFreePlan()) {
-      let popover = this.popoverController.create(SendViaComponent, {
-        send_via: this.checkin.send_via,
-        app_enabled: this.organization.app_enabled,
-        email_enabled: false,
-        sms_enabled: false,
-        slack_enabled: false,
-        voice_enabled: false,
-        on_changed:(send_via:any) => {
-          this.logger.info(this, "sendViaChanged", send_via);
-          this.checkin.send_via = send_via;
-          this.countRecipients();
-        }
-      },{
-        showBackdrop: true,
-        enableBackdropDismiss: true
-      });
-      popover.present({
-        ev: event
-      });
-    }
-    else {
-      let popover = this.popoverController.create(SendViaComponent, {
-        send_via: this.checkin.send_via,
-        app_enabled: this.organization.app_enabled,
-        email_enabled: this.organization.email_enabled,
-        sms_enabled: this.organization.sms_enabled,
-        slack_enabled: this.organization.slack_enabled,
-        voice_enabled: this.organization.voice_enabled,
-        on_changed:(send_via:any) => {
-          this.logger.info(this, "sendViaChanged", send_via);
-          this.checkin.send_via = send_via;
-          this.countRecipients();
-        }
-      },{
-        showBackdrop: true,
-        enableBackdropDismiss: true
-      });
-      popover.present({
-        ev: event
-      });
-    }
-  }
+  // private showPopover(event:any) {
+  //   this.logger.info(this, "showPopover", event, this.checkin.send_via);
+  //   if (this.organization.hasFreePlan()) {
+  //     let popover = this.popoverController.create(SendViaComponent, {
+  //       send_via: this.checkin.send_via,
+  //       app_enabled: this.organization.app_enabled,
+  //       email_enabled: false,
+  //       sms_enabled: false,
+  //       slack_enabled: false,
+  //       voice_enabled: false,
+  //       on_changed:(send_via:any) => {
+  //         this.logger.info(this, "sendViaChanged", send_via);
+  //         this.checkin.send_via = send_via;
+  //         this.countRecipients();
+  //       }
+  //     },{
+  //       showBackdrop: true,
+  //       enableBackdropDismiss: true
+  //     });
+  //     popover.present({
+  //       ev: event
+  //     });
+  //   }
+  //   else {
+  //     let popover = this.popoverController.create(SendViaComponent, {
+  //       send_via: this.checkin.send_via,
+  //       app_enabled: this.organization.app_enabled,
+  //       email_enabled: this.organization.email_enabled,
+  //       sms_enabled: this.organization.sms_enabled,
+  //       slack_enabled: this.organization.slack_enabled,
+  //       voice_enabled: this.organization.voice_enabled,
+  //       on_changed:(send_via:any) => {
+  //         this.logger.info(this, "sendViaChanged", send_via);
+  //         this.checkin.send_via = send_via;
+  //         this.countRecipients();
+  //       }
+  //     },{
+  //       showBackdrop: true,
+  //       enableBackdropDismiss: true
+  //     });
+  //     popover.present({
+  //       ev: event
+  //     });
+  //   }
+  // }
 
   private countRecipients() {
     this.checkin.waiting_count = this.checkin.recipientIds().length;

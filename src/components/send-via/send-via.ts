@@ -21,8 +21,8 @@ export class SendViaComponent {
   app_enabled:boolean=false;
   app_selected:boolean=false;
 
-  voice_enabled:boolean=true;
-  voice_selected:boolean=true;
+  voice_enabled:boolean=false;
+  voice_selected:boolean=false;
 
   constructor(
     private params:NavParams,
