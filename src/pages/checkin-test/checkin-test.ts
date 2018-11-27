@@ -106,6 +106,7 @@ export class CheckinTestPage extends BasePrivatePage {
         recipient.user_id = this.user.id;
         this.checkin.recipients.push(recipient);
       }
+      resolve(this.checkin);
     });
   }
 
@@ -122,6 +123,10 @@ export class CheckinTestPage extends BasePrivatePage {
         this.hideModal({
           checkin: checkin
         });
+      },
+      (error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Saving Checkin", error);
       });
     },
     (error:any) => {
