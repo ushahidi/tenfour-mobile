@@ -486,7 +486,14 @@ export class HttpProvider {
           return message.toString();
         }
         else {
-          let json = JSON.parse(message);
+          let json;
+
+          try {
+            json = JSON.parse(message);
+          } catch (err) {
+            return "An unknown error has occurred";
+          }
+
           if (json['errors']) {
             let errors = json['errors'];
             let messages = [];
