@@ -106,3 +106,12 @@
   </ion-list> -->
 
 </ion-content>
+
+<ion-footer *ngIf="checkin && checkin.waiting_count">
+  <ion-toolbar>
+    <ion-title>
+        <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
+        <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
+    </ion-title>
+  </ion-toolbar>
+</ion-footer>
