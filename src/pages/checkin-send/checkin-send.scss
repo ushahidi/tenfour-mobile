@@ -23,6 +23,20 @@ page-checkin-send {
   //   }
   // }
 
+  .recipients-item {
+    [stacked].label {
+      max-height: 1.5em !important;
+    }
+    .recipients-list {
+      margin-top:0;
+      // padding-bottom:5px;
+
+      span {
+        margin-right: 10px;
+      }
+    }
+  }
+
   .answer .badge {
     transform: scale(.5, .5);
   }

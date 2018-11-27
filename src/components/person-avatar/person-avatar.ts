@@ -27,6 +27,9 @@ export class PersonAvatarComponent {
   @Input()
   large:boolean = false;
 
+  @Input()
+  mini:boolean = false;
+
   offset:number = 0;
 
   errorImage:string = 'assets/images/user.jpg';
