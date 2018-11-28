@@ -46,6 +46,9 @@ export class Checkin extends Model {
           this.recipients.push(recipient);
         }
       }
+      if (data.groups) {
+        this.group_ids = data.groups.map((group:Group) => group.id).join(",");
+      }
       if (data.replies) {
         this.replies = [];
         for (let _reply of data.replies) {
@@ -147,6 +150,8 @@ export class Checkin extends Model {
 
   public recipients:Recipient[] = [];
 
+  @Column("group_ids", TEXT)
+  public group_ids:string = null;
   public groups:Group[] = [];
 
   public replies:Reply[] = [];

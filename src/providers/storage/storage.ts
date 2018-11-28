@@ -751,12 +751,14 @@ export class StorageProvider {
       this.provider.getModel<Checkin>(new Checkin(), where).then((checkin:Checkin) => {
         if (checkin) {
           Promise.all([
+            this.getCheckinGroups(organization, checkin),
             this.getAnswers(organization, checkin),
             this.getReplies(organization, checkin),
             this.getRecipients(organization, checkin)]).then((results:any[]) => {
-              checkin.answers = <Answer[]>results[0];
-              checkin.replies = <Reply[]>results[1];
-              checkin.recipients = <Recipient[]>results[2];
+              checkin.groups = <Group[]>results[0];
+              checkin.answers = <Answer[]>results[1];
+              checkin.replies = <Reply[]>results[2];
+              checkin.recipients = <Recipient[]>results[3];
               resolve(checkin);
           });
         }
@@ -764,6 +766,20 @@ export class StorageProvider {
           resolve(null);
         }
       });
+    });
+  }
+
+  private getCheckinGroups(organization:Organization, checkin:Checkin):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      if (checkin.group_ids) {
+        let promises = [];
+        checkin.group_ids.split(",").forEach(group_id => {
+          promises.push(this.getGroup(organization, Number(group_id)));
+        });
+        Promise.all(promises).then((results:Group[]) => { resolve(results); });
+      } else {
+        resolve([]);
+      }
     });
   }
 

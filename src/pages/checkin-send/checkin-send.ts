@@ -155,6 +155,7 @@ export class CheckinSendPage extends BasePrivatePage {
        }
        if (data && data.groups) {
          this.checkin.groups = data.groups;
+         this.checkin.group_ids = this.checkin.groups.map((group) => { return group.id; }).join(',');
        }
        if (data && data.everyone) {
          this.checkin.everyone = true;
