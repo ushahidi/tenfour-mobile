@@ -139,7 +139,8 @@ export class CheckinSendPage extends BasePrivatePage {
       groups: this.checkin.groups,
       people: this.checkin.recipients,
       show_groups: true,
-      show_people: true
+      show_people: true,
+      show_everyone: true,
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);

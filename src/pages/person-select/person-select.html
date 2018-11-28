@@ -23,6 +23,11 @@
       <button float-right ion-button clear tappable color="primary" *ngIf="groups.length > 0" (click)="selectAllGroups(true)">Select All</button>
       <h2>Groups</h2>
     </ion-list-header>
+    <ion-item color="white" *ngIf="show_everyone">
+      <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
+      <ion-label>Everyone</ion-label>
+      <ion-checkbox item-right [(ngModel)]="everyone"></ion-checkbox>
+    </ion-item>
     <ion-item color="white" *ngFor="let group of groups">
       <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
       <ion-label>{{group.name}}</ion-label>

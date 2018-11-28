@@ -142,7 +142,8 @@ export class GroupEditPage extends BasePrivatePage {
       organization: this.organization,
       people: this.group.members,
       show_groups: false,
-      show_people: true
+      show_people: true,
+      show_everyone: false
      });
     modal.onDidDismiss(data => {
        if (data && data.people) {
