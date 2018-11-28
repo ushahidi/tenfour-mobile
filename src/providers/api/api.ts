@@ -788,7 +788,9 @@ export class ApiProvider extends HttpProvider {
           message: checkin.message,
           answers: checkin.answers,
           recipients: checkin.recipientIds().map((id) => { return {id: id} }),
-          send_via: checkin.sendVia()
+          send_via: checkin.sendVia(),
+          everyone: !!checkin.everyone,
+          group_ids: checkin.groups.map((group) => { return group.id; })
         };
         if (checkin.self_test_check_in) {
           params['self_test_check_in'] = 1;
@@ -821,7 +823,9 @@ export class ApiProvider extends HttpProvider {
           message: checkin.message,
           answers: checkin.answers,
           recipients: checkin.recipientIds().map((id) => { return {id: id} }),
-          send_via: checkin.sendVia()
+          send_via: checkin.sendVia(),
+          everyone: !!checkin.everyone,
+          group_ids: checkin.groups.map((group) => { return group.id; })
         };
         if (checkin.self_test_check_in) {
           params['self_test_check_in'] = 1;
