@@ -4,6 +4,7 @@ import { App, IonicPage, Platform, TextInput, NavParams, NavController, ViewCont
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 
 import { Template } from '../../models/template';
+import { Checkin } from '../../models/checkin';
 import { Organization } from '../../models/organization';
 
 import { ApiProvider } from '../../providers/api/api';
@@ -92,7 +93,41 @@ export class CheckinTemplatesPage extends BasePrivatePage {
     });
   }
 
-  private edit() {
+  private delete(template:Template) {
+    this.logger.info(this, "delete", template);
 
+    let loading = this.showLoading("Deleting...", true);
+
+    template.template = false;
+
+    this.api.updateCheckin(this.organization, <Checkin>template)
+      .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
+      .then((saved) => {
+        loading.dismiss();
+        this.showToast("Saved check-in deleted");
+        this.loadUpdates();
+      })
+      .catch((error:any) => {
+        loading.dismiss();
+        this.showAlert("The saved check-in could not be deleted", error);
+      });
+  }
+
+  private showConfirmDelete(template:Template) {
+    this.logger.info(this, "showConfirmDelete", template);
+    let buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "save", "Cancelled");
+        }
+      },
+      {
+        text: 'Delete',
+        handler: () => { this.delete(template); }
+      }
+    ];
+    this.showConfirm("Are you sure?", "Deleting this check-in template can't be undone.", buttons);
   }
 }
