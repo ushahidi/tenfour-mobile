@@ -109,9 +109,38 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-    this.hideModal({
-      canceled: true
-    });
+
+    if (this.checkin.template) {
+        let buttons = [
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              this.logger.info(this, "save", "Cancelled");
+            }
+          },
+          {
+            text: 'Discard',
+            handler: () => {
+              this.hideModal({
+                canceled: true
+              });
+            }
+          },
+          {
+            text: 'Save & Exit',
+            handler: () => {
+              this.createCheckin(event);
+            }
+          },
+        ];
+        this.showConfirm("Do you want to save this check-in?",
+          "You can save this check-in to re-use later.", buttons);
+    } else {
+      this.hideModal({
+        canceled: true
+      });
+    }
   }
 
   private editAnswers() {
@@ -204,6 +233,24 @@ export class CheckinSendPage extends BasePrivatePage {
         ]
       );
     }
+  }
+
+  private createCheckin(event:any) {
+    let loading = this.showLoading("Saving...", true);
+    this.api.createCheckin(this.organization, this.checkin)
+      .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
+      .then(() => {
+        loading.dismiss();
+        this.showToast(`Check-In saved`);
+        let firstViewController = this.navController.first();
+        this.navController.popToRoot({ animate: false }).then(() => {
+          firstViewController.dismiss({ checkin: Checkin });
+        });
+      })
+      .catch((error:any) => {
+        loading.dismiss();
+        this.showAlert("Problem Creating Check-In", error);
+      });
   }
 
   private sendCheckin(event:any) {

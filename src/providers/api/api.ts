@@ -822,6 +822,32 @@ export class ApiProvider extends HttpProvider {
     return params;
   }
 
+  // create a check-in without sending
+  public createCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
+        let params = this.getCheckInParams(organization, checkin);
+        params.recipients = [];
+        this.httpPost(url, params, token.access_token).then((data:any) => {
+          if (data && data.checkin) {
+            let checkin = new Checkin(data.checkin);
+            resolve(checkin);
+          }
+          else {
+            reject("Checkin Not Created");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
