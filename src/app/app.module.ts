@@ -131,6 +131,7 @@ import { OrganizationLogoModule } from '../components/organization-logo/organiza
 import { CheckinBadgesModule } from '../components/checkin-badges/checkin-badges.module';
 import { CheckinPopoverModule } from '../components/checkin-popover/checkin-popover.module';
 import { BulkActionsModule } from '../components/bulk-actions/bulk-actions.module';
+import { CheckinActionsModule } from '../components/checkin-actions/checkin-actions.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';

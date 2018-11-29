@@ -1,5 +1,6 @@
 <ion-list>
   <ion-item text-wrap text-center color="white">
+    <p class="saved" *ngIf="checkin.template">Saved</p>
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>
     <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
