@@ -3,6 +3,7 @@ import { App, IonicPage, Platform, TextInput, NavParams, NavController, ViewCont
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
+import { CheckinTemplatesPage } from '../../pages/checkin-templates/checkin-templates';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -228,6 +229,13 @@ export class CheckinEditPage extends BasePrivatePage {
   //     ev: event
   //   });
   // }
+
+  private showTemplates(event:any) {
+    this.logger.info(this, "showTemplates");
+    this.showModal(CheckinTemplatesPage, {
+      organization: this.organization
+    });
+  }
 
   private onKeyPress(event:any) {
     if (this.isKeyReturn(event)) {

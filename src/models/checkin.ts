@@ -138,6 +138,9 @@ export class Checkin extends Model {
   @Column("everyone", BOOLEAN)
   public everyone:boolean = false;
 
+  @Column("template", BOOLEAN)
+  public template:boolean = false;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 

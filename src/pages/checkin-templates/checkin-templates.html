@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+        <button ion-button icon-only color="cancel" (click)="hideModal($event)">
+        <ion-icon ios="ios-arrow-round-back" md="md-arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
+    <ion-title>Saved check-ins</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="edit($event)" *ngIf="templates && templates.length">Edit</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+
+  <div text-center class="spinner" *ngIf="loading == true">
+    <ion-spinner name="ios"></ion-spinner>
+  </div>
+
+  <ion-list>
+    <ion-item *ngIf="!loading && (!templates || !templates.length)">
+      <ion-label>You have no saved check-ins</ion-label>
+    </ion-item>
+
+    <button ion-item color="white" *ngFor="let template of templates">
+      <h2 ion-text color="primary">{{template.message}}</h2>
+      <p>Send to
+        <span *ngIf="template.everyone">everyone</span>
+        <span *ngIf="!template.everyone && template.groups.length == 1">
+          1 group
+        </span>
+        <span *ngIf="!template.everyone && template.groups.length > 1">
+          {{template.groups.length}} groups
+        </span>
+        <span *ngIf="!template.everyone && !template.groups.length">
+          nobody
+        </span>
+        via
+        <span *ngIf="template.send_via.length">{{template.send_via | humanize}}</span>
+        <span *ngIf="!template.send_via.length">no channels</span>
+      </p>
+    </button>
+  </ion-list>
+
+</ion-content>

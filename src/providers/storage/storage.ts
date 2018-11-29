@@ -11,6 +11,7 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+import { Template } from '../../models/template';
 import { Organization } from '../../models/organization';
 import { Answer } from '../../models/answer';
 import { Reply } from '../../models/reply';
@@ -637,9 +638,21 @@ export class StorageProvider {
     });
   }
 
-  public getCheckins(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
+  public getTemplates(organization:Organization):Promise<Template[]> {
     return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
+      this.getCheckins(organization, null, null, true).then((checkins) => {
+        let templates = [];
+        checkins.forEach((checkin) => {
+          templates.push(<Template>checkin);
+        });
+        resolve(templates);
+      }, reject);
+    });
+  }
+
+  public getCheckins(organization:Organization, limit:number=null, offset:number=null, template:boolean=false):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      let where = { organization_id: organization.id, template: !!template };
       let order = { created_at: "DESC" };
       this.provider.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
         if (checkins && checkins.length > 0) {

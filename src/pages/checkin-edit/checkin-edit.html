@@ -24,9 +24,9 @@
     <ion-list-header>
       <h2>...Or send a saved check-in</h2>
     </ion-list-header>
-    <ion-item color="white" tappable detail-push (click)="void">
+    <button ion-item color="white" tappable detail-push (click)="showTemplates($event)">
       Saved check-ins
-    </ion-item>
+    </button>
   </ion-list>
 
   <!-- <ion-list *ngIf="checkin && checkin.answers">

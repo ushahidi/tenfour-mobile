@@ -14,6 +14,7 @@ import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
+import { Template } from '../../models/template';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Group } from '../../models/group';
@@ -636,6 +637,31 @@ export class ApiProvider extends HttpProvider {
           else {
             reject("Contact Not Updated");
           }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getTemplates(organization:Organization):Promise<Template[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?template=true`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let templates = [];
+          if (data && data.checkins) {
+            for (let _checkin of data.checkins) {
+              let template = new Template(_checkin);
+              templates.push(template);
+            }
+          }
+          resolve(templates);
         },
         (error:any) => {
           reject(error);
