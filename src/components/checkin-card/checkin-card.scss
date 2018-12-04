@@ -1,25 +1,24 @@
 checkin-card {
   ion-card {
     ion-card-content {
-      person-avatar {
-      }
       h1 {
         font-size: 1.4em !important;
+        padding-top: 10px;
+        padding-left: 5px;
       }
       p {
+        padding-left: 5px;
         color: color($colors, text) !important;
         strong {
           color: color($colors, black) !important;
           font-weight: 500 !important;
         }
       }
-    }
-    ion-row {
-      border-top: 1px solid color($colors, light) !important;
-      ion-col {
-        button {
-          font-weight: 500 !important;
-        }
+      person-avatar {
+        // .large {
+        //   width:50px !important;
+        //   height:50px !important;
+        // }
       }
     }
   }
