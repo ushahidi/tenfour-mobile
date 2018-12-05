@@ -43,6 +43,7 @@ npm install -g android-simulator@latest
 #### Clean Modules
 ```
 rm -r node_modules
+rm -f package-lock.json
 npm install
 ```
 #### Remove Platforms
@@ -82,12 +83,14 @@ ENV=prod ionic serve --livereload --consolelogs
 #### Release iOS
 ```
 rvm use system
+export NODE_OPTIONS=--max_old_space_size=4096
 ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
 ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 #### Release Android
 ```
 sdkmanager --update
+export NODE_OPTIONS=--max_old_space_size=4096
 ENV=prod ionic cordova prepare android --prod --release --buildConfig=build.json
 ENV=prod ionic cordova build android --device --prod --release --buildConfig=build.json
 ```
