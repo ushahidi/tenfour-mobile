@@ -49,6 +49,9 @@ export class Checkin extends Model {
       if (data.groups) {
         this.group_ids = data.groups.map((group:Group) => group.id).join(",");
       }
+      if (data.users) {
+        this.user_ids = data.users.map((user:User) => user.id).join(",");
+      }
       if (data.replies) {
         this.replies = [];
         for (let _reply of data.replies) {
@@ -157,6 +160,10 @@ export class Checkin extends Model {
   public group_ids:string = null;
   public groups:Group[] = [];
 
+  @Column("user_ids", TEXT)
+  public user_ids:string = null;
+  public users:User[] = [];
+
   public replies:Reply[] = [];
 
   public reply:Reply = null;
@@ -250,7 +257,7 @@ export class Checkin extends Model {
   }
 
   public recipientIds():number[] {
-    return this.flattenRecipients().map(r => r.user_id ? r.user_id : r.id);
+    return this.getRecipients().map(r => r.user_id ? r.user_id : r.id);
   }
 
   public sendVia() {
@@ -321,11 +328,11 @@ export class Checkin extends Model {
     }
   }
 
-  private flattenRecipients():any[] {
+  private getRecipients():Recipient[] {
     let _recipients = {};
 
-    for (let recipient of this.recipients) {
-      _recipients[recipient.user_id] = recipient;
+    for (let recipient of this.users) {
+      _recipients[recipient.id] = recipient;
     }
 
     for (let group of this.groups) {
@@ -335,13 +342,13 @@ export class Checkin extends Model {
       }
     }
 
-    return Object.keys(_recipients).map((key) => { return _recipients[key]; });
+    return Object.keys(_recipients).map((key) => { return <Recipient>_recipients[key]; });
   }
 
   public creditsRequired():number {
     let creditsRequired = 0;
     let checkinSendVia = this.sendVia();
-    let _recipients = this.flattenRecipients();
+    let _recipients = this.getRecipients();
 
     for (let recipient of _recipients) {
       for (let contact of recipient.contacts) {

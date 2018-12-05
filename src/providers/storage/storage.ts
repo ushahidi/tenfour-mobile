@@ -765,13 +765,15 @@ export class StorageProvider {
         if (checkin) {
           Promise.all([
             this.getCheckinGroups(organization, checkin),
+            this.getCheckinUsers(organization, checkin),
             this.getAnswers(organization, checkin),
             this.getReplies(organization, checkin),
             this.getRecipients(organization, checkin)]).then((results:any[]) => {
               checkin.groups = <Group[]>results[0];
-              checkin.answers = <Answer[]>results[1];
-              checkin.replies = <Reply[]>results[2];
-              checkin.recipients = <Recipient[]>results[3];
+              checkin.users = <User[]>results[1];
+              checkin.answers = <Answer[]>results[2];
+              checkin.replies = <Reply[]>results[3];
+              checkin.recipients = <Recipient[]>results[4];
               resolve(checkin);
           });
         }
@@ -790,6 +792,20 @@ export class StorageProvider {
           promises.push(this.getGroup(organization, Number(group_id)));
         });
         Promise.all(promises).then((results:Group[]) => { resolve(results); });
+      } else {
+        resolve([]);
+      }
+    });
+  }
+
+  private getCheckinUsers(organization:Organization, checkin:Checkin):Promise<User[]> {
+    return new Promise((resolve, reject) => {
+      if (checkin.user_ids) {
+        let promises = [];
+        checkin.user_ids.split(",").forEach(user_id => {
+          promises.push(this.getPerson(organization, Number(user_id)));
+        });
+        Promise.all(promises).then((results:User[]) => { resolve(results); });
       } else {
         resolve([]);
       }

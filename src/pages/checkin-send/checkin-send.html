@@ -36,16 +36,16 @@
     </button>
     <button class="recipients-item" ion-item text-wrap (click)="addPerson()">
       <ion-label stacked>Send to...</ion-label>
-      <ion-label *ngIf="!checkin.recipients.length && !checkin.groups.length">Add people or groups</ion-label>
-      <ion-label class="recipients-list" *ngIf="checkin.recipients.length || checkin.groups.length">
+      <ion-label *ngIf="!checkin.users.length && !checkin.groups.length">Add people or groups</ion-label>
+      <ion-label class="recipients-list" *ngIf="checkin.users.length || checkin.groups.length">
         <span *ngFor="let group of checkin.groups">
           <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
           {{group.name}}
         </span>
-        <span *ngFor="let recipient of checkin.recipients">
+        <span *ngFor="let user of checkin.users">
           <!-- <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [mini]="true"></person-avatar> -->
           <ion-icon item-left class="recipient-icon" ios="ios-person" md="md-person"></ion-icon>
-          {{recipient.name}}
+          {{user.name}}
         </span>
       </ion-label>
     </button>

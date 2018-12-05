@@ -814,7 +814,8 @@ export class ApiProvider extends HttpProvider {
       send_via: checkin.sendVia(),
       everyone: !!checkin.everyone,
       template: !!checkin.template,
-      group_ids: checkin.groups.map((group) => { return group.id; })
+      group_ids: checkin.groups.map((group) => { return group.id; }),
+      user_ids: checkin.users.map((user) => { return user.id; })
     };
     if (checkin.self_test_check_in) {
       params['self_test_check_in'] = 1;
