@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
 import { HumanizeModule } from '../../pipes/humanize/humanize.module';
+import { CheckinSendModule } from '../../pages/checkin-send/checkin-send.module';
 
 import { CheckinTemplatesPage } from './checkin-templates';
 

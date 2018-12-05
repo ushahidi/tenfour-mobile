@@ -2,6 +2,7 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { App, IonicPage, Platform, TextInput, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
+import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
 
 import { Template } from '../../models/template';
 import { Checkin } from '../../models/checkin';
@@ -129,5 +130,15 @@ export class CheckinTemplatesPage extends BasePrivatePage {
       }
     ];
     this.showConfirm("Are you sure?", "Deleting this check-in template can't be undone.", buttons);
+  }
+
+  private sendTemplate(template:Template) {
+    this.logger.info(this, "sendTemplate", template);
+
+    this.showModal(CheckinSendPage, {
+      organization: this.organization,
+      user: this.user,
+      checkin: new Checkin(template)
+    });
   }
 }

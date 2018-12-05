@@ -166,7 +166,7 @@ export class CheckinSendPage extends BasePrivatePage {
       organization: this.organization,
       user: this.user,
       groups: this.checkin.groups,
-      people: this.checkin.recipients,
+      people: this.checkin.users,
       show_groups: true,
       show_people: true,
       show_everyone: true,
@@ -174,13 +174,16 @@ export class CheckinSendPage extends BasePrivatePage {
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);
        if (data && data.people) {
-         let recipients = [];
-         for (let person of data.people) {
-           let recipient = new Recipient(person);
-           recipient.user_id = person.id;
-           recipients.push(recipient);
-         }
-         this.checkin.recipients = recipients;
+         // let recipients = [];
+         // for (let person of data.people) {
+         //   let recipient = new Recipient(person);
+         //   recipient.user_id = person.id;
+         //   recipients.push(recipient);
+         // }
+         // this.checkin.recipients = recipients;
+
+         this.checkin.users = data.people;
+         this.checkin.user_ids = this.checkin.users.map((user) => { return user.id; }).join(',');
        }
        if (data && data.groups) {
          this.checkin.groups = data.groups;

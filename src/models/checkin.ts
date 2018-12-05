@@ -368,4 +368,33 @@ export class Checkin extends Model {
 
     return creditsRequired;
   }
+
+  public sendTo():string {
+    let send_to = [];
+
+    if (this.everyone) {
+      send_to.push('everyone');
+    } else {
+      if (this.groups) {
+        if (this.groups.length == 1) {
+          send_to.push('1 group');
+        } else {
+          send_to.push(this.groups.length + ' groups');
+        }
+      }
+      if (this.users) {
+        if (this.users.length == 1) {
+          send_to.push('1 person');
+        } else {
+          send_to.push(this.users.length + ' people');
+        }
+      }
+    }
+
+    if (send_to.length == 0) {
+      send_to.push('nobody');
+    }
+
+    return send_to.join(' and ');
+  }
 }
