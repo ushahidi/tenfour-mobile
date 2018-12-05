@@ -58,7 +58,7 @@ export class CheckinSendPage extends BasePrivatePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    let loading = this.showLoading("Loading...");
+    let loading = this.showLoading("Loading...", true);
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
@@ -76,15 +76,19 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
-    return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
+    return new Promise((resolve, reject) => {
+      return this.loadOrganization(cache)
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckin(cache); })
+      .then(() => { return this.loadContactsForCheckin(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
+        this.countRecipients();
+        this.checkin.template = false;
         if (event) {
           event.complete();
         }
+        resolve(true);
       })
       .catch((error) => {
         this.logger.error(this, "loadUpdates", "Failed", error);
@@ -92,7 +96,9 @@ export class CheckinSendPage extends BasePrivatePage {
           event.complete();
         }
         this.showToast(error);
+        resolve(false);
       });
+    });
   }
 
   private loadCheckin(cache:boolean=true):Promise<Checkin> {
@@ -105,6 +111,38 @@ export class CheckinSendPage extends BasePrivatePage {
       }
       resolve(this.checkin);
     });
+  }
+
+  private loadContactsForCheckin(cache:boolean=true):Promise<any> {
+    return new Promise((resolve, reject) => {
+      let promises = [];
+
+      this.checkin.users.forEach((person:Person) => {
+        promises.push(this.loadContactsForPerson(cache, person));
+      });
+
+      this.checkin.groups.forEach((group:Group) => {
+        group.members.forEach((person:Person) => {
+          promises.push(this.loadContactsForPerson(cache, person));
+        });
+      });
+
+      Promise.all(promises).then(resolve,reject);
+    });
+  }
+
+  private loadContactsForPerson(cache:boolean=true, person:Person):Promise<Person> {
+    return new Promise((resolve, reject) => {
+      this.promiseFallback(cache,
+        this.storage.getPerson(this.organization, person.id),
+        this.api.getPerson(this.organization, person.id)).then((person2:Person) => {
+          person.contacts = person2.contacts;
+          resolve(person);
+        },
+        (error:any) => {
+          reject(null);
+        });
+      });
   }
 
   private cancelEdit(event:any) {
