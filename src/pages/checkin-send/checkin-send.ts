@@ -104,10 +104,8 @@ export class CheckinSendPage extends BasePrivatePage {
   private loadCheckin(cache:boolean=true):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.checkin = this.getParameter<Checkin>("checkin");
-      if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
-        if (this.organization && this.organization.hasFreePlan()) {
-          this.checkin.send_via = "app";
-        }
+      if (this.organization && this.organization.hasFreePlan()) {
+        this.checkin.send_via = "app";
       }
       resolve(this.checkin);
     });
