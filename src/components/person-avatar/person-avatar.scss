@@ -54,5 +54,20 @@ person-avatar {
         border-width: 6px;
       }
     }
+    &.mini {
+      width:15px !important;
+      height:15px !important;
+      margin-bottom: 0px;
+      margin-left: 10px;
+      margin-right: 2px;
+      .initials {
+        font-size: 5px;
+        padding-top: 4px;
+      }
+      &.border {
+        border-width: 1px;
+      }
+      display: inline-block;
+    }
   }
 }

@@ -11,6 +11,7 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Checkin } from '../../models/checkin';
+import { Template } from '../../models/template';
 import { Organization } from '../../models/organization';
 import { Answer } from '../../models/answer';
 import { Reply } from '../../models/reply';
@@ -637,9 +638,21 @@ export class StorageProvider {
     });
   }
 
-  public getCheckins(organization:Organization, limit:number=null, offset:number=null):Promise<Checkin[]> {
+  public getTemplates(organization:Organization):Promise<Template[]> {
     return new Promise((resolve, reject) => {
-      let where = { organization_id: organization.id };
+      this.getCheckins(organization, null, null, true).then((checkins) => {
+        let templates = [];
+        checkins.forEach((checkin) => {
+          templates.push(<Template>checkin);
+        });
+        resolve(templates);
+      }, reject);
+    });
+  }
+
+  public getCheckins(organization:Organization, limit:number=null, offset:number=null, template:boolean=false):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      let where = { organization_id: organization.id, template: !!template };
       let order = { created_at: "DESC" };
       this.provider.getModels<Checkin>(new Checkin(), where, order, limit, offset).then((checkins:Checkin[]) => {
         if (checkins && checkins.length > 0) {
@@ -751,12 +764,16 @@ export class StorageProvider {
       this.provider.getModel<Checkin>(new Checkin(), where).then((checkin:Checkin) => {
         if (checkin) {
           Promise.all([
+            this.getCheckinGroups(organization, checkin),
+            this.getCheckinUsers(organization, checkin),
             this.getAnswers(organization, checkin),
             this.getReplies(organization, checkin),
             this.getRecipients(organization, checkin)]).then((results:any[]) => {
-              checkin.answers = <Answer[]>results[0];
-              checkin.replies = <Reply[]>results[1];
-              checkin.recipients = <Recipient[]>results[2];
+              checkin.groups = <Group[]>results[0];
+              checkin.users = <User[]>results[1];
+              checkin.answers = <Answer[]>results[2];
+              checkin.replies = <Reply[]>results[3];
+              checkin.recipients = <Recipient[]>results[4];
               resolve(checkin);
           });
         }
@@ -764,6 +781,34 @@ export class StorageProvider {
           resolve(null);
         }
       });
+    });
+  }
+
+  private getCheckinGroups(organization:Organization, checkin:Checkin):Promise<Group[]> {
+    return new Promise((resolve, reject) => {
+      if (checkin.group_ids) {
+        let promises = [];
+        checkin.group_ids.split(",").forEach(group_id => {
+          promises.push(this.getGroup(organization, Number(group_id)));
+        });
+        Promise.all(promises).then((results:Group[]) => { resolve(results); });
+      } else {
+        resolve([]);
+      }
+    });
+  }
+
+  private getCheckinUsers(organization:Organization, checkin:Checkin):Promise<User[]> {
+    return new Promise((resolve, reject) => {
+      if (checkin.user_ids) {
+        let promises = [];
+        checkin.user_ids.split(",").forEach(user_id => {
+          promises.push(this.getPerson(organization, Number(user_id)));
+        });
+        Promise.all(promises).then((results:User[]) => { resolve(results); });
+      } else {
+        resolve([]);
+      }
     });
   }
 

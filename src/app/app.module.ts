@@ -72,6 +72,9 @@ import { CheckinEditModule } from '../pages/checkin-edit/checkin-edit.module';
 import { CheckinSendModule } from '../pages/checkin-send/checkin-send.module';
 import { CheckinTestModule } from '../pages/checkin-test/checkin-test.module';
 import { CheckinTokenModule } from '../pages/checkin-token/checkin-token.module';
+import { CheckinAnswersModule } from '../pages/checkin-answers/checkin-answers.module';
+import { CheckinChannelsModule } from '../pages/checkin-channels/checkin-channels.module';
+import { CheckinTemplatesModule } from '../pages/checkin-templates/checkin-templates.module';
 
 import { CheckinDetailsModule } from '../pages/checkin-details/checkin-details.module';
 import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.module';
@@ -128,6 +131,7 @@ import { OrganizationLogoModule } from '../components/organization-logo/organiza
 import { CheckinBadgesModule } from '../components/checkin-badges/checkin-badges.module';
 import { CheckinPopoverModule } from '../components/checkin-popover/checkin-popover.module';
 import { BulkActionsModule } from '../components/bulk-actions/bulk-actions.module';
+import { CheckinActionsModule } from '../components/checkin-actions/checkin-actions.module';
 
 import { LoggerProvider } from '../providers/logger/logger';
 import { ApiProvider } from '../providers/api/api';
@@ -206,6 +210,9 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     CheckinTokenModule,
     CheckinDetailsModule,
     CheckinRespondModule,
+    CheckinAnswersModule,
+    CheckinChannelsModule,
+    CheckinTemplatesModule,
     ContactsImportModule,
     ContactsMatchModule,
     NotificationListModule,

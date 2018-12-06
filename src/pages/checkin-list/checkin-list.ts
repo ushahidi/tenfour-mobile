@@ -362,6 +362,9 @@ export class CheckinListPage extends BasePrivatePage {
   private filterCheckins(checkins:Checkin[]) {
     let filtered = [];
     for (let checkin of checkins) {
+      if (checkin.template && !checkin.recipients.length) {
+        continue;
+      }
       if (this.filter === "all") {
         filtered.push(checkin);
       }

@@ -1,8 +1,9 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinRespondPage } from '../../pages/checkin-respond/checkin-respond';
+import { CheckinActionsComponent } from '../../components/checkin-actions/checkin-actions';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
@@ -48,6 +49,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
       protected alertController:AlertController,
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
+      protected popoverController:PopoverController,
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
@@ -243,29 +245,24 @@ export class CheckinDetailsPage extends BasePrivatePage {
     this.hideModal();
   }
 
-  private shareCheckin(event:any) {
-    let subject = this.checkin.message;
-    let message = [];
-    for (let answer of this.checkin.answers) {
-      if (answer.replies > 0) {
-        let replies = [];
-        for (let reply of this.checkin.answerReplies(answer)) {
-          replies.push(reply.user_name);
-        }
-        message.push(`${answer.answer} - ${replies.join(", ")}`);
+  private showCheckinActions($event) {
+    this.logger.info(this, "showCheckinActions");
+
+    let popover = this.popoverController.create(CheckinActionsComponent, {
+      organization: this.organization,
+      user: this.user,
+      checkin: this.checkin
+    });
+    popover.onDidDismiss(data => {
+      this.logger.info(this, 'showCheckinActions', 'onDidDismiss');
+
+      if (data) {
+        this.loadUpdates(false);
       }
-    }
-    if (this.checkin.replies.length < this.checkin.recipients.length) {
-      let pending = [];
-      for (let recipient of this.checkin.recipientsPending()) {
-        pending.push(recipient.name);
-      }
-      message.push(`No Response - ${pending.join(", ")}`);
-    }
-    let image = this.checkin.user_picture;
-    let website = `https://${this.organization.subdomain}.tenfour.org/#checkins/${this.checkin.id}`;
-    this.logger.info(this, "shareCheckin", subject, message.join(" "), image, website);
-    this.showShare(subject, message.join(" "), image, website);
+    });
+    popover.present({
+      ev: $event
+    });
   }
 
 }

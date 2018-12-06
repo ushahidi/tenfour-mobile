@@ -46,6 +46,12 @@ export class Checkin extends Model {
           this.recipients.push(recipient);
         }
       }
+      if (data.groups) {
+        this.group_ids = data.groups.map((group:Group) => group.id).join(",");
+      }
+      if (data.users) {
+        this.user_ids = data.users.map((user:User) => user.id).join(",");
+      }
       if (data.replies) {
         this.replies = [];
         for (let _reply of data.replies) {
@@ -132,6 +138,12 @@ export class Checkin extends Model {
   @Column("uri", TEXT)
   public uri:string = null;
 
+  @Column("everyone", BOOLEAN)
+  public everyone:boolean = false;
+
+  @Column("template", BOOLEAN)
+  public template:boolean = false;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 
@@ -144,7 +156,13 @@ export class Checkin extends Model {
 
   public recipients:Recipient[] = [];
 
+  @Column("group_ids", TEXT)
+  public group_ids:string = null;
   public groups:Group[] = [];
+
+  @Column("user_ids", TEXT)
+  public user_ids:string = null;
+  public users:User[] = [];
 
   public replies:Reply[] = [];
 
@@ -239,7 +257,7 @@ export class Checkin extends Model {
   }
 
   public recipientIds():number[] {
-    return this.flattenRecipients().map(r => r.user_id ? r.user_id : r.id);
+    return this.getRecipients().map(r => r.user_id ? r.user_id : r.id);
   }
 
   public sendVia() {
@@ -310,11 +328,11 @@ export class Checkin extends Model {
     }
   }
 
-  private flattenRecipients():any[] {
+  private getRecipients():Recipient[] {
     let _recipients = {};
 
-    for (let recipient of this.recipients) {
-      _recipients[recipient.user_id] = recipient;
+    for (let recipient of this.users) {
+      _recipients[recipient.id] = recipient;
     }
 
     for (let group of this.groups) {
@@ -324,13 +342,13 @@ export class Checkin extends Model {
       }
     }
 
-    return Object.keys(_recipients).map((key) => { return _recipients[key]; });
+    return Object.keys(_recipients).map((key) => { return <Recipient>_recipients[key]; });
   }
 
   public creditsRequired():number {
     let creditsRequired = 0;
     let checkinSendVia = this.sendVia();
-    let _recipients = this.flattenRecipients();
+    let _recipients = this.getRecipients();
 
     for (let recipient of _recipients) {
       for (let contact of recipient.contacts) {
@@ -349,5 +367,34 @@ export class Checkin extends Model {
     }
 
     return creditsRequired;
+  }
+
+  public sendTo():string {
+    let send_to = [];
+
+    if (this.everyone) {
+      send_to.push('everyone');
+    } else {
+      if (this.groups) {
+        if (this.groups.length == 1) {
+          send_to.push('1 group');
+        } else {
+          send_to.push(this.groups.length + ' groups');
+        }
+      }
+      if (this.users) {
+        if (this.users.length == 1) {
+          send_to.push('1 person');
+        } else {
+          send_to.push(this.users.length + ' people');
+        }
+      }
+    }
+
+    if (send_to.length == 0) {
+      send_to.push('nobody');
+    }
+
+    return send_to.join(' and ');
   }
 }

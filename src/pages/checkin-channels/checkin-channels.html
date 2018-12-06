@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-title>Send via...</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="done($event)" *ngIf="checkin">Done</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+
+  <ion-list *ngIf="checkin">
+    <ion-item color="white">
+      <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
+      <ion-label>SMS</ion-label>
+      <ion-checkbox [(ngModel)]="sms_selected" item-right [disabled]="!sms_enabled"></ion-checkbox>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-call" md="md-call" item-left></ion-icon>
+      <ion-label>Voice Call</ion-label>
+      <ion-checkbox [(ngModel)]="voice_selected" item-right [disabled]="!voice_enabled"></ion-checkbox>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
+      <ion-label>Email</ion-label>
+      <ion-checkbox [(ngModel)]="email_selected" item-right [disabled]="!email_enabled"></ion-checkbox>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
+      <ion-label>Slack</ion-label>
+      <ion-checkbox [(ngModel)]="slack_selected" item-right [disabled]="!slack_enabled"></ion-checkbox>
+    </ion-item>
+    <ion-item color="white">
+      <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+      <ion-label>TenFour App</ion-label>
+      <ion-checkbox [(ngModel)]="app_selected" item-right ></ion-checkbox>
+    </ion-item>
+    <button ion-item color="white" tappable (click)="upgradeToPro()" *ngIf="organization.hasFreePlan()">
+      <h2 ion-text color="primary">Upgrade now to send via SMS, voice and email</h2>
+    </button>
+  </ion-list>
+
+</ion-content>

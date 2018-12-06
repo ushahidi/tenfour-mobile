@@ -563,7 +563,8 @@ export class PersonEditPage extends BasePrivatePage {
       user: this.user,
       groups: this.person.groups,
       show_groups: true,
-      show_people: false
+      show_people: false,
+      show_everyone: false,
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "showPeopleSelect", data);
