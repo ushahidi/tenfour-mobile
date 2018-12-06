@@ -19,13 +19,18 @@
   <div text-center class="spinner" *ngIf="loading == true && (organization == null || organization.groups == null || organization.groups.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
+  <div class="zero-state" *ngIf="loading == false && organization && organization.groups && organization.groups.length == 0">
+    <img src="assets/images/zero-add-group.png"/>
+    <h2>Adding Groups</h2>
+    <h6>Easiest way to send Check-Ins to the same group of people.</h6>
+    <button ion-button color="primary" (click)="createGroup($event)">Add A Group To TenFour</button>
+  </div>
   <ion-list *ngIf="organization && organization.groups">
-    <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
+    <!-- <ion-item no-lines *ngIf="loading == false && organization.groups.length == 0">
       <h2 text-center padding-top margin-top>There currently are no Groups...</h2>
-    </ion-item>
+    </ion-item> -->
     <ion-list *ngIf="organization && organization.groups">
-      <group-row [group]="group" [user]="user" [selectable]="false"
-                 (rowClicked)="showGroup(group)"
+      <group-row [group]="group" [user]="user" [selectable]="false" (rowClicked)="showGroup(group)"
                  *ngFor="let group of organization.groups"></group-row>
     </ion-list>
   </ion-list>

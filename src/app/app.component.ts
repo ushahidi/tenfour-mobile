@@ -17,8 +17,6 @@ import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
 
-import { OnboardListPage } from '../pages/onboard-list/onboard-list';
-
 import { PasswordResetPage } from '../pages/password-reset/password-reset';
 
 import { CheckinListPage } from '../pages/checkin-list/checkin-list';
@@ -434,18 +432,10 @@ export class TenFourApp {
         this.storage.getUser().then((user:User) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", user);
           this.user = user;
-          if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-            if (this.hasRootPage() == false) {
-              this.showCheckinList();
-            }
-            resolve(true);
+          if (this.hasRootPage() == false) {
+            this.showCheckinList();
           }
-          else {
-            if (this.hasRootPage() == false) {
-              this.showOnboardList(user);
-            }
-            resolve(true);
-          }
+          resolve(true);
         },
         (error:any) => {
           this.logger.info(this, "loadWebApp", this.locationHash(), "User", "None");
@@ -481,16 +471,9 @@ export class TenFourApp {
             this.organization = organization;
             this.storage.getUser().then((user:User) => {
               this.logger.info(this, "loadMobileApp", "User", user);
-              if (user && user.config_profile_reviewed && user.config_self_test_sent) {
-                this.user = user;
-                this.showCheckinList();
-                resolve(true);
-              }
-              else {
-                this.logger.info(this, "loadMobileApp", "User", "None");
-                this.showOnboardList(user);
-                resolve(true);
-              }
+              this.user = user;
+              this.showCheckinList();
+              resolve(true);
             },
             (error:any) => {
               this.logger.info(this, "loadMobileApp", "User", "None");
@@ -651,20 +634,6 @@ export class TenFourApp {
       (error:any) => {
         this.logger.error(this, "showSignupVerify", error);
       });
-  }
-
-  private showOnboardList(user:User=null) {
-    this.logger.info(this, "showOnboardList");
-    this.nav.setRoot(OnboardListPage, {
-      organization: this.organization,
-      user: user
-    }).then((loaded:any) => {
-      this.logger.info(this, "showOnboardList", "Loaded");
-      this.hideSplashScreen();
-    },
-    (error:any) => {
-      this.logger.error(this, "showOnboardList", error);
-    });
   }
 
   private showCheckinList(event:any=null) {

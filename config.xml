@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ushahidi.tenfour" version="2.8.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ushahidi.tenfour" version="2.9.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>TenFour</name>
     <description>TenFour App</description>
     <author email="support@ushahidi.com" href="https://ushahidi.com">Ushahidi</author>
@@ -135,8 +135,6 @@
     <allow-navigation href="http://192.168.0.30:8100" />
     <allow-navigation href="http://192.168.178.192:8100" />
     <allow-navigation href="http://169.254.69.103:8100" />
-    <engine name="ios" spec="~4.5.5" />
-    <engine name="android" spec="~6.4.0" />
     <plugin name="cordova-plugin-app-version" spec="^0.1.9" />
     <plugin name="cordova-plugin-appavailability" spec="^0.4.2" />
     <plugin name="cordova-plugin-camera" spec="^2.4.1">
@@ -183,5 +181,7 @@
     <plugin name="cordova-plugin-intercom" spec="^6.1.0" />
     <plugin name="cordova-plugin-nativestorage" spec="^2.2.2" />
     <plugin name="cordova-plugin-firebase" spec="^1.0.5" />
-    <engine name="browser" spec="~5.0.3" />
+    <engine name="ios" spec="~4.5.5" />
+    <engine name="android" spec="~7.1.2" />
+    <engine name="browser" spec="~5.0.4" />
 </widget>

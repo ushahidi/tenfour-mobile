@@ -82,8 +82,6 @@ import { CheckinRespondModule } from '../pages/checkin-respond/checkin-respond.m
 import { ContactsImportModule } from '../pages/contacts-import/contacts-import.module';
 import { ContactsMatchModule } from '../pages/contacts-match/contacts-match.module';
 
-import { OnboardListModule } from '../pages/onboard-list/onboard-list.module';
-
 import { PasswordResetModule } from '../pages/password-reset/password-reset.module';
 
 import { GroupListModule } from '../pages/group-list/group-list.module';
@@ -101,6 +99,7 @@ import { SettingsRolesModule } from '../pages/settings-roles/settings-roles.modu
 import { SettingsPaymentsModule } from '../pages/settings-payments/settings-payments.module';
 import { SettingsChannelsModule } from '../pages/settings-channels/settings-channels.module';
 import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module';
+import { SettingsTutorialModule } from '../pages/settings-tutorial/settings-tutorial.module';
 
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
@@ -203,7 +202,6 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     SignupPlanModule,
     SignupPaymentModule,
     SignupPasswordModule,
-    OnboardListModule,
     PasswordResetModule,
     CheckinListModule,
     CheckinEditModule,
@@ -231,6 +229,7 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     SettingsLDAPModule,
     SettingsSizesModule,
     SettingsRegionsModule,
+    SettingsTutorialModule,
     UnsubscribePageModule,
     BulkAddToGroupModule,
     BulkChangeRoleModule,

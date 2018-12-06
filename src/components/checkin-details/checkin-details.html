@@ -10,23 +10,36 @@
     <button ion-button text-only item-right clear color="primary" tappable *ngIf="canResend" (click)="onResendClicked($event)">Resend</button>
   </ion-item>
 </ion-list>
+<ion-list *ngIf="checkin.recipients.length > ENABLE_FILTER_AFTER_RECIPIENT_COUNT">
+  <ion-list-header>
+    <ion-searchbar start placeholder="Search..." [debounce]="250" [(ngModel)]="filter"></ion-searchbar>
+  </ion-list-header>
+</ion-list>
 <ion-list *ngFor="let answer of checkin.answers">
   <ion-list-header *ngIf="answer.replies > 0">
     <h2>{{answer.answer}}</h2>
   </ion-list-header>
-  <checkin-reply [reply]="reply" [answer]="answer" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
+  <checkin-reply [reply]="reply" [answer]="answer" [user]="user"
+    (click)="onReplyClicked(reply, $event)"
+    [hidden]="isRecipientFiltered(reply.user_name)"
+    *ngFor="let reply of checkin.answerReplies(answer)"></checkin-reply>
 </ion-list>
 <ion-list *ngIf="checkin.otherReplies().length > 0">
   <ion-list-header>
     <h2>Other Response</h2>
   </ion-list-header>
-  <checkin-reply [reply]="reply" [user]="user" (click)="editReply(reply, $event)" *ngFor="let reply of checkin.otherReplies()"></checkin-reply>
+  <checkin-reply [reply]="reply" [user]="user"
+    (click)="onReplyClicked(reply, $event)"
+    [hidden]="isRecipientFiltered(reply.user_name)"
+    *ngFor="let reply of checkin.otherReplies()"></checkin-reply>
 </ion-list>
 <ion-list *ngIf="checkin.recipientsPending().length">
   <ion-list-header>
     <h2>No Response</h2>
   </ion-list-header>
-  <ion-item color="white" *ngFor="let recipient of checkin.recipientsPending()">
+  <ion-item color="white"
+    [hidden]="isRecipientFiltered(recipient.name)"
+    *ngFor="let recipient of checkin.recipientsPending()">
     <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
     <ion-grid no-padding>
       <ion-row no-padding>

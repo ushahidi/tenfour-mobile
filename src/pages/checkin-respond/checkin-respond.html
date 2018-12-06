@@ -6,8 +6,8 @@
     <ion-title *ngIf="checkins && checkins.length == 0"></ion-title>
     <ion-title *ngIf="checkins && checkins.length > 1">{{index + 1}} / {{checkins.length}}</ion-title>
     <ion-buttons right>
-      <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id == null" (click)="sendReply(checkin, checkin.reply)">Send</button>
-      <button ion-button color="primary" *ngIf="checkin && checkin.reply && checkin.reply.id != null" (click)="saveReply(checkin, checkin.reply)">Save</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" *ngIf="checkin && checkin.reply && checkin.reply.id == null" (click)="sendReply(checkin, checkin.reply)">Send</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" *ngIf="checkin && checkin.reply && checkin.reply.id != null" (click)="saveReply(checkin, checkin.reply)">Save</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

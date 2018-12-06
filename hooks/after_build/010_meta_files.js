@@ -12,7 +12,7 @@ function puts(error, stdout, stderr) {
 
 function removeMetaFiles() {
   process.stdout.write('removeMetaFiles');
-  var apk = "platforms/android/build/outputs/apk/release/android-release.apk";
+  var apk = "platforms/android/app/build/outputs/apk/release/app-release.apk";
   if (fs.existsSync(root + "/" + apk)) {
     var command = "zip -d " + apk + " META-INF/\*";
     process.stdout.write(command);

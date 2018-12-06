@@ -55,21 +55,16 @@ ionic cordova platform rm browser
 #### Add Platforms
 ```
 ionic cordova platform add ios --buildConfig=build.json
-ionic cordova platform add android@6.4.0 --buildConfig=build.json
+ionic cordova platform add android --buildConfig=build.json
 ionic cordova platform add browser
-```
-#### Add Plugins
-```
-cordova plugin rm cordova-plugin-nativestorage
-cordova plugin add cordova-plugin-nativestorage@2.2.2
 ```
 #### Debug iOS
 ```
 cordova run ios --list
 ENV=prod ionic cordova run ios --livereload --consolelogs --device --buildConfig=build.json
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 11.4"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 11.4"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 11.3"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
 ```
 #### Debug Android
 ```

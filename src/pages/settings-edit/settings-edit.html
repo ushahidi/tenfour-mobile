@@ -5,7 +5,7 @@
     </ion-buttons>
     <ion-title>Edit Organization</ion-title>
     <ion-buttons right>
-      <button ion-button color="primary" (click)="doneEdit($event)">Save</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="doneEdit($event)">Save</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

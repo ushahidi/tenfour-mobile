@@ -40,19 +40,50 @@ export class BulkChangeRolePage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
+
+      this.people = this.navParams.get('people');
+
+      if (this.people.length == 1) {
+        this.role = this.people[0].role;
+      }
   }
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-
-    this.people = this.navParams.get('people');
   }
 
   private save() {
     this.logger.info(this, "save");
 
+    this.checkChangeOwnerRole();
+  }
+
+  private checkChangeOwnerRole() {
+      if (this.people.find(person => {
+        return person.role === 'owner';
+      })) {
+        let buttons = [
+          {
+            text: 'Continue',
+            handler: this.checkSelfChangeRole.bind(this)
+          },
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              this.logger.info(this, "save", "Cancelled");
+            }
+          }
+        ];
+        this.showConfirm("Change Role", "The organization owner's role will not be changed, proceed with other changes?", buttons);
+      } else {
+        this.checkSelfChangeRole();
+      }
+  }
+
+  private checkSelfChangeRole() {
     if (this.people.find(person => {
-      return person.id === this.user.id;
+      return person.id === this.user.id && person.role !== 'owner';
     })) {
       let buttons = [
         {
@@ -84,6 +115,10 @@ export class BulkChangeRolePage extends BasePrivatePage {
           return;
         }
 
+        if (person.role === 'owner') {
+          return;
+        }
+
         person.role = this.role;
 
         promises.push(new Promise((resolve, reject) => {
@@ -95,12 +130,14 @@ export class BulkChangeRolePage extends BasePrivatePage {
         }));
     });
 
+    let updateCount = promises.length;
+
     Promise.all(promises).then(() => {
         loading.dismiss();
         this.hideModal();
 
-        if (promises.length) {
-          this.showToast('Updated the role of ' + this.people.length + ' ' + (this.people.length==1?'person':'people'));
+        if (updateCount) {
+          this.showToast('Updated the role of ' + updateCount + ' ' + (updateCount==1?'person':'people'));
         }
     },(error:any) => {
       loading.dismiss();

@@ -4,7 +4,7 @@
       <button ion-button color="cancel" (click)="cancelImport($event)">Back</button>
     </ion-buttons>
     <ion-buttons right *ngIf="user">
-      <button ion-button color="primary" (click)="importContacts($event)">Import</button>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="importContacts($event)">Import</button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>

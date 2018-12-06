@@ -210,6 +210,59 @@ ion-list {
 .spinner {
   ion-spinner {
     margin-top: 75px;
+    margin-bottom: 75px;
+  }
+}
+@keyframes fadein {
+  0% { opacity:0; }
+  25% { opacity:0; }
+  100% { opacity:1; }
+}
+@-moz-keyframes fadein {
+  0% { opacity:0; }
+  25% { opacity:0; }
+  100% { opacity:1; }
+}
+@-webkit-keyframes fadein {
+  0% { opacity:0; }
+  25% { opacity:0; }
+  100% { opacity:1; }
+}
+@-ms-keyframes fadein {
+  0% { opacity:0; }
+  25% { opacity:0; }
+  100% { opacity:1; }
+}
+@-o-keyframes fadein {
+  0% { opacity:0; }
+  25% { opacity:0; }
+  100% { opacity:1; }
+}
+.zero-state {
+  text-align: center;
+  margin-top: 50px;
+  margin-bottom: 50px;
+  padding-left: 40px;
+  padding-right: 40px;
+  -webkit-animation: 2s ease 0s normal forwards 1 fadein;
+  -moz-animation: 2s ease 0s normal forwards 1 fadein;
+  -ms-animation: 2s ease 0s normal forwards 1 fadein;
+  -o-animation: 2s ease 0s normal forwards 1 fadein;
+  animation: 2s ease 0s normal forwards 1 fadein;
+  h2 {
+    text-align: center;
+  }
+  h6 {
+    font-weight: 400;
+    text-align: center;
+  }
+  img {
+    width: 400px;
+    max-width: 90%;
+    margin-bottom: 10px;
+  }
+  button {
+    margin-top: 15px;
   }
 }
 .truncate {
@@ -284,6 +337,11 @@ ion-list {
   padding-left: 40px; // because of intercom button
 }
 
+ion-modal {
+  ion-backdrop:nth-of-type(1) {
+    opacity: 0.7 !important;
+  }
+}
 @for $i from 2 to 5 {
   ion-modal:nth-of-type(#{$i}) {
     ion-backdrop {
