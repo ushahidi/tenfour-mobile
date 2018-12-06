@@ -155,12 +155,6 @@ export class CheckinEditPage extends BasePrivatePage {
         this.message.setFocus();
       }, 500);
     }
-    // else if (this.checkin.hasBlankAnswers()) {
-    //   this.showAlert("Blank Answers", "Answers must have a value.");
-    // }
-    // else if (this.checkin.hasDuplicateAnswers()) {
-    //   this.showAlert("Duplicate Answers", "Answers must be unique.");
-    // }
     else {
       this.showModal(CheckinSendPage, {
         organization: this.organization,
@@ -185,50 +179,6 @@ export class CheckinEditPage extends BasePrivatePage {
       answer: "Yes"
     }));
   }
-
-  // private addAnswer() {
-  //   let colors = [
-  //     "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
-  //     "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
-  //     "#A28AD9", "#19AEE9", "#0273A3", "#304170",
-  //     "#99238C", "#C7470D", "#793EE8", "#1E9545"];
-  //   let color = colors[this.checkin.answers.length];
-  //   this.checkin.answers.push(new Answer({
-  //     icon: "",
-  //     type: "custom",
-  //     color: color,
-  //     answer: "Maybe"
-  //   }));
-  // }
-  //
-  // private removeAnswer(answer:Answer) {
-  //   for (let i = 0; i < this.checkin.answers.length; i++) {
-  //     if (this.checkin.answers[i] === answer) {
-  //       this.checkin.answers.splice(i, 1);
-  //       break;
-  //     }
-  //   }
-  // }
-  //
-  // private removeAnswers() {
-  //   this.checkin.answers = [];
-  // }
-  //
-  // private changeColor(answer:Answer, event:any) {
-  //   this.logger.info(this, "changeColor", answer);
-  //   let popover = this.popoverController.create(ColorPickerComponent,
-  //     { color: answer.color,
-  //       on_changed:(color:any) => {
-  //           this.logger.info(this, "changeColor", color);
-  //           answer.color = color;
-  //         }
-  //       },
-  //     { showBackdrop: true,
-  //       enableBackdropDismiss: true });
-  //   popover.present({
-  //     ev: event
-  //   });
-  // }
 
   private showTemplates(event:any) {
     this.logger.info(this, "showTemplates");

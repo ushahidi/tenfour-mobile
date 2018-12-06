@@ -43,20 +43,11 @@
           {{group.name}}
         </span>
         <span *ngFor="let user of checkin.users">
-          <!-- <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [mini]="true"></person-avatar> -->
           <ion-icon item-left class="recipient-icon" ios="ios-person" md="md-person"></ion-icon>
           {{user.name}}
         </span>
       </ion-label>
     </button>
-
-
-          <!-- <h3>
-            <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
-            <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
-          </h3> -->
-
-
   </ion-list>
 
   <ion-list  *ngIf="organization && checkin">
@@ -65,45 +56,6 @@
       <ion-checkbox checked="false" item-end [(ngModel)]="checkin.template"></ion-checkbox>
     </ion-item>
   </ion-list>
-
-  <!-- <ion-list *ngIf="checkin">
-    <ion-list-header>
-      <h2>Send Via</h2>
-    </ion-list-header>
-    <ion-item color="white" detail-push tappable (click)="showPopover($event)">
-      <ion-label color="primary">Select channels</ion-label>
-      <ion-note item-end>{{checkin.send_via | humanize}}</ion-note>
-    </ion-item>
-    <ion-item tappable (click)="upgradeToPro($event)" *ngIf="organization && organization.hasFreePlan()">
-      <h2 ion-text color="primary">Upgrade to TenFour Pro to send via SMS and email</h2>
-    </ion-item>
-  </ion-list>
-  <ion-list *ngIf="checkin">
-    <ion-list-header>
-      <h2>Send To</h2>
-    </ion-list-header>
-    <ion-item color="white" tappable (click)="addPerson()">
-      <h2 ion-text color="primary">Add people</h2>
-    </ion-item>
-    <ion-item color="white" class="group" *ngFor="let group of checkin.groups">
-      <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
-      <h2>{{group.name}}</h2>
-      <h3 *ngIf="checkin.send_via">via {{checkin.send_via | humanize}}</h3>
-      <h3 *ngIf="!checkin.send_via">Will not receive the Check-In</h3>
-      <button ion-button icon-only item-right clear color="black" tappable (click)="removeGroup(group)">
-        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
-      </button>
-    </ion-item>
-    <ion-item color="white" class="person" *ngFor="let recipient of checkin.recipients">
-      <person-avatar item-left [initials]="recipient.initials" [image]="recipient.profile_picture" [large]="false"></person-avatar>
-      <h2>{{recipient.name}}</h2>
-      <h3 *ngIf="recipient.send_via">via {{recipient.send_via | humanize}}</h3>
-      <h3 *ngIf="!recipient.send_via">Will not receive the Check-In</h3>
-      <button ion-button icon-only item-right clear color="black" tappable (click)="removeRecipient(recipient)">
-        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
-      </button>
-    </ion-item>
-  </ion-list> -->
 
 </ion-content>
 

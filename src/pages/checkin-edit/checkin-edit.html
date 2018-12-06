@@ -29,32 +29,4 @@
     </button>
   </ion-list>
 
-  <!-- <ion-list *ngIf="checkin && checkin.answers">
-    <ion-list-header>
-      <h2>Answers</h2>
-    </ion-list-header>
-    <ion-item color="white" tappable (click)="addAnswer()" *ngIf="checkin.answers.length > 0">
-      <h2 ion-text color="primary">Add answer</h2>
-    </ion-item>
-    <ion-item color="white" *ngFor="let answer of checkin.answers">
-      <button ion-button icon-only item-start clear tappable (click)="changeColor(answer, $event)">
-        <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
-      </button>
-      <ion-input type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
-      <button ion-button icon-only item-end clear color="black" tappable (click)="removeAnswer(answer)">
-        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
-      </button>
-    </ion-item>
-  </ion-list>
-
-  <div padding-left padding-right text-center>
-    <button ion-button text-only clear color="primary" (click)="addDefaults()" *ngIf="checkin && checkin.answers && checkin.answers.length == 0">
-      Ask for a response
-    </button>
-    <button ion-button text-only clear color="primary" (click)="removeAnswers()" *ngIf="checkin && checkin.answers && checkin.answers.length > 0">
-      Don't ask for a response
-    </button>
-  </div> -->
-
-
 </ion-content>

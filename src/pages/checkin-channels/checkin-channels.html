@@ -1,8 +1,5 @@
 <ion-header>
   <ion-navbar color="navbar">
-    <!-- <ion-buttons left>
-      <button ion-button color="cancel" (click)="cancel($event)">Cancel</button>
-    </ion-buttons> -->
     <ion-title>Send via...</ion-title>
     <ion-buttons right>
       <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="done($event)" *ngIf="checkin">Done</button>
