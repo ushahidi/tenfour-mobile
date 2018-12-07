@@ -162,6 +162,9 @@ export class PersonListPage extends BasePrivatePage {
 
   private showPerson(person:Person, event:any=null) {
     this.logger.info(this, "showPerson", person);
+    if (!person) {
+      return this.logger.error(this, "showPerson", "person is not defined");
+    }
     let modal = this.showModalOrPage(PersonDetailsPage, {
       organization: this.organization,
       user: this.user,

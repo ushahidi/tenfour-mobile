@@ -27,3 +27,5 @@ export let EVENT_SUBSCRIPTION_CHANGED:string = "subscription:changed";
 export let EVENT_CHECKINS_WAITING_CHANGED:string = "checkinswaiting:changed";
 
 export let EVENT_NOTIFICATIONS_CHANGED:string = "notifications:changed";
+
+export let EVENT_FIREBASE_TOKEN:string = "firebase:token";

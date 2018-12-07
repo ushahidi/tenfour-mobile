@@ -1,5 +1,10 @@
 <ion-header>
   <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button icon-only (click)="hideModal($event)">
+        <ion-icon name="arrow-back"></ion-icon>
+      </button>
+    </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons right>
       <button color="primary" ion-button text-only [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="!sent">Next</button>
@@ -11,7 +16,8 @@
 
     <ion-item text-wrap class="heading">
       <img src="assets/images/logo-dots.png"/>
-      <h2 *ngIf="!sent">What's your email address?</h2>
+      <h2 *ngIf="!sent">Look up your organization domain</h2>
+      <p *ngIf="!sent">Enter your email address and we will send you your organization details.</p>
       <h2 *ngIf="sent">Check your email inbox.</h2>
     </ion-item>
 

@@ -27,6 +27,7 @@ export class SignupEmailPage extends BasePublicPage {
 
   @ViewChild('email')
   email:TextInput;
+  showBackButton:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -42,6 +43,11 @@ export class SignupEmailPage extends BasePublicPage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
+  }
+
+  ionViewWillEnter() {
+    super.ionViewWillEnter();
+    this.showBackButton = this.getParameter<boolean>("showBackButton");
   }
 
   ionViewDidEnter() {

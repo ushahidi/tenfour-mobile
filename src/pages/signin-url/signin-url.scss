@@ -14,4 +14,7 @@ page-signin-url {
   ion-title {
     text-align: center;
   }
+  ion-list ion-item.input {
+    margin-top: 0;
+  }
 }

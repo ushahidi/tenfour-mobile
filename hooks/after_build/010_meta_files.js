@@ -10,19 +10,20 @@ function puts(error, stdout, stderr) {
   console.log(stdout);
 }
 
-function removeMetaFiles() {
-  process.stdout.write('removeMetaFiles');
-  var apk = "platforms/android/app/build/outputs/apk/release/app-release.apk";
+function removeMetaFiles(apk) {
   if (fs.existsSync(root + "/" + apk)) {
+    process.stdout.write("removeMetaFiles APK " + apk + " cleaning..." + '\n');
     var command = "zip -d " + apk + " META-INF/\*";
     process.stdout.write(command);
     exec(command, puts);
+    process.stdout.write("removeMetaFiles APK " + apk + " cleaned" + '\n');
   }
   else {
-    process.stdout.write("removeMetaFiles APK " + apk + " does not exist");
+    process.stdout.write("removeMetaFiles APK " + apk + " not found" + '\n');
   }
 }
 
 if (platform === 'android') {
-  removeMetaFiles();
+  removeMetaFiles("platforms/android/build/outputs/apk/release/android-release.apk");
+  removeMetaFiles("platforms/android/app/build/outputs/apk/release/app-release.apk");
 }

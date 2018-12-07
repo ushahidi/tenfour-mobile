@@ -2,12 +2,13 @@ import { Component, NgZone, ViewChild } from '@angular/core';
 import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
-import { SigninEmailPage } from '../../pages/signin-email/signin-email';
 import { SignupEmailPage } from '../../pages/signup-email/signup-email';
 import { SigninLookupPage } from '../../pages/signin-lookup/signin-lookup';
+import { SigninTokenPage } from '../../pages/signin-token/signin-token';
 
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
+import { Token } from '../../models/token';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -21,13 +22,20 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
   selector: 'page-signin-url',
   templateUrl: 'signin-url.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ SigninEmailPage, SignupEmailPage ]
+  entryComponents:[ SignupEmailPage ]
 })
 export class SigninUrlPage extends BasePublicPage {
 
   @ViewChild('subdomain')
   subdomain:TextInput;
+  @ViewChild('email')
+  email:TextInput;
+  @ViewChild('password')
+  password:TextInput;
   title:string = null;
+  organization:Organization = null;
+  loading:boolean = false;
+  domain:string = this.environment.getAppDomain();
 
   constructor(
       protected zone:NgZone,
@@ -56,10 +64,14 @@ export class SigninUrlPage extends BasePublicPage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
+
+    if (this.navParams.get('token')) {
+      this.logger.info(this, 'token', this.navParams.get('token'));
+    }
+
     let organizationSubdomain = this.parseOrganizationSubdomain();
     if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
-      this.showNext();
     }
   }
 
@@ -85,38 +97,74 @@ export class SigninUrlPage extends BasePublicPage {
       setTimeout(() => {
         this.subdomain.setFocus();
       }, 500);
+      return;
     }
-    else {
-      let subdomain = this.subdomain.value.toLowerCase();
-      let loading = this.showLoading("Searching...", true);
-      this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
-        this.logger.info(this, "showNext", organizations);
-        loading.dismiss();
-        if (organizations && organizations.length > 0) {
-          let organization:Organization = organizations[0];
-          if (!this.redirectToOrganizationSubdomain(organization)) {
-            this.storage.setOrganization(organization).then((stored:boolean) => {
-              this.showModal(SigninEmailPage, {
-                organization: organization
-              }, {
-                enableBackdropDismiss: false
-              });
-            });
-          }
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+      return;
+    }
+    if (this.password.value.length == 0) {
+      this.showToast("Please enter your password");
+      setTimeout(() => {
+        this.password.setFocus();
+      }, 500);
+      return;
+    }
+
+    this.loading = true;
+    let loading = this.showLoading("Logging in...", true);
+
+    Promise.resolve()
+      .then(() => { return this.loadOrganization(); })
+      .then(() => { return this.api.userLogin(this.organization, this.email.value, this.password.value); })
+      .then((token:Token) => {
+        this.logger.info(this, "showNext", token);
+
+        if (!this.loginToOrganizationSubdomain(this.organization, token)) {
+          this.loading = false;
+          loading.dismiss();
+          this.hideModals();
+          this.showRootPage(SigninTokenPage, {
+            organization: this.organization,
+            token: JSON.stringify(token)
+          })
         }
-        else {
-          this.showAlert("Organization not found", "Sorry, that organization doesn't exist.");
-        }
-      },
-      (error:any) => {
+      })
+      .catch((error:any) => {
         this.logger.error(this, "showNext", error);
+        this.loading = false;
         loading.dismiss();
-        this.showAlert("Problem Finding Organization", error);
+        if (error === 'invalid_credentials') {
+          error = "Invalid email and/or password. Please try again.";
+        }
+        this.showAlert("Login Unsuccessful", error);
       });
-    }
   }
 
-  private redirectToOrganizationSubdomain(organization:Organization):boolean {
+  private loadOrganization():Promise<Organization> {
+    this.logger.info(this, "loadOrganization");
+    return new Promise((resolve, reject) => {
+      let subdomain = this.subdomain.value.toLowerCase();
+      this.api.getOrganizations(subdomain).then((organizations:Organization[]) => {
+        this.logger.info(this, "loadOrganization", organizations);
+        if (organizations && organizations.length > 0) {
+          this.organization = organizations[0];
+          resolve(this.organization);
+        }
+        else {
+          reject('Sorry, that organization does\'t exist.');
+        }
+      }, (error:any) => {
+        this.logger.error(this, "loadOrganization", error);
+        reject();
+      });
+    });
+  }
+
+  private loginToOrganizationSubdomain(organization:Organization, token:Token):boolean {
     if (this.website) {
       let appDomain = this.environment.getAppDomain();
       let extension = '.' + appDomain.replace('app.', '');
@@ -128,7 +176,8 @@ export class SigninUrlPage extends BasePublicPage {
           + subdomain
           + extension
           + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-          + "/");
+          + "/#/signin/token/"
+          + encodeURIComponent(JSON.stringify(token)));
         return true;
       }
     }
@@ -137,14 +186,53 @@ export class SigninUrlPage extends BasePublicPage {
 
   private createOrganization(event:any) {
     this.logger.info(this, "createOrganization");
-    this.showModal(SignupEmailPage, {}, {
+    this.showModal(SignupEmailPage, {
+      showBackButton: true
+    }, {
       enableBackdropDismiss: false
     });
   }
 
   private lookupOrganization(event:any) {
     this.logger.info(this, "lookupOrganization");
-    this.showPage(SigninLookupPage, {});
+    this.showModal(SigninLookupPage, {});
+  }
+
+  private resetPassword(event:any) {
+    this.logger.info(this, "resetPassword");
+    if (this.subdomain.value.length == 0) {
+      this.showToast("Please enter your domain");
+      setTimeout(() => {
+        this.subdomain.setFocus();
+      }, 500);
+      return;
+    }
+    if (this.email.value.length == 0) {
+      this.showToast("Please enter your email");
+      setTimeout(() => {
+        this.email.setFocus();
+      }, 500);
+      return;
+    }
+    let loading = this.showLoading("Resetting...", true);
+    this.loadOrganization().then((organization:Organization) => {
+      let title = "Check Your Inbox";
+      let message = `If your email address ${this.email.value} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
+      this.api.resetPassword(this.organization.subdomain, this.email.value).then((reset:any) => {
+        this.logger.info(this, "resetPassword", reset);
+        loading.dismiss();
+        this.showAlert(title, message);
+      },
+      (error:any) => {
+        this.logger.error(this, "resetPassword", error);
+        loading.dismiss();
+        this.showAlert(title, message);
+      });
+    }, (error) => {
+      this.logger.error(this, "resetPassword", error);
+      loading.dismiss();
+      this.showAlert("Organization not found", "Sorry, organization \"" + this.subdomain.value + "\" does not exist.");
+    });
   }
 
   private showNextOnReturn(event:any) {

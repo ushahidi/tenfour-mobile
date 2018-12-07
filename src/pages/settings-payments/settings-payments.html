@@ -9,7 +9,7 @@
 <ion-content>
   <ion-grid>
     <ion-row>
-      <ion-col col-12 col-sm>
+      <ion-col col-12 col-sm-4>
         <h2 class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">Extra SMS Credits</h2>
           <ion-card class="extra-sms-credits" [class.enabled]="organization && organization.hasProPlan()">
           <ion-card-header>
@@ -40,7 +40,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col col-12 col-sm>
+      <ion-col col-12 col-sm-4>
         <h2 [class.activated]="organization && organization.hasProPlan()">Pro</h2>
         <ion-card [class.activated]="organization && organization.hasProPlan()">
           <ion-card-header>{{PRO_FLAT_RATE | currency}} USD per month</ion-card-header>
@@ -55,10 +55,10 @@
               <ion-item *ngIf="organization && organization.hasProPlan() && organization.credits_extra"><ion-icon name="checkmark-circle" item-start></ion-icon>{{organization.credits_extra | number}} extra credits per month</ion-item>
             </ion-list>
             <ion-list *ngIf="organization && organization.hasProPlan() && subscription">
-              <ion-item><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}}
+              <ion-item text-wrap><ion-icon name="people" item-start></ion-icon>{{billingEstimate | currency}} per month for {{organization.user_count}}
                 <ng-container *ngIf="organization.user_count == 1">person</ng-container>
                 <ng-container *ngIf="organization.user_count > 1">people</ng-container>
-                (Estimate)</ion-item>
+                (estimate)</ion-item>
               <ion-item text-wrap><ion-icon name="calculator" item-start></ion-icon>Billed on {{subscription.next_billing_at | dayOfMonth}} of every month</ion-item>
               <ion-item text-wrap *ngIf="subscription.promo_code"><ion-icon name="pricetag" item-start></ion-icon>Coupon code: {{subscription.promo_code}}</ion-item>
               <ion-item text-wrap><ion-icon name="card" item-start></ion-icon>XXXX-XXXX-XXXX-{{subscription.last_four}} {{subscription.card_type}}</ion-item>
@@ -71,7 +71,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col col-12 col-sm>
+      <ion-col col-12 col-sm-4>
         <h2 [class.activated]="organization && organization.hasFreePlan()">Free</h2>
         <ion-card [class.activated]="organization && organization.hasFreePlan()">
           <ion-card-header>Free!</ion-card-header>

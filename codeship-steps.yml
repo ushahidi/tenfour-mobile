@@ -39,7 +39,7 @@
   steps:
   - name: "deploy .wellknown to develop"
     service: awscli
-    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-dev-client-eu/.well-known/ --content-type application/json 
+    command: aws s3 sync /vols/src/.well-known/ s3://ushahidi-tenfour-dev-client-eu/.well-known/ --content-type application/json
 
   - name: "build PWA client (dev)"
     service: builder
@@ -48,3 +48,26 @@
   - name: "deploy PWA client (dev)"
     service: awscli
     command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-dev-client-eu/
+
+
+- type: serial
+  steps:
+  - name: "Build PWA client (preview)"
+    service: builder
+    command: ENV=dev npm run ionic:build --debug
+  - name: "Deploy PWA client (preview)"
+    service: ansible
+    command: >
+      ANSIBLE_GITHUB_REPO=tenfour-infra
+      ANSIBLE_GITHUB_REPO_VERSION=master
+      GITHUB_STATUS_TOKEN=$GITHUB_TOKEN
+      ush-ansible-playbook.sh -vv -i hosts/hosts_ansible client-deploy.yml
+        -e BRANCH_NAME="$CI_BRANCH"
+        -e DEPLOYMENTS_DOMAIN="preview.tenfour.org"
+        -e CLIENT_DEPLOY_SRC="/vols/src/tmp/pwa/"
+        -e CLIENT_REPO="$CI_REPO_NAME"
+        -e CLIENT_VERSION="$CI_COMMIT_ID"
+        -e COMMIT_STATUS_CONTEXT="continuous-deployment/${CI_NAME}"
+        -e DEPLOYMENT_LOG_URL="http://app.codeship.com/projects/${CI_PROJECT_ID}/builds/${CI_BUILD_ID}"
+        -e ENVIRONMENT=preview
+        -e tf_folder="tg/live-eu/preview"

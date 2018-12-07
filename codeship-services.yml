@@ -9,3 +9,11 @@ awscli:
     - .:/vols/src
   encrypted_env_file: deployment.env.encrypted
   cached: true
+
+ansible:
+  image: ushahidi/engineering-deployer:master
+  encrypted_env_file: deployment.env.encrypted
+  environment:
+    AWS_DEFAULT_REGION: us-east-1
+  volumes:
+    - .:/vols/src

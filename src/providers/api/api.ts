@@ -14,6 +14,7 @@ import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
+import { Template } from '../../models/template';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Group } from '../../models/group';
@@ -647,6 +648,31 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getTemplates(organization:Organization):Promise<Template[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?template=true`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let templates = [];
+          if (data && data.checkins) {
+            for (let _checkin of data.checkins) {
+              let template = new Template(_checkin);
+              templates.push(template);
+            }
+          }
+          resolve(templates);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
   public getCheckins(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
@@ -779,20 +805,31 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+  private getCheckInParams(organization:Organization, checkin:Checkin) {
+    let params = {
+      organization_id: organization.id,
+      message: checkin.message,
+      answers: checkin.answers,
+      recipients: checkin.recipientIds().map((id) => { return {id: id} }),
+      send_via: checkin.sendVia(),
+      everyone: !!checkin.everyone,
+      template: !!checkin.template,
+      group_ids: checkin.groups.map((group) => { return group.id; }),
+      user_ids: checkin.users.map((user) => { return user.id; })
+    };
+    if (checkin.self_test_check_in) {
+      params['self_test_check_in'] = 1;
+    }
+    return params;
+  }
+
+  // create a check-in without sending
+  public createCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
-        let params = {
-          organization_id: organization.id,
-          message: checkin.message,
-          answers: checkin.answers,
-          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
-          send_via: checkin.sendVia()
-        };
-        if (checkin.self_test_check_in) {
-          params['self_test_check_in'] = 1;
-        }
+        let params = this.getCheckInParams(organization, checkin);
+        params.recipients = [];
         this.httpPost(url, params, token.access_token).then((data:any) => {
           if (data && data.checkin) {
             let checkin = new Checkin(data.checkin);
@@ -812,27 +849,67 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public resendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+  public sendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
-        let params = {
-          organization_id: organization.id,
-          message: checkin.message,
-          answers: checkin.answers,
-          recipients: checkin.recipientIds().map((id) => { return {id: id} }),
-          send_via: checkin.sendVia()
-        };
-        if (checkin.self_test_check_in) {
-          params['self_test_check_in'] = 1;
-        }
-        this.httpPut(url, params, token.access_token).then((data:any) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
+        let params = this.getCheckInParams(organization, checkin);
+        this.httpPost(url, params, token.access_token).then((data:any) => {
           if (data && data.checkin) {
             let checkin = new Checkin(data.checkin);
             resolve(checkin);
           }
           else {
             reject("Checkin Not Created");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public updateCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = this.getCheckInParams(organization, checkin);
+        delete params.recipients;
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          if (data && data.checkin) {
+            let checkin = new Checkin(data.checkin);
+            resolve(checkin);
+          }
+          else {
+            reject("Checkin Not Updated");
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public resendCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = this.getCheckInParams(organization, checkin);
+        this.httpPut(url, params, token.access_token).then((data:any) => {
+          if (data && data.checkin) {
+            let checkin = new Checkin(data.checkin);
+            resolve(checkin);
+          }
+          else {
+            reject("Checkin Not Resent");
           }
         },
         (error:any) => {
