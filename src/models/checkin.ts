@@ -378,14 +378,14 @@ export class Checkin extends Model {
       if (this.groups) {
         if (this.groups.length == 1) {
           send_to.push('1 group');
-        } else {
+        } else if (this.groups.length > 1) {
           send_to.push(this.groups.length + ' groups');
         }
       }
       if (this.users) {
         if (this.users.length == 1) {
           send_to.push('1 person');
-        } else {
+        } else if (this.users.length > 1) {
           send_to.push(this.users.length + ' people');
         }
       }
