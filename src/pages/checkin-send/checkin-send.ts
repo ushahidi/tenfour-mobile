@@ -80,6 +80,7 @@ export class CheckinSendPage extends BasePrivatePage {
       return this.loadOrganization(cache)
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadCheckin(cache); })
+      .then(() => { return this.loadEveryone(cache); })
       .then(() => { return this.loadContactsForCheckin(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -111,17 +112,39 @@ export class CheckinSendPage extends BasePrivatePage {
     });
   }
 
+  private loadEveryone(cache:boolean=true):Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.checkin.everyone) {
+        this.promiseFallback(cache,
+          this.storage.getPeople(this.organization),
+          this.api.getPeople(this.organization)).then((people:Person[]) => {
+            this.checkin.users = people;
+            resolve(true);
+          },
+          (error:any) => {
+            reject(null);
+          });
+      } else {
+        resolve(false);
+      }
+    });
+  }
+
   private loadContactsForCheckin(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       let promises = [];
 
       this.checkin.users.forEach((person:Person) => {
-        promises.push(this.loadContactsForPerson(cache, person));
+        if (!person.contacts || !person.contacts.length) {
+          promises.push(this.loadContactsForPerson(cache, person));
+        }
       });
 
       this.checkin.groups.forEach((group:Group) => {
         group.members.forEach((person:Person) => {
-          promises.push(this.loadContactsForPerson(cache, person));
+          if (!person.contacts || !person.contacts.length) {
+            promises.push(this.loadContactsForPerson(cache, person));
+          }
         });
       });
 

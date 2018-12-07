@@ -19,8 +19,8 @@
       <ion-label>You have no saved check-ins</ion-label>
     </ion-item>
 
-    <ion-item color="white" *ngFor="let template of templates" (click)="sendTemplate(template)">
-      <h2 ion-text color="primary">{{template.message}}</h2>
+    <ion-item color="white" *ngFor="let template of templates" >
+      <h2 ion-text color="primary" (click)="sendTemplate(template)">{{template.message}}</h2>
       <p>Send to
         {{template.sendTo()}}
         via
