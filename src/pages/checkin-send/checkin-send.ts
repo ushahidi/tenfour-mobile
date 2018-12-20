@@ -85,7 +85,6 @@ export class CheckinSendPage extends BasePrivatePage {
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         this.countRecipients();
-        this.checkin.template = false;
         if (event) {
           event.complete();
         }

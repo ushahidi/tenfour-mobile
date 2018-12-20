@@ -135,10 +135,13 @@ export class CheckinTemplatesPage extends BasePrivatePage {
   private sendTemplate(template:Template) {
     this.logger.info(this, "sendTemplate", template);
 
+    let checkin = new Checkin(template);
+    checkin.template = false;
+
     this.showModal(CheckinSendPage, {
       organization: this.organization,
       user: this.user,
-      checkin: new Checkin(template)
+      checkin: new Checkin(checkin)
     });
   }
 }
