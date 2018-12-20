@@ -351,6 +351,10 @@ export class Checkin extends Model {
     let _recipients = this.getRecipients();
 
     for (let recipient of _recipients) {
+      if (!recipient.contacts || !recipient.contacts.length) {
+        continue;
+      }
+      
       for (let contact of recipient.contacts) {
         if (contact.blocked) {
           continue;

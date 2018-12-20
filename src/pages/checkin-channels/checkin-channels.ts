@@ -80,8 +80,8 @@ export class CheckinChannelsPage extends BasePrivatePage {
       this.voice_enabled = this.organization.voice_enabled;
     }
 
-    if (this.checkin.send_via && this.checkin.send_via.length > 0) {
-      let values = this.checkin.send_via.split(",");
+    if (this.checkin.sendVia().length) {
+      let values = this.checkin.sendVia();
       this.email_selected = values.indexOf('email') != -1;
       this.sms_selected = values.indexOf('sms') != -1;
       this.slack_selected = values.indexOf('slack') != -1;
