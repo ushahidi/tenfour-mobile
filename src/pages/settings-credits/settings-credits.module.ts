@@ -5,11 +5,11 @@ import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 
 @NgModule({
   declarations: [
-    SettingsCreditsPage,
+    SettingsCreditsPage
   ],
   imports: [
     DateTimeModule,
-    IonicPageModule.forChild(SettingsCreditsPage),
-  ],
+    IonicPageModule.forChild(SettingsCreditsPage)
+  ]
 })
 export class SettingsCreditsPageModule {}

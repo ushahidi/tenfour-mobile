@@ -8,13 +8,13 @@ import { CheckinBadgesModule } from '../../components/checkin-badges/checkin-bad
 
 @NgModule({
   declarations: [
-    CheckinCardComponent,
+    CheckinCardComponent
   ],
   imports: [
     DateTimeModule,
     PersonAvatarModule,
     CheckinBadgesModule,
-    IonicPageModule.forChild(CheckinCardComponent),
+    IonicPageModule.forChild(CheckinCardComponent)
   ],
   exports: [
     CheckinCardComponent

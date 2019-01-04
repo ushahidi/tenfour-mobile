@@ -11,7 +11,7 @@ export class Settings extends Model {
     this.copyInto(data);
   }
 
-  public newInstance<M extends Settings>(data:any=null):Settings {
+  public newInstance<Settings>(data:any=null):any {
     return new Settings(data);
   }
 

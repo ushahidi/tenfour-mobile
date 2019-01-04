@@ -11,12 +11,12 @@ import { SigninLookupModule } from '../../pages/signin-lookup/signin-lookup.modu
 
 @NgModule({
   declarations: [
-    SigninUrlPage,
+    SigninUrlPage
   ],
   imports: [
     SignupEmailModule,
     SigninLookupModule,
-    IonicPageModule.forChild(SigninUrlPage),
+    IonicPageModule.forChild(SigninUrlPage)
   ],
   exports: [
     SigninUrlPage

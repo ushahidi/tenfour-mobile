@@ -22,7 +22,7 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
   selector: 'page-checkin-channels',
   templateUrl: 'checkin-channels.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class CheckinChannelsPage extends BasePrivatePage {
 
@@ -65,21 +65,19 @@ export class CheckinChannelsPage extends BasePrivatePage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-
     this.checkin = this.getParameter<Checkin>("checkin");
     this.organization = this.getParameter<Organization>("organization");
     this.user = this.getParameter<User>("user");
-
     if (this.organization.hasFreePlan()) {
       this.app_enabled = this.organization.app_enabled;
-    } else {
-      this.app_enabled =  this.organization.app_enabled;
+    }
+    else {
+      this.app_enabled = this.organization.app_enabled;
       this.email_enabled = this.organization.email_enabled;
       this.sms_enabled = this.organization.sms_enabled;
       this.slack_enabled = this.organization.slack_enabled;
       this.voice_enabled = this.organization.voice_enabled;
     }
-
     if (this.checkin.sendVia().length) {
       let values = this.checkin.sendVia();
       this.email_selected = values.indexOf('email') != -1;
@@ -90,7 +88,7 @@ export class CheckinChannelsPage extends BasePrivatePage {
     }
   }
 
-  private done() {
+  done() {
     let send_via = [];
     if (this.email_enabled && this.email_selected) {
       send_via.push('email');
@@ -114,7 +112,7 @@ export class CheckinChannelsPage extends BasePrivatePage {
     this.hideModal();
   }
 
-  private upgradeToPro(event:any) {
+  upgradeToPro(event:any) {
     this.logger.info(this, "upgradeToPro");
     if (this.ios) {
       let alert = this.showAlert("Visit Website", "Please login to the website to upgrade to TenFour Pro.");

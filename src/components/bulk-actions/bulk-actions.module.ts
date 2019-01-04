@@ -10,14 +10,14 @@ import { BulkActionsComponent } from './bulk-actions';
 
 @NgModule({
   declarations: [
-    BulkActionsComponent,
+    BulkActionsComponent
   ],
   imports: [
     BulkAddToGroupModule,
     BulkChangeRoleModule,
     BulkInviteModule,
     BulkRemoveModule,
-    IonicPageModule.forChild(BulkActionsComponent),
+    IonicPageModule.forChild(BulkActionsComponent)
   ],
   exports: [
     BulkActionsComponent

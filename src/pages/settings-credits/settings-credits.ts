@@ -14,9 +14,9 @@ import { EVENT_CREDITS_CHANGED } from '../../constants/events';
 @IonicPage()
 @Component({
   selector: 'page-settings-credits',
-  templateUrl: 'settings-credits.html',
+  templateUrl: 'settings-credits.html'
 })
-export class SettingsCreditsPage  extends BasePrivatePage {
+export class SettingsCreditsPage extends BasePrivatePage {
 
   credits:number = 0;
   creditsEstimate:number = 0;
@@ -109,12 +109,12 @@ export class SettingsCreditsPage  extends BasePrivatePage {
 
   private doneAdd(event:any) {
     let loading = this.showLoading("Adding credits...", true);
-
     Promise.resolve()
     .then(() => {
       if (this.addCreditsImmediately) {
         return this.api.addCredits(this.organization, this.subscription, this.credits);
-      } else {
+      }
+      else {
         return Promise.resolve(true);
       }
     })
@@ -152,11 +152,9 @@ export class SettingsCreditsPage  extends BasePrivatePage {
     })
     .then(() => {
       let alert = this.credits + ' extra credits have been added to your account';
-
       if (this.addCreditsRecurring) {
         alert += ' (recurring)';
       }
-
       loading.dismiss();
       this.showToast(alert);
       this.hideModal({
@@ -167,7 +165,6 @@ export class SettingsCreditsPage  extends BasePrivatePage {
       loading.dismiss();
       this.showAlert("Problem adding credits", error);
     });
-
   }
 
 }

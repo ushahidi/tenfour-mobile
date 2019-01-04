@@ -21,7 +21,7 @@ import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-pay
   selector: 'page-settings-channels',
   templateUrl: 'settings-channels.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SettingsChannelsPage extends BasePrivatePage {
 

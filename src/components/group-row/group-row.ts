@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
@@ -7,7 +7,7 @@ import { Person } from '../../models/person';
   selector: 'group-row',
   templateUrl: 'group-row.html'
 })
-export class GroupRowComponent {
+export class GroupRowComponent implements OnInit {
 
   @Input()
   group:Group;

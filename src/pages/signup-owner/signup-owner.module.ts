@@ -7,11 +7,11 @@ import { SignupNameModule } from '../../pages/signup-name/signup-name.module';
 
 @NgModule({
   declarations: [
-    SignupOwnerPage,
+    SignupOwnerPage
   ],
   imports: [
     SignupNameModule,
-    IonicPageModule.forChild(SignupOwnerPage),
+    IonicPageModule.forChild(SignupOwnerPage)
   ],
   exports: [
     SignupOwnerPage

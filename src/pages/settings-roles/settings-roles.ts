@@ -19,7 +19,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-roles',
   templateUrl: 'settings-roles.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SettingsRolesPage extends BasePrivatePage {
 

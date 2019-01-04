@@ -8,12 +8,12 @@ import { SignupPasswordModule } from '../../pages/signup-password/signup-passwor
 
 @NgModule({
   declarations: [
-    SignupPlanPage,
+    SignupPlanPage
   ],
   imports: [
     SignupPaymentModule,
     SignupPasswordModule,
-    IonicPageModule.forChild(SignupPlanPage),
+    IonicPageModule.forChild(SignupPlanPage)
   ],
   exports: [
     SignupPlanPage

@@ -3,7 +3,7 @@ import { DayOfMonthPipe } from './day-of-month';
 
 @NgModule({
   declarations: [
-    DayOfMonthPipe,
+    DayOfMonthPipe
   ],
   imports: [ ],
   exports: [

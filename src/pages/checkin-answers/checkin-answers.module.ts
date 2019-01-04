@@ -5,10 +5,10 @@ import { CheckinAnswersPage } from './checkin-answers';
 
 @NgModule({
   declarations: [
-    CheckinAnswersPage,
+    CheckinAnswersPage
   ],
   imports: [
-    IonicPageModule.forChild(CheckinAnswersPage),
+    IonicPageModule.forChild(CheckinAnswersPage)
   ],
   exports: [
     CheckinAnswersPage

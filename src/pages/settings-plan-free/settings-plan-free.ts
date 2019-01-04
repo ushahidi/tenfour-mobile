@@ -14,7 +14,7 @@ import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
 @IonicPage()
 @Component({
   selector: 'page-settings-plan-free',
-  templateUrl: 'settings-plan-free.html',
+  templateUrl: 'settings-plan-free.html'
 })
 export class SettingsPlanFreePage extends BasePrivatePage {
 

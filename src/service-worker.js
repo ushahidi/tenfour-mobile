@@ -26,9 +26,9 @@ self.addEventListener('activate', event => {
 });
 self.addEventListener('notificationclick', function(e) {
   console.log('ServiceWorker notificationclick');
-  // var notification = e.notification;
-  // var primaryKey = notification.data.primaryKey;
-  // var action = e.action;
+  // let notification = e.notification;
+  // let primaryKey = notification.data.primaryKey;
+  // let action = e.action;
   // if (action === 'close') {
   //   notification.close();
   // }
@@ -38,8 +38,8 @@ self.addEventListener('notificationclick', function(e) {
 });
 self.addEventListener('notificationclose', function(e) {
   console.log('ServiceWorker notificationclose');
-  // var notification = e.notification;
-  // var primaryKey = notification.data.primaryKey;
+  // let notification = e.notification;
+  // let primaryKey = notification.data.primaryKey;
 });
 self.toolbox.options.cache = {
   name: 'ionic-cache'

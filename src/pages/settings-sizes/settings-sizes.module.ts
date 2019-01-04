@@ -5,10 +5,10 @@ import { SettingsSizesPage } from './settings-sizes';
 
 @NgModule({
   declarations: [
-    SettingsSizesPage,
+    SettingsSizesPage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsSizesPage),
+    IonicPageModule.forChild(SettingsSizesPage)
   ],
   exports: [
     SettingsSizesPage

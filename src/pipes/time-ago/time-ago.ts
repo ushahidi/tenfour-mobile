@@ -8,7 +8,7 @@ import * as moment from 'moment';
 export class TimeAgoPipe implements PipeTransform {
 
   transform(value: string, args: any[]=null): any {
-    var date = new Date(value);
+    let date = new Date(value);
     moment.locale('en', {
         relativeTime : {
             future: 'in %s',

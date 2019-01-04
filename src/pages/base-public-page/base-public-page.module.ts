@@ -5,10 +5,10 @@ import { BasePublicPage } from './base-public-page';
 
 @NgModule({
   declarations: [
-    BasePublicPage,
+    BasePublicPage
   ],
   imports: [
-    IonicPageModule.forChild(BasePublicPage),
+    IonicPageModule.forChild(BasePublicPage)
   ],
   exports: [
     BasePublicPage

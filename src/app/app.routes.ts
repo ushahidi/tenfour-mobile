@@ -15,7 +15,7 @@ import { SignupCheckPage } from '../pages/signup-check/signup-check';
 import { SignupVerifyPage } from '../pages/signup-verify/signup-verify';
 import { SignupOwnerPage } from '../pages/signup-owner/signup-owner';
 import { SignupNamePage } from '../pages/signup-name/signup-name';
-import { SignupUrlPage} from '../pages/signup-url/signup-url';
+import { SignupUrlPage } from '../pages/signup-url/signup-url';
 import { SignupPlanPage } from '../pages/signup-plan/signup-plan';
 import { SignupPaymentPage } from '../pages/signup-payment/signup-payment';
 import { SignupPasswordPage } from '../pages/signup-password/signup-password';
@@ -45,7 +45,7 @@ import { GroupDetailsPage } from '../pages/group-details/group-details';
 
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 
-import { SettingsListPage} from '../pages/settings-list/settings-list';
+import { SettingsListPage } from '../pages/settings-list/settings-list';
 import { SettingsEditPage } from '../pages/settings-edit/settings-edit';
 import { SettingsTypesPage } from '../pages/settings-types/settings-types';
 import { SettingsSizesPage } from '../pages/settings-sizes/settings-sizes';
@@ -119,6 +119,6 @@ export class TenFourRoutes {
     { component: SettingsLDAPPage, name: 'SettingsLDAPPage', segment: 'settings/ldap', defaultHistory: ['SettingsListPage'] },
     { component: SettingsTutorialPage, name: 'SettingsTutorialPage', segment: 'settings/tutorial', defaultHistory: ['SettingsListPage'] },
 
-    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' },
+    { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' }
   ];
 }

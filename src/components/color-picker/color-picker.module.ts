@@ -4,10 +4,10 @@ import { ColorPickerComponent } from './color-picker';
 
 @NgModule({
   declarations: [
-    ColorPickerComponent,
+    ColorPickerComponent
   ],
   imports: [
-    IonicPageModule.forChild(ColorPickerComponent),
+    IonicPageModule.forChild(ColorPickerComponent)
   ],
   exports: [
     ColorPickerComponent

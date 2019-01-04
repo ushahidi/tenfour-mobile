@@ -1,4 +1,4 @@
-import { Component, Input, ElementRef } from '@angular/core';
+import { Component, Input, ElementRef, OnInit, AfterContentInit, OnChanges } from '@angular/core';
 import { style, state, animate, transition, trigger } from '@angular/animations';
 
 @Component({
@@ -13,7 +13,7 @@ import { style, state, animate, transition, trigger } from '@angular/animations'
     ])
   ]
 })
-export class PersonAvatarComponent {
+export class PersonAvatarComponent implements OnInit, AfterContentInit, OnChanges {
 
   @Input()
   image:string = null;

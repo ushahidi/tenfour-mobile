@@ -9,12 +9,12 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    CheckinEditPage,
+    CheckinEditPage
   ],
   imports: [
     PersonAvatarModule,
     CheckinSendModule,
-    IonicPageModule.forChild(CheckinEditPage),
+    IonicPageModule.forChild(CheckinEditPage)
   ],
   exports: [
     CheckinEditPage

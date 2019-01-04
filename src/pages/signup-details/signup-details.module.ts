@@ -4,14 +4,13 @@ import { SignupDetailsPage } from './signup-details';
 
 import { SignupPasswordModule } from '../../pages/signup-password/signup-password.module';
 
-
 @NgModule({
   declarations: [
-    SignupDetailsPage,
+    SignupDetailsPage
   ],
   imports: [
     SignupPasswordModule,
-    IonicPageModule.forChild(SignupDetailsPage),
+    IonicPageModule.forChild(SignupDetailsPage)
   ],
   exports: [
     SignupDetailsPage

@@ -6,11 +6,11 @@ import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 
 @NgModule({
   declarations: [
-    SettingsPlanProWelcomePage,
+    SettingsPlanProWelcomePage
   ],
   imports: [
     DateTimeModule,
-    IonicPageModule.forChild(SettingsPlanProWelcomePage),
-  ],
+    IonicPageModule.forChild(SettingsPlanProWelcomePage)
+  ]
 })
 export class SettingsPlanProWelcomePageModule {}

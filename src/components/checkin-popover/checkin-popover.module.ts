@@ -5,10 +5,10 @@ import { CheckinPopoverComponent } from './checkin-popover';
 
 @NgModule({
   declarations: [
-    CheckinPopoverComponent,
+    CheckinPopoverComponent
   ],
   imports: [
-    IonicPageModule.forChild(CheckinPopoverComponent),
+    IonicPageModule.forChild(CheckinPopoverComponent)
   ],
   exports: [
     CheckinPopoverComponent

@@ -26,7 +26,7 @@ export class Group extends Model {
     }
   }
 
-  public newInstance<M extends Group>(data:any=null):Group {
+  public newInstance<Group>(data:any=null):any {
     return new Group(data);
   }
 
@@ -67,7 +67,9 @@ export class Group extends Model {
   public loadMembers(people:Person[]) {
     if (this.member_ids) {
       let memberIds = this.member_ids.split(",");
-      this.members = people.filter((person:Person) => { memberIds.indexOf(person.id.toString()) != -1});
+      this.members = people.filter((person:Person) => {
+        return memberIds.indexOf(person.id.toString()) != -1
+      });
     }
   }
 

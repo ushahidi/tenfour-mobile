@@ -64,7 +64,7 @@ export class Notification extends Model {
     }
   }
 
-  public newInstance<M extends Notification>(data:any=null):Notification {
+  public newInstance<Notification>(data:any=null):any {
     return new Notification(data);
   }
 

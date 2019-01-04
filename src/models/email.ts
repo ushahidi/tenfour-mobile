@@ -11,7 +11,7 @@ export class Email extends Model {
     this.copyInto(data);
   }
 
-  public newInstance<M extends Email>(data:any=null):Email {
+  public newInstance<Email>(data:any=null):any {
     return new Email(data);
   }
 

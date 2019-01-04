@@ -8,12 +8,12 @@ import { GroupRowModule } from '../../components/group-row/group-row.module';
 
 @NgModule({
   declarations: [
-    BulkAddToGroupPage,
+    BulkAddToGroupPage
   ],
   imports: [
     GroupRowModule,
     MultiAvatarModule,
-    IonicPageModule.forChild(BulkAddToGroupPage),
+    IonicPageModule.forChild(BulkAddToGroupPage)
   ],
   exports: [
     BulkAddToGroupPage

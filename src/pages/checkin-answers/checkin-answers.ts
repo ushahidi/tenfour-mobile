@@ -20,7 +20,7 @@ import { ColorPickerComponent } from '../../components/color-picker/color-picker
   selector: 'page-checkin-answers',
   templateUrl: 'checkin-answers.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class CheckinAnswersPage extends BasePrivatePage {
 
@@ -51,7 +51,7 @@ export class CheckinAnswersPage extends BasePrivatePage {
     this.dontAskForResponse = !this.checkin.answers.length;
   }
 
-  private addAnswer() {
+  addAnswer() {
     let colors = [
       "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
       "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
@@ -66,7 +66,7 @@ export class CheckinAnswersPage extends BasePrivatePage {
     }));
   }
 
-  private removeAnswer(answer:Answer) {
+  removeAnswer(answer:Answer) {
     for (let i = 0; i < this.checkin.answers.length; i++) {
       if (this.checkin.answers[i] === answer) {
         this.checkin.answers.splice(i, 1);
@@ -75,19 +75,20 @@ export class CheckinAnswersPage extends BasePrivatePage {
     }
   }
 
-  private toggleAnswers() {
+  toggleAnswers() {
     if (this.dontAskForResponse) {
       this.removeAnswers();
-    } else {
+    }
+    else {
       this.addDefaults();
     }
   }
 
-  private removeAnswers() {
+  removeAnswers() {
     this.checkin.answers = [];
   }
 
-  private addDefaults() {
+  addDefaults() {
     this.checkin.answers = [];
     this.checkin.answers.push(new Answer({
       icon: "icon-exclaim",
@@ -103,7 +104,7 @@ export class CheckinAnswersPage extends BasePrivatePage {
     }));
   }
 
-  private changeColor(answer:Answer, event:any) {
+  changeColor(answer:Answer, event:any) {
     this.logger.info(this, "changeColor", answer);
     let popover = this.popoverController.create(ColorPickerComponent,
       { color: answer.color,
@@ -119,9 +120,8 @@ export class CheckinAnswersPage extends BasePrivatePage {
     });
   }
 
-  private done() {
+  done() {
     this.logger.info(this, "done");
-
     if (this.checkin.hasBlankAnswers()) {
       this.showAlert("Blank Answers", "Answers must have a value.");
     }

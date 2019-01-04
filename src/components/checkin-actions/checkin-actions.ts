@@ -1,11 +1,11 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
+import { Component, NgZone, ViewChild, OnInit } from '@angular/core';
 import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
 
 import { Checkin } from '../../models/checkin';
 import { Organization } from '../../models/organization';
-import { User }  from '../../models/user';
+import { User } from '../../models/user';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -14,7 +14,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'checkin-actions-popover',
   templateUrl: 'checkin-actions.html'
 })
-export class CheckinActionsComponent extends BasePage {
+export class CheckinActionsComponent extends BasePage implements OnInit {
 
   checkin:Checkin;
   organization:Organization;
@@ -70,10 +70,8 @@ export class CheckinActionsComponent extends BasePage {
 
   private saveAsTemplate() {
     let loading = this.showLoading("Saving...", true);
-
     let checkin = new Checkin(this.checkin);
     checkin.template = true;
-
     this.api.updateCheckin(this.organization, checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then((saved) => {
@@ -90,10 +88,8 @@ export class CheckinActionsComponent extends BasePage {
 
   private removeAsTemplate() {
     let loading = this.showLoading("Removing...", true);
-
     let checkin = new Checkin(this.checkin);
     checkin.template = false;
-
     this.api.updateCheckin(this.organization, checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then((saved) => {

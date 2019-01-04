@@ -11,7 +11,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'BulkInvitePage',
+  name: 'BulkInvitePage'
 })
 @Component({
   selector: 'bulk-invite',
@@ -43,12 +43,7 @@ export class BulkInvitePage extends BasePrivatePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-
     this.people = this.navParams.get('people');
-  }
-
-  ionViewWillLeave() {
-    super.ionViewWillLeave();
   }
 
   private get peopleWithoutEmail() {
@@ -63,20 +58,16 @@ export class BulkInvitePage extends BasePrivatePage {
     });
   }
 
-  private invite() {
+  invite() {
     this.logger.info(this, "invite");
-
     let loading = this.showLoading("Inviting...", true);
     let promises = [];
-
     this.people.forEach(person => {
       if (!person.hasEmails()) {
         return;
       }
-
       promises.push(this.api.invitePerson(this.organization, person));
     });
-
     Promise.all(promises).then(() => {
         loading.dismiss();
         this.hideModal();

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 
-
 import { CheckinListPage } from './checkin-list';
 import { CheckinDetailsModule } from '../../pages/checkin-details/checkin-details.module';
 import { CheckinEditModule } from '../../pages/checkin-edit/checkin-edit.module';
@@ -14,7 +13,7 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
 
 @NgModule({
   declarations: [
-    CheckinListPage,
+    CheckinListPage
   ],
   imports: [
     DateTimeModule,
@@ -24,7 +23,7 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
     CheckinRespondModule,
     CheckinDetailsModule,
     NotificationListModule,
-    IonicPageModule.forChild(CheckinListPage),
+    IonicPageModule.forChild(CheckinListPage)
   ],
   exports: [
     CheckinListPage

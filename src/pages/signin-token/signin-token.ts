@@ -27,7 +27,7 @@ import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
   selector: 'page-signin-token',
   templateUrl: 'signin-token.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SigninTokenPage extends BasePublicPage {
 
@@ -119,7 +119,7 @@ export class SigninTokenPage extends BasePublicPage {
       this.storage.removeGroups(),
       this.storage.removeEmails(),
       this.storage.removePeople(),
-      this.storage.removeContacts(),
+      this.storage.removeContacts()
     ];
     return Promise.all(removes);
   }
@@ -290,6 +290,5 @@ export class SigninTokenPage extends BasePublicPage {
       });
     });
   }
-
 
 }

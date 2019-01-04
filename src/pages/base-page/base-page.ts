@@ -14,7 +14,7 @@ import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 @Component({
   selector: 'base-page',
   template: "<ion-header></ion-header><ion-content></ion-content>",
-  providers: [ LoggerProvider ],
+  providers: [ LoggerProvider ]
 })
 export class BasePage {
 
@@ -307,7 +307,7 @@ export class BasePage {
 
   protected promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
     return new Promise((resolve, reject) => {
-      var timer = setTimeout(() => {
+      let timer = setTimeout(() => {
         reject("Promise Timeout");
       }, milliseconds);
       promise.then((result:any) => {

@@ -5,10 +5,10 @@ import { CheckinActionsComponent } from './checkin-actions';
 
 @NgModule({
   declarations: [
-    CheckinActionsComponent,
+    CheckinActionsComponent
   ],
   imports: [
-    IonicPageModule.forChild(CheckinActionsComponent),
+    IonicPageModule.forChild(CheckinActionsComponent)
   ],
   exports: [
     CheckinActionsComponent

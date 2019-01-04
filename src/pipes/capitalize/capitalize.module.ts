@@ -3,7 +3,7 @@ import { CapitalizePipe } from './capitalize';
 
 @NgModule({
   declarations: [
-    CapitalizePipe,
+    CapitalizePipe
   ],
   imports: [ ],
   exports: [

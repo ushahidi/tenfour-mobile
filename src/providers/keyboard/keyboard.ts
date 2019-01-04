@@ -3,28 +3,37 @@ import { Platform } from 'ionic-angular';
 
 import { Keyboard } from '@ionic-native/keyboard';
 
-import { LoggerProvider } from '../../providers/logger/logger';
-
 @Injectable()
 export class KeyboardProvider {
 
   constructor(
     private platform:Platform,
-    private keyboard:Keyboard,
-    private logger:LoggerProvider) {
+    private keyboard:Keyboard) {
 
   }
 
-  public show() {
-    if (this.platform.is("cordova")) {
-      this.keyboard.show();
-    }
+  public show():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.platform.is("cordova")) {
+        this.keyboard.show();
+        resolve(true);
+      }
+      else {
+        resolve(false);
+      }
+    });
   }
 
-  public hide() {
-    if (this.platform.is("cordova")) {
-      this.keyboard.hide();
-    }
+  public hide():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      if (this.platform.is("cordova")) {
+        this.keyboard.hide();
+        resolve(true);
+      }
+      else {
+        resolve(false);
+      }
+    });
   }
 
 }

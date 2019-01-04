@@ -4,7 +4,7 @@ import { Person } from '../../models/person';
 
 @Component({
   selector: 'multi-avatar',
-  templateUrl: 'multi-avatar.html',
+  templateUrl: 'multi-avatar.html'
 })
 export class MultiAvatarComponent {
 

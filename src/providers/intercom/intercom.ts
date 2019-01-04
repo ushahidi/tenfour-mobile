@@ -4,7 +4,6 @@ import { Platform } from 'ionic-angular';
 import { Intercom as IntercomWeb } from 'ng-intercom';
 import { Intercom as IntercomNative } from '@ionic-native/intercom';
 
-import { Device } from '@ionic-native/device';
 import { AppVersion } from '@ionic-native/app-version';
 
 import { Organization } from '../../models/organization';
@@ -18,7 +17,6 @@ export class IntercomProvider {
 
   constructor(
     private platform:Platform,
-    private device:Device,
     private appVersion:AppVersion,
     private logger:LoggerProvider,
     private environment:EnvironmentProvider,

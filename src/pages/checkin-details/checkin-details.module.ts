@@ -11,7 +11,7 @@ import { CheckinDetailModule } from '../../components/checkin-details/checkin-de
 
 @NgModule({
   declarations: [
-    CheckinDetailsPage,
+    CheckinDetailsPage
   ],
   imports: [
     DateTimeModule,
@@ -19,7 +19,7 @@ import { CheckinDetailModule } from '../../components/checkin-details/checkin-de
     CheckinRespondModule,
     CheckinDetailModule,
     CheckinActionsModule,
-    IonicPageModule.forChild(CheckinDetailsPage),
+    IonicPageModule.forChild(CheckinDetailsPage)
   ],
   exports: [
     CheckinDetailsPage

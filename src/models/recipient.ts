@@ -21,7 +21,7 @@ export class Recipient extends Model {
     }
   }
 
-  public newInstance<M extends Recipient>(data:any=null):Recipient {
+  public newInstance<Recipient>(data:any=null):any {
     return new Recipient(data);
   }
 

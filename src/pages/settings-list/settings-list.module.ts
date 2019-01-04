@@ -13,7 +13,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    SettingsListPage,
+    SettingsListPage
   ],
   imports: [
     PersonAvatarModule,
@@ -22,7 +22,7 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
     SettingsRegionsModule,
     SettingsSizesModule,
     SettingsPaymentsModule,
-    IonicPageModule.forChild(SettingsListPage),
+    IonicPageModule.forChild(SettingsListPage)
   ],
   exports: [
     SettingsListPage

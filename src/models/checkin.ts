@@ -80,7 +80,7 @@ export class Checkin extends Model {
     }
   }
 
-  public newInstance<M extends Checkin>(data:any=null):Checkin {
+  public newInstance<Checkin>(data:any=null):any {
     return new Checkin(data);
   }
 
@@ -354,7 +354,7 @@ export class Checkin extends Model {
       if (!recipient.contacts || !recipient.contacts.length) {
         continue;
       }
-      
+
       for (let contact of recipient.contacts) {
         if (contact.blocked) {
           continue;

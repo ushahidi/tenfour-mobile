@@ -5,10 +5,10 @@ import { SettingsTypesPage } from './settings-types';
 
 @NgModule({
   declarations: [
-    SettingsTypesPage,
+    SettingsTypesPage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsTypesPage),
+    IonicPageModule.forChild(SettingsTypesPage)
   ],
   exports: [
     SettingsTypesPage

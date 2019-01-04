@@ -1,6 +1,5 @@
 import { Component, NgZone, ViewChild } from '@angular/core';
-import { IonicPage, TextInput,
-         Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { SignupPasswordPage } from '../../pages/signup-password/signup-password';
@@ -17,7 +16,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
 })
 @Component({
   selector: 'page-signup-details',
-  templateUrl: 'signup-details.html',
+  templateUrl: 'signup-details.html'
 })
 export class SignupDetailsPage extends BasePublicPage {
 
