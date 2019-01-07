@@ -64,7 +64,7 @@ export class Person extends Model {
     }
   }
 
-  public newInstance<Person>(data:any=null):any {
+  public newInstance<M extends Person>(data:any=null):any {
     return new Person(data);
   }
 

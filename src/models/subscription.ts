@@ -11,7 +11,7 @@ export class Subscription extends Model {
     this.copyInto(data);
   }
 
-  public newInstance<Subscription>(data:any=null):any {
+  public newInstance<M extends Subscription>(data:any=null):any {
     return new Subscription(data);
   }
 

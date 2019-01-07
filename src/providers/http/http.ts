@@ -20,8 +20,8 @@ import { LoggerProvider } from '../logger/logger';
 @Injectable()
 export class HttpProvider {
 
-  TIMEOUT:number = 1 * 60 * 1000;
-  TIMEOUT_UPLOAD:number = 5 * 60 * 1000;
+  readonly TIMEOUT:number = 1 * 60 * 1000;
+  readonly TIMEOUT_UPLOAD:number = 5 * 60 * 1000;
 
   constructor(
     protected platform:Platform,

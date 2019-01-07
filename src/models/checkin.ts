@@ -80,7 +80,7 @@ export class Checkin extends Model {
     }
   }
 
-  public newInstance<Checkin>(data:any=null):any {
+  public newInstance<M extends Checkin>(data:any=null):any {
     return new Checkin(data);
   }
 

@@ -26,7 +26,7 @@ export class Group extends Model {
     }
   }
 
-  public newInstance<Group>(data:any=null):any {
+  public newInstance<M extends Group>(data:any=null):any {
     return new Group(data);
   }
 

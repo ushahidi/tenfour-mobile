@@ -46,7 +46,7 @@
     "no-unused-variable": [
       true,
       {
-        "ignore-pattern": "([A-Z][A-Z_]+|[A-Z][a-z]+)"
+        "ignore-pattern": "([A-Z][A-Z_]+|[A-Z][a-z]+|[M])"
       }
     ],
     "no-var-keyword": true,

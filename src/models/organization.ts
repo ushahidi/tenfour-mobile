@@ -97,7 +97,7 @@ export class Organization extends Model {
     }
   }
 
-  public newInstance<Organization>(data:any=null):any {
+  public newInstance<M extends Organization>(data:any=null):any {
     return new Organization(data);
   }
 

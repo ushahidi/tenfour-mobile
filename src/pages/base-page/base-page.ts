@@ -18,12 +18,11 @@ import { StatusBarProvider } from '../../providers/status-bar/status-bar';
 })
 export class BasePage {
 
-  protected WIDTH_SMALL:number = 540;
-  protected WIDTH_MEDIUM:number = 720;
-  protected WIDTH_LARGE:number = 960;
-  protected WIDTH_EXTRA_LARGE:number = 1140;
-
-  protected KEYCODE_RETURN:number = 13;
+  protected readonly WIDTH_SMALL:number = 540;
+  protected readonly WIDTH_MEDIUM:number = 720;
+  protected readonly WIDTH_LARGE:number = 960;
+  protected readonly WIDTH_EXTRA_LARGE:number = 1140;
+  protected readonly KEYCODE_RETURN:number = 13;
 
   protected offline:boolean = false;
   protected tablet:boolean = false;
@@ -307,7 +306,7 @@ export class BasePage {
 
   protected promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
     return new Promise((resolve, reject) => {
-      let timer = setTimeout(() => {
+      const timer = setTimeout(() => {
         reject("Promise Timeout");
       }, milliseconds);
       promise.then((result:any) => {
