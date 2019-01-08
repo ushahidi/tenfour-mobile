@@ -14,7 +14,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 import { EVENT_GROUP_CHANGED } from '../../constants/events';
 
 @IonicPage({
-  name: 'BulkAddToGroupPage',
+  name: 'BulkAddToGroupPage'
 })
 @Component({
   selector: 'bulk-addtogroup',
@@ -54,11 +54,10 @@ export class BulkAddToGroupPage extends BasePrivatePage {
 
   ionViewDidEnter() {
     super.ionViewDidEnter();
-
     this.people = this.navParams.get('people');
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.loading = true;
     return Promise.resolve()
       .then(() => this.loadGroups(cache))
@@ -79,7 +78,7 @@ export class BulkAddToGroupPage extends BasePrivatePage {
       });
   }
 
-  private loadGroups(cache:boolean=true):Promise<any> {
+  loadGroups(cache:boolean=true):Promise<any> {
     this.logger.info(this, "loadGroups", cache);
     return new Promise((resolve, reject) => {
       this.promiseFallback(cache,
@@ -95,16 +94,13 @@ export class BulkAddToGroupPage extends BasePrivatePage {
     });
   }
 
-  private addPeopleToGroups() {
+  addPeopleToGroups() {
     this.logger.info(this, "addPeopleToGroups");
-
     let loading = this.showLoading("Saving...", true);
     let promises = [];
-
     this.organization.groups.forEach(group => {
         if (group.selected) {
           this.people.forEach(person => { group.members.push(person); });
-
           promises.push(new Promise((resolve, reject) => {
             this.api.updateGroup(this.organization, group).then((updatedGroup:Group) => {
               this.storage.saveGroup(this.organization, updatedGroup).then((saved:any) => {
@@ -115,7 +111,6 @@ export class BulkAddToGroupPage extends BasePrivatePage {
           }));
         }
     });
-
     Promise.all(promises).then(() => {
         loading.dismiss();
         this.hideModal();

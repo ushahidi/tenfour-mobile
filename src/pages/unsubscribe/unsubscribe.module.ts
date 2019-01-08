@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+
 import { UnsubscribePage } from './unsubscribe';
 
 @NgModule({
   declarations: [
-    UnsubscribePage,
+    UnsubscribePage
   ],
   imports: [
-    IonicPageModule.forChild(UnsubscribePage),
-  ],
+    IonicPageModule.forChild(UnsubscribePage)
+  ]
 })
 export class UnsubscribePageModule {}

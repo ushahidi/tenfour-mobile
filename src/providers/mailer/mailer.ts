@@ -7,7 +7,6 @@ import { AppAvailability } from '@ionic-native/app-availability';
 
 import { Country } from '../../models/country';
 
-import { LoggerProvider } from '../../providers/logger/logger';
 import { BrowserProvider } from '../../providers/browser/browser';
 
 @Injectable()
@@ -19,8 +18,7 @@ export class MailerProvider {
   constructor(
     private platform:Platform,
     private appAvailability:AppAvailability,
-    private browser:BrowserProvider,
-    private logger:LoggerProvider) {
+    private browser:BrowserProvider) {
   }
 
   public openEmail():Promise<boolean> {

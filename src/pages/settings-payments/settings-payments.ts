@@ -134,7 +134,7 @@ export class SettingsPaymentsPage extends BasePrivatePage {
 
   private switchToFree(event:any) {
     this.logger.info(this, "switchToFree");
-    let modal = this.showModal(SettingsPlanFreePage);
+    this.showModal(SettingsPlanFreePage);
   }
 
   private hashChangeSwitchToPro() {

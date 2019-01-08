@@ -7,11 +7,11 @@ import { MultiAvatarModule } from '../../components/multi-avatar/multi-avatar.mo
 
 @NgModule({
   declarations: [
-    BulkRemovePage,
+    BulkRemovePage
   ],
   imports: [
     MultiAvatarModule,
-    IonicPageModule.forChild(BulkRemovePage),
+    IonicPageModule.forChild(BulkRemovePage)
   ],
   exports: [
     BulkRemovePage

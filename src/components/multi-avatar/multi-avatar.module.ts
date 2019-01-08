@@ -5,11 +5,11 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    MultiAvatarComponent,
+    MultiAvatarComponent
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(MultiAvatarComponent),
+    IonicPageModule.forChild(MultiAvatarComponent)
   ],
   exports: [
     MultiAvatarComponent

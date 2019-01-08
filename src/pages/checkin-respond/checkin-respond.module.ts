@@ -9,13 +9,13 @@ import { CheckinRespondComponentModule } from '../../components/checkin-respond/
 
 @NgModule({
   declarations: [
-    CheckinRespondPage,
+    CheckinRespondPage
   ],
   imports: [
     PersonAvatarModule,
     DateTimeModule,
     CheckinRespondComponentModule,
-    IonicPageModule.forChild(CheckinRespondPage),
+    IonicPageModule.forChild(CheckinRespondPage)
   ],
   exports: [
     CheckinRespondPage

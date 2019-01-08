@@ -9,13 +9,13 @@ import { PersonRowModule } from '../../components/person-row/person-row.module';
 
 @NgModule({
   declarations: [
-    PersonEditPage,
+    PersonEditPage
   ],
   imports: [
     DateTimeModule,
     PersonRowModule,
     PersonAvatarModule,
-    IonicPageModule.forChild(PersonEditPage),
+    IonicPageModule.forChild(PersonEditPage)
   ],
   exports: [
     PersonEditPage

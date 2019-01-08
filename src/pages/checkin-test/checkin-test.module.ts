@@ -8,12 +8,12 @@ import { HumanizeModule } from '../../pipes/humanize/humanize.module';
 
 @NgModule({
   declarations: [
-    CheckinTestPage,
+    CheckinTestPage
   ],
   imports: [
     HumanizeModule,
     PersonAvatarModule,
-    IonicPageModule.forChild(CheckinTestPage),
+    IonicPageModule.forChild(CheckinTestPage)
   ],
   exports: [
     CheckinTestPage

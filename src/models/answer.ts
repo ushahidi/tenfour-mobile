@@ -11,7 +11,7 @@ export class Answer extends Model {
     this.copyInto(data);
   }
 
-  public newInstance<M extends Answer>(data:any=null):Answer {
+  public newInstance<M extends Answer>(data:any=null):any {
     return new Answer(data);
   }
 

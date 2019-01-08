@@ -57,7 +57,7 @@ export class SignupCheckPage extends BasePublicPage {
     this.analytics.trackPage(this);
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
@@ -77,7 +77,7 @@ export class SignupCheckPage extends BasePublicPage {
       });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
+  loadOrganization(cache:boolean=true):Promise<Organization> {
     return new Promise((resolve, reject) => {
       if (cache && this.organization) {
         resolve(this.organization);
@@ -99,7 +99,7 @@ export class SignupCheckPage extends BasePublicPage {
     });
   }
 
-  private loadMailer():Promise<boolean> {
+  loadMailer():Promise<boolean> {
     return new Promise((resolve, reject) => {
       this.mailer.canOpenEmail().then((canOpenEmail:boolean) => {
         this.canOpenEmail = canOpenEmail;
@@ -108,12 +108,13 @@ export class SignupCheckPage extends BasePublicPage {
     });
   }
 
-  private openMail(event:any) {
+  openMail(event:any) {
     this.logger.info(this, "openMail");
     this.mailer.openEmail();
   }
-  
-  private closeModal(event:any) {
+
+  closeModal(event:any) {
     this.hideModal();
   }
+
 }

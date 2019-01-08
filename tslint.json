@@ -1,11 +1,81 @@
 {
   "rules": {
+    "angular-whitespace": [
+      true,
+      "check-pipe",
+      "check-semicolon"
+    ],
+    "banana-in-box": true,
+    "callable-types": true,
+    "comment-format": [
+      true,
+      "check-space",
+      "singleline"
+    ],
+    "component-selector": [
+      true,
+      "element",
+      "kebab-case"
+    ],
+    "directive-selector": [
+      true,
+      "attribute",
+      "camelCase"
+    ],
+    "import-destructuring-spacing": true,
+    "import-spacing": true,
+    "indent": [
+      true,
+      2,
+      "spaces"
+    ],
+    "no-attribute-parameter-decorator": true,
+    "no-consecutive-blank-lines": true,
+    "no-debugger": true,
+    "no-duplicate-imports": true,
     "no-duplicate-variable": true,
+    "no-eval": true,
+    "no-forward-ref": true,
+    "no-input-rename": true,
+    "no-misused-new": true,
+    "no-multi-spaces": true,
+    "no-output-rename": true,
+    "no-trailing-whitespace": true,
+    "no-unnecessary-initializer": true,
+    "no-unused-expression": true,
     "no-unused-variable": [
-      false
+      true,
+      {
+        "ignore-pattern": "([A-Z][A-Z_]+|[A-Z][a-z]+|[M])"
+      }
+    ],
+    "no-var-keyword": true,
+    "templates-no-negated-async": true,
+    "trailing-comma": [
+      true,
+      {
+        "multiline": "never",
+        "singleline": "never"
+      }
+    ],
+    "use-host-property-decorator": true,
+    "use-input-property-decorator": true,
+    "use-life-cycle-interface": true,
+    "use-output-property-decorator": true,
+    "use-pipe-transform-interface": true,
+    "use-view-encapsulation": true,
+    "variable-name": [
+      true,
+      "allow-leading-underscore",
+      "allow-pascal-case",
+      "allow-snake-case",
+      "allow-trailing-underscore",
+      "ban-keywords",
+      "check-format"
     ]
   },
   "rulesDirectory": [
+    "node_modules/codelyzer",
     "node_modules/tslint-eslint-rules/dist/rules"
   ]
 }

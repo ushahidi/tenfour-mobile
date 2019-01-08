@@ -18,7 +18,6 @@ import { Template } from '../../models/template';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Group } from '../../models/group';
-import { Settings } from '../../models/settings';
 import { Region } from '../../models/region';
 import { Subscription } from '../../models/subscription';
 import { Notification } from '../../models/notification';
@@ -293,7 +292,7 @@ export class ApiProvider extends HttpProvider {
         password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
-        verification_code: verificationCode,
+        verification_code: verificationCode
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
@@ -697,7 +696,6 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
-
 
   public getCheckinsWaiting(organization:Organization, user:User, limit:number=10):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
@@ -1115,7 +1113,7 @@ export class ApiProvider extends HttpProvider {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
         let params = {
           id: user.id,
-          name: user.name,
+          name: user.name
         };
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.notifications) {
@@ -1608,7 +1606,6 @@ export class ApiProvider extends HttpProvider {
   public matchCSVContacts(organization:Organization, map:any, data:any):Promise<any> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-
         // Initialize a new array of the length of the csv column with nulls
         let maps_to = [];
         let columns = data.file.columns;
@@ -1616,10 +1613,8 @@ export class ApiProvider extends HttpProvider {
         for (let i = 0; i < Object.keys(columns).length; i++) {
           maps_to.push(null);
         }
-
-        //iterate through the map Object, check if value is null and replace any null with value
-        //insert this into the maps_to array in the correct positions
-
+        // iterate through the map Object, check if value is null and replace any null with value
+        // insert this into the maps_to array in the correct positions
         for (let i=0; i<columns.length; i++) {
           for (let mapKey of Object.keys(map)) {
             if (map[mapKey] === columns[i]) {
@@ -1627,13 +1622,11 @@ export class ApiProvider extends HttpProvider {
             }
           }
         }
-
         let params = {
           fileId: data.file.id,
           orgId: organization.id,
           maps_to: maps_to
         };
-
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
         this.httpPut(url, params, token.access_token).then((data:any) => {
           resolve(data);
@@ -1655,7 +1648,6 @@ export class ApiProvider extends HttpProvider {
           fileId: data.file.id,
           orgId: organization.id
         };
-
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
         this.httpPost(url, params, token.access_token).then((data:any) => {
           resolve(true);
@@ -1713,7 +1705,7 @@ export class ApiProvider extends HttpProvider {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/organization/lookup`;
       let params = {
-        email: email,
+        email: email
       };
       this.httpPost(url, params).then((data:any) => {
         resolve(true);

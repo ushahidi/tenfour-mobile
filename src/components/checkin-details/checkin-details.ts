@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter  } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
@@ -9,7 +9,7 @@ import { Recipient } from '../../models/recipient';
   selector: 'checkin-details',
   templateUrl: 'checkin-details.html'
 })
-export class CheckinDetailsComponent {
+export class CheckinDetailsComponent implements OnInit {
 
   filter:String = '';
   ENABLE_FILTER_AFTER_RECIPIENT_COUNT:number = 10;

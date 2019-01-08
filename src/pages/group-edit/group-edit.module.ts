@@ -6,11 +6,11 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    GroupEditPage,
+    GroupEditPage
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(GroupEditPage),
+    IonicPageModule.forChild(GroupEditPage)
   ],
   exports: [
     GroupEditPage

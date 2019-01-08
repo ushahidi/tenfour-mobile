@@ -5,10 +5,10 @@ import { SettingsChannelsPage } from './settings-channels';
 
 @NgModule({
   declarations: [
-    SettingsChannelsPage,
+    SettingsChannelsPage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsChannelsPage),
+    IonicPageModule.forChild(SettingsChannelsPage)
   ],
   exports: [
     SettingsChannelsPage

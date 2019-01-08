@@ -4,10 +4,10 @@ import { PersonAvatarComponent } from './person-avatar';
 
 @NgModule({
   declarations: [
-    PersonAvatarComponent,
+    PersonAvatarComponent
   ],
   imports: [
-    IonicPageModule.forChild(PersonAvatarComponent),
+    IonicPageModule.forChild(PersonAvatarComponent)
   ],
   exports: [
     PersonAvatarComponent

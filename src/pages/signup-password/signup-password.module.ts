@@ -5,10 +5,10 @@ import { SignupPasswordPage } from './signup-password';
 
 @NgModule({
   declarations: [
-    SignupPasswordPage,
+    SignupPasswordPage
   ],
   imports: [
-    IonicPageModule.forChild(SignupPasswordPage),
+    IonicPageModule.forChild(SignupPasswordPage)
   ],
   exports: [
     SignupPasswordPage

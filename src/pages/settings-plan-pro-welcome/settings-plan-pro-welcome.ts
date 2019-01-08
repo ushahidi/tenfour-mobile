@@ -14,7 +14,7 @@ import { EVENT_SUBSCRIPTION_CHANGED } from '../../constants/events';
 @IonicPage()
 @Component({
   selector: 'page-settings-plan-pro-welcome',
-  templateUrl: 'settings-plan-pro-welcome.html',
+  templateUrl: 'settings-plan-pro-welcome.html'
 })
 export class SettingsPlanProWelcomePage extends BasePrivatePage {
 

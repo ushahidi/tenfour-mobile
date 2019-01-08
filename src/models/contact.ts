@@ -16,7 +16,7 @@ export class Contact extends Model {
     }
   }
 
-  public newInstance<M extends Contact>(data:any=null):Contact {
+  public newInstance<M extends Contact>(data:any=null):any {
     return new Contact(data);
   }
 

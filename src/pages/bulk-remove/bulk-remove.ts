@@ -11,7 +11,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'BulkRemovePage',
+  name: 'BulkRemovePage'
 })
 @Component({
   selector: 'bulk-remove',
@@ -47,7 +47,7 @@ export class BulkRemovePage extends BasePrivatePage {
     this.people = this.navParams.get('people');
   }
 
-  private confirm() {
+  confirm() {
     this.logger.info(this, "confirm");
 
     let buttons = [
@@ -68,17 +68,16 @@ export class BulkRemovePage extends BasePrivatePage {
       return person.id === this.user.id;
     })) {
       this.showConfirm("Remove People", "Warning: This operation will also remove your account", buttons);
-    } else {
+    }
+    else {
       this.showConfirm("Remove People", "Are you sure you want to remove these people?", buttons);
     }
   }
 
-  private remove() {
+  remove() {
     this.logger.info(this, "remove");
-
     let loading = this.showLoading("Removing...", true);
     let promises = [];
-
     this.people.forEach(person => {
         promises.push(new Promise((resolve, reject) => {
           this.api.deletePerson(this.organization, person).then((deleted:any) => {
@@ -95,7 +94,6 @@ export class BulkRemovePage extends BasePrivatePage {
     Promise.all(promises).then(() => {
         loading.dismiss();
         this.hideModal();
-
         if (promises.length) {
           this.showToast('Removed ' + this.people.length + ' ' +
             (this.people.length==1?'person':'people') +

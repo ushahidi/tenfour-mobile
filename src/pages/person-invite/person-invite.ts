@@ -19,7 +19,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-person-invite',
   templateUrl: 'person-invite.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class PersonInvitePage extends BasePrivatePage {
 

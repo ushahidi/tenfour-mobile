@@ -1,11 +1,11 @@
-import { Injectable, Pipe } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 import * as moment from 'moment';
 
 @Pipe({
   name: 'dateTime'
 })
 @Injectable()
-export class DateTimePipe {
+export class DateTimePipe implements PipeTransform {
 
   transform(value, args) {
     if (value) {
@@ -24,4 +24,5 @@ export class DateTimePipe {
     }
     return "";
   }
+
 }

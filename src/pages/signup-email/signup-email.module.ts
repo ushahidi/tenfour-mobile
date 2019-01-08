@@ -7,11 +7,11 @@ import { SignupCheckModule } from '../../pages/signup-check/signup-check.module'
 
 @NgModule({
   declarations: [
-    SignupEmailPage,
+    SignupEmailPage
   ],
   imports: [
     SignupCheckModule,
-    IonicPageModule.forChild(SignupEmailPage),
+    IonicPageModule.forChild(SignupEmailPage)
   ],
   exports: [
     SignupEmailPage

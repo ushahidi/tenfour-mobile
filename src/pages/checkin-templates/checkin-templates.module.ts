@@ -8,11 +8,11 @@ import { CheckinTemplatesPage } from './checkin-templates';
 
 @NgModule({
   declarations: [
-    CheckinTemplatesPage,
+    CheckinTemplatesPage
   ],
   imports: [
     HumanizeModule,
-    IonicPageModule.forChild(CheckinTemplatesPage),
+    IonicPageModule.forChild(CheckinTemplatesPage)
   ],
   exports: [
     CheckinTemplatesPage

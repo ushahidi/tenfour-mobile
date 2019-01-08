@@ -9,13 +9,13 @@ import { GroupRowModule } from '../../components/group-row/group-row.module';
 
 @NgModule({
   declarations: [
-    GroupListPage,
+    GroupListPage
   ],
   imports: [
     GroupEditModule,
     GroupDetailsModule,
     GroupRowModule,
-    IonicPageModule.forChild(GroupListPage),
+    IonicPageModule.forChild(GroupListPage)
   ],
   exports: [
     GroupListPage

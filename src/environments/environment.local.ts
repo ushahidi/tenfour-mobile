@@ -12,5 +12,5 @@ export const Environment:IEnvironment = {
   firebaseAppId: "",
   firebaseApiKey: "",
   firebaseSenderId: '804609537189',
-  sentryDSN: "",
+  sentryDSN: ""
 };

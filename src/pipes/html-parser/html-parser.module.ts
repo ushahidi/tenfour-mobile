@@ -3,7 +3,7 @@ import { HtmlParserPipe } from './html-parser';
 
 @NgModule({
   declarations: [
-    HtmlParserPipe,
+    HtmlParserPipe
   ],
   imports: [ ],
   exports: [

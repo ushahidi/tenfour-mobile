@@ -1,9 +1,10 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'groupBy',
+  name: 'groupBy'
 })
 export class GroupByPipe implements PipeTransform {
+
   transform(collection:Array<any>, property:string, firstCharacter:boolean=true):Array<any> {
     if (!collection) {
       return [];
@@ -20,4 +21,5 @@ export class GroupByPipe implements PipeTransform {
     }, {});
     return Object.keys(groupedCollection).map(key => ({ key, values: groupedCollection[key] }));
   }
+
 }

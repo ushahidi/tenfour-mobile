@@ -13,7 +13,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 @IonicPage()
 @Component({
   selector: 'page-settings-plan-pro',
-  templateUrl: 'settings-plan-pro.html',
+  templateUrl: 'settings-plan-pro.html'
 })
 export class SettingsPlanProPage extends BasePrivatePage {
 

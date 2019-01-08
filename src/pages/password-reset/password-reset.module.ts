@@ -7,11 +7,11 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    PasswordResetPage,
+    PasswordResetPage
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(PasswordResetPage),
+    IonicPageModule.forChild(PasswordResetPage)
   ],
   exports: [
     PasswordResetPage

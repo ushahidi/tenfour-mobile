@@ -14,7 +14,7 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
 
 @NgModule({
   declarations: [
-    PersonDetailsPage,
+    PersonDetailsPage
   ],
   imports: [
     DateTimeModule,
@@ -24,7 +24,7 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
     PersonEditModule,
     CheckinDetailsModule,
     CheckinReplyModule,
-    IonicPageModule.forChild(PersonDetailsPage),
+    IonicPageModule.forChild(PersonDetailsPage)
   ],
   exports: [
     PersonDetailsPage

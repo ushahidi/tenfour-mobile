@@ -7,11 +7,11 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    PersonRowComponent,
+    PersonRowComponent
   ],
   imports: [
     PersonAvatarModule,
-    IonicPageModule.forChild(PersonRowComponent),
+    IonicPageModule.forChild(PersonRowComponent)
   ],
   exports: [
     PersonRowComponent

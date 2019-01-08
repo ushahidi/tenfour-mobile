@@ -18,7 +18,7 @@ export class Reply extends Model {
     }
   }
 
-  public newInstance<M extends Reply>(data:any=null):Reply {
+  public newInstance<M extends Reply>(data:any=null):any {
     return new Reply(data);
   }
 

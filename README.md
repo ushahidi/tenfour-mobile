@@ -3,6 +3,11 @@
 
 ---
 
+#### Style Guide
+Visit [STYLE.md](/STYLE.md) to see the development style guide.
+
+---
+
 #### Page Flow
 Visit [PAGES.md](/docs/PAGES.md) to see the hierarchy of pages in the app.
 
@@ -99,6 +104,10 @@ ENV=prod ionic cordova build android --device --prod --release --buildConfig=bui
 ENV=develop npm run ionic:build --prod --release
 ENV=staging npm run ionic:build --prod --release
 ENV=prod npm run ionic:build --prod --release
+```
+#### Code Audit
+```
+npm run lint
 ```
 #### Commit Branch
 ```

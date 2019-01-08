@@ -164,7 +164,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
         this.storage.getReplies(this.organization, this.checkin),
         this.api.getReplies(this.organization, this.checkin)).then((replies:Reply[]) => {
           this.logger.info(this, "loadReplies", replies);
-          this.storage.saveReplies(this.organization,  this.checkin, replies).then((saved:boolean) => {
+          this.storage.saveReplies(this.organization, this.checkin, replies).then((saved:boolean) => {
             this.checkin.replies = replies;
             resolve(replies);
           },

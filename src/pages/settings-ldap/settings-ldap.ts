@@ -19,7 +19,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-ldap',
   templateUrl: 'settings-ldap.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SettingsLDAPPage extends BasePrivatePage {
 

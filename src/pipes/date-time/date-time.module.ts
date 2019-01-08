@@ -3,7 +3,7 @@ import { DateTimePipe } from './date-time';
 
 @NgModule({
   declarations: [
-    DateTimePipe,
+    DateTimePipe
   ],
   imports: [ ],
   exports: [
