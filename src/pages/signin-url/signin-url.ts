@@ -176,7 +176,8 @@ export class SigninUrlPage extends BasePublicPage {
           + subdomain
           + extension
           + (location.port != '80' && location.port != '443' ? ':' + location.port : '')
-          + "/#/signin/token/"
+          + location.pathname
+          + "#/signin/token/"
           + encodeURIComponent(JSON.stringify(token)));
         return true;
       }
