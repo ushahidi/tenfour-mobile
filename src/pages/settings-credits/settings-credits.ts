@@ -144,7 +144,7 @@ export class SettingsCreditsPage extends BasePrivatePage {
             (error:any) => {
               reject(error);
             });
-          }, 10000);
+          }, 30000);
         });
       } else {
         return Promise.resolve(true);
