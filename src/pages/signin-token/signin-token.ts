@@ -3,6 +3,7 @@ import { IonicPage, App, TextInput, Platform, NavParams, NavController, ViewCont
 
 import { BasePublicPage } from '../../pages/base-public-page/base-public-page';
 import { CheckinListPage } from '../../pages/checkin-list/checkin-list';
+import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
 import { Token } from '../../models/token';
 import { Organization } from '../../models/organization';
@@ -13,31 +14,28 @@ import { Person } from '../../models/person';
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { FirebaseProvider } from '../../providers/firebase/firebase';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 import { EVENT_USER_AUTHENTICATED } from '../../constants/events';
 
 @IonicPage({
-  name: 'SigninPasswordPage',
-  segment: 'signin/password',
-  defaultHistory: ['SigninUrlPage', 'SigninEmailPage']
+  name: 'SigninTokenPage',
+  segment: 'signin/token',
+  defaultHistory: ['SigninUrlPage']
 })
 @Component({
-  selector: 'page-signin-password',
-  templateUrl: 'signin-password.html',
+  selector: 'page-signin-token',
+  templateUrl: 'signin-token.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[ CheckinListPage ]
+  entryComponents:[  ]
 })
-export class SigninPasswordPage extends BasePublicPage {
-
-  @ViewChild('password')
-  password:TextInput;
+export class SigninTokenPage extends BasePublicPage {
 
   organization:Organization = null;
   person:Person = null;
   token:Token = null;
-  email:string = null;
   logo:string = "assets/images/logo-dots.png";
-  loading:boolean = false;
+  loading:boolean = true;
 
   constructor(
       protected app:App,
@@ -53,16 +51,77 @@ export class SigninPasswordPage extends BasePublicPage {
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
       protected storage:StorageProvider,
+      protected environment:EnvironmentProvider,
       protected firebase:FirebaseProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-    let loading = this.showLoading("Loading...");
-    this.loadUpdates(true).then((loaded:any) => {
+    let loading = this.showLoading("Logging in...");
+
+    try {
+      this.token = this.navParams.get('token') ? <Token>JSON.parse(this.navParams.get('token')) : null;
+    } catch (e) {
+      this.logger.error(this, e);
+    }
+
+    if (!this.token) {
       loading.dismiss();
-    });
+      return this.showRootPage(SigninUrlPage, {});
+    }
+
+    Promise.resolve()
+      .then(() => this.loadUpdates())
+      .then(() => this.userLogout())
+      .then(() => this.authWithToken())
+      .then(() => {
+        if (this.person.name && this.person.name.length > 0) {
+          this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
+        }
+        else {
+          this.showToast(`Welcome to ${this.organization.name}`);
+        }
+
+        this.hideModals().then(() => {
+          this.showRootPage(CheckinListPage, {
+            organization: this.organization,
+            user: this.person
+          },{
+            animate: true,
+            direction: 'forward' }).then(() => {
+            loading.dismiss();
+            this.events.publish(EVENT_USER_AUTHENTICATED);
+          });
+        });
+      })
+      .catch((error:any) => {
+        this.logger.error(this, error);
+        loading.dismiss();
+        this.showRootPage(SigninUrlPage, {});
+      });
+  }
+
+  private userLogout(event:any=null) {
+    this.logger.info(this, "userLogout");
+    let removes = [
+      this.api.removeToken(this.organization),
+      this.storage.removeFirebase(),
+      this.storage.removeOrganization(),
+      this.storage.removeUser(),
+      this.storage.removeOrganizations(),
+      this.storage.removeSubscriptions(),
+      this.storage.removeNotifications(),
+      this.storage.removeCheckins(),
+      this.storage.removeAnswers(),
+      this.storage.removeReplies(),
+      this.storage.removeRecipients(),
+      this.storage.removeGroups(),
+      this.storage.removeEmails(),
+      this.storage.removePeople(),
+      this.storage.removeContacts(),
+    ];
+    return Promise.all(removes);
   }
 
   ionViewDidEnter() {
@@ -70,11 +129,30 @@ export class SigninPasswordPage extends BasePublicPage {
     this.analytics.trackPage(this);
   }
 
+  ionViewCanEnter():Promise<boolean> {
+    return Promise.resolve(true);
+  }
+
+  private parseOrganizationSubdomain() {
+    if (this.website) {
+      let hostname = location.hostname;
+      let appDomain = this.environment.getAppDomain().replace('app.', '');
+      if (appDomain && appDomain !== hostname && 'localhost' !== hostname) {
+        let subdomain = hostname.replace('.' + appDomain, '');
+        if (subdomain !== 'app') {
+          this.logger.info(this, 'Subdomain', subdomain);
+          return subdomain.toLowerCase();
+        }
+      }
+    }
+    return null;
+  }
+
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
+
     return Promise.resolve()
-      .then(() => { return this.loadOrganization(cache); })
-      .then(() => { return this.loadEmail(); })
+      .then(() => { return this.loadOrganization(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -90,89 +168,55 @@ export class SigninPasswordPage extends BasePublicPage {
       });
   }
 
-  private loadOrganization(cache:boolean=true):Promise<Organization> {
+  private loadOrganization():Promise<Organization> {
+    this.logger.info(this, "loadOrganization");
     return new Promise((resolve, reject) => {
-      if (cache && this.organization) {
-        resolve(this.organization);
-      }
-      else if (this.hasParameter("organization")){
+
+      if (this.hasParameter("organization")) {
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
-      }
-      else {
-        this.storage.getOrganization().then((organization:Organization) => {
-          this.organization = organization;
-          resolve(this.organization);
-        },
-        (error:any) => {
-          this.organization = null;
-          reject("No organization provided");
+      } else {
+        let organizationSubdomain = this.parseOrganizationSubdomain();
+
+        if (!organizationSubdomain) {
+          reject();
+        }
+
+        this.api.getOrganizations(organizationSubdomain).then((organizations:Organization[]) => {
+          this.logger.info(this, "loadOrganization", organizations);
+          if (organizations && organizations.length > 0) {
+            this.organization = organizations[0];
+            resolve(this.organization);
+          }
+          else {
+            reject('Organization not found.');
+          }
+        }, (error:any) => {
+          this.logger.error(this, "loadOrganization", error);
+          reject();
         });
       }
     });
   }
 
-  private loadEmail():Promise<string> {
-    return new Promise((resolve, reject) => {
-      if (this.hasParameter("email")) {
-        this.email = this.getParameter<string>("email");
-        resolve(this.email);
-      }
-      else {
-        reject("No email provided");
-      }
-    })
-  }
+  private authWithToken():Promise<any> {
+    this.logger.info(this, "authWithToken");
 
-  private showNext(event:any) {
-    this.logger.info(this, "showNext");
-    if (this.password.value == null || this.password.value.length == 0) {
-      this.showToast("Please enter your password");
-      setTimeout(() => {
-        this.password.setFocus();
-      }, 500);
-    }
-    else {
-      this.loading = true;
-      let loading = this.showLoading("Logging in...", true);
-      let password = this.password.value;
-      Promise.resolve()
-        .then(() => { return this.api.userLogin(this.organization, this.email, password); })
-        .then((token:Token) => { this.token = token; return this.api.getPerson(this.organization, "me"); })
+    return new Promise((resolve, reject) => {
+        this.api.saveToken(this.organization, this.token)
+        .then(() => { return this.api.getPerson(this.organization, "me"); })
         .then((person:Person) => { this.person = person; return this.api.getOrganization(this.organization); })
         .then((organization:Organization) => { this.organization = organization; return this.loadSubscriptions(this.organization, this.person); })
         .then((subscriptions:Subscription[]) => { return this.saveChanges(this.organization, this.person, subscriptions); })
         .then((saved:boolean) => {
-          this.logger.info(this, "showNext", saved);
+          this.logger.info(this, "authWithToken", saved);
           this.updateFirebase(this.organization, this.person);
           this.analytics.trackLogin(this.organization, this.person);
           this.intercom.trackLogin(this.organization, this.person);
-          this.loading = false;
-          if (this.person.name && this.person.name.length > 0) {
-            this.showToast(`Hello ${this.person.name}, welcome to ${this.organization.name}`);
-          }
-          else {
-            this.showToast(`Welcome to ${this.organization.name}`);
-          }
-          this.hideModals().then(() => {
-            this.showRootPage(CheckinListPage, {
-              organization: this.organization,
-              user: this.person
-            },{
-              animate: true,
-              direction: 'forward' }).then(() => {
-              loading.dismiss();
-              this.events.publish(EVENT_USER_AUTHENTICATED);
-            });
-          });
+          resolve();
         })
-        .catch((error:any) => {
-          this.logger.error(this, "showNext", error);
-          this.loading = false;
-          loading.dismiss();
-          this.showAlert("Login Unsuccessful", "Invalid email and/or password, please try again.");
-        });
-      }
+        .catch(reject);
+    });
   }
 
   private loadSubscriptions(organization:Organization, person:Person):Promise<Subscription[]> {
@@ -227,7 +271,7 @@ export class SigninPasswordPage extends BasePublicPage {
       let subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
       organization.user_id = person.id;
       organization.user_name = person.name;
-      organization.email = this.email;
+      organization.email = person.hasEmails() ? person.getEmails()[0].contact : '';
       let saves = [
         this.storage.setUser(person),
         this.storage.setOrganization(organization),
@@ -247,33 +291,5 @@ export class SigninPasswordPage extends BasePublicPage {
     });
   }
 
-  private resetPassword(event:any) {
-    let title = "Check Your Inbox";
-    let message = `If your email address ${this.email} has been registered with ${this.organization.name}, then you will receive instructions for resetting your password.`;
-    let loading = this.showLoading("Resetting...", true);
-    this.api.resetPassword(this.organization.subdomain, this.email).then((reset:any) => {
-      this.logger.info(this, "resetPassword", reset);
-      loading.dismiss();
-      this.showAlert(title, message);
-    },
-    (error:any) => {
-      this.logger.error(this, "resetPassword", error);
-      loading.dismiss();
-      this.showAlert(title, message);
-    });
-  }
-
-  private showNextOnReturn(event:any) {
-    if (this.isKeyReturn(event)) {
-      this.hideKeyboard();
-      this.showNext(event);
-      return false;
-    }
-    return true;
-  }
-
-  private closeModal(event:any=null) {
-    this.hideModal();
-  }
 
 }

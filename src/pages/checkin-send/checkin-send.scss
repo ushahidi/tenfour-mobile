@@ -1,25 +1,20 @@
 page-checkin-send {
-  ion-item {
-    h3 {
-      padding-top: 4px;
-      color: color($colors, text) !important;
+  
+  .recipients-item {
+    [stacked].label {
+      max-height: 1.5em !important;
     }
-    &.group {
-      ion-icon {
-      }
-      h2 {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
-      }
-    }
-    &.person {
-      person-avatar {
-        margin-right: 30px !important;
-      }
-      h2 {
-        margin-left: 0 !important;
-        padding-left: 0 !important;
+    .recipients-list {
+      // margin-top:0;
+      padding-bottom:5px;
+
+      span {
+        margin-right: 10px;
       }
     }
+  }
+
+  .answer .badge {
+    transform: scale(.5, .5);
   }
 }

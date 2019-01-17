@@ -330,6 +330,7 @@ export class CheckinListPage extends BasePrivatePage {
       this.logger.info(this, "testCheckin", "Modal", data);
       if (data) {
         this.user.config_self_test_sent = true;
+        this.loadUpdates();
       }
       else {
         this.user.config_self_test_sent = false;
@@ -361,6 +362,9 @@ export class CheckinListPage extends BasePrivatePage {
   private filterCheckins(checkins:Checkin[]) {
     let filtered = [];
     for (let checkin of checkins) {
+      if (checkin.template && !checkin.recipients.length) {
+        continue;
+      }
       if (this.filter === "all") {
         filtered.push(checkin);
       }

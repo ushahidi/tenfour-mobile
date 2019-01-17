@@ -27,7 +27,9 @@ export class PersonSelectPage extends BasePrivatePage {
   groups:Group[] = null;
   show_groups:boolean = true;
   show_people:boolean = true;
+  show_everyone:boolean = false;
   loading:boolean = false;
+  everyone:boolean = false;
 
   constructor(
       protected zone:NgZone,
@@ -53,6 +55,7 @@ export class PersonSelectPage extends BasePrivatePage {
     super.ionViewWillEnter();
     this.show_groups = this.getParameter<boolean>("show_groups");
     this.show_people = this.getParameter<boolean>("show_people");
+    this.show_everyone = this.getParameter<boolean>("show_everyone");
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -194,9 +197,15 @@ export class PersonSelectPage extends BasePrivatePage {
         }
       }
     }
+    if (this.everyone) {
+      for (let person of this.people) {
+        people.push(person);
+      }
+    }
     this.hideModal({
       people: people,
-      groups: groups
+      groups: groups,
+      everyone: this.everyone
     });
   }
 

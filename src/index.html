@@ -41,9 +41,9 @@
   <script src="cordova.js"></script>
   <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js')
-      .then(() => console.log('Service Worker Loaded'))
-      .catch(() => console.warn('Service Worker Not Loaded'));
+    navigator.serviceWorker.register('/service-worker.js')
+      .then(() => console.log('ServiceWorker Loaded'))
+      .catch(() => console.warn('ServiceWorker Not Loaded'));
   }
   </script>
   <link href="build/main.css" rel="stylesheet">

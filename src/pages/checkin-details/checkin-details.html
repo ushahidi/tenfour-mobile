@@ -5,8 +5,8 @@
     </ion-buttons>
     <ion-title></ion-title>
     <ion-buttons right *ngIf="user">
-      <button #create ion-button icon-only color="primary" *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="shareCheckin($event)">
-        <ion-icon ios="ios-share-outline" md="md-share"></ion-icon>
+      <button ion-button icon-only (click)="showCheckinActions($event)">
+        <ion-icon name="more"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>

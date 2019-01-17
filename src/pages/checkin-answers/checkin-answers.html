@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <!-- <ion-buttons left>
+      <button ion-button color="cancel" (click)="cancel($event)">Cancel</button>
+    </ion-buttons> -->
+    <ion-title>Answers</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="done($event)" *ngIf="checkin">Done</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+
+  <ion-list *ngIf="checkin">
+    <ion-item color="white" tappable (click)="addAnswer()" *ngIf="!dontAskForResponse">
+      <h2 ion-text color="primary">Add answer</h2>
+    </ion-item>
+    <ion-item color="white" *ngFor="let answer of checkin.answers">
+      <button ion-button icon-only item-start clear tappable (click)="changeColor(answer, $event)">
+        <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
+      </button>
+      <ion-input type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" placeholder="Enter answer" [(ngModel)]="answer.answer"></ion-input>
+      <button ion-button icon-only item-end clear color="black" tappable (click)="removeAnswer(answer)">
+        <ion-icon color="grey" ios="ios-close-circle" md="md-close-circle"></ion-icon>
+      </button>
+    </ion-item>
+    <ion-item>
+      <ion-label>Don't ask for a response</ion-label>
+      <ion-checkbox checked="false" item-end [(ngModel)]="dontAskForResponse" (ionChange)="toggleAnswers($event)"></ion-checkbox>
+    </ion-item>
+  </ion-list>
+
+</ion-content>

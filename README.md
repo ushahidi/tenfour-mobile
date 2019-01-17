@@ -43,6 +43,7 @@ npm install -g android-simulator@latest
 #### Clean Modules
 ```
 rm -r node_modules
+rm -f package-lock.json
 npm install
 ```
 #### Remove Platforms
@@ -55,22 +56,22 @@ ionic cordova platform rm browser
 #### Add Platforms
 ```
 ionic cordova platform add ios --buildConfig=build.json
-ionic cordova platform add android --buildConfig=build.json
+ionic cordova platform add android@6.4.0 --buildConfig=build.json
 ionic cordova platform add browser
 ```
 #### Debug iOS
 ```
 cordova run ios --list
-ENV=prod ionic cordova run ios --livereload --consolelogs --device --buildConfig=build.json
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
-ENV=prod ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=dev ionic cordova run ios --livereload --consolelogs --device --buildConfig=build.json
+ENV=dev ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-SE, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=dev ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPhone-8-Plus, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
+ENV=dev ionic cordova emulate ios --livereload --consolelogs --emulator --debug --target "iPad-Pro--12-9-inch---2nd-generation-, 12.1" -- --buildFlag="-UseModernBuildSystem=0"
 ```
 #### Debug Android
 ```
 cordova run android --list
-ionic cordova run android --livereload --consolelogs --device --debug
-ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
+ENV=dev ionic cordova run android --livereload --consolelogs --device --debug
+ENV=dev ionic cordova emulate android --livereload --consolelogs --emulator --target Nexus_S_API_26
 ```
 #### Debug PWA
 ```
@@ -82,11 +83,14 @@ ENV=prod ionic serve --livereload --consolelogs
 #### Release iOS
 ```
 rvm use system
+export NODE_OPTIONS=--max_old_space_size=4096
 ENV=prod ionic cordova prepare ios --prod --release --buildConfig=build.json
 ENV=prod ionic cordova build ios --prod --release --buildConfig=build.json
 ```
 #### Release Android
 ```
+sdkmanager --update
+export NODE_OPTIONS=--max_old_space_size=4096
 ENV=prod ionic cordova prepare android --prod --release --buildConfig=build.json
 ENV=prod ionic cordova build android --device --prod --release --buildConfig=build.json
 ```

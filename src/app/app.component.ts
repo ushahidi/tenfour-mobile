@@ -5,8 +5,7 @@ import { SplashScreenPage } from '../pages/splash-screen/splash-screen';
 
 import { SigninPage } from '../pages/signin/signin';
 import { SigninUrlPage } from '../pages/signin-url/signin-url';
-import { SigninEmailPage } from '../pages/signin-email/signin-email';
-import { SigninPasswordPage } from '../pages/signin-password/signin-password';
+import { SigninTokenPage} from '../pages/signin-token/signin-token';
 import { SigninLookupPage } from '../pages/signin-lookup/signin-lookup';
 
 import { SignupPage } from '../pages/signup/signup';
@@ -76,7 +75,8 @@ import {
   EVENT_CREDITS_CHANGED,
   EVENT_SUBSCRIPTION_CHANGED,
   EVENT_CHECKINS_WAITING_CHANGED,
-  EVENT_NOTIFICATIONS_CHANGED } from '../constants/events';
+  EVENT_NOTIFICATIONS_CHANGED,
+  EVENT_FIREBASE_TOKEN } from '../constants/events';
 
 @Component({
   templateUrl: 'app.html'
@@ -271,12 +271,9 @@ export class TenFourApp {
           if (deeplink.path === '/#signin') {
             this.showSigninUrl();
           }
-          else if (deeplink.path === '/#signin/email') {
-            this.logger.warn(this, "loadDeepLinks", "SigninEmailPage");
-          }
-          else if (deeplink.path === '/#signin/password') {
-            this.logger.warn(this, "loadDeepLinks", "SignupPasswordPage");
-          }
+          // else if (deeplink.path.startsWith('/#signin/token')) {
+          //   this.showSigninTokenPage();
+          // }
           else if (deeplink.path === '/#signup') {
              this.showSignupPage();
           }
@@ -385,6 +382,17 @@ export class TenFourApp {
       this.events.subscribe(EVENT_NOTIFICATIONS_CHANGED, () => {
         this.logger.info(this, "loadEvents", EVENT_NOTIFICATIONS_CHANGED);
         this.loadUnreadNotifications();
+      });
+      this.events.subscribe(EVENT_FIREBASE_TOKEN, (token:string) => {
+        this.logger.info(this, "loadEvents", EVENT_FIREBASE_TOKEN, token);
+        if (this.organization && this.user && token) {
+          this.api.updateFirebase(this.organization, this.user, token).then((posted:boolean) => {
+            this.logger.info(this, "loadEvents", EVENT_FIREBASE_TOKEN, token, "Posted");
+          },
+          (error:any) => {
+            this.logger.error(this, "loadEvents", EVENT_FIREBASE_TOKEN, token, error);
+          });
+        }
       })
       resolve(true);
     })
@@ -396,19 +404,7 @@ export class TenFourApp {
       this.firebase.initialize().then((loaded:boolean) => {
         if (loaded) {
           this.logger.info(this, "loadPushNotifications", "Loaded");
-          this.firebase.onNotification().subscribe((notification:any) => {
-            if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
-              this.logger.info(this, "onNotification", EVENT_CHECKIN_CREATED, notification);
-              this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
-            }
-            else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
-              this.logger.info(this, "onNotification", EVENT_CHECKIN_UPDATED, notification);
-              this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
-            }
-            else if (notification) {
-              this.logger.warn(this, "onNotification", "Unknown", notification);
-            }
-          });
+          this.firebase.subscribeNotifications();
           resolve(true);
         }
         else {

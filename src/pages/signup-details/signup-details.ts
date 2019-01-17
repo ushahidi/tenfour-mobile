@@ -9,6 +9,7 @@ import { Organization } from '../../models/organization';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
+import { EnvironmentProvider } from '../../providers/environment/environment';
 
 @IonicPage({
   name: 'SignupDetailsPage',
@@ -27,6 +28,7 @@ export class SignupDetailsPage extends BasePublicPage {
   @ViewChild('subdomain')
   subdomain:TextInput;
 
+  domain:string = this.environment.getAppDomain();
   organization:Organization;
 
   constructor(
@@ -41,7 +43,8 @@ export class SignupDetailsPage extends BasePublicPage {
       protected loadingController:LoadingController,
       protected actionController:ActionSheetController,
       protected api:ApiProvider,
-      protected storage:StorageProvider) {
+      protected storage:StorageProvider,
+      protected environment:EnvironmentProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
   }
   ionViewWillEnter() {
