@@ -64,9 +64,9 @@ export class TenFourRoutes {
     { component: SplashScreenPage, name: 'SplashScreenPage', segment: 'loading' },
 
     { component: SigninPage, name: 'SigninPage', segment: 'signin' },
-    { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninInvitePage, name: 'SigninInvitePage', segment: 'signin/invite/:subdomain/:person_id/:email/:token', defaultHistory: [] },
     { component: SigninTokenPage, name: 'SigninTokenPage', segment: 'signin/token/:token' },
-    { component: SigninLookupPage, name: 'SigninLookupPage', segment: 'signin/lookup', defaultHistory: ['SigninUrlPage'] },
+    { component: SigninLookupPage, name: 'SigninLookupPage', segment: 'signin/lookup', defaultHistory: [] },
 
     { component: PasswordResetPage, name: 'PasswordResetPage', segment: 'signin/password/reset/:subdomain/:email/:token', defaultHistory: [] },
 
