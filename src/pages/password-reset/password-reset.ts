@@ -57,6 +57,16 @@ export class PasswordResetPage extends BasePublicPage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+
+    if (!this.modal) {
+      this.loading=true;
+      this.showModal(PasswordResetPage, {
+        token: this.getParameter('token'),
+        subdomain: this.getParameter('subdomain'),
+        email: this.getParameter('email')
+      }, {enableBackdropDismiss: false});
+    }
+
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -147,6 +157,7 @@ export class PasswordResetPage extends BasePublicPage {
         loading.dismiss();
         let alert = this.showAlert("Password Reset", "Your password has been reset.");
         alert.onDidDismiss((data:any) => {
+          this.hideModal();
           this.showRootPage(SigninUrlPage);
         });
       },
