@@ -63,6 +63,17 @@ export class SigninInvitePage extends BasePublicPage {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
+
+    if (!this.modal) {
+      this.loading=true;
+      this.showModal(SigninInvitePage, {
+        token: this.getParameter('token'),
+        person_id: this.getParameter('person_id'),
+        subdomain: this.getParameter('subdomain'),
+        email: this.getParameter('email')
+      }, {enableBackdropDismiss: false});
+    }
+
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -210,6 +221,7 @@ export class SigninInvitePage extends BasePublicPage {
           else {
             this.showToast(`Welcome to ${this.organization.name}`);
           }
+          this.hideModal();
           this.showRootPage(CheckinListPage, {});
         })
         .catch((error) => {
