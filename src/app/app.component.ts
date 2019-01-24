@@ -498,13 +498,13 @@ export class TenFourApp {
           },
           (error:any) => {
             loading.dismiss();
-            this.showAlert("Problem Creating Database", "There was a problem creating the database.");
+            this.showAlert("Problem Creating Database", "There was a problem creating the database. Support has been notified, and they will investigate the issue.");
             this.analytics.trackError(error);
           });
         },
         (error:any) => {
           loading.dismiss();
-          this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
+          this.showAlert("Problem Resetting Database", "There was a problem resetting the database. Support has been notified, and they will investigate the issue.");
           this.analytics.trackError(error);
         });
       }
