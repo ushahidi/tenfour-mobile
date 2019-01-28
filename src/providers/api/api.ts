@@ -100,12 +100,17 @@ export class ApiProvider extends HttpProvider {
 
   public removeToken(organization:Organization):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.storage.remove(organization.subdomain).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
+      if (organization) {
+        this.storage.remove(organization.subdomain).then((removed:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
         resolve(false);
-      });
+      }
     });
   }
 

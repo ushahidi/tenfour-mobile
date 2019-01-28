@@ -487,25 +487,25 @@ export class TenFourApp {
   }
 
   protected databaseChanged(models:Model[]) {
-    this.showAlert("Database Schema Changed", "The database schema has changed, your local database will need to be reset.", [{
+    this.showAlert("Update Needed", "It looks like the database this app uses is out of date. We need to reset the database to have everything work correctly.", [{
       text: 'Reset Database',
       handler: (clicked) => {
         let loading = this.showLoading("Resetting...", true);
         this.resetDatastore().then((reset:any) => {
           this.loadDatastore(models).then((created:any) => {
             loading.dismiss();
-            this.showSigninUrl();
+            this.userLogout();
           },
           (error:any) => {
             loading.dismiss();
-            this.showAlert("Problem Creating Database", "There was a problem creating the database.");
-            // TODO log error message
+            this.showAlert("Problem Creating Database", "There was a problem creating the database. Support has been notified, and they will investigate the issue.");
+            this.analytics.trackError(error);
           });
         },
         (error:any) => {
           loading.dismiss();
-          this.showAlert("Problem Resetting Database", "There was a problem resetting the database.");
-          // TODO log error message
+          this.showAlert("Problem Resetting Database", "There was a problem resetting the database. Support has been notified, and they will investigate the issue.");
+          this.analytics.trackError(error);
         });
       }
     }]);
