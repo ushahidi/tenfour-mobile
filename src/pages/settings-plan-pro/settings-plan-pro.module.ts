@@ -4,10 +4,10 @@ import { SettingsPlanProPage } from './settings-plan-pro';
 
 @NgModule({
   declarations: [
-    SettingsPlanProPage,
+    SettingsPlanProPage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsPlanProPage),
-  ],
+    IonicPageModule.forChild(SettingsPlanProPage)
+  ]
 })
 export class SettingsPlanProPageModule {}

@@ -13,7 +13,7 @@ import { HumanizeModule } from '../../pipes/humanize/humanize.module';
 
 @NgModule({
   declarations: [
-    CheckinSendPage,
+    CheckinSendPage
   ],
   imports: [
     SendViaModule,
@@ -21,7 +21,7 @@ import { HumanizeModule } from '../../pipes/humanize/humanize.module';
     PersonAvatarModule,
     PersonSelectModule,
     CheckinAnswersModule,
-    IonicPageModule.forChild(CheckinSendPage),
+    IonicPageModule.forChild(CheckinSendPage)
   ],
   exports: [
     CheckinSendPage

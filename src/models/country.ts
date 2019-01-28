@@ -11,7 +11,7 @@ export class Country extends Model {
     this.copyInto(data);
   }
 
-  public newInstance<M extends Country>(data:any=null):Country {
+  public newInstance<M extends Country>(data:any=null):any {
     return new Country(data);
   }
 

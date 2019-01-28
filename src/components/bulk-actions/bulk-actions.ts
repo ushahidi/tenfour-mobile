@@ -1,4 +1,4 @@
-import { Component, NgZone, ViewChild } from '@angular/core';
+import { Component, NgZone, ViewChild, OnInit } from '@angular/core';
 import { IonicPage, Button, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePage } from '../../pages/base-page/base-page';
@@ -16,7 +16,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'bulk-actions',
   templateUrl: 'bulk-actions.html'
 })
-export class BulkActionsComponent extends BasePage {
+export class BulkActionsComponent extends BasePage implements OnInit {
 
   people:Person[];
   organization:Organization;
@@ -41,7 +41,7 @@ export class BulkActionsComponent extends BasePage {
     this.organization = this.navParams.get('organization');
   }
 
-  private addToGroup() {
+  addToGroup() {
     this.showModalOrPage(BulkAddToGroupPage, {
       people: this.people,
       organization: this.organization
@@ -49,7 +49,7 @@ export class BulkActionsComponent extends BasePage {
     this.viewController.dismiss();
   }
 
-  private changeRole() {
+  changeRole() {
     this.showModalOrPage(BulkChangeRolePage, {
       people: this.people,
       organization: this.organization
@@ -57,7 +57,7 @@ export class BulkActionsComponent extends BasePage {
     this.viewController.dismiss();
   }
 
-  private sendInvite() {
+  sendInvite() {
     this.showModalOrPage(BulkInvitePage, {
       people: this.people,
       organization: this.organization
@@ -65,7 +65,7 @@ export class BulkActionsComponent extends BasePage {
     this.viewController.dismiss();
   }
 
-  private remove() {
+  remove() {
     this.showModalOrPage(BulkRemovePage, {
       people: this.people,
       organization: this.organization

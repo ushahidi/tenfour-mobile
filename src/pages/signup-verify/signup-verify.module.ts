@@ -5,10 +5,10 @@ import { SignupVerifyPage } from './signup-verify';
 
 @NgModule({
   declarations: [
-    SignupVerifyPage,
+    SignupVerifyPage
   ],
   imports: [
-    IonicPageModule.forChild(SignupVerifyPage),
+    IonicPageModule.forChild(SignupVerifyPage)
   ],
   exports: [
     SignupVerifyPage

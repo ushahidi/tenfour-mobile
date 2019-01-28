@@ -14,7 +14,7 @@ import { CheckinReplyModule } from '../../components/checkin-reply/checkin-reply
 
 @NgModule({
   declarations: [
-    PersonProfilePage,
+    PersonProfilePage
   ],
   imports: [
     DateTimeModule,
@@ -24,7 +24,7 @@ import { CheckinReplyModule } from '../../components/checkin-reply/checkin-reply
     PersonEditModule,
     CheckinDetailsModule,
     CheckinReplyModule,
-    IonicPageModule.forChild(PersonProfilePage),
+    IonicPageModule.forChild(PersonProfilePage)
   ],
   exports: [
     PersonProfilePage

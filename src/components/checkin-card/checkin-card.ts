@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
@@ -9,7 +9,7 @@ import { LoggerProvider } from '../../providers/logger/logger';
   selector: 'checkin-card',
   templateUrl: 'checkin-card.html'
 })
-export class CheckinCardComponent {
+export class CheckinCardComponent implements OnInit {
 
   @Input()
   checkin:Checkin = null;

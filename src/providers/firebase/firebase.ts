@@ -295,7 +295,7 @@ export class FirebaseProvider {
 
   private promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
     return new Promise((resolve, reject) => {
-      var timer = setTimeout(() => {
+      let timer = setTimeout(() => {
         reject("Promise Timeout");
       }, milliseconds);
       promise.then((result:any) => {

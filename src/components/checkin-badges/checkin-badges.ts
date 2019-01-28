@@ -23,12 +23,12 @@ export class CheckinBadgesComponent {
   constructor() {}
 
   protected getBadges():any {
-    let _badges = [];
+    let badges = [];
     if (this.checkin) {
       if (this.checkin.answers) {
         for (let answer of this.checkin.answers) {
           if (this.checkin.waiting_count > 0) {
-            _badges.push({
+            badges.push({
               color: answer.color,
               number: answer.replies || 0,
               text: answer.answer,
@@ -36,7 +36,7 @@ export class CheckinBadgesComponent {
             });
           }
           else if (answer.replies > 0) {
-            _badges.push({
+            badges.push({
               color: answer.color,
               number: answer.replies || 0,
               text: answer.answer,
@@ -46,44 +46,35 @@ export class CheckinBadgesComponent {
         }
       }
       if (this.checkin.otherReplies().length > 0) {
-        _badges.push({
+        badges.push({
           text: this.RESPONSE_OTHER,
           color: this.RESPONSE_OTHER_COLOR,
           number: this.checkin.otherReplies().length || 0
         });
       }
       if (this.checkin.waiting_count > 0) {
-        _badges.push({
+        badges.push({
           text: this.RESPONSE_NONE,
           color: this.RESPONSE_NONE_COLOR,
           number: this.checkin.waiting_count || 0
         });
       }
-      let zeros = 0;
-      let values = 0;
-      let width = 60;
-      let responses = 0;
-      for (let badge of _badges) {
-        if (badge.number == 0) {
-          zeros = zeros + 1;
-        }
-        else {
-          values = values + 1;
-        }
-        responses = responses + badge.number;
+      let width = 50;
+      let mininum = 10;
+      let total = badges.reduce((total, badge) => total + badge.number, 0);
+      let defaults = badges.filter((badge) => (badge.number / total * 100) < mininum);
+      let percentages = badges.filter((badge) => (badge.number / total * 100) >= mininum);
+      for (let badge of defaults) {
+        badge.width = `${width}px`;
       }
-      for (let badge of _badges) {
-        if (badge.number == 0) {
-          badge.width = `${width}px`;
-        }
-        else {
-          let percentage = (badge.number / responses * 100);
-          let pixels = values > 0 ? zeros*(width/values) : zeros*width;
-          badge.width = `calc(${percentage}% - ${pixels}px)`;
-        }
+      let divisor = percentages.reduce((total, badge) => total + badge.number, 0);
+      for (let badge of percentages) {
+        let percentage = (badge.number / divisor * 100);
+        let pixels = defaults.length > 0 ? defaults.length*(width/percentages.length) : defaults.length*width;
+        badge.width = `calc(${percentage}% - ${pixels}px)`;
       }
     }
-    return _badges;
+    return badges;
   }
 
 }

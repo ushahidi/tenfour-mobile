@@ -7,11 +7,11 @@ import { MultiAvatarModule } from '../../components/multi-avatar/multi-avatar.mo
 
 @NgModule({
   declarations: [
-    BulkChangeRolePage,
+    BulkChangeRolePage
   ],
   imports: [
     MultiAvatarModule,
-    IonicPageModule.forChild(BulkChangeRolePage),
+    IonicPageModule.forChild(BulkChangeRolePage)
   ],
   exports: [
     BulkChangeRolePage

@@ -5,10 +5,10 @@ import { CheckinChannelsPage } from './checkin-channels';
 
 @NgModule({
   declarations: [
-    CheckinChannelsPage,
+    CheckinChannelsPage
   ],
   imports: [
-    IonicPageModule.forChild(CheckinChannelsPage),
+    IonicPageModule.forChild(CheckinChannelsPage)
   ],
   exports: [
     CheckinChannelsPage

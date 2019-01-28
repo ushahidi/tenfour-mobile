@@ -44,7 +44,7 @@ export class NetworkProvider {
     }
   }
 
-  public onConnected():Observable<boolean>  {
+  public onConnected():Observable<boolean> {
     if (this.platform.is("cordova")) {
       this.network.onConnect().subscribe(() => {
         this.logger.info(this, "subscribeNetwork", "Network Connected", this.network.type);
@@ -69,6 +69,5 @@ export class NetworkProvider {
       return Observable.of(true);
     }
   }
-
 
 }

@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NavParams, ViewController } from 'ionic-angular';
 
 @Component({
   selector: 'send-via',
   templateUrl: 'send-via.html'
 })
-export class SendViaComponent {
+export class SendViaComponent implements OnInit {
 
   send_via:string="";
 

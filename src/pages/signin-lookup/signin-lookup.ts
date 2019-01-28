@@ -18,7 +18,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
   selector: 'page-signin-lookup',
   templateUrl: 'signin-lookup.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SigninLookupPage extends BasePublicPage {
 

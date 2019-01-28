@@ -8,12 +8,12 @@ import { CheckinListModule } from '../../pages/checkin-list/checkin-list.module'
 
 @NgModule({
   declarations: [
-    SettingsTutorialPage,
+    SettingsTutorialPage
   ],
   imports: [
     CheckinTestModule,
     CheckinListModule,
-    IonicPageModule.forChild(SettingsTutorialPage),
+    IonicPageModule.forChild(SettingsTutorialPage)
   ],
   exports: [
     SettingsTutorialPage

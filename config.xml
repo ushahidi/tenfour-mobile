@@ -78,6 +78,16 @@
         <config-file parent="ITSAppUsesNonExemptEncryption" platform="ios" target="*-Info.plist">
             <false />
         </config-file>
+        <config-file parent="com.apple.developer.associated-domains" target="*-Debug.plist">
+            <array>
+                <string>applinks:dev.tenfour.org</string>
+            </array>
+        </config-file>
+        <config-file parent="com.apple.developer.associated-domains" target="*-Release.plist">
+            <array>
+                <string>applinks:app.tenfour.org</string>
+            </array>
+        </config-file>
         <icon height="57" src="resources/ios/icon/icon.png" width="57" />
         <icon height="114" src="resources/ios/icon/icon@2x.png" width="114" />
         <icon height="40" src="resources/ios/icon/icon-40.png" width="40" />

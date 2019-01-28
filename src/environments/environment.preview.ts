@@ -1,9 +1,9 @@
 import { IEnvironment } from './environment.interface';
 
 export const Environment:IEnvironment = {
-  environmentName: 'Local Environment',
-  appDomain: 'tenfour.local',
-  apiEndpoint: 'http://api.tenfour.local',
+  environmentName: 'Preview Environment',
+  appDomain: 'preview.tenfour.org',
+  apiEndpoint: 'https://api.staging.tenfour.org',
   clientId: "1",
   clientSecret: "T7913s89oGgJ478J73MRHoO2gcRRLQ",
   intercomAppId: "",
@@ -11,6 +11,6 @@ export const Environment:IEnvironment = {
   segmentApiKey: "",
   firebaseAppId: "",
   firebaseApiKey: "",
-  firebaseSenderId: '804609537189',
-  sentryDSN: ""
+  firebaseSenderId: '',
+  sentryDSN: '',
 };

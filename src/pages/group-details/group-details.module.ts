@@ -9,12 +9,12 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    GroupDetailsPage,
+    GroupDetailsPage
   ],
   imports: [
     PersonAvatarModule,
     GroupEditModule,
-    IonicPageModule.forChild(GroupDetailsPage),
+    IonicPageModule.forChild(GroupDetailsPage)
   ],
   exports: [
     GroupDetailsPage

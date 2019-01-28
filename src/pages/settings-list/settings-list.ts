@@ -162,7 +162,7 @@ export class SettingsListPage extends BasePrivatePage {
   private settingsLDAP(event:any) {
     this.logger.info(this, "settingsLDAP");
     this.showModal(SettingsLDAPPage, {
-      organization: this.organization,
+      organization: this.organization
     });
   }
 }

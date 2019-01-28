@@ -3,7 +3,7 @@ import { GroupByPipe } from './group-by';
 
 @NgModule({
   declarations: [
-    GroupByPipe,
+    GroupByPipe
   ],
   imports: [ ],
   exports: [

@@ -4,10 +4,10 @@ import { SettingsPlanFreePage } from './settings-plan-free';
 
 @NgModule({
   declarations: [
-    SettingsPlanFreePage,
+    SettingsPlanFreePage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsPlanFreePage),
-  ],
+    IonicPageModule.forChild(SettingsPlanFreePage)
+  ]
 })
 export class SettingsPlanFreePageModule {}

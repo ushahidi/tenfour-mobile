@@ -32,7 +32,7 @@ export class ThumbnailProvider {
       canvas.width = img.width;
       canvas.height = img.height;
 
-      var ctx2 = canvas.getContext("2d");
+      let ctx2 = canvas.getContext("2d");
       ctx2.drawImage(img, 0, 0, img.width, img.height);
 
       return canvas.toDataURL(mimeType ? mimeType : this.MIME_TYPE);

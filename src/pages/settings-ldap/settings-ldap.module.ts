@@ -7,11 +7,11 @@ import { SettingsLDAPPage } from './settings-ldap';
 
 @NgModule({
   declarations: [
-    SettingsLDAPPage,
+    SettingsLDAPPage
   ],
   imports: [
     DateTimeModule,
-    IonicPageModule.forChild(SettingsLDAPPage),
+    IonicPageModule.forChild(SettingsLDAPPage)
   ],
   exports: [
     SettingsLDAPPage

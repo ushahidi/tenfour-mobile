@@ -3,7 +3,7 @@ import { TitleizePipe } from './titleize';
 
 @NgModule({
   declarations: [
-    TitleizePipe,
+    TitleizePipe
   ],
   imports: [ ],
   exports: [

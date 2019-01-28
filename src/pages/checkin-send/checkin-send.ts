@@ -190,7 +190,7 @@ export class CheckinSendPage extends BasePrivatePage {
             handler: () => {
               this.createCheckin(event);
             }
-          },
+          }
         ];
         this.showConfirm("Do you want to save this check-in?",
           "You can save this check-in to re-use later.", buttons);
@@ -203,15 +203,14 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private editAnswers() {
     this.logger.info(this, "editAnswers");
-    let modal = this.showModal(CheckinAnswersPage, {
+    this.showModal(CheckinAnswersPage, {
       checkin: this.checkin
     });
   }
 
   private editChannels() {
     this.logger.info(this, "editChannels");
-
-    let modal = this.showModal(CheckinChannelsPage, {
+    this.showModal(CheckinChannelsPage, {
       checkin: this.checkin,
       organization: this.organization,
       user: this.user
@@ -227,7 +226,7 @@ export class CheckinSendPage extends BasePrivatePage {
       people: this.checkin.users,
       show_groups: true,
       show_people: true,
-      show_everyone: true,
+      show_everyone: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);

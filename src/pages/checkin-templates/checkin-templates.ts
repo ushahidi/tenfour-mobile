@@ -20,7 +20,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-checkin-templates',
   templateUrl: 'checkin-templates.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class CheckinTemplatesPage extends BasePrivatePage {
 

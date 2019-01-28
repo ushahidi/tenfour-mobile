@@ -4,10 +4,10 @@ import { SendViaComponent } from './send-via';
 
 @NgModule({
   declarations: [
-    SendViaComponent,
+    SendViaComponent
   ],
   imports: [
-    IonicPageModule.forChild(SendViaComponent),
+    IonicPageModule.forChild(SendViaComponent)
   ],
   exports: [
     SendViaComponent

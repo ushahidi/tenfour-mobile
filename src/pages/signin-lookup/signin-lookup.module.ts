@@ -5,10 +5,10 @@ import { SigninLookupPage } from './signin-lookup';
 
 @NgModule({
   declarations: [
-    SigninLookupPage,
+    SigninLookupPage
   ],
   imports: [
-    IonicPageModule.forChild(SigninLookupPage),
+    IonicPageModule.forChild(SigninLookupPage)
   ],
   exports: [
     SigninLookupPage

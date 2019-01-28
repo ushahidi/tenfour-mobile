@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Platform, NavController } from 'ionic-angular';
 
-import { Sim } from '@ionic-native/sim';
 import { Contacts } from '@ionic-native/contacts';
 
 import { LoggerProvider } from '../../providers/logger/logger';
@@ -10,7 +8,6 @@ import { LoggerProvider } from '../../providers/logger/logger';
 export class ContactsProvider {
 
   constructor(
-    private platform:Platform,
     private contacts:Contacts,
     private logger:LoggerProvider) {
   }

@@ -8,12 +8,12 @@ import { PersonAvatarModule } from '../../components/person-avatar/person-avatar
 
 @NgModule({
   declarations: [
-    CheckinRespondComponent,
+    CheckinRespondComponent
   ],
   imports: [
     DateTimeModule,
     PersonAvatarModule,
-    IonicPageModule.forChild(CheckinRespondComponent),
+    IonicPageModule.forChild(CheckinRespondComponent)
   ],
   exports: [
     CheckinRespondComponent

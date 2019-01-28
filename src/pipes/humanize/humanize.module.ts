@@ -3,7 +3,7 @@ import { HumanizePipe } from './humanize';
 
 @NgModule({
   declarations: [
-    HumanizePipe,
+    HumanizePipe
   ],
   imports: [ ],
   exports: [

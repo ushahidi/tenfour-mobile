@@ -4,10 +4,10 @@ import { ContactsImportPage } from './contacts-import';
 
 @NgModule({
   declarations: [
-    ContactsImportPage,
+    ContactsImportPage
   ],
   imports: [
-    IonicPageModule.forChild(ContactsImportPage),
+    IonicPageModule.forChild(ContactsImportPage)
   ],
   exports: [
     ContactsImportPage

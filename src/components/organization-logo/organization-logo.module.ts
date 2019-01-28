@@ -5,10 +5,10 @@ import { OrganizationLogoComponent } from './organization-logo';
 
 @NgModule({
   declarations: [
-    OrganizationLogoComponent,
+    OrganizationLogoComponent
   ],
   imports: [
-    IonicPageModule.forChild(OrganizationLogoComponent),
+    IonicPageModule.forChild(OrganizationLogoComponent)
   ],
   exports: [
     OrganizationLogoComponent

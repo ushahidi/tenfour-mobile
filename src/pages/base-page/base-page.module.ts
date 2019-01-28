@@ -5,10 +5,10 @@ import { BasePage } from './base-page';
 
 @NgModule({
   declarations: [
-    BasePage,
+    BasePage
   ],
   imports: [
-    IonicPageModule.forChild(BasePage),
+    IonicPageModule.forChild(BasePage)
   ],
   exports: [
     BasePage
