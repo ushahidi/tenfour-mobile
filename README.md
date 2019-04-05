@@ -51,6 +51,13 @@ rm -r node_modules
 rm -f package-lock.json
 npm install
 ```
+#### CocoaPods
+```
+gem update --system
+gem cleanup --system
+gem install cocoapods -n /usr/local/bin
+pod setup
+```
 #### Remove Platforms
 ```
 cordova clean
@@ -60,7 +67,7 @@ ionic cordova platform rm browser
 ```
 #### Add Platforms
 ```
-ionic cordova platform add ios --buildConfig=build.json
+ionic cordova platform add ios@4.5.5 --buildConfig=build.json
 ionic cordova platform add android@6.4.0 --buildConfig=build.json
 ionic cordova platform add browser
 ```

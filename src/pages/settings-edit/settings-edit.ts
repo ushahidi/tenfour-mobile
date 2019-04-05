@@ -196,7 +196,7 @@ export class SettingsEditPage extends BasePrivatePage {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         let img = document.createElement("img");
-        img.src = reader.result;
+        img.src = reader.result as string;
         img.onload = function () {
           let imageData = this.thumbnail.toThumbnailDataURL(img);
 
