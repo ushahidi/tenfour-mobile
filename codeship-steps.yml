@@ -13,7 +13,7 @@
 
     - name: "deploy PWA client (production)"
       service: awscli
-      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-production-client/
+      command: aws s3 sync /vols/src/tmp/pwa/ s3://ushahidi-tenfour-production-client-eu/
 
 
 - type: parallel
