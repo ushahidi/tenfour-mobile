@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Platform } from 'ionic-angular';
 
 import { Observable } from 'rxjs/Observable';
@@ -118,7 +118,7 @@ export class LocationProvider {
       else {
         let latitude = location.latitude;
         let longitude = location.longitude;
-        let host = "https://maps.googleapis.com";
+        let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
         let url = `${host}/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${this.key}`;
         this.logger.info(this, "loadAddress", url);
         this.http.get(url, {})
@@ -148,7 +148,7 @@ export class LocationProvider {
 
   public searchAddress(address:string, limit:number=5, latitude:number=null, longitude:number=null):Promise<Location[]> {
     return new Promise((resolve, reject) => {
-      let host = "https://maps.googleapis.com";
+      let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
       let url = `${host}/maps/api/place/autocomplete/json?input=${address}&types=geocode&key=${this.key}`;
       if (latitude && longitude) {
         url = url + `&location=${latitude},${longitude}`;
@@ -189,7 +189,7 @@ export class LocationProvider {
   public placeDetails(location:Location):Promise<Location> {
     return new Promise((resolve, reject) => {
       if (location && location.place && location.place.length > 0) {
-        let host = "https://maps.googleapis.com";
+        let host = isDevMode() ? "/maps.googleapis.com" : "https://maps.googleapis.com";
         let url = `${host}/maps/api/place/details/json?placeid=${location.place}&key=${this.key}`;
         this.logger.info(this, "placeDetails", url);
         this.http.get(url, {})

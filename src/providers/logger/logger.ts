@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Platform } from 'ionic-angular';
 
 import { Device } from '@ionic-native/device';
@@ -26,6 +26,9 @@ export class LoggerProvider {
             this.enabled = false;
           });
         }
+      }
+      else if (isDevMode()) {
+        this.enabled = true;
       }
       else {
         this.enabled = false;
