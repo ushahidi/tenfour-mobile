@@ -3,6 +3,7 @@
   "integrations": {
     "cordova": {}
   },
+  "type": "ionic-angular",
   "proxies": [
     {
       "path": "/api.tenfour.org",
@@ -20,7 +21,5 @@
       "path": "/maps.googleapis.com",
       "proxyUrl": "https://maps.googleapis.com"
     }
-  ],
-  "type": "ionic-angular",
-  "app_id": ""
+  ]
 }

@@ -12,7 +12,7 @@ function puts(error, stdout, stderr) {
 
 function installCordovaIosSim() {
   process.stdout.write("installCordovaIosSim" + "\n");
-  exec("cd platforms/ios/cordova && npm install ios-sim", puts)
+  exec("cd platforms/ios/cordova && npm install ios-sim@next", puts)
 }
 
 if (platform === 'ios') {
