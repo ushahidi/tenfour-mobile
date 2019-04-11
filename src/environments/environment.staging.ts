@@ -12,5 +12,5 @@ export const Environment:IEnvironment = {
   firebaseAppId: "tenfour-7322f",
   firebaseApiKey: "AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI",
   firebaseSenderId: '804609537189',
-  sentryDSN: ''
+  sentryDSN: 'https://451ca63db3d441ffbd32e07098886d64@sentry.io/149595'
 };
