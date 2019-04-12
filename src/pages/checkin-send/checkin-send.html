@@ -77,7 +77,7 @@
     </ion-item>
     <ion-item *ngIf="checkin.frequency!='once'">
       <ion-label stacked color="dark">Number of check-ins</ion-label>
-      <ion-input #total type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
+      <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
                  [(ngModel)]="checkin.remaining_count" (ngModelChange)="countsChanged($event)"></ion-input>
     </ion-item>
   </ion-list>

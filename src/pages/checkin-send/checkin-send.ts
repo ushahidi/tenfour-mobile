@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, Select, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -39,9 +39,6 @@ export class CheckinSendPage extends BasePrivatePage {
   @ViewChild('select')
   select:Select;
 
-  @ViewChild('total')
-  total:TextInput;
-
   min_date:string = null;
   max_date:string = null;
 
@@ -70,7 +67,7 @@ export class CheckinSendPage extends BasePrivatePage {
     });
     let today = new Date();
     this.min_date = new Date(new Date().setDate(today.getDate() - 1)).toISOString();
-    this.max_date = new Date(new Date().setFullYear(today.getFullYear() + 1)).toISOString();
+    this.max_date = new Date(new Date().setFullYear(today.getFullYear() + 2)).toISOString();
   }
 
   ionViewDidEnter() {
