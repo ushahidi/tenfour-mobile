@@ -20,6 +20,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+import { TIME_HOURS, TIME_DAYS, TIME_WEEKS, TIME_MONTHS, TIME_YEARS } from '../../constants/times';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -381,21 +382,21 @@ export class CheckinSendPage extends BasePrivatePage {
     if (this.checkin.started_at && this.checkin.expired_at) {
       let started_at = new Date(this.checkin.started_at).valueOf();
       let expired_at = new Date(this.checkin.expired_at).valueOf();
-      let difference = Math.abs((expired_at - started_at) / 1000);
+      let difference = Math.abs((expired_at - started_at));
       if (this.checkin.frequency == 'hourly') {
-        this.checkin.remaining_count = Math.round(difference / (60*60));
+        this.checkin.remaining_count = Math.round(difference / TIME_HOURS);
       }
       else if (this.checkin.frequency == 'daily') {
-        this.checkin.remaining_count = Math.round(difference / (60*60*24));
+        this.checkin.remaining_count = Math.round(difference / TIME_DAYS);
       }
       else if (this.checkin.frequency == 'weekly') {
-        this.checkin.remaining_count = Math.round(difference / (60*60*24*7));
+        this.checkin.remaining_count = Math.round(difference / TIME_WEEKS);
       }
       else if (this.checkin.frequency == 'monthly') {
-        this.checkin.remaining_count = Math.round(difference / (60*60*24*30));
+        this.checkin.remaining_count = Math.round(difference / TIME_MONTHS);
       }
       else if (this.checkin.frequency == 'yearly') {
-        this.checkin.remaining_count = Math.round(difference / (60*60*24*365));
+        this.checkin.remaining_count = Math.round(difference / TIME_YEARS);
       }
       else {
         this.checkin.remaining_count = null;
@@ -411,23 +412,23 @@ export class CheckinSendPage extends BasePrivatePage {
     if (this.checkin.started_at) {
       let started_at = new Date(this.checkin.started_at);
       if (this.checkin.frequency == 'hourly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60);
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_HOURS);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else if (this.checkin.frequency == 'daily') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24);
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_DAYS);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else if (this.checkin.frequency == 'weekly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*7);
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_WEEKS);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else if (this.checkin.frequency == 'monthly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*30);
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_MONTHS);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else if (this.checkin.frequency == 'yearly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*365);
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_YEARS);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else {
