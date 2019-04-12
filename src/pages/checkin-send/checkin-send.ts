@@ -43,6 +43,15 @@ export class CheckinSendPage extends BasePrivatePage {
   min_date:string = null;
   max_date:string = null;
 
+  frequencies:any = {
+    'once': null,
+    'hourly': TIME_HOURS,
+    'daily': TIME_DAYS,
+    'weekly': TIME_WEEKS,
+    'monthly': TIME_MONTHS,
+    'yearly': TIME_YEARS
+  }
+
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -380,23 +389,12 @@ export class CheckinSendPage extends BasePrivatePage {
   private datesChanged(event:any) {
     this.logger.info(this, "datesChanged", event);
     if (this.checkin.started_at && this.checkin.expired_at) {
-      let started_at = new Date(this.checkin.started_at).valueOf();
-      let expired_at = new Date(this.checkin.expired_at).valueOf();
-      let difference = Math.abs((expired_at - started_at));
-      if (this.checkin.frequency == 'hourly') {
-        this.checkin.remaining_count = Math.round(difference / TIME_HOURS);
-      }
-      else if (this.checkin.frequency == 'daily') {
-        this.checkin.remaining_count = Math.round(difference / TIME_DAYS);
-      }
-      else if (this.checkin.frequency == 'weekly') {
-        this.checkin.remaining_count = Math.round(difference / TIME_WEEKS);
-      }
-      else if (this.checkin.frequency == 'monthly') {
-        this.checkin.remaining_count = Math.round(difference / TIME_MONTHS);
-      }
-      else if (this.checkin.frequency == 'yearly') {
-        this.checkin.remaining_count = Math.round(difference / TIME_YEARS);
+      let milliseconds = this.frequencies[this.checkin.frequency];
+      if (milliseconds) {
+        let started_at = new Date(this.checkin.started_at).valueOf();
+        let expired_at = new Date(this.checkin.expired_at).valueOf();
+        let duration = Math.abs((expired_at - started_at));
+        this.checkin.remaining_count = Math.round(duration / milliseconds);
       }
       else {
         this.checkin.remaining_count = null;
@@ -411,24 +409,9 @@ export class CheckinSendPage extends BasePrivatePage {
     this.logger.info(this, "countsChanged", event);
     if (this.checkin.started_at) {
       let started_at = new Date(this.checkin.started_at);
-      if (this.checkin.frequency == 'hourly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_HOURS);
-        this.checkin.expired_at = new Date(expired_at).toISOString();
-      }
-      else if (this.checkin.frequency == 'daily') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_DAYS);
-        this.checkin.expired_at = new Date(expired_at).toISOString();
-      }
-      else if (this.checkin.frequency == 'weekly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_WEEKS);
-        this.checkin.expired_at = new Date(expired_at).toISOString();
-      }
-      else if (this.checkin.frequency == 'monthly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_MONTHS);
-        this.checkin.expired_at = new Date(expired_at).toISOString();
-      }
-      else if (this.checkin.frequency == 'yearly') {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * TIME_YEARS);
+      let milliseconds = this.frequencies[this.checkin.frequency];
+      if (milliseconds) {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count * milliseconds);
         this.checkin.expired_at = new Date(expired_at).toISOString();
       }
       else {

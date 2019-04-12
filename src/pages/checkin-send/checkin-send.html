@@ -67,9 +67,10 @@
         <ion-option value="daily">Daily</ion-option>
         <ion-option value="weekly">Weekly</ion-option>
         <ion-option value="monthly">Monthly</ion-option>
+        <ion-option value="yearly">Yearly</ion-option>
       </ion-select>
     </ion-item>
-    <ion-item *ngIf="checkin.frequency=='hourly'">
+    <ion-item *ngIf="checkin.frequency!='once'">
       <ion-label stacked color="dark">Until</ion-label>
       <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
                     [min]="min_date" [max]="max_date" [(ngModel)]="checkin.expired_at"
