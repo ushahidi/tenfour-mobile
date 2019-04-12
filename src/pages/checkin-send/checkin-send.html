@@ -48,22 +48,51 @@
         </span>
       </ion-label>
     </button>
+    <button ion-item text-wrap (click)="editChannels()">
+      <ion-label stacked>Send via</ion-label>
+      <ion-label *ngIf="checkin.send_via.length">{{checkin.send_via | humanize}}</ion-label>
+      <ion-label *ngIf="!checkin.send_via.length">Don't send the check-in</ion-label>
+    </button>
+    <ion-item>
+      <ion-label stacked color="dark">When</ion-label>
+      <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
+                    [min]="min_date" [max]="max_date" [(ngModel)]="checkin.started_at"
+                    placeholder="Right now" (ngModelChange)="datesChanged($event)"></ion-datetime>
+    </ion-item>
+    <ion-item text-wrap color="white">
+      <ion-label stacked color="dark">Frequency</ion-label>
+      <ion-select [(ngModel)]="checkin.frequency" (ngModelChange)="datesChanged($event)">
+        <ion-option value="once">Once</ion-option>
+        <ion-option value="hourly">Hourly</ion-option>
+        <ion-option value="daily">Daily</ion-option>
+        <ion-option value="weekly">Weekly</ion-option>
+        <ion-option value="monthly">Monthly</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item *ngIf="checkin.frequency=='hourly'">
+      <ion-label stacked color="dark">Until</ion-label>
+      <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
+                    [min]="min_date" [max]="max_date" [(ngModel)]="checkin.expired_at"
+                    placeholder="Enter ending date" (ngModelChange)="datesChanged($event)"></ion-datetime>
+    </ion-item>
+    <ion-item *ngIf="checkin.frequency!='once'">
+      <ion-label stacked color="dark">Number of check-ins</ion-label>
+      <ion-input #total type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
+                 [(ngModel)]="checkin.remaining_count" (ngModelChange)="countsChanged($event)"></ion-input>
+    </ion-item>
   </ion-list>
-
-  <ion-list  *ngIf="organization && checkin">
+  <ion-list *ngIf="organization && checkin">
     <ion-item>
       <ion-label>Save this check-in to re-use later</ion-label>
       <ion-checkbox checked="false" item-end [(ngModel)]="checkin.template"></ion-checkbox>
     </ion-item>
   </ion-list>
-
 </ion-content>
-
 <ion-footer *ngIf="checkin && checkin.waiting_count">
   <ion-toolbar>
     <ion-title>
-        <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
-        <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
+      <span>{{checkin.waiting_count || 0}} {{checkin.waiting_count == 1 ? "recipient" : "recipients"}}</span>
+      <span *ngIf="checkin.creditsRequired()">&middot; {{checkin.creditsRequired()}} {{checkin.creditsRequired() == 1 ? "credit" : "credits"}}</span>
     </ion-title>
   </ion-toolbar>
 </ion-footer>

@@ -1,5 +1,5 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
-import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
+import { IonicPage, Select, TextInput, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
@@ -39,6 +39,12 @@ export class CheckinSendPage extends BasePrivatePage {
   @ViewChild('select')
   select:Select;
 
+  @ViewChild('total')
+  total:TextInput;
+
+  min_date:string = null;
+  max_date:string = null;
+
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -62,6 +68,9 @@ export class CheckinSendPage extends BasePrivatePage {
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
+    let today = new Date();
+    this.min_date = new Date(new Date().setDate(today.getDate() - 1)).toISOString();
+    this.max_date = new Date(new Date().setFullYear(today.getFullYear() + 1)).toISOString();
   }
 
   ionViewDidEnter() {
@@ -132,13 +141,11 @@ export class CheckinSendPage extends BasePrivatePage {
   private loadContactsForCheckin(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       let promises = [];
-
       this.checkin.users.forEach((person:Person) => {
         if (!person.contacts || !person.contacts.length) {
           promises.push(this.loadContactsForPerson(cache, person));
         }
       });
-
       this.checkin.groups.forEach((group:Group) => {
         group.members.forEach((person:Person) => {
           if (!person.contacts || !person.contacts.length) {
@@ -167,7 +174,6 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-
     if (this.checkin.template) {
         let buttons = [
           {
@@ -371,6 +377,66 @@ export class CheckinSendPage extends BasePrivatePage {
     }, (error) => {
       this.showToast(error);
     });
+  }
+
+  private datesChanged(event:any) {
+    this.logger.info(this, "datesChanged", event);
+    if (this.checkin.started_at && this.checkin.expired_at) {
+      let started_at = new Date(this.checkin.started_at).valueOf();
+      let expired_at = new Date(this.checkin.expired_at).valueOf();
+      let difference = Math.abs((expired_at - started_at) / 1000);
+      if (this.checkin.frequency == 'hourly') {
+        this.checkin.remaining_count = Math.round(difference / (60*60));
+      }
+      else if (this.checkin.frequency == 'daily') {
+        this.checkin.remaining_count = Math.round(difference / (60*60*24));
+      }
+      else if (this.checkin.frequency == 'weekly') {
+        this.checkin.remaining_count = Math.round(difference / (60*60*24*7));
+      }
+      else if (this.checkin.frequency == 'monthly') {
+        this.checkin.remaining_count = Math.round(difference / (60*60*24*30));
+      }
+      else if (this.checkin.frequency == 'yearly') {
+        this.checkin.remaining_count = Math.round(difference / (60*60*24*365));
+      }
+      else {
+        this.checkin.remaining_count = null;
+      }
+    }
+    else {
+      this.checkin.remaining_count = null;
+    }
+  }
+
+  private countsChanged(event:any) {
+    this.logger.info(this, "countsChanged", event);
+    if (this.checkin.started_at) {
+      let started_at = new Date(this.checkin.started_at);
+      if (this.checkin.frequency == 'hourly') {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60);
+        this.checkin.expired_at = new Date(expired_at).toISOString();
+      }
+      else if (this.checkin.frequency == 'daily') {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24);
+        this.checkin.expired_at = new Date(expired_at).toISOString();
+      }
+      else if (this.checkin.frequency == 'weekly') {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*7);
+        this.checkin.expired_at = new Date(expired_at).toISOString();
+      }
+      else if (this.checkin.frequency == 'monthly') {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*30);
+        this.checkin.expired_at = new Date(expired_at).toISOString();
+      }
+      else if (this.checkin.frequency == 'yearly') {
+        let expired_at = started_at.getTime() + (this.checkin.remaining_count*1000*60*60*24*365);
+        this.checkin.expired_at = new Date(expired_at).toISOString();
+      }
+      else {
+        this.checkin.expired_at = null;
+      }
+    }
   }
 
 }
