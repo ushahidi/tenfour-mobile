@@ -40,8 +40,8 @@ export class CheckinSendPage extends BasePrivatePage {
   @ViewChild('select')
   select:Select;
 
-  min_date:string = null;
-  max_date:string = null;
+  today:string = null;
+  future:string = null;
 
   frequencies:any = {
     'once': null,
@@ -76,8 +76,8 @@ export class CheckinSendPage extends BasePrivatePage {
       loading.dismiss();
     });
     let today = new Date();
-    this.min_date = new Date(new Date().setDate(today.getDate() - 1)).toISOString();
-    this.max_date = new Date(new Date().setFullYear(today.getFullYear() + 2)).toISOString();
+    this.today = this.yearMonthDay(today);
+    this.future = this.yearMonthDay(today, 0, 0, 0, 2);
   }
 
   ionViewDidEnter() {
@@ -418,6 +418,22 @@ export class CheckinSendPage extends BasePrivatePage {
         this.checkin.expired_at = null;
       }
     }
+  }
+
+  private yearMonthDay(date:Date, hours:number=0, days:number=0, months:number=0, years:number=0):string {
+    if (hours > 0) {
+      date.setHours(date.getHours() + hours);
+    }
+    if (days > 0) {
+      date.setDay(date.getDate() + days);
+    }
+    if (months > 0) {
+      date.setMonth(date.getMonth() + months);
+    }
+    if (years > 0) {
+      date.setFullYear(date.getFullYear() + years);
+    }
+    return date.toJSON().split("T")[0];
   }
 
 }
