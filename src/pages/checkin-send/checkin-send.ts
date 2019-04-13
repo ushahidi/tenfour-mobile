@@ -425,7 +425,7 @@ export class CheckinSendPage extends BasePrivatePage {
       date.setHours(date.getHours() + hours);
     }
     if (days > 0) {
-      date.setDay(date.getDate() + days);
+      date.setDate(date.getDate() + days);
     }
     if (months > 0) {
       date.setMonth(date.getMonth() + months);
