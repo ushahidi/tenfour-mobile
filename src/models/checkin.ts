@@ -126,8 +126,8 @@ export class Checkin extends Model {
   @Column("sent_count", INTEGER)
   public sent_count:number = null;
 
-  @Column("remaining_count", INTEGER)
-  public remaining_count:number = null;
+  @Column("check_in_count", INTEGER)
+  public check_in_count:number = null;
 
   @Column("replied", BOOLEAN)
   public replied:boolean = null;
@@ -150,11 +150,11 @@ export class Checkin extends Model {
   @Column("frequency", TEXT)
   public frequency:string = null;
 
-  @Column("started_at", TEXT)
-  public started_at:Date|string = null;
+  @Column("starts_at", TEXT)
+  public starts_at:Date = null;
 
-  @Column("expired_at", TEXT)
-  public expired_at:Date|string = null;
+  @Column("expires_at", TEXT)
+  public expires_at:Date = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;

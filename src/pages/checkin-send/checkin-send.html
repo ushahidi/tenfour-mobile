@@ -56,7 +56,7 @@
     <ion-item>
       <ion-label stacked color="dark">When</ion-label>
       <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
-                    [min]="today" [max]="future" [(ngModel)]="checkin.started_at"
+                    [min]="today" [max]="future" [(ngModel)]="starts_at"
                     placeholder="Right now" (ngModelChange)="datesChanged($event)"></ion-datetime>
     </ion-item>
     <ion-item text-wrap color="white">
@@ -73,13 +73,13 @@
     <ion-item *ngIf="checkin.frequency!='once'">
       <ion-label stacked color="dark">Until</ion-label>
       <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
-                    [min]="today" [max]="future" [(ngModel)]="checkin.expired_at"
+                    [min]="today" [max]="future" [(ngModel)]="expires_at"
                     placeholder="Enter ending date" (ngModelChange)="datesChanged($event)"></ion-datetime>
     </ion-item>
     <ion-item *ngIf="checkin.frequency!='once'">
       <ion-label stacked color="dark">Number of check-ins</ion-label>
       <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
-                 [(ngModel)]="checkin.remaining_count" (ngModelChange)="countsChanged($event)"></ion-input>
+                 [(ngModel)]="checkin.check_in_count" (ngModelChange)="countsChanged($event)"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="organization && checkin">

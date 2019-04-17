@@ -1,6 +1,8 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
+import * as moment from 'moment';
+
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
@@ -42,6 +44,8 @@ export class CheckinSendPage extends BasePrivatePage {
 
   today:string = null;
   future:string = null;
+  expires_at:string = null;
+  starts_at:string = null;
 
   frequencies:any = {
     'once': null,
@@ -75,9 +79,8 @@ export class CheckinSendPage extends BasePrivatePage {
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
-    let today = new Date();
-    this.today = this.yearMonthDay(today);
-    this.future = this.yearMonthDay(today, 0, 0, 0, 2);
+    this.today = moment().local().format('YYYY-MM-DD');
+    this.future = moment().add(2, 'years').format('YYYY-MM-DD');
   }
 
   ionViewDidEnter() {
@@ -123,6 +126,8 @@ export class CheckinSendPage extends BasePrivatePage {
       if (this.organization && this.organization.hasFreePlan()) {
         this.checkin.send_via = "app";
       }
+      this.starts_at = this.checkin.starts_at ? this.checkin.starts_at.toISOString() : null;
+      this.expires_at = this.checkin.expires_at ? this.checkin.expires_at.toISOString() : null;
       resolve(this.checkin);
     });
   }
@@ -302,6 +307,8 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private createCheckin(event:any) {
     let loading = this.showLoading("Saving...", true);
+    this.checkin.starts_at = new Date(this.starts_at);
+    this.checkin.expires_at = new Date(this.expires_at);
     this.api.createCheckin(this.organization, this.checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then(() => {
@@ -388,52 +395,36 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private datesChanged(event:any) {
     this.logger.info(this, "datesChanged", event);
-    if (this.checkin.started_at && this.checkin.expired_at) {
+    if (this.starts_at && this.expires_at) {
       let milliseconds = this.frequencies[this.checkin.frequency];
       if (milliseconds) {
-        let started_at = new Date(this.checkin.started_at).valueOf();
-        let expired_at = new Date(this.checkin.expired_at).valueOf();
-        let duration = Math.abs((expired_at - started_at));
-        this.checkin.remaining_count = Math.round(duration / milliseconds);
+        let starts_at = new Date(this.starts_at).valueOf();
+        let expires_at = new Date(this.expires_at).valueOf();
+        let duration = Math.abs((expires_at - starts_at));
+        this.checkin.check_in_count = Math.round(duration / milliseconds);
       }
       else {
-        this.checkin.remaining_count = null;
+        this.checkin.check_in_count = null;
       }
     }
     else {
-      this.checkin.remaining_count = null;
+      this.checkin.check_in_count = null;
     }
   }
 
   private countsChanged(event:any) {
     this.logger.info(this, "countsChanged", event);
-    if (this.checkin.started_at) {
-      let started_at = new Date(this.checkin.started_at);
+    if (this.starts_at) {
+      let starts_at = new Date(this.starts_at);
       let milliseconds = this.frequencies[this.checkin.frequency];
       if (milliseconds) {
-        let expired_at = started_at.getTime() + (this.checkin.remaining_count * milliseconds);
-        this.checkin.expired_at = new Date(expired_at).toISOString();
+        let expires_at = starts_at.getTime() + (this.checkin.check_in_count * milliseconds);
+        this.expires_at = new Date(expires_at).toISOString();
       }
       else {
-        this.checkin.expired_at = null;
+        this.expires_at = null;
       }
     }
-  }
-
-  private yearMonthDay(date:Date, hours:number=0, days:number=0, months:number=0, years:number=0):string {
-    if (hours > 0) {
-      date.setHours(date.getHours() + hours);
-    }
-    if (days > 0) {
-      date.setDate(date.getDate() + days);
-    }
-    if (months > 0) {
-      date.setMonth(date.getMonth() + months);
-    }
-    if (years > 0) {
-      date.setFullYear(date.getFullYear() + years);
-    }
-    return date.toJSON().split("T")[0];
   }
 
 }
