@@ -819,10 +819,7 @@ export class ApiProvider extends HttpProvider {
       template: !!checkin.template,
       group_ids: checkin.groups.map((group) => { return group.id; }),
       user_ids: checkin.users.map((user) => { return user.id; }),
-      frequency: checkin.frequency,
-      starts_at: checkin.starts_at,
-      expires_at: checkin.expires_at,
-      check_in_count: checkin.check_in_count
+      schedule: checkin.schedule
     };
     if (checkin.self_test_check_in) {
       params['self_test_check_in'] = 1;

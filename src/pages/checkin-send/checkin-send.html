@@ -56,12 +56,12 @@
     <ion-item>
       <ion-label stacked color="dark">When</ion-label>
       <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
-                    [min]="today" [max]="future" [(ngModel)]="starts_at"
+                    [min]="today" [max]="future" [(ngModel)]="checkin.schedule.starts_at"
                     placeholder="Right now" (ngModelChange)="datesChanged($event)"></ion-datetime>
     </ion-item>
     <ion-item text-wrap color="white">
       <ion-label stacked color="dark">Frequency</ion-label>
-      <ion-select [(ngModel)]="checkin.frequency" (ngModelChange)="datesChanged($event)">
+      <ion-select [(ngModel)]="checkin.schedule.frequency" (ngModelChange)="datesChanged($event)">
         <ion-option value="once">Once</ion-option>
         <ion-option value="hourly">Hourly</ion-option>
         <ion-option value="daily">Daily</ion-option>
@@ -70,16 +70,16 @@
         <ion-option value="yearly">Yearly</ion-option>
       </ion-select>
     </ion-item>
-    <ion-item *ngIf="checkin.frequency!='once'">
+    <ion-item *ngIf="checkin.schedule.frequency!='once'">
       <ion-label stacked color="dark">Until</ion-label>
       <ion-datetime displayFormat="MMMM DD YYYY, h:mm a" pickerFormat="MMM D YYYY h mm A"
-                    [min]="today" [max]="future" [(ngModel)]="expires_at"
+                    [min]="today" [max]="future" [(ngModel)]="checkin.schedule.expires_at"
                     placeholder="Enter ending date" (ngModelChange)="datesChanged($event)"></ion-datetime>
     </ion-item>
-    <ion-item *ngIf="checkin.frequency!='once'">
+    <ion-item *ngIf="checkin.schedule.frequency!='once'">
       <ion-label stacked color="dark">Number of check-ins</ion-label>
       <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
-                 [(ngModel)]="checkin.check_in_count" (ngModelChange)="countsChanged($event)"></ion-input>
+                 [(ngModel)]="checkin.schedule.check_in_count" (ngModelChange)="countsChanged($event)"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="organization && checkin">

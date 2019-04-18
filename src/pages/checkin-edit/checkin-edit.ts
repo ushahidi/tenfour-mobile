@@ -10,6 +10,7 @@ import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Answer } from '../../models/answer';
+import { Schedule } from '../../models/schedule';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -114,6 +115,8 @@ export class CheckinEditPage extends BasePrivatePage {
       user_id: this.user.id,
       user_initials: this.user.initials,
       user_picture: this.user.profile_picture,
+    });
+    this.checkin.schedule = new Schedule({
       frequency: "once"
     });
     let send_via = [];

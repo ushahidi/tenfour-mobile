@@ -17,6 +17,7 @@ import { Checkin } from '../../models/checkin';
 import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
+import { Schedule } from '../../models/schedule';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
@@ -44,9 +45,6 @@ export class CheckinSendPage extends BasePrivatePage {
 
   today:string = null;
   future:string = null;
-  expires_at:string = null;
-  starts_at:string = null;
-
   frequencies:any = {
     'once': null,
     'hourly': TIME_HOURS,
@@ -126,8 +124,6 @@ export class CheckinSendPage extends BasePrivatePage {
       if (this.organization && this.organization.hasFreePlan()) {
         this.checkin.send_via = "app";
       }
-      this.starts_at = this.checkin.starts_at ? this.checkin.starts_at.toISOString() : null;
-      this.expires_at = this.checkin.expires_at ? this.checkin.expires_at.toISOString() : null;
       resolve(this.checkin);
     });
   }
@@ -307,8 +303,6 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private createCheckin(event:any) {
     let loading = this.showLoading("Saving...", true);
-    this.checkin.starts_at = this.starts_at ? new Date(this.starts_at) : null;
-    this.checkin.expires_at = this.expires_at ? new Date(this.expires_at) : null;
     this.api.createCheckin(this.organization, this.checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then(() => {
@@ -337,8 +331,6 @@ export class CheckinSendPage extends BasePrivatePage {
     }
     else {
       let loading = this.showLoading("Sending...", true);
-      this.checkin.starts_at = this.starts_at ? new Date(this.starts_at) : null;
-      this.checkin.expires_at = this.expires_at ? new Date(this.expires_at) : null;
       this.api.sendCheckin(this.organization, this.checkin)
         .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
         .then((saved:boolean) => { return this.api.getOrganization(this.organization); })
@@ -397,34 +389,34 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private datesChanged(event:any) {
     this.logger.info(this, "datesChanged", event);
-    if (this.starts_at && this.expires_at) {
-      let milliseconds = this.frequencies[this.checkin.frequency];
+    if (this.checkin.schedule.hasStartsAt() && this.checkin.schedule.hasExpiresAt()) {
+      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
       if (milliseconds) {
-        let starts_at = new Date(this.starts_at).valueOf();
-        let expires_at = new Date(this.expires_at).valueOf();
+        let starts_at = this.checkin.schedule.startsAt().valueOf();
+        let expires_at = this.checkin.schedule.expiresAt().valueOf();
         let duration = Math.abs((expires_at - starts_at));
-        this.checkin.check_in_count = Math.round(duration / milliseconds);
+        this.checkin.schedule.check_in_count = Math.round(duration / milliseconds);
       }
       else {
-        this.checkin.check_in_count = null;
+        this.checkin.schedule.check_in_count = null;
       }
     }
     else {
-      this.checkin.check_in_count = null;
+      this.checkin.schedule.check_in_count = null;
     }
   }
 
   private countsChanged(event:any) {
     this.logger.info(this, "countsChanged", event);
-    if (this.starts_at) {
-      let starts_at = new Date(this.starts_at);
-      let milliseconds = this.frequencies[this.checkin.frequency];
+    if (this.checkin.schedule.hasStartsAt()) {
+      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
       if (milliseconds) {
-        let expires_at = starts_at.getTime() + (this.checkin.check_in_count * milliseconds);
-        this.expires_at = new Date(expires_at).toISOString();
+        let starts_at = this.checkin.schedule.startsAt();
+        let expires_at = starts_at.getTime() + (this.checkin.schedule.check_in_count * milliseconds);
+        this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
       }
       else {
-        this.expires_at = null;
+        this.checkin.schedule.expires_at = null;
       }
     }
   }
