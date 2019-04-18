@@ -307,8 +307,8 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private createCheckin(event:any) {
     let loading = this.showLoading("Saving...", true);
-    this.checkin.starts_at = new Date(this.starts_at);
-    this.checkin.expires_at = new Date(this.expires_at);
+    this.checkin.starts_at = this.starts_at ? new Date(this.starts_at) : null;
+    this.checkin.expires_at = this.expires_at ? new Date(this.expires_at) : null;
     this.api.createCheckin(this.organization, this.checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then(() => {
@@ -337,6 +337,8 @@ export class CheckinSendPage extends BasePrivatePage {
     }
     else {
       let loading = this.showLoading("Sending...", true);
+      this.checkin.starts_at = this.starts_at ? new Date(this.starts_at) : null;
+      this.checkin.expires_at = this.expires_at ? new Date(this.expires_at) : null;
       this.api.sendCheckin(this.organization, this.checkin)
         .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
         .then((saved:boolean) => { return this.api.getOrganization(this.organization); })
