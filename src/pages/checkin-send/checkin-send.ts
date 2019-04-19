@@ -124,6 +124,11 @@ export class CheckinSendPage extends BasePrivatePage {
       if (this.organization && this.organization.hasFreePlan()) {
         this.checkin.send_via = "app";
       }
+      if (this.checkin.schedule == null) {
+        this.checkin.schedule = new Schedule({
+          frequency: "once"
+        });
+      }
       resolve(this.checkin);
     });
   }
