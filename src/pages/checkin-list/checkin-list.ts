@@ -22,6 +22,12 @@ import {
   EVENT_CHECKIN_UPDATED,
   EVENT_CHECKINS_WAITING_CHANGED } from '../../constants/events';
 
+export enum Filter {
+  sent = "sent",
+  inbox = "inbox",
+  scheduled = "scheduled"
+}
+
 @IonicPage({
   name: 'CheckinListPage',
   segment: 'checkins'
@@ -34,7 +40,7 @@ import {
 })
 export class CheckinListPage extends BasePrivatePage {
 
-  filter:string = "sent";
+  filter:Filter = Filter.sent;
   checkins:Checkin[] = [];
   selected:Checkin = null;
   loading:boolean = false;
@@ -147,13 +153,13 @@ export class CheckinListPage extends BasePrivatePage {
       this.offset = 0;
       this.checkins = [];
       let promise:Promise<Checkin[]> = null;
-      if (this.filter === 'sent') {
+      if (this.filter === Filter.sent) {
         promise = this.loadSentCheckins(cache);
       }
-      else if (this.filter === 'inbox') {
+      else if (this.filter === Filter.inbox) {
         promise = this.loadInboxCheckins(cache);
       }
-      else if (this.filter === 'scheduled') {
+      else if (this.filter === Filter.scheduled) {
         promise = this.loadScheduledCheckins(cache);
       }
       promise.then((checkins:Checkin[]) => {
@@ -171,13 +177,13 @@ export class CheckinListPage extends BasePrivatePage {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
       let promise:Promise<Checkin[]> = null;
-      if (this.filter === 'sent') {
+      if (this.filter === Filter.sent) {
         promise = this.loadSentCheckins(true);
       }
-      else if (this.filter === 'inbox') {
+      else if (this.filter === Filter.inbox) {
         promise = this.loadInboxCheckins(true);
       }
-      else if (this.filter === 'scheduled') {
+      else if (this.filter === Filter.scheduled) {
         promise = this.loadScheduledCheckins(true);
       }
       promise.then((checkins:Checkin[]) => {
@@ -405,15 +411,15 @@ export class CheckinListPage extends BasePrivatePage {
       if (checkin.template && !checkin.recipients.length) {
         continue;
       }
-      if (this.filter === "sent") {
+      if (this.filter === Filter.sent) {
         filtered.push(checkin);
       }
-      else if (this.filter === "inbox") {
+      else if (this.filter === Filter.inbox) {
         if (checkin.canRespond(this.user)) {
           filtered.push(checkin);
         }
       }
-      else if (this.filter === "scheduled") {
+      else if (this.filter === Filter.scheduled) {
         if (checkin.schedule) {
           filtered.push(checkin);
         }
