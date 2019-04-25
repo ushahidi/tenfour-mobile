@@ -702,10 +702,10 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10):Promise<Checkin[]> {
+  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}&offset=${offset}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let checkins = [];
@@ -715,6 +715,31 @@ export class ApiProvider extends HttpProvider {
               if (checkin.canRespond(user)) {
                 checkins.push(checkin);
               }
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getCheckinsScheduled(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/scheduled_check_ins/?limit=${limit}&offset=${offset}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let checkins = [];
+          if (data && data.checkins) {
+            for (let _checkin of data.checkins) {
+              let checkin = new Checkin(_checkin);
+              checkins.push(checkin);
             }
           }
           resolve(checkins);

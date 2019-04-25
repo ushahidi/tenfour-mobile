@@ -34,7 +34,7 @@ import {
 })
 export class CheckinListPage extends BasePrivatePage {
 
-  filter:string = "all";
+  filter:string = "sent";
   checkins:Checkin[] = [];
   selected:Checkin = null;
   loading:boolean = false;
@@ -65,11 +65,11 @@ export class CheckinListPage extends BasePrivatePage {
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
-      this.loadWaitingResponse(true, this.mobile).then((waiting:Checkin[]) => {
-        this.logger.info(this, "ionViewDidLoad", "loadWaitingResponse", "Loaded");
+      this.loadInboxCheckins(true, this.mobile).then((waiting:Checkin[]) => {
+        this.logger.info(this, "ionViewDidLoad", "loadInboxCheckins", "Loaded");
       },
       (error:any) => {
-        this.logger.error(this, "ionViewDidLoad", "loadWaitingResponse", error);
+        this.logger.error(this, "ionViewDidLoad", "loadInboxCheckins", error);
       });
     });
   }
@@ -145,10 +145,64 @@ export class CheckinListPage extends BasePrivatePage {
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
+      this.checkins = [];
+      let promise:Promise<Checkin[]> = null;
+      if (this.filter === 'sent') {
+        promise = this.loadSentCheckins(cache);
+      }
+      else if (this.filter === 'inbox') {
+        promise = this.loadInboxCheckins(cache);
+      }
+      else if (this.filter === 'scheduled') {
+        promise = this.loadScheduledCheckins(cache);
+      }
+      promise.then((checkins:Checkin[]) => {
+        this.organization.checkins = checkins;
+        this.checkins = checkins;
+        resolve(this.checkins);
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  private loadMoreCheckins(event:any) {
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      let promise:Promise<Checkin[]> = null;
+      if (this.filter === 'sent') {
+        promise = this.loadSentCheckins(true);
+      }
+      else if (this.filter === 'inbox') {
+        promise = this.loadInboxCheckins(true);
+      }
+      else if (this.filter === 'scheduled') {
+        promise = this.loadScheduledCheckins(true);
+      }
+      promise.then((checkins:Checkin[]) => {
+        this.organization.checkins = [...this.organization.checkins, ...checkins];
+        this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
+        if (event) {
+          event.complete();
+        }
+        resolve(this.checkins);
+      },
+      (error:any) => {
+        if (event) {
+          event.complete();
+        }
+        reject(error);
+      });
+    });
+  }
+
+  private loadSentCheckins(cache:boolean=true):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
       this.promiseFallback(cache,
         this.storage.getCheckins(this.organization, this.limit, this.offset),
         this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
-          this.logger.info(this, "loadCheckins", checkins.length);
+          this.logger.info(this, "loadSentCheckins", checkins.length);
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
               if (this.user && this.user.id == reply.user_id) {
@@ -157,17 +211,60 @@ export class CheckinListPage extends BasePrivatePage {
             }
           }
           this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.organization.checkins = checkins;
-            this.checkins = this.filterCheckins(checkins);
-            resolve(this.checkins);
+            resolve(checkins);
+          },
+          (error:any) => {
+            reject(error);
           });
         },
         (error:any) => {
-          this.logger.error(this, "loadCheckins", error);
-          this.organization.checkins = [];
-          this.checkins = [];
+          this.logger.error(this, "loadSentCheckins", error);
           reject(error);
         });
+    });
+  }
+
+  private loadInboxCheckins(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadInboxCheckins");
+      this.promiseFallback(cache,
+        this.storage.getCheckinsWaiting(this.organization, this.user, 25, this.offset),
+        this.api.getCheckinsWaiting(this.organization, this.user, 25, this.offset), 1).then((checkins:Checkin[]) => {
+          if (checkins && checkins.length > 0) {
+            this.logger.info(this, "loadInboxCheckins", checkins.length);
+            this.events.publish(EVENT_CHECKINS_WAITING_CHANGED, checkins);
+            this.badgeNumber = checkins.length;
+            this.badge.setBadgeNumber(this.badgeNumber);
+            if (showPopup == true) {
+              let checkin = checkins[0];
+              this.showCheckinRespond(checkin, checkins);
+            }
+            resolve(checkins);
+          }
+          else {
+            this.logger.info(this, "loadInboxCheckins", 0);
+            this.badgeNumber = 0;
+            this.badge.clearBadgeNumber();
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.logger.info(error, "loadInboxCheckins", error);
+          resolve([]);
+        });
+    });
+  }
+
+  private loadScheduledCheckins(cache:boolean=true):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.api.getCheckinsScheduled(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.logger.info(this, "loadScheduledCheckins", checkins.length);
+        resolve(checkins);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadScheduledCheckins", error);
+        reject(error);
+      });
     });
   }
 
@@ -189,61 +286,6 @@ export class CheckinListPage extends BasePrivatePage {
         this.logger.error(this, "loadCheckin", checkinId, error);
         resolve(null);
       });
-    });
-  }
-
-  private loadMore(event:any) {
-    return new Promise((resolve, reject) => {
-      this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.promiseFallback(true,
-        this.storage.getCheckins(this.organization, this.limit, this.offset),
-        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
-          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.organization.checkins = [...this.organization.checkins, ...checkins];
-            this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
-            if (event) {
-              event.complete();
-            }
-            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Loaded", this.organization.checkins.length);
-            resolve(this.checkins);
-          });
-        },
-        (error:any) => {
-          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Failed", error);
-          reject(error);
-        });
-    });
-  }
-
-  private loadWaitingResponse(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadWaitingResponse");
-      this.promiseFallback(cache,
-        this.storage.getCheckinsWaiting(this.organization, this.user, 25),
-        this.api.getCheckinsWaiting(this.organization, this.user, 25), 1).then((checkins:Checkin[]) => {
-          if (checkins && checkins.length > 0) {
-            this.logger.info(this, "loadWaitingResponse", checkins.length);
-            this.events.publish(EVENT_CHECKINS_WAITING_CHANGED, checkins);
-            this.badgeNumber = checkins.length;
-            this.badge.setBadgeNumber(this.badgeNumber);
-            if (showPopup == true) {
-              let checkin = checkins[0];
-              this.showCheckinRespond(checkin, checkins);
-            }
-            resolve(checkins);
-          }
-          else {
-            this.logger.info(this, "loadWaitingResponse", 0);
-            this.badgeNumber = 0;
-            this.badge.clearBadgeNumber();
-            resolve([]);
-          }
-        },
-        (error:any) => {
-          this.logger.info(error, "loadWaitingResponse", error);
-          resolve([]);
-        });
     });
   }
 
@@ -274,7 +316,7 @@ export class CheckinListPage extends BasePrivatePage {
         else {
           this.loadCheckins(false).then((loaded:any) => {
             this.logger.info(this, "showCheckinRespond", "loadCheckins", "Loaded");
-            this.loadWaitingResponse(true, false);
+            this.loadInboxCheckins(true, false);
           },
           (error:any) => {
             this.logger.info(this, "showCheckinRespond", "loadCheckins", error);
@@ -310,7 +352,12 @@ export class CheckinListPage extends BasePrivatePage {
         else {
           this.loadCheckins(false).then((loaded:any) => {
             this.logger.info(this, "createCheckin", "loadCheckins", "Loaded");
-            this.loadWaitingResponse(true, false);
+            this.loadInboxCheckins(true, false).then((checkins:Checkin[]) =>{
+              this.logger.info(this, "createCheckin", "loadCheckins", "loadInboxCheckins", "Loaded");
+            },
+            (error:any) => {
+              this.logger.error(this, "createCheckin", "loadCheckins", "loadInboxCheckins", error);
+            });
           },
           (error:any) => {
             this.logger.error(this, "createCheckin", "loadCheckins", error);
@@ -340,23 +387,16 @@ export class CheckinListPage extends BasePrivatePage {
 
   private filterChanged(event:any) {
     this.logger.info(this, "filterChanged", this.filter);
-    let loading = this.showLoading("Filtering...");
+    let loading = this.showLoading("Loading...");
     this.loading = true;
-    this.offset = 0;
-    this.checkins = [];
-    if (this.filter === "all") {
-      this.loadCheckins(true).then((filtered:any) => {
-        this.loading = false;
-        loading.dismiss();
-      });
-    }
-    else if (this.filter === "waiting") {
-      this.loadWaitingResponse(true, false).then((checkins:Checkin[]) => {
-        this.checkins = this.filterCheckins(checkins);
-        this.loading = false;
-        loading.dismiss();
-      });
-    }
+    this.loadCheckins(true).then((checkins:Checkin[]) => {
+      this.loading = false;
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.loading = false;
+      loading.dismiss();
+    });
   }
 
   private filterCheckins(checkins:Checkin[]) {
@@ -365,28 +405,22 @@ export class CheckinListPage extends BasePrivatePage {
       if (checkin.template && !checkin.recipients.length) {
         continue;
       }
-      if (this.filter === "all") {
+      if (this.filter === "sent") {
         filtered.push(checkin);
       }
-      else if (this.filter === "waiting") {
+      else if (this.filter === "inbox") {
         if (checkin.canRespond(this.user)) {
+          filtered.push(checkin);
+        }
+      }
+      else if (this.filter === "scheduled") {
+        if (checkin.schedule) {
           filtered.push(checkin);
         }
       }
     }
     this.logger.info(this, "filterCheckins", this.filter, "Checkins", checkins.length, "Filtered", filtered.length);
     return filtered;
-  }
-
-  private swipeEvent(event:any) {
-    if(event.direction == '2'){
-      this.logger.info(this, "swipeEvent", event, "Left");
-      this.filter = "all";
-    }
-    else if(event.direction == '4'){
-      this.logger.info(this, "swipeEvent", event, "Right");
-      this.filter = "waiting";
-    }
   }
 
 }

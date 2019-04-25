@@ -2,6 +2,7 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
+import { Schedule } from '../../models/schedule';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 
