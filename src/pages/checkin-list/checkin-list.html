@@ -18,9 +18,9 @@
   </ion-refresher>
   <div padding-left padding-right>
     <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
-      <ion-segment-button value="sent">Sent</ion-segment-button>
-      <ion-segment-button value="inbox">Inbox</ion-segment-button>
-      <ion-segment-button value="scheduled">Scheduled</ion-segment-button>
+      <ion-segment-button [value]="Filter.sent">Sent</ion-segment-button>
+      <ion-segment-button [value]="Filter.inbox">Inbox</ion-segment-button>
+      <ion-segment-button [value]="Filter.scheduled">Scheduled</ion-segment-button>
     </ion-segment>
   </div>
   <div text-center class="spinner" *ngIf="loading == true && (checkins == null || checkins.length == 0)">

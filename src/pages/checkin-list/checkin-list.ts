@@ -40,6 +40,7 @@ export enum Filter {
 })
 export class CheckinListPage extends BasePrivatePage {
 
+  Filter:any = Filter;
   filter:Filter = Filter.sent;
   checkins:Checkin[] = [];
   selected:Checkin = null;
