@@ -732,17 +732,35 @@ export class ApiProvider extends HttpProvider {
   public getCheckinsScheduled(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/scheduled_check_ins/?limit=${limit}&offset=${offset}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/scheduled/?limit=${limit}&offset=${offset}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let checkins = [];
-          if (data && data.checkins) {
-            for (let _checkin of data.checkins) {
+          if (data && data.scheduled_check_ins) {
+            for (let _checkin of data.scheduled_check_ins) {
               let checkin = new Checkin(_checkin);
               checkins.push(checkin);
             }
           }
           resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public deleteCheckinScheduled(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/scheduled/${checkin.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
         },
         (error:any) => {
           reject(error);

@@ -114,7 +114,7 @@ export class CheckinEditPage extends BasePrivatePage {
       organization_id: this.organization.id,
       user_id: this.user.id,
       user_initials: this.user.initials,
-      user_picture: this.user.profile_picture,
+      user_picture: this.user.profile_picture
     });
     this.checkin.schedule = new Schedule({
       frequency: "once"

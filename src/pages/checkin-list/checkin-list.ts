@@ -153,17 +153,17 @@ export class CheckinListPage extends BasePrivatePage {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       this.checkins = [];
-      let promise:Promise<Checkin[]> = null;
+      let loadCheckins:Promise<Checkin[]> = null;
       if (this.filter === Filter.sent) {
-        promise = this.loadSentCheckins(cache);
+        loadCheckins = this.loadSentCheckins(cache);
       }
       else if (this.filter === Filter.inbox) {
-        promise = this.loadInboxCheckins(cache);
+        loadCheckins = this.loadInboxCheckins(cache);
       }
       else if (this.filter === Filter.scheduled) {
-        promise = this.loadScheduledCheckins(cache);
+        loadCheckins = this.loadScheduledCheckins(cache);
       }
-      promise.then((checkins:Checkin[]) => {
+      loadCheckins.then((checkins:Checkin[]) => {
         this.organization.checkins = checkins;
         this.checkins = checkins;
         resolve(this.checkins);
@@ -177,19 +177,19 @@ export class CheckinListPage extends BasePrivatePage {
   private loadMoreCheckins(event:any) {
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
-      let promise:Promise<Checkin[]> = null;
+      let loadMoreCheckins:Promise<Checkin[]> = null;
       if (this.filter === Filter.sent) {
-        promise = this.loadSentCheckins(true);
+        loadMoreCheckins = this.loadSentCheckins(true);
       }
       else if (this.filter === Filter.inbox) {
-        promise = this.loadInboxCheckins(true);
+        loadMoreCheckins = this.loadInboxCheckins(true);
       }
       else if (this.filter === Filter.scheduled) {
-        promise = this.loadScheduledCheckins(true);
+        loadMoreCheckins = this.loadScheduledCheckins(true);
       }
-      promise.then((checkins:Checkin[]) => {
+      loadMoreCheckins.then((checkins:Checkin[]) => {
         this.organization.checkins = [...this.organization.checkins, ...checkins];
-        this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
+        this.checkins = [...this.checkins, ...checkins];
         if (event) {
           event.complete();
         }
@@ -221,6 +221,7 @@ export class CheckinListPage extends BasePrivatePage {
             resolve(checkins);
           },
           (error:any) => {
+            this.logger.error(this, "loadSentCheckins", error);
             reject(error);
           });
         },
@@ -345,6 +346,20 @@ export class CheckinListPage extends BasePrivatePage {
     });
   }
 
+  private deleteCheckin(checkin:Checkin) {
+    this.logger.info(this, "deleteCheckin", checkin);
+    let loading = this.showLoading("Deleting...", true);
+    this.api.deleteCheckinScheduled(this.organization, checkin).then((_checkin:Checkin) => {
+      this.checkins = this.checkins.filter(c => c.id !== checkin.id);
+      loading.dismiss();
+      this.showToast(`Check-In ${checkin.message} deleted`);
+    },
+    (error:any) => {
+      loading.dismiss();
+      this.showAlert("Problem Deleting Check-In", error);
+    });
+  }
+
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
@@ -404,30 +419,6 @@ export class CheckinListPage extends BasePrivatePage {
       this.loading = false;
       loading.dismiss();
     });
-  }
-
-  private filterCheckins(checkins:Checkin[]) {
-    let filtered = [];
-    for (let checkin of checkins) {
-      if (checkin.template && !checkin.recipients.length) {
-        continue;
-      }
-      if (this.filter === Filter.sent) {
-        filtered.push(checkin);
-      }
-      else if (this.filter === Filter.inbox) {
-        if (checkin.canRespond(this.user)) {
-          filtered.push(checkin);
-        }
-      }
-      else if (this.filter === Filter.scheduled) {
-        if (checkin.schedule) {
-          filtered.push(checkin);
-        }
-      }
-    }
-    this.logger.info(this, "filterCheckins", this.filter, "Checkins", checkins.length, "Filtered", filtered.length);
-    return filtered;
   }
 
 }

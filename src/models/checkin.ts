@@ -127,11 +127,17 @@ export class Checkin extends Model {
   @Column("waiting_count", INTEGER)
   public waiting_count:number = null;
 
+  @Column("remaining_count", INTEGER)
+  public remaining_count:number = null;
+
   @Column("sent_count", INTEGER)
   public sent_count:number = null;
 
   @Column("replied", BOOLEAN)
   public replied:boolean = null;
+
+  @Column("scheduled", BOOLEAN)
+  public scheduled:boolean = null;
 
   @Column("self_test_check_in", BOOLEAN)
   public self_test_check_in:boolean = null;
@@ -147,6 +153,12 @@ export class Checkin extends Model {
 
   @Column("template", BOOLEAN)
   public template:boolean = false;
+
+  @Column("starts_at", TEXT)
+  public starts_at:string = null;
+
+  @Column("expires_at", TEXT)
+  public expires_at:string = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;
@@ -239,10 +251,23 @@ export class Checkin extends Model {
     if (person == null) {
       return false;
     }
+    if (this.scheduled == true && this.sent == false) {
+      return false;
+    }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
       if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
         return true;
       }
+    }
+    return false;
+  }
+
+  public canDelete(person:Person):boolean {
+    if (person == null) {
+      return false;
+    }
+    if (person.id == this.user_id || person.isOwnerOrAdmin()) {
+      return this.scheduled == true && this.sent == false;
     }
     return false;
   }
