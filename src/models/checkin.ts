@@ -245,9 +245,6 @@ export class Checkin extends Model {
     if (person == null) {
       return false;
     }
-    if (this.scheduled == true && this.sent == false) {
-      return false;
-    }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
       if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
         return true;
@@ -261,7 +258,7 @@ export class Checkin extends Model {
       return false;
     }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
-      return this.scheduled == true && this.sent == false;
+      return this.schedule != null;
     }
     return false;
   }

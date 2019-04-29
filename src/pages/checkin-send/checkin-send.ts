@@ -400,14 +400,14 @@ export class CheckinSendPage extends BasePrivatePage {
         let starts_at = this.checkin.schedule.startsAt().valueOf();
         let expires_at = this.checkin.schedule.expiresAt().valueOf();
         let duration = Math.abs((expires_at - starts_at));
-        this.checkin.schedule.check_in_count = Math.round(duration / milliseconds);
+        this.checkin.schedule.remaining_count = Math.round(duration / milliseconds);
       }
       else {
-        this.checkin.schedule.check_in_count = null;
+        this.checkin.schedule.remaining_count = null;
       }
     }
     else {
-      this.checkin.schedule.check_in_count = null;
+      this.checkin.schedule.remaining_count = null;
     }
   }
 
@@ -417,7 +417,7 @@ export class CheckinSendPage extends BasePrivatePage {
       let milliseconds = this.frequencies[this.checkin.schedule.frequency];
       if (milliseconds) {
         let starts_at = this.checkin.schedule.startsAt();
-        let expires_at = starts_at.getTime() + (this.checkin.schedule.check_in_count * milliseconds);
+        let expires_at = starts_at.getTime() + (this.checkin.schedule.remaining_count * milliseconds);
         this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
       }
       else {
