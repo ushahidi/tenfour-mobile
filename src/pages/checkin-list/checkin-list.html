@@ -41,8 +41,9 @@
       <h2 text-center padding-top margin-top *ngIf="filter == 'inbox'">There currently are no Check-Ins awaiting response...</h2>
     </ion-item>
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
-                  (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)"
-                  (resendSelected)="resendCheckin(checkin)" (deleteSelected)="deleteCheckin(checkin)"
+                  (cardSelected)="showCheckinDetails(checkin)"
+                  (sendSelected)="showCheckinRespond(checkin)" (resendSelected)="resendCheckin(checkin)"
+                  (deleteSelected)="deleteCheckin(checkin)" (deleteAllSelected)="deleteAllCheckin(checkin)"
                   *ngFor="let checkin of checkins"></checkin-card>
   </ion-list>
   <ion-infinite-scroll (ionInfinite)="loadMoreCheckins($event)">

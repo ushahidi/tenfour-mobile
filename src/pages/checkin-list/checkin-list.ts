@@ -348,16 +348,67 @@ export class CheckinListPage extends BasePrivatePage {
 
   private deleteCheckin(checkin:Checkin) {
     this.logger.info(this, "deleteCheckin", checkin);
-    let loading = this.showLoading("Deleting...", true);
-    this.api.deleteCheckinScheduled(this.organization, checkin).then((_checkin:Checkin) => {
-      this.checkins = this.checkins.filter(c => c.id !== checkin.id);
-      loading.dismiss();
-      this.showToast(`Check-In ${checkin.message} deleted`);
-    },
-    (error:any) => {
-      loading.dismiss();
-      this.showAlert("Problem Deleting Check-In", error);
-    });
+    let buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "deleteCheckin", "Cancelled");
+        }
+      },
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          this.api.deleteCheckin(this.organization, checkin).then((deleted:any) => {
+            this.checkins = this.checkins.filter(c => c.id !== checkin.id);
+            loading.dismiss();
+            this.showToast(`Check-In ${checkin.message} deleted`);
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Deleting Scheduled Check-In", error);
+          });
+        }
+      }
+    ];
+    this.showConfirm("Are you sure?", "Deleting this scheduled check-in can't be undone.", buttons);
+  }
+
+  private deleteAllCheckin(checkin:Checkin) {
+    this.logger.info(this, "deleteAllCheckin", checkin);
+    let buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "save", "Cancelled");
+        }
+      },
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          this.api.deleteCheckinScheduled(this.organization, checkin).then((deleted:any) => {
+            this.loadScheduledCheckins(true).then((checkins:Checkin[]) => {
+              this.organization.checkins = checkins;
+              this.checkins = checkins;
+              loading.dismiss();
+              this.showToast(`Check-In ${checkin.message} deleted`);
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.showAlert("Problem Loading Scheduled Check-ins", error);
+            });
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Deleting Scheduled Check-Ins", error);
+          });
+        }
+      }
+    ];
+    this.showConfirm("Are you sure?", "Deleting all scheduled check-ins in this set can't be undone.", buttons);
   }
 
   private createCheckin(event:any) {

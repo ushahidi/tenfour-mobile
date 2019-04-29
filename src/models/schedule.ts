@@ -18,17 +18,26 @@ export class Schedule extends Model {
   @Column("id", INTEGER, PRIMARY_KEY)
   public id:number = null;
 
+  @Column("scheduled", BOOLEAN)
+  public scheduled:boolean = null;
+
   @Column("frequency", TEXT)
   public frequency:string = null;
 
+  @Column("remaining_count", INTEGER)
+  public remaining_count:number = null;
+  
   @Column("starts_at", TEXT)
   public starts_at:string = null;
 
   @Column("expires_at", TEXT)
   public expires_at:string = null;
 
-  @Column("check_in_count", INTEGER)
-  public check_in_count:number = null;
+  @Column("created_at", TEXT)
+  public created_at:Date = null;
+
+  @Column("updated_at", TEXT)
+  public updated_at:Date = null;
 
   public hasStartsAt():boolean {
     return this.starts_at && this.starts_at.length > 0;

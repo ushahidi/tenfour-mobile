@@ -33,13 +33,16 @@ export class CheckinCardComponent implements OnInit {
   @Output()
   deleteSelected = new EventEmitter();
 
+  @Output()
+  deleteAllSelected = new EventEmitter();
+
   hasCardSelected:boolean = false;
   hasSendSelected:boolean = false;
   hasResendSelected:boolean = false;
   hasDeleteSelected:boolean = false;
+  hasDeleteAllSelected:boolean = false;
 
   constructor(private logger:LoggerProvider) {
-
   }
 
   ngOnInit() {
@@ -47,6 +50,7 @@ export class CheckinCardComponent implements OnInit {
     this.hasSendSelected = this.sendSelected && this.sendSelected.observers.length > 0;
     this.hasResendSelected = this.resendSelected && this.resendSelected.observers.length > 0;
     this.hasDeleteSelected = this.deleteSelected && this.deleteSelected.observers.length > 0;
+    this.hasDeleteAllSelected = this.deleteAllSelected && this.deleteAllSelected.observers.length > 0;
   }
 
   onCardSelected(event:any) {
@@ -67,6 +71,11 @@ export class CheckinCardComponent implements OnInit {
   onDeleteSelected(event:any) {
     this.logger.info(this, "onDeleteSelected");
     this.deleteSelected.emit();
+  }
+
+  onDeleteAllSelected(event:any) {
+    this.logger.info(this, "onDeleteAllSelected");
+    this.deleteAllSelected.emit();
   }
 
 }

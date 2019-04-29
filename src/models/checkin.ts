@@ -81,6 +81,9 @@ export class Checkin extends Model {
       if (data.schedule) {
         this.schedule = new Schedule(data.schedule);
       }
+      else if (data.scheduled_checkin) {
+        this.schedule = new Schedule(data.scheduled_checkin);
+      }
     }
   }
 
@@ -136,9 +139,6 @@ export class Checkin extends Model {
   @Column("replied", BOOLEAN)
   public replied:boolean = null;
 
-  @Column("scheduled", BOOLEAN)
-  public scheduled:boolean = null;
-
   @Column("self_test_check_in", BOOLEAN)
   public self_test_check_in:boolean = null;
 
@@ -153,12 +153,6 @@ export class Checkin extends Model {
 
   @Column("template", BOOLEAN)
   public template:boolean = false;
-
-  @Column("starts_at", TEXT)
-  public starts_at:string = null;
-
-  @Column("expires_at", TEXT)
-  public expires_at:string = null;
 
   @Column("created_at", TEXT)
   public created_at:Date = null;
