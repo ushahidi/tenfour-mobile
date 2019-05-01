@@ -79,7 +79,7 @@
     <ion-item *ngIf="checkin.schedule.frequency!='once'">
       <ion-label stacked color="dark">Number of check-ins</ion-label>
       <ion-input type="number" autocorrect="off" autocapitalize="off" autocomplete="off"
-                 [(ngModel)]="checkin.schedule.check_in_count" (ngModelChange)="countsChanged($event)"></ion-input>
+                 [(ngModel)]="checkin.schedule.remaining_count" (ngModelChange)="countsChanged($event)"></ion-input>
     </ion-item>
   </ion-list>
   <ion-list *ngIf="organization && checkin">
