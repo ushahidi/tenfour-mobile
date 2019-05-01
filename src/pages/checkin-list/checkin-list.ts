@@ -353,35 +353,6 @@ export class CheckinListPage extends BasePrivatePage {
         text: 'Cancel',
         role: 'cancel',
         handler: () => {
-          this.logger.info(this, "deleteCheckin", "Cancelled");
-        }
-      },
-      {
-        text: 'Delete',
-        handler: () => {
-          let loading = this.showLoading("Deleting...", true);
-          this.api.deleteCheckin(this.organization, checkin).then((deleted:any) => {
-            this.checkins = this.checkins.filter(c => c.id !== checkin.id);
-            loading.dismiss();
-            this.showToast(`Check-In ${checkin.message} deleted`);
-          },
-          (error:any) => {
-            loading.dismiss();
-            this.showAlert("Problem Deleting Scheduled Check-In", error);
-          });
-        }
-      }
-    ];
-    this.showConfirm("Are you sure?", "Deleting this scheduled check-in can't be undone.", buttons);
-  }
-
-  private deleteAllCheckin(checkin:Checkin) {
-    this.logger.info(this, "deleteAllCheckin", checkin);
-    let buttons = [
-      {
-        text: 'Cancel',
-        role: 'cancel',
-        handler: () => {
           this.logger.info(this, "save", "Cancelled");
         }
       },
