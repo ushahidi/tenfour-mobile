@@ -8,6 +8,7 @@ import { User } from '../models/user';
 import { Recipient } from '../models/recipient';
 import { Answer } from '../models/answer';
 import { Reply } from '../models/reply';
+import { Schedule } from '../models/schedule';
 
 @Table("checkins")
 export class Checkin extends Model {
@@ -77,6 +78,12 @@ export class Checkin extends Model {
         this.user_initials = this.user.initials;
         this.user_picture = this.user.profile_picture;
       }
+      if (data.schedule) {
+        this.schedule = new Schedule(data.schedule);
+      }
+      else if (data.scheduled_checkin) {
+        this.schedule = new Schedule(data.scheduled_checkin);
+      }
     }
   }
 
@@ -123,6 +130,9 @@ export class Checkin extends Model {
   @Column("waiting_count", INTEGER)
   public waiting_count:number = null;
 
+  @Column("remaining_count", INTEGER)
+  public remaining_count:number = null;
+
   @Column("sent_count", INTEGER)
   public sent_count:number = null;
 
@@ -168,6 +178,8 @@ export class Checkin extends Model {
 
   public reply:Reply = null;
 
+  public schedule:Schedule = null;
+
   public answerReplies(answer:Answer):Reply[] {
     if (this.replies && this.replies.length > 0) {
       return this.replies.filter(reply => reply.answer == answer.answer);
@@ -179,23 +191,18 @@ export class Checkin extends Model {
     if (!this.replies || !this.replies.length) {
       return [];
     }
-
     let otherReplies = [];
-
     for (let reply of this.replies) {
       let otherAnswer = true;
-
       for (let answer of this.answers) {
         if (reply.answer === answer.answer) {
           otherAnswer = false;
         }
       }
-
       if (otherAnswer) {
         otherReplies.push(reply);
       }
     }
-
     return otherReplies;
   }
 
@@ -240,8 +247,18 @@ export class Checkin extends Model {
     }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
       if (this.replies == null || this.replies.length == 0 || this.replies.length < this.recipients.length) {
-        return true;
+        return this.sent != false;
       }
+    }
+    return false;
+  }
+
+  public canDelete(person:Person):boolean {
+    if (person == null) {
+      return false;
+    }
+    if (person.id == this.user_id || person.isOwnerOrAdmin()) {
+      return this.sent != true;
     }
     return false;
   }
@@ -264,11 +281,9 @@ export class Checkin extends Model {
     if (Array.isArray(this.send_via)) {
       return this.send_via;
     }
-
     if (typeof this.send_via === 'string') {
       return this.send_via.split(",");
     }
-
     return [];
   }
 
@@ -298,50 +313,40 @@ export class Checkin extends Model {
 
   public fillRecipientsSendVia():void {
     let checkin_send_via = this.sendVia();
-
     for (let recipient of this.recipients) {
       let recipient_send_via = [];
-
       for (let contact of recipient.contacts) {
         if (contact.blocked) {
           continue;
         }
-
         if (contact.type === 'phone' && checkin_send_via.indexOf('sms') > -1) {
           recipient_send_via.push('sms');
         }
-
         if (contact.type === 'phone' && checkin_send_via.indexOf('voice') > -1) {
           recipient_send_via.push('voice');
         }
-
         if (contact.type === 'email' && checkin_send_via.indexOf('email') > -1) {
           recipient_send_via.push('email');
         }
       }
-
       if (checkin_send_via.indexOf('app') > -1) {
         recipient_send_via.push('app');
       }
-
       recipient.send_via = recipient_send_via.join(',');
     }
   }
 
   private getRecipients():Recipient[] {
     let _recipients = {};
-
     for (let recipient of this.users) {
       _recipients[recipient.id] = recipient;
     }
-
     for (let group of this.groups) {
       for (let recipient of group.members) {
         _recipients[recipient.id] = recipient;
         _recipients[recipient.id].user_id = recipient.id;
       }
     }
-
     return Object.keys(_recipients).map((key) => { return <Recipient>_recipients[key]; });
   }
 
@@ -349,33 +354,27 @@ export class Checkin extends Model {
     let creditsRequired = 0;
     let checkinSendVia = this.sendVia();
     let _recipients = this.getRecipients();
-
     for (let recipient of _recipients) {
       if (!recipient.contacts || !recipient.contacts.length) {
         continue;
       }
-
       for (let contact of recipient.contacts) {
         if (contact.blocked) {
           continue;
         }
-
         if (contact.type === 'phone' && checkinSendVia.indexOf('sms') > -1) {
           creditsRequired++;
         }
-
         if (contact.type === 'phone' && checkinSendVia.indexOf('voice') > -1) {
           creditsRequired++;
         }
       }
     }
-
     return creditsRequired;
   }
 
   public sendTo():string {
     let send_to = [];
-
     if (this.everyone) {
       send_to.push('everyone');
     } else {
@@ -394,11 +393,9 @@ export class Checkin extends Model {
         }
       }
     }
-
     if (send_to.length == 0) {
       send_to.push('nobody');
     }
-
     return send_to.join(' and ');
   }
 }

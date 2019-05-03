@@ -10,6 +10,7 @@ import { PersonSelectModule } from '../../pages/person-select/person-select.modu
 import { PersonAvatarModule } from '../../components/person-avatar/person-avatar.module';
 import { SendViaModule } from '../../components/send-via/send-via.module';
 import { HumanizeModule } from '../../pipes/humanize/humanize.module';
+import { DateTimeModule } from '../../pipes/date-time/date-time.module';
 
 @NgModule({
   declarations: [
@@ -18,6 +19,7 @@ import { HumanizeModule } from '../../pipes/humanize/humanize.module';
   imports: [
     SendViaModule,
     HumanizeModule,
+    DateTimeModule,
     PersonAvatarModule,
     PersonSelectModule,
     CheckinAnswersModule,
