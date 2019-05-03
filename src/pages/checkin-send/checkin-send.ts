@@ -1,6 +1,8 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
+import * as moment from 'moment';
+
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
@@ -15,11 +17,13 @@ import { Checkin } from '../../models/checkin';
 import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
+import { Schedule } from '../../models/schedule';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+import { TIME_HOURS, TIME_DAYS, TIME_WEEKS, TIME_MONTHS, TIME_YEARS } from '../../constants/times';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -38,6 +42,17 @@ export class CheckinSendPage extends BasePrivatePage {
 
   @ViewChild('select')
   select:Select;
+
+  today:string = null;
+  future:string = null;
+  frequencies:any = {
+    'once': null,
+    'hourly': TIME_HOURS,
+    'daily': TIME_DAYS,
+    'weekly': TIME_WEEKS,
+    'monthly': TIME_MONTHS,
+    'yearly': TIME_YEARS
+  }
 
   constructor(
       protected zone:NgZone,
@@ -62,6 +77,8 @@ export class CheckinSendPage extends BasePrivatePage {
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
+    this.today = moment().local().format('YYYY-MM-DD');
+    this.future = moment().add(2, 'years').format('YYYY-MM-DD');
   }
 
   ionViewDidEnter() {
@@ -107,6 +124,11 @@ export class CheckinSendPage extends BasePrivatePage {
       if (this.organization && this.organization.hasFreePlan()) {
         this.checkin.send_via = "app";
       }
+      if (this.checkin.schedule == null) {
+        this.checkin.schedule = new Schedule({
+          frequency: "once"
+        });
+      }
       resolve(this.checkin);
     });
   }
@@ -132,13 +154,11 @@ export class CheckinSendPage extends BasePrivatePage {
   private loadContactsForCheckin(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       let promises = [];
-
       this.checkin.users.forEach((person:Person) => {
         if (!person.contacts || !person.contacts.length) {
           promises.push(this.loadContactsForPerson(cache, person));
         }
       });
-
       this.checkin.groups.forEach((group:Group) => {
         group.members.forEach((person:Person) => {
           if (!person.contacts || !person.contacts.length) {
@@ -167,7 +187,6 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-
     if (this.checkin.template) {
         let buttons = [
           {
@@ -371,6 +390,40 @@ export class CheckinSendPage extends BasePrivatePage {
     }, (error) => {
       this.showToast(error);
     });
+  }
+
+  private datesChanged(event:any) {
+    this.logger.info(this, "datesChanged", event);
+    if (this.checkin.schedule.hasStartsAt() && this.checkin.schedule.hasExpiresAt()) {
+      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
+      if (milliseconds) {
+        let starts_at = this.checkin.schedule.startsAt().valueOf();
+        let expires_at = this.checkin.schedule.expiresAt().valueOf();
+        let duration = Math.abs((expires_at - starts_at));
+        this.checkin.schedule.remaining_count = Math.round(duration / milliseconds);
+      }
+      else {
+        this.checkin.schedule.remaining_count = null;
+      }
+    }
+    else {
+      this.checkin.schedule.remaining_count = null;
+    }
+  }
+
+  private countsChanged(event:any) {
+    this.logger.info(this, "countsChanged", event);
+    if (this.checkin.schedule.hasStartsAt()) {
+      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
+      if (milliseconds) {
+        let starts_at = this.checkin.schedule.startsAt();
+        let expires_at = starts_at.getTime() + (this.checkin.schedule.remaining_count * milliseconds);
+        this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
+      }
+      else {
+        this.checkin.schedule.expires_at = null;
+      }
+    }
   }
 
 }

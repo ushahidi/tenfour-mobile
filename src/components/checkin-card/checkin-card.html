@@ -2,15 +2,18 @@
   <ion-card-content text-center tappable (click)="onCardSelected($event)">
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>
-    <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
+    <p>{{checkin.send_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
     <checkin-badges [checkin]="checkin" *ngIf="checkin"></checkin-badges>
   </ion-card-content>
-  <ion-row no-padding no-margin *ngIf="(hasSendSelected && checkin.canRespond(user)) || (hasResendSelected && checkin.canResend(user))">
+  <ion-row no-padding no-margin *ngIf="(hasSendSelected && checkin.canRespond(user)) ||
+                                       (hasResendSelected && checkin.canResend(user)) ||
+                                       (hasDeleteSelected && checkin.canDelete(user))">
     <ion-col col-6 text-left no-padding no-margin>
       <button ion-button clear color="primary" tappable *ngIf="checkin.canRespond(user)" (click)="onSendSelected($event)">Respond</button>
     </ion-col>
     <ion-col col-6 text-right no-padding no-margin>
       <button ion-button clear color="primary" tappable *ngIf="checkin.canResend(user)" (click)="onResendSelected($event)">Resend</button>
+      <button ion-button clear color="primary" tappable *ngIf="checkin.canDelete(user)" (click)="onDeleteSelected($event)">Delete All</button>
     </ion-col>
   </ion-row>
 </ion-card>
