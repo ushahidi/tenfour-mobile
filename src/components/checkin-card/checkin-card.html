@@ -2,7 +2,7 @@
   <ion-card-content text-center tappable (click)="onCardSelected($event)">
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>
-    <p>{{checkin.send_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
+    <p>{{(checkin.send_at || checkin.created_at) | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
     <checkin-badges [checkin]="checkin" *ngIf="checkin"></checkin-badges>
   </ion-card-content>
   <ion-row no-padding no-margin *ngIf="(hasSendSelected && checkin.canRespond(user)) ||
