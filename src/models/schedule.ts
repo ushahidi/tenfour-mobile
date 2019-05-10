@@ -26,7 +26,7 @@ export class Schedule extends Model {
 
   @Column("remaining_count", INTEGER)
   public remaining_count:number = null;
-  
+
   @Column("starts_at", TEXT)
   public starts_at:string = null;
 
