@@ -325,7 +325,6 @@ export class CheckinSendPage extends BasePrivatePage {
   }
 
   private sendCheckin(event:any) {
-    this.logger.warn(this, "sendCheckin", this.checkin.schedule.frequency, this.checkin.schedule.expires_at);
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
       this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
     }
