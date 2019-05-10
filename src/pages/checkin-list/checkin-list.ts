@@ -78,6 +78,9 @@ export class CheckinListPage extends BasePrivatePage {
       (error:any) => {
         this.logger.error(this, "ionViewDidLoad", "loadInboxCheckins", error);
       });
+    },
+    (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
     });
   }
 
@@ -145,7 +148,12 @@ export class CheckinListPage extends BasePrivatePage {
           event.complete();
         }
         this.loading = false;
-        this.showToast(error);
+        if (error === "Unable to authenticate with invalid API key and token.") {
+          this.showAlert("Problem Logging In", error);
+        }
+        else {
+          this.showToast(error);
+        }
       });
   }
 
@@ -169,6 +177,7 @@ export class CheckinListPage extends BasePrivatePage {
         resolve(this.checkins);
       },
       (error:any) => {
+        this.logger.error(this, "loadCheckins", error);
         reject(error);
       });
     });
@@ -196,6 +205,7 @@ export class CheckinListPage extends BasePrivatePage {
         resolve(this.checkins);
       },
       (error:any) => {
+        this.logger.error(this, "loadMoreCheckins", error);
         if (event) {
           event.complete();
         }
@@ -257,7 +267,7 @@ export class CheckinListPage extends BasePrivatePage {
           }
         },
         (error:any) => {
-          this.logger.info(error, "loadInboxCheckins", error);
+          this.logger.info(this, "loadInboxCheckins", error);
           resolve([]);
         });
     });

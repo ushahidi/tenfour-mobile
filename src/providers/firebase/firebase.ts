@@ -38,6 +38,7 @@ export class FirebaseProvider {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         if (this.platform.is("cordova")) {
+          this.logger.info(this, "initialize", "cordova");
           this.getToken().then((token:string) => {
             resolve(token != null);
           },
@@ -46,24 +47,30 @@ export class FirebaseProvider {
           });
         }
         else if ('serviceWorker' in navigator) {
-          firebase.initializeApp({
-            projectId: ENVIRONMENT.firebaseAppId,
-            apiKey: ENVIRONMENT.firebaseApiKey,
-            messagingSenderId: ENVIRONMENT.firebaseSenderId
-          });
-          this.firebaseWeb = firebase.messaging();
-          navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            this.logger.info(this, "getToken", "serviceWorker", registration);
-            this.firebaseWeb.useServiceWorker(registration);
-            this.getToken().then((token:string) => {
-              resolve(token != null);
-            },
-            (error:any) => {
-              resolve(false);
+          try {
+            firebase.initializeApp({
+              projectId: ENVIRONMENT.firebaseAppId,
+              apiKey: ENVIRONMENT.firebaseApiKey,
+              messagingSenderId: ENVIRONMENT.firebaseSenderId
             });
-          });
+            this.firebaseWeb = firebase.messaging();
+            navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+              this.logger.info(this, "initialize", "serviceWorker", registration);
+              this.firebaseWeb.useServiceWorker(registration);
+              this.getToken().then((token:string) => {
+                resolve(token != null);
+              },
+              (error:any) => {
+                resolve(false);
+              });
+            });
+          }
+          catch (error) {
+            this.logger.warn(this, "initialize", "Firebase not supported in your browser");
+          }
         }
         else {
+          this.logger.warn(this, "initialize", "Not Loaded");
           resolve(false);
         }
       });
@@ -93,7 +100,8 @@ export class FirebaseProvider {
             resolve(null);
           });
       }
-      else if ('serviceWorker' in navigator) {
+      else if (this.firebaseWeb) {
+        this.logger.info(this, "getToken", "serviceWorker");
         this.firebaseWeb.requestPermission()
           .then((permission:any) => {
             this.logger.info(this, "getToken", "permission", permission);
@@ -147,7 +155,7 @@ export class FirebaseProvider {
           });
       });
     }
-    else if ('serviceWorker' in navigator) {
+    else if (this.firebaseWeb) {
       this.logger.info(this, "subscribeNotifications", "serviceWorker");
       this.firebaseWeb.onMessage((data:any) => {
         this.logger.info(this, "subscribeNotifications", "onMessage", data);

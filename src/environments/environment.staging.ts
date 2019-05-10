@@ -10,7 +10,7 @@ export const Environment:IEnvironment = {
   segmentAppId: "zyqqcTkGmM",
   segmentApiKey: "ieZYKiegj7ctbK38BqQKPIwaCommytok",
   firebaseAppId: "tenfour-7322f",
-  firebaseApiKey: "AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI",
+  firebaseApiKey: "AIzaSyB2oFSjaXf-7dkwNPa_8QsHHn600apSMck",
   firebaseSenderId: '804609537189',
   sentryDSN: 'https://451ca63db3d441ffbd32e07098886d64@sentry.io/149595'
 };

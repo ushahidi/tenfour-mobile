@@ -876,6 +876,9 @@ export class TenFourApp {
     if (this.organization && this.user) {
       return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
         this.checkinsWaitingNumber = checkins.length;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCheckinsWaiting", error);
       });
     }
   }
@@ -884,6 +887,9 @@ export class TenFourApp {
     if (this.organization && this.user) {
       return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
         this.unreadNotificationsNumber = notifications.length;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadUnreadNotifications", error);
       });
     }
   }
