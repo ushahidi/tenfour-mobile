@@ -154,6 +154,9 @@ export class Checkin extends Model {
   @Column("template", BOOLEAN)
   public template:boolean = false;
 
+  @Column("send_at", TEXT)
+  public send_at:Date = null;
+
   @Column("created_at", TEXT)
   public created_at:Date = null;
 
@@ -258,7 +261,7 @@ export class Checkin extends Model {
       return false;
     }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
-      return this.sent != true;
+      return this.sent !== true && this.send_at !== null;
     }
     return false;
   }
