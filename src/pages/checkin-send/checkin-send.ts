@@ -325,11 +325,15 @@ export class CheckinSendPage extends BasePrivatePage {
   }
 
   private sendCheckin(event:any) {
+    this.logger.warn(this, "sendCheckin", this.checkin.schedule.frequency, this.checkin.schedule.expires_at);
     if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
       this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
     }
     else if (this.checkin.recipientIds().length == 0) {
       this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
+    }
+    else if (this.checkin.schedule.frequency !== 'once' && this.checkin.schedule.hasExpiresAt() == false) {
+      this.showToast("Please specify 'Until' for when the scheduled Check-In should end", 4000);
     }
     else if (this.checkin.creditsRequired() > this.organization.credits) {
       this.showBillingAlert();
@@ -413,16 +417,19 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private countsChanged(event:any) {
     this.logger.info(this, "countsChanged", event);
-    if (this.checkin.schedule.hasStartsAt()) {
-      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
-      if (milliseconds) {
-        let starts_at = this.checkin.schedule.startsAt();
-        let expires_at = starts_at.getTime() + (this.checkin.schedule.remaining_count * milliseconds);
-        this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
-      }
-      else {
-        this.checkin.schedule.expires_at = null;
-      }
+    if (this.checkin.schedule.hasStartsAt() == false) {
+      let now = new Date();
+      let local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      this.checkin.schedule.starts_at = new Date(local).toISOString();
+    }
+    let milliseconds = this.frequencies[this.checkin.schedule.frequency];
+    if (milliseconds) {
+      let starts_at = this.checkin.schedule.startsAt();
+      let expires_at = starts_at.getTime() + (this.checkin.schedule.remaining_count * milliseconds);
+      this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
+    }
+    else {
+      this.checkin.schedule.expires_at = null;
     }
   }
 
