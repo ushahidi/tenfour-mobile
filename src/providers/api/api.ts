@@ -869,6 +869,8 @@ export class ApiProvider extends HttpProvider {
         let local = new Date(checkin.schedule.starts_at);
         let utc = new Date(local.getTime() + local.getTimezoneOffset() * 60000);
         params['schedule']['starts_at'] = utc.toISOString();
+      } else {
+        params['schedule']['starts_at'] = new Date().toISOString();
       }
       if (checkin.schedule.expires_at && checkin.schedule.expires_at.length > 0) {
         let local = new Date(checkin.schedule.expires_at);
