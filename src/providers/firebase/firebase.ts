@@ -49,7 +49,8 @@ export class FirebaseProvider {
         else if ('serviceWorker' in navigator) {
           try {
             firebase.initializeApp({
-              projectId: ENVIRONMENT.firebaseAppId,
+              appId: ENVIRONMENT.firebaseAppId,
+              projectId: ENVIRONMENT.firebaseProjectId,
               apiKey: ENVIRONMENT.firebaseApiKey,
               messagingSenderId: ENVIRONMENT.firebaseSenderId
             });
@@ -126,6 +127,36 @@ export class FirebaseProvider {
         this.logger.warn(this, "getToken", "Browser does not support notifications");
         resolve(null);
       }
+    });
+  }
+
+  public removeToken():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.getFirebase().then((token:string) => {
+        if (token && token.length > 0) {
+          if (this.platform.is("cordova")) {
+            resolve(false);
+          }
+          else {
+            this.firebaseWeb.deleteToken(token).then((deleted:any) => {
+              this.logger.info(this, "removeToken", "Removed");
+              resolve(true);
+            },
+            (error:any) => {
+              this.logger.error(this, "removeToken", "deleteToken", error);
+              resolve(false);
+            });
+          }
+        }
+        else {
+          this.logger.warn(this, "removeToken", "No Token");
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "removeToken", error);
+        resolve(false);
+      });
     });
   }
 

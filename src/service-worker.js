@@ -4,19 +4,24 @@ importScripts('https://www.gstatic.com/firebasejs/5.5.9/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/5.5.9/firebase-messaging.js');
 firebase.initializeApp({
   projectId: "tenfour-7322f",
-  apiKey: "AIzaSyB2oFSjaXf-7dkwNPa_8QsHHn600apSMck",
-  messagingSenderId: '804609537189'
+  messagingSenderId: "804609537189",
+  appId: "1:804609537189:web:2d7be5b938d60162",
+  apiKey: "AIzaSyB2oFSjaXf-7dkwNPa_8QsHHn600apSMck"
 });
 if (firebase.messaging.isSupported()) {
   const firebaseMessaging = firebase.messaging();
   firebaseMessaging.setBackgroundMessageHandler((event) => {
     console.log('ServiceWorker setBackgroundMessageHandler', event);
-    let title = "TenFour Notification";
-    const options = {
-      icon: '/assets/images/logo-dots.png',
-      body: "You received a TenFour notification."
-    };
-    return self.registration.showNotification(title, options);
+    if (event.data) {
+      console.log('ServiceWorker setBackgroundMessageHandler data', event.data.json());
+      let json =  event.data.json();
+      let title = json.notitication.title;
+      const options = {
+        body: json.notitication.body,
+        icon: '/assets/images/logo-dots.png'
+      };
+      return event.waitUntil(self.registration.showNotification(title, options));
+    }
   });
 }
 else {
@@ -30,12 +35,16 @@ self.addEventListener('activate', (event) => {
 });
 self.addEventListener('push', (event) => {
   console.log('ServiceWorker push', event);
-  let title = "TenFour Notification";
-  const options = {
-    icon: '/assets/images/logo-dots.png',
-    body: "You received a TenFour notification."
-  };
-  event.waitUntil(self.registration.showNotification(title, options));
+  if (event.data) {
+    console.log('ServiceWorker push data', event.data.json());
+    let json =  event.data.json();
+    let title = json.notitication.title;
+    const options = {
+      body: json.notitication.body,
+      icon: '/assets/images/logo-dots.png'
+    };
+    return event.waitUntil(self.registration.showNotification(title, options));
+  }
 });
 self.addEventListener('notificationclick', (event) => {
   var origin = event.origin || event.srcElement.origin;
@@ -57,7 +66,9 @@ self.addEventListener('notificationclick', (event) => {
     else if (origin) {
       clients.openWindow(origin).then(function(windowClient) {
         event.notification.close();
-        windowClient.focus();
+        if (windowClient) {
+          windowClient.focus();
+        }
       });
     }
   });

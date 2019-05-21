@@ -736,6 +736,7 @@ export class TenFourApp {
     let loading = this.showLoading("Logging out...", true);
     let removes = [
       this.api.removeToken(this.organization),
+      this.firebase.removeToken(),
       this.storage.removeFirebase(),
       this.storage.removeOrganization(),
       this.storage.removeUser(),

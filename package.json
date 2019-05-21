@@ -113,7 +113,7 @@
     "ng-intercom": "0.2.2",
     "ngx-localstorage": "2.0.1",
     "ngx-segment-analytics": "^1.0.4",
-    "raven-js": "^3.27.0",
+    "raven-js": "3.27.0",
     "rxjs": "5.5.11",
     "sw-toolbox": "^3.6.0",
     "zone.js": "0.8.26"
