@@ -26,7 +26,7 @@ export class Schedule extends Model {
 
   @Column("remaining_count", INTEGER)
   public remaining_count:number = null;
-  
+
   @Column("starts_at", TEXT)
   public starts_at:string = null;
 
@@ -40,11 +40,11 @@ export class Schedule extends Model {
   public updated_at:Date = null;
 
   public hasStartsAt():boolean {
-    return this.starts_at && this.starts_at.length > 0;
+    return this.starts_at != null && this.starts_at.length > 0;
   }
 
   public hasExpiresAt():boolean {
-    return this.expires_at && this.expires_at.length > 0;
+    return this.expires_at != null && this.expires_at.length > 0;
   }
 
   public startsAt():Date {

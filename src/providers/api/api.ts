@@ -861,15 +861,31 @@ export class ApiProvider extends HttpProvider {
       everyone: !!checkin.everyone,
       template: !!checkin.template,
       group_ids: checkin.groups.map((group) => { return group.id; }),
-      user_ids: checkin.users.map((user) => { return user.id; }),
-      schedule: checkin.schedule
+      user_ids: checkin.users.map((user) => { return user.id; })
     };
+    if (checkin.schedule && !this.checkinShouldSendNow(checkin)) {
+      params['schedule'] = checkin.schedule;
+      if (checkin.schedule.starts_at && checkin.schedule.starts_at.length > 0) {
+        let local = new Date(checkin.schedule.starts_at);
+        let utc = new Date(local.getTime() + local.getTimezoneOffset() * 60000);
+        params['schedule']['starts_at'] = utc.toISOString();
+      } else {
+        params['schedule']['starts_at'] = new Date().toISOString();
+      }
+      if (checkin.schedule.expires_at && checkin.schedule.expires_at.length > 0) {
+        let local = new Date(checkin.schedule.expires_at);
+        let utc = new Date(local.getTime() + local.getTimezoneOffset() * 60000);
+        params['schedule']['expires_at'] = utc.toISOString();
+      }
+    }
     if (checkin.self_test_check_in) {
       params['self_test_check_in'] = 1;
     }
     return params;
   }
-
+  private checkinShouldSendNow(checkin:Checkin) {
+    return checkin.schedule.frequency === 'once' && !checkin.schedule.startsAt() && !checkin.schedule.expiresAt();
+  }
   // create a check-in without sending
   public createCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
