@@ -58,14 +58,22 @@ self.addEventListener('notificationclick', (event) => {
       let client = clientList[i];
       if (client.url.match(origin) != null) {
         console.log('ServiceWorker notificationclick client', client.url);
-        messageClient(client, event.notification.data);
-        return client.focus();
+        return Promise.resolve()
+          .then(() => client.focus())
+          .then(() => messageClient(client, event.notification.data))
+          .catch((error) => {
+            console.error('ServiceWorker notificationclick', error);
+          });
       }
     }
     clients.openWindow(origin).then(function(windowClient) {
       console.log('ServiceWorker notificationclick window', origin);
-      messageClient(windowClient, event.notification.data);
-      return windowClient.focus();
+      return Promise.resolve()
+        .then(() => windowClient.focus())
+        .then(() => messageClient(windowClient, event.notification.data))
+        .catch((error) => {
+          console.error('ServiceWorker notificationclick', error);
+        });
     },
     function(error) {
       console.error("clients.openWindow", error);
@@ -84,13 +92,13 @@ function messageClient(client, data) {
     const channel = new MessageChannel();
     channel.port1.onmessage = function(event) {
       if (event.data.error) {
-        reject(event.data.error);
+        resolve(event.data.error);
       }
       else {
         resolve(event.data);
       }
     };
-    client.postMessage(JSON.stringify(data), [channel.port2]);
+    client.postMessage(data, [channel.port2]);
   });
 }
 self.toolbox.options.cache = {

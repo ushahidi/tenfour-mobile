@@ -199,7 +199,7 @@ export class FirebaseProvider {
         this.logger.info(this, "subscribeNotifications", "message", data);
         if (data && data.data) {
           this.logger.info(this, "subscribeNotifications", "message data", data.data);
-          this.publishEvent(JSON.parse(data.data));
+          this.publishEvent(data.data);
         }
       });
       this.firebaseWeb.onMessage((data:any) => {
