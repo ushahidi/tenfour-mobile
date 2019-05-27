@@ -87,18 +87,45 @@ export class CheckinListPage extends BasePrivatePage {
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.selected = null;
-    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number) => {
-      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId);
-      let alert = this.showAlert("Check-In Received", "You have received a new Check-In.");
-      alert.onDidDismiss(data => {
-        let loading = this.showLoading("Loading...");
-        this.loadCheckins(false).then((checkins:Checkin[]) => {
-          loading.dismiss();
+    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number, data:any) => {
+      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, data);
+      let message = ["You received a new Check-In"];
+      if (data && data['sender_name']) {
+        message.push(` from ${data['sender_name']}`)
+      }
+      if (data && data['msg']) {
+        message.push(`, ${data['msg']}`);
+      }
+      this.showConfirm("Check-In Received", message.join(""), [
+        {
+          text: 'View',
+          handler: () => {
+            let loading = this.showLoading("Loading...");
+            this.loadInboxCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+              let checkin = checkins.find(checkin => checkin.id == checkinId);
+              this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, "showCheckinDetails", checkin);
+              this.showCheckinDetails(checkin);
+            },
+            (error:any) => {
+              loading.dismiss();
+            });
+          }
         },
-        (error:any) => {
-          loading.dismiss();
-        });
-      });
+        {
+          text: 'Ignore',
+          role: 'cancel',
+          handler: () => {
+            let loading = this.showLoading("Loading...");
+            this.loadCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+            },
+            (error:any) => {
+              loading.dismiss();
+            })
+          }
+        }
+      ]);
     });
     this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
       this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
@@ -308,13 +335,15 @@ export class CheckinListPage extends BasePrivatePage {
   }
 
   private showCheckinDetails(checkin:Checkin) {
-    this.showModalOrPage(CheckinDetailsPage, {
-      organization: this.organization,
-      user: this.user,
-      person: this.user,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (checkin) {
+      this.showModalOrPage(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.user,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
   private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {

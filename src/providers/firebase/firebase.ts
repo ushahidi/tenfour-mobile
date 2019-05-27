@@ -101,7 +101,7 @@ export class FirebaseProvider {
             resolve(null);
           });
       }
-      else if (this.firebaseWeb) {
+      else if ('serviceWorker' in navigator) {
         this.logger.info(this, "getToken", "serviceWorker");
         this.firebaseWeb.requestPermission()
           .then((permission:any) => {
@@ -135,10 +135,11 @@ export class FirebaseProvider {
       this.storage.getFirebase().then((token:string) => {
         if (token && token.length > 0) {
           if (this.platform.is("cordova")) {
+            // TODO remove firebase token via native plugin
             resolve(false);
           }
-          else {
-            this.firebaseWeb.deleteToken(token).then((deleted:any) => {
+          else if (this.firebaseWeb != null) {
+            this.promiseTimeout(this.firebaseWeb.deleteToken(token), 3000).then((deleted:any) => {
               this.logger.info(this, "removeToken", "Removed");
               resolve(true);
             },
@@ -146,6 +147,9 @@ export class FirebaseProvider {
               this.logger.error(this, "removeToken", "deleteToken", error);
               resolve(false);
             });
+          }
+          else {
+            resolve(false);
           }
         }
         else {
@@ -165,7 +169,10 @@ export class FirebaseProvider {
       this.logger.info(this, "subscribeNotifications", "cordova");
       this.firebaseNative.onNotificationOpen().subscribe((data:any) => {
         this.logger.info(this, "subscribeNotifications", data);
-        if (data && data.notification) {
+        if (data && data.data) {
+          this.publishEvent(data.data);
+        }
+        else if (data && data.notification) {
           this.publishEvent(data.notification);
         }
       });
@@ -186,11 +193,14 @@ export class FirebaseProvider {
           });
       });
     }
-    else if (this.firebaseWeb) {
+    else if (this.firebaseWeb != null) {
       this.logger.info(this, "subscribeNotifications", "serviceWorker");
       this.firebaseWeb.onMessage((data:any) => {
         this.logger.info(this, "subscribeNotifications", "onMessage", data);
-        if (data && data.notification) {
+        if (data && data.data) {
+          this.publishEvent(data.data);
+        }
+        else if (data && data.notification) {
           this.publishEvent(data.notification);
         }
       },
@@ -225,15 +235,15 @@ export class FirebaseProvider {
   public publishEvent(notification:any) {
     if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_CREATED, notification);
-      this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id'], notification);
     }
     else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_UPDATED, notification);
-      this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id'], notification);
     }
     else if (notification && notification['type'] == EVENT_CHECKIN_DETAILS) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_DETAILS, notification);
-      this.events.publish(EVENT_CHECKIN_DETAILS, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_DETAILS, notification['checkin_id'], notification);
     }
     else {
       this.logger.warn(this, "publishEvent", "Notification", notification);

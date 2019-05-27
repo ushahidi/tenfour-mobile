@@ -12,15 +12,14 @@ if (firebase.messaging.isSupported()) {
   const firebaseMessaging = firebase.messaging();
   firebaseMessaging.setBackgroundMessageHandler((event) => {
     console.log('ServiceWorker setBackgroundMessageHandler', event);
-    if (event.data) {
-      console.log('ServiceWorker setBackgroundMessageHandler data', event.data.json());
-      let json =  event.data.json();
-      let title = json.notitication.title;
-      const options = {
-        body: json.notitication.body,
+    if (event && event.data) {
+      let json = event.data.json();
+      let title = json.data != null ? json.data.title : json.notification.title;
+      let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
+      return event.waitUntil(self.registration.showNotification(title, {
+        body: body,
         icon: '/assets/images/logo-dots.png'
-      };
-      return event.waitUntil(self.registration.showNotification(title, options));
+      }));
     }
   });
 }
@@ -35,39 +34,52 @@ self.addEventListener('activate', (event) => {
 });
 self.addEventListener('push', (event) => {
   console.log('ServiceWorker push', event);
-  if (event.data) {
-    console.log('ServiceWorker push data', event.data.json());
-    let json =  event.data.json();
-    let title = json.notitication.title;
-    const options = {
-      body: json.notitication.body,
+  if (event && event.data) {
+    let json = event.data.json();
+    console.log('ServiceWorker push data', json);
+    let title = json.data != null ? json.data.title : json.notification.title;
+    let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
+    return event.waitUntil(self.registration.showNotification(title, {
+      body: body,
       icon: '/assets/images/logo-dots.png'
-    };
-    return event.waitUntil(self.registration.showNotification(title, options));
+    }));
   }
 });
 self.addEventListener('notificationclick', (event) => {
-  var origin = event.origin || event.srcElement.origin;
-  console.log('ServiceWorker notificationclick Origin', origin);
-  console.log('ServiceWorker notificationclick Notification', event.notification);
+  console.log('ServiceWorker notificationclick', event);
+  var origin = event.srcElement ? event.srcElement.origin : event.origin;
+  console.log('ServiceWorker notificationclick origin', origin);
   var promise = clients.matchAll().then(function(clientList) {
     var client = null;
     for (var i = 0 ; i < clientList.length ; i++) {
       if (clientList[i].url.match(origin) != null) {
-        console.log('ServiceWorker notificationclick Tab', clientList[i].url);
+        console.log('ServiceWorker notificationclick tab', clientList[i].url);
         client = clientList[i];
         break;
       }
     }
-    if (client) {
-      event.notification.close();
-      client.focus();
-    }
-    else if (origin) {
-      clients.openWindow(origin).then(function(windowClient) {
+    if (client != null) {
+      console.log('ServiceWorker notificationclick client', client);
+      if (event.notification != null) {
         event.notification.close();
-        if (windowClient) {
-          windowClient.focus();
+      }
+      if ('focus' in client) {
+        try {
+          client.focus();  
+        }
+        catch(){}
+      }
+    }
+    else if (origin != null) {
+      console.log('ServiceWorker notificationclick window', origin);
+      if (event.notification != null) {
+        event.notification.close();
+      }
+      clients.openWindow(origin).then(function(windowClient) {
+        if ('focus' in windowClient) {
+          try {
+            windowClient.focus();
+          } catch(){}
         }
       });
     }
