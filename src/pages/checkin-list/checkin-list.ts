@@ -100,7 +100,7 @@ export class CheckinListPage extends BasePrivatePage {
         {
           text: 'View',
           handler: () => {
-            let loading = this.showLoading("Loading...");
+            let loading = this.showLoading("Loading...", true);
             this.loadInboxCheckins(false).then((checkins:Checkin[]) => {
               loading.dismiss();
               let checkin = checkins.find(checkin => checkin.id == checkinId);

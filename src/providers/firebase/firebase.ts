@@ -195,13 +195,17 @@ export class FirebaseProvider {
     }
     else if (this.firebaseWeb != null) {
       this.logger.info(this, "subscribeNotifications", "serviceWorker");
+      navigator.serviceWorker.addEventListener('message', (data:any) => {
+        this.logger.info(this, "subscribeNotifications", "message", data);
+        if (data && data.data) {
+          this.logger.info(this, "subscribeNotifications", "message data", data.data);
+          this.publishEvent(JSON.parse(data.data));
+        }
+      });
       this.firebaseWeb.onMessage((data:any) => {
         this.logger.info(this, "subscribeNotifications", "onMessage", data);
         if (data && data.data) {
           this.publishEvent(data.data);
-        }
-        else if (data && data.notification) {
-          this.publishEvent(data.notification);
         }
       },
       (error:any) => {
