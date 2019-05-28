@@ -45,10 +45,10 @@ self.addEventListener('push', (event) => {
 });
 self.addEventListener('notificationclick', (event) => {
   console.log('ServiceWorker notificationclick', event);
-  var origin = event.srcElement ? event.srcElement.origin : event.origin;
   if (event.notification != null) {
     event.notification.close();
   }
+  var origin = event.srcElement.origin;
   var promise = clients.matchAll().then(function(clientList) {
     for (var i = 0 ; i < clientList.length ; i++) {
       let client = clientList[i];
