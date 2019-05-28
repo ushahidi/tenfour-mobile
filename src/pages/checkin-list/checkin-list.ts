@@ -116,12 +116,15 @@ export class CheckinListPage extends BasePrivatePage {
           text: 'Ignore',
           role: 'cancel',
           handler: () => {
+            this.loading = true;
             let loading = this.showLoading("Loading...");
             this.loadCheckins(false).then((checkins:Checkin[]) => {
               loading.dismiss();
+              this.loading = false;
             },
             (error:any) => {
               loading.dismiss();
+              this.loading = false;
             })
           }
         }

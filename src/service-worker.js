@@ -8,24 +8,23 @@ firebase.initializeApp({
   appId: "1:804609537189:web:2d7be5b938d60162",
   apiKey: "AIzaSyB2oFSjaXf-7dkwNPa_8QsHHn600apSMck"
 });
-// if (firebase.messaging.isSupported()) {
-//   const firebaseMessaging = firebase.messaging();
-//   firebaseMessaging.setBackgroundMessageHandler((event) => {
-//     console.log('ServiceWorker setBackgroundMessageHandler', event);
-//     if (event && event.data) {
-//       let json = event.data.json();
-//       let title = json.data != null ? json.data.title : json.notification.title;
-//       let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
-//       return event.waitUntil(self.registration.showNotification(title, {
-//         body: body,
-//         icon: '/assets/images/logo-dots.png'
-//       }));
-//     }
-//   });
-// }
-// else {
-//   console.error("ServiceWorker Firebase not supported in your browser");
-// }
+if (firebase.messaging.isSupported()) {
+  const firebaseMessaging = firebase.messaging();
+  firebaseMessaging.setBackgroundMessageHandler((event) => {
+    let json = event.data != null ? event.data.json() : {};
+    console.log('ServiceWorker setBackgroundMessageHandler', json);
+    let title = json.data != null ? json.data.title : json.notification.title;
+    let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
+    return self.registration.showNotification(title, {
+      body: body,
+      data: json.data,
+      icon: '/assets/images/logo-dots.png',
+    });
+  });
+}
+else {
+  console.warn("ServiceWorker Firebase not supported in your browser");
+}
 self.addEventListener('install', (event) => {
   console.log("ServiceWorker installed", event);
 });
@@ -33,19 +32,16 @@ self.addEventListener('activate', (event) => {
   console.log("ServiceWorker activated", event);
 });
 self.addEventListener('push', (event) => {
-  console.log('ServiceWorker push', event);
-  if (event && event.data) {
-    let json = event.data.json();
-    console.log('ServiceWorker push data', json);
-    let title = json.data != null ? json.data.title : json.notification.title;
-    let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
-    event.stopImmediatePropagation();
-    return event.waitUntil(self.registration.showNotification(title, {
-      body: body,
-      icon: '/assets/images/logo-dots.png',
-      data: json.data
-    }));
-  }
+  let json = event.data != null ? event.data.json() : {};
+  console.log('ServiceWorker push', json);
+  let title = json.data != null ? json.data.title : json.notification.title;
+  let body = json.data != null ? `${json.data.sender_name}, ${json.data.msg}` : json.notification.body;
+  let promise = self.registration.showNotification(title, {
+    body: body,
+    data: json.data,
+    icon: '/assets/images/logo-dots.png'
+  });
+  return event.waitUntil(promise);
 });
 self.addEventListener('notificationclick', (event) => {
   console.log('ServiceWorker notificationclick', event);
@@ -57,32 +53,30 @@ self.addEventListener('notificationclick', (event) => {
     for (var i = 0 ; i < clientList.length ; i++) {
       let client = clientList[i];
       if (client.url.match(origin) != null) {
-        console.log('ServiceWorker notificationclick client', client.url);
         return Promise.resolve()
           .then(() => client.focus())
           .then(() => messageClient(client, event.notification.data))
           .catch((error) => {
-            console.error('ServiceWorker notificationclick', error);
+            console.warn("ServiceWorker notificationclick", error);
           });
       }
     }
     clients.openWindow(origin).then(function(windowClient) {
-      console.log('ServiceWorker notificationclick window', origin);
       return Promise.resolve()
         .then(() => windowClient.focus())
         .then(() => messageClient(windowClient, event.notification.data))
         .catch((error) => {
-          console.error('ServiceWorker notificationclick', error);
+          console.warn("ServiceWorker notificationclick", error);
         });
     },
     function(error) {
-      console.error("clients.openWindow", error);
+      console.warn("ServiceWorker clients.openWindow", error);
     });
   },
   function(error) {
-    console.error("clients.matchAll", error);
+    console.warn("ServiceWorker clients.matchAll", error);
   });
-  event.waitUntil(promise);
+  return event.waitUntil(promise);
 });
 self.addEventListener('notificationclose', (event) => {
   console.log('ServiceWorker notificationclose', event);
