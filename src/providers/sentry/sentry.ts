@@ -1,48 +1,46 @@
-import { IonicErrorHandler } from 'ionic-angular';
-import Raven from 'raven-js';
+import { Injectable, ErrorHandler, isDevMode } from '@angular/core';
+import { Platform, IonicErrorHandler } from 'ionic-angular';
+
+import * as WebSentry from '@sentry/browser';
+import * as NativeSentry from 'sentry-cordova';
+
 import { Environment as ENVIRONMENT } from "@app/env";
 
-Raven.config(ENVIRONMENT.sentryDSN, {
-  release: require('../../version').version,
-  environment: ENVIRONMENT.environmentName,
-  dataCallback: data => {
-    if (data.message) {
-      data.message = data.message.replace(/"Authorization":"(.*?)"/, '"Authorization":"****"');
-      data.message = data.message.replace(/"client_secret":"(.*?)"/, '"client_secret":"****"');
-      data.message = data.message.replace(/"password":"(.*?)"/, '"password":"****"');
-      data.message = data.message.replace(/"accessToken":"(.*?)"/, '"accessToken":"****"');
-    }
-    if (data.fingerprint && data.fingerprint[0]) {
-      data.fingerprint[0] = data.fingerprint[0].replace(/"Authorization":"(.*?)"/, '"Authorization":"****"');
-      data.fingerprint[0] = data.fingerprint[0].replace(/"client_secret":"(.*?)"/, '"client_secret":"****"');
-      data.fingerprint[0] = data.fingerprint[0].replace(/"password":"(.*?)"/, '"password":"****"');
-      data.fingerprint[0] = data.fingerprint[0].replace(/"accessToken":"(.*?)"/, '"accessToken":"****"');
-    }
-    if (data.culprit) {
-      data.culprit = data.culprit.substring(data.culprit.lastIndexOf('/'));
-    }
-    let stacktrace = data.stacktrace || data.exception && data.exception.values[0].stacktrace;
-    if (stacktrace) {
-      stacktrace.frames.forEach(function (frame) {
-        frame.filename = frame.filename.substring(frame.filename.lastIndexOf('/'));
-      });
-    }
+@Injectable()
+export class SentryErrorHandler extends IonicErrorHandler implements ErrorHandler {
+  constructor(private platform:Platform) {
+    super();
+    this.platform.ready().then(() => {
+      if (ENVIRONMENT.sentryDSN == null || ENVIRONMENT.sentryDSN.length == 0) {
+        // skip loading Sentry
+      }
+      else if (this.platform.is("cordova")) {
+        NativeSentry.init({ dsn: ENVIRONMENT.sentryDSN });
+      }
+      else {
+        WebSentry.init({ dsn: ENVIRONMENT.sentryDSN });
+      }
+    });
   }
-}).install();
-
-export class SentryErrorHandler extends IonicErrorHandler {
 
   handleError(error) {
     super.handleError(error);
     try {
-      if (ENVIRONMENT.environmentName.includes("Production") ||
-          ENVIRONMENT.environmentName.includes("Staging")) {
-        Raven.captureException(error.originalError || error);
+      if (isDevMode) {
+        console.error(error);
+      }
+      else if (ENVIRONMENT.sentryDSN == null || ENVIRONMENT.sentryDSN.length == 0) {
+        console.error(error);
+      }
+      else if (this.platform.is("cordova")) {
+        NativeSentry.captureException(error.originalError || error);
+      }
+      else {
+        WebSentry.captureException(error.originalError || error);
       }
     }
     catch(e) {
       console.error(e);
     }
   }
-
 }
