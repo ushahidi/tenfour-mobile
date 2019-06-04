@@ -71,7 +71,7 @@ export class CheckinDetailsPage extends BasePrivatePage {
         checkin: this.checkin.message
       });
     }
-    this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
+    this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number, data:any) => {
       this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
       if (this.checkin.id === checkinId) {
         let alert = this.showAlert("Check-In Received", "This Check-In has received a new response.");

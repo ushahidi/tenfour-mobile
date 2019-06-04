@@ -281,6 +281,8 @@ export class BasePage {
             },
             (error2:any) => {
               reject(error2);
+            }).catch((error3:any) => {
+              reject(error3);
             });
           }
         },
@@ -290,7 +292,11 @@ export class BasePage {
           },
           (error2:any) => {
             reject(error2);
+          }).catch((error3:any) => {
+            reject(error3);
           });
+        }).catch((error3:any) => {
+          reject(error3);
         });
       }
       else {
@@ -299,6 +305,8 @@ export class BasePage {
         },
         (error2:any) => {
           reject(error2);
+        }).catch((error3:any) => {
+          reject(error3);
         });
       }
     });

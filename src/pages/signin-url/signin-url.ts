@@ -64,11 +64,9 @@ export class SigninUrlPage extends BasePublicPage {
   ionViewDidEnter() {
     super.ionViewDidEnter();
     this.analytics.trackPage(this);
-
     if (this.navParams.get('token')) {
       this.logger.info(this, 'token', this.navParams.get('token'));
     }
-
     let organizationSubdomain = this.parseOrganizationSubdomain();
     if (organizationSubdomain && organizationSubdomain.length > 0) {
       this.subdomain.value = organizationSubdomain;
@@ -113,16 +111,13 @@ export class SigninUrlPage extends BasePublicPage {
       }, 500);
       return;
     }
-
     this.loading = true;
     let loading = this.showLoading("Logging in...", true);
-
     Promise.resolve()
       .then(() => { return this.loadOrganization(); })
       .then(() => { return this.api.userLogin(this.organization, this.email.value, this.password.value); })
       .then((token:Token) => {
         this.logger.info(this, "showNext", token);
-
         if (!this.loginToOrganizationSubdomain(this.organization, token)) {
           this.loading = false;
           loading.dismiss();

@@ -78,24 +78,57 @@ export class CheckinListPage extends BasePrivatePage {
       (error:any) => {
         this.logger.error(this, "ionViewDidLoad", "loadInboxCheckins", error);
       });
+    },
+    (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
     });
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.selected = null;
-    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number) => {
-      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId);
-      let alert = this.showAlert("Check-In Received", "You have received a new Check-In.");
-      alert.onDidDismiss(data => {
-        let loading = this.showLoading("Loading...");
-        this.loadCheckins(false).then((checkins:Checkin[]) => {
-          loading.dismiss();
+    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number, data:any) => {
+      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, data);
+      let message = ["You received a new Check-In"];
+      if (data && data['sender_name']) {
+        message.push(` from ${data['sender_name']}`)
+      }
+      if (data && data['msg']) {
+        message.push(`, ${data['msg']}`);
+      }
+      this.showConfirm("Check-In Received", message.join(""), [
+        {
+          text: 'View',
+          handler: () => {
+            let loading = this.showLoading("Loading...", true);
+            this.loadInboxCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+              let checkin = checkins.find(checkin => checkin.id == checkinId);
+              this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, "showCheckinDetails", checkin);
+              this.showCheckinDetails(checkin);
+            },
+            (error:any) => {
+              loading.dismiss();
+            });
+          }
         },
-        (error:any) => {
-          loading.dismiss();
-        });
-      });
+        {
+          text: 'Ignore',
+          role: 'cancel',
+          handler: () => {
+            this.loading = true;
+            let loading = this.showLoading("Loading...");
+            this.loadCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+              this.loading = false;
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.loading = false;
+            })
+          }
+        }
+      ]);
     });
     this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
       this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
@@ -145,7 +178,12 @@ export class CheckinListPage extends BasePrivatePage {
           event.complete();
         }
         this.loading = false;
-        this.showToast(error);
+        if (error === "Unable to authenticate with invalid API key and token.") {
+          this.showAlert("Problem Logging In", error);
+        }
+        else {
+          this.showToast(error);
+        }
       });
   }
 
@@ -169,6 +207,7 @@ export class CheckinListPage extends BasePrivatePage {
         resolve(this.checkins);
       },
       (error:any) => {
+        this.logger.error(this, "loadCheckins", error);
         reject(error);
       });
     });
@@ -196,6 +235,7 @@ export class CheckinListPage extends BasePrivatePage {
         resolve(this.checkins);
       },
       (error:any) => {
+        this.logger.error(this, "loadMoreCheckins", error);
         if (event) {
           event.complete();
         }
@@ -257,7 +297,7 @@ export class CheckinListPage extends BasePrivatePage {
           }
         },
         (error:any) => {
-          this.logger.info(error, "loadInboxCheckins", error);
+          this.logger.info(this, "loadInboxCheckins", error);
           resolve([]);
         });
     });
@@ -298,13 +338,15 @@ export class CheckinListPage extends BasePrivatePage {
   }
 
   private showCheckinDetails(checkin:Checkin) {
-    this.showModalOrPage(CheckinDetailsPage, {
-      organization: this.organization,
-      user: this.user,
-      person: this.user,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (checkin) {
+      this.showModalOrPage(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.user,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
   private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {
