@@ -82,7 +82,6 @@ export class SigninTokenPage extends BasePublicPage {
         else {
           this.showToast(`Welcome to ${this.organization.name}`);
         }
-
         this.hideModals().then(() => {
           this.showRootPage(CheckinListPage, {
             organization: this.organization,
@@ -150,7 +149,6 @@ export class SigninTokenPage extends BasePublicPage {
 
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
-
     return Promise.resolve()
       .then(() => { return this.loadOrganization(); })
       .then(() => {
@@ -171,7 +169,6 @@ export class SigninTokenPage extends BasePublicPage {
   private loadOrganization():Promise<Organization> {
     this.logger.info(this, "loadOrganization");
     return new Promise((resolve, reject) => {
-
       if (this.hasParameter("organization")) {
         this.organization = this.getParameter<Organization>("organization");
         resolve(this.organization);
@@ -181,7 +178,6 @@ export class SigninTokenPage extends BasePublicPage {
         if (!organizationSubdomain) {
           reject();
         }
-
         this.api.getOrganizations(organizationSubdomain).then((organizations:Organization[]) => {
           this.logger.info(this, "loadOrganization", organizations);
           if (organizations && organizations.length > 0) {
@@ -201,7 +197,6 @@ export class SigninTokenPage extends BasePublicPage {
 
   private authWithToken():Promise<any> {
     this.logger.info(this, "authWithToken");
-
     return new Promise((resolve, reject) => {
         this.api.saveToken(this.organization, this.token)
         .then(() => { return this.api.getPerson(this.organization, "me"); })

@@ -2,14 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>AD_UNIT_ID_FOR_BANNER_TEST</key>
-	<string>ca-app-pub-3940256099942544/2934735716</string>
-	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
-	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
 	<string>804609537189-lfonm8i7p4fe9idblhcuoh24l9fa859f.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
 	<string>com.googleusercontent.apps.804609537189-lfonm8i7p4fe9idblhcuoh24l9fa859f</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>804609537189-vu2itoj9d3c22hki89vhq2sju949svfc.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyBVrazg_PbRPVWpnoalUGZHfaIhwfYm8DI</string>
 	<key>GCM_SENDER_ID</key>
@@ -23,7 +21,7 @@
 	<key>STORAGE_BUCKET</key>
 	<string>tenfour-7322f.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
-	<true></true>
+	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
 	<false></false>
 	<key>IS_APPINVITE_ENABLED</key>

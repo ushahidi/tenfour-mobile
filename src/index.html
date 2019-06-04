@@ -39,13 +39,7 @@
   <link rel="mask-icon" href="assets/icon/safari-pinned-tab.svg" color="#5bab60">
 
   <script src="cordova.js"></script>
-  <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/service-worker.js')
-      .then(() => console.log('ServiceWorker Loaded'))
-      .catch(() => console.warn('ServiceWorker Not Loaded'));
-  }
-  </script>
+
   <link href="build/main.css" rel="stylesheet">
 </head>
 <body>

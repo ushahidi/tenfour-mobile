@@ -47,6 +47,7 @@ npm install -g android-simulator@latest
 ```
 #### Clean Modules
 ```
+rm -r www
 rm -r node_modules
 rm -f package-lock.json
 npm install
@@ -70,6 +71,10 @@ ionic cordova platform rm browser
 ionic cordova platform add ios@4.5.5 --buildConfig=build.json
 ionic cordova platform add android@6.4.0 --buildConfig=build.json
 ionic cordova platform add browser
+```
+#### Add Plugins
+```
+cordova plugin add sentry-cordova
 ```
 #### Debug iOS
 ```

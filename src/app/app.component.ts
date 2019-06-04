@@ -736,6 +736,7 @@ export class TenFourApp {
     let loading = this.showLoading("Logging out...", true);
     let removes = [
       this.api.removeToken(this.organization),
+      this.firebase.removeToken(),
       this.storage.removeFirebase(),
       this.storage.removeOrganization(),
       this.storage.removeUser(),
@@ -876,6 +877,9 @@ export class TenFourApp {
     if (this.organization && this.user) {
       return this.api.getCheckinsWaiting(this.organization, this.user, 25).then((checkins:Checkin[]) => {
         this.checkinsWaitingNumber = checkins.length;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCheckinsWaiting", error);
       });
     }
   }
@@ -884,6 +888,9 @@ export class TenFourApp {
     if (this.organization && this.user) {
       return this.api.getUnreadNotifications(this.organization, this.user).then((notifications:Notification[]) => {
         this.unreadNotificationsNumber = notifications.length;
+      },
+      (error:any) => {
+        this.logger.error(this, "loadUnreadNotifications", error);
       });
     }
   }

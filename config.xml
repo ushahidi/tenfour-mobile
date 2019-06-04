@@ -194,4 +194,5 @@
     <engine name="ios" spec="~4.5.5" />
     <engine name="android" spec="~6.4.0" />
     <engine name="browser" spec="~5.0.4" />
+    <plugin name="sentry-cordova" spec="^0.12.3" />
 </widget>
