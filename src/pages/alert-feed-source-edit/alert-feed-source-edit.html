@@ -1,0 +1,15 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Add Alert</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="checkin">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <h1> SOMETHING SOMETHINGHELP ME</h1>
+</ion-content>  

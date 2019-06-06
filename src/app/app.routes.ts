@@ -58,6 +58,10 @@ import { SettingsTutorialPage } from '../pages/settings-tutorial/settings-tutori
 
 import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
 
+import { AlertFeedPage } from '../pages/alert-feed/alert-feed';
+import { AlertFeedEditPage } from '../pages/alert-feed-edit/alert-feed-edit';
+import { AlertFeedSourceEditPage } from '../pages/alert-feed-source-edit/alert-feed-source-edit';
+
 export class TenFourRoutes {
 
   static readonly ROUTES = [
@@ -118,7 +122,11 @@ export class TenFourRoutes {
     { component: SettingsPaymentsPage, name: 'SettingsPaymentsPage', segment: 'settings/payments', defaultHistory: ['SettingsListPage'] },
     { component: SettingsLDAPPage, name: 'SettingsLDAPPage', segment: 'settings/ldap', defaultHistory: ['SettingsListPage'] },
     { component: SettingsTutorialPage, name: 'SettingsTutorialPage', segment: 'settings/tutorial', defaultHistory: ['SettingsListPage'] },
-
+    
+    { component: AlertFeedPage, name: 'AlertFeedPage', segment: 'alert-feed' },
+    { component: AlertFeedEditPage, name: 'AlertFeedEditPage', segment: 'alert-feed-edit', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertFeedSourceEditPage, name: 'AlertFeedSourceEditPage', segment: 'alert-feed-source-edit', defaultHistory: ['AlertFeedEditPage'] },
+    
     { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' }
   ];
 }

@@ -16,6 +16,9 @@ import { GroupListPage } from '../pages/group-list/group-list';
 import { PersonListPage } from '../pages/person-list/person-list';
 import { PersonProfilePage } from '../pages/person-profile/person-profile';
 import { SettingsListPage } from '../pages/settings-list/settings-list';
+
+import { AlertFeedPage } from '../pages/alert-feed/alert-feed';
+
 import { NotificationListPage } from '../pages/notification-list/notification-list';
 import { SettingsPaymentsPage } from '../pages/settings-payments/settings-payments';
 
@@ -307,6 +310,9 @@ export class TenFourApp {
           else if (deeplink.path === '/#settings') {
              this.showSettingsList();
           }
+          else if (deeplink.path === '/#alert-feed') {
+            this.showAlertFeed();
+         }
           else if (deeplink.path === '/#profile') {
              this.showPersonProfile();
           }
@@ -696,6 +702,21 @@ export class TenFourApp {
     },
     (error:any) => {
       this.logger.error(this, "showPersonProfile", error);
+    });
+  }
+
+  protected showAlertFeed(event:any=null) {
+    this.logger.info(this, "showAlertFeed");
+    this.nav.setRoot(AlertFeedPage, {
+      organization: this.organization,
+      user: this.user
+    }).then((loaded:any) => {
+      this.logger.info(this, "showAlertFeed", "Loaded");
+      this.hideSideMenu();
+      this.hideSplashScreen();
+    },
+    (error:any) => {
+      this.logger.error(this, "showAlertFeed", error);
     });
   }
 

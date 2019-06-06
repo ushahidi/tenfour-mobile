@@ -26,6 +26,7 @@ import { HttpProvider } from '../../providers/http/http';
 import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
 import { EnvironmentProvider } from '../../providers/environment/environment';
+import { AlertFeed } from '../../models/alertFeed';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -233,6 +234,46 @@ export class ApiProvider extends HttpProvider {
       },
       (error:any) => {
         reject(`There was a problem verifying email ${email}.`);
+      });
+    });
+  }
+
+  public getAlertFeed(id:number):Promise<AlertFeed> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/api/v1/alertFeed/${id}`;
+      this.httpGet(url).then((data:any) => {
+        if (data) {
+          const feed = new AlertFeed(data);
+          resolve(feed);
+        }
+        else {
+          resolve(null);
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public saveAlertFeed(feed:AlertFeed):Promise<AlertFeed> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/api/v1/alertFeed`;
+      if (feed.id) {
+        url = `${url}/${feed.id}`;
+      }
+      let save = feed.id ? this.httpPut : this.httpPost;
+      save(url, feed.getValues()).then((data:any) => {
+        if (data) {
+          const feed = new AlertFeed(data);
+          resolve(feed);
+        }
+        else {
+          resolve(null);
+        }
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

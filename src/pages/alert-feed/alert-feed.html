@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <button ion-button icon-only menuToggle color="cancel">
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Alert Feed</ion-title>
+    <ion-buttons right *ngIf="user && user.isOwner() && organization && organization.hasProPlan()">
+      <button ion-button icon-start [solid]="website == true ? 'true' : null" color="primary" *ngIf="user.isOwner() || user.isAdmin()" (click)="addAlertFeed($event)">
+        <ion-icon ios="md-add" md="md-add"></ion-icon>
+        <span *ngIf="website == true">Add</span>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <div class="zero-state" *ngIf="organization && alerts.length === 0">
+    <!-- zero state help logo/icon-->
+  </div>
+  <div *ngIf="organization && alerts.length === 0">
+    <h1>Adding Alerts</h1>
+    <p>You can add in alerts from third parties by using apis, RSS or email alerts.</p>
+    <ion-buttons>
+      <button ion-button color="primary" click="addAlertFeed($event)">Add an alert feed</button>
+    </ion-buttons>
+  </div>
+  <ion-list>
+    <ion-item *ngFor="let alert of alerts">
+        <ion-label>{{alert.country}}, {{alert.city}}</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

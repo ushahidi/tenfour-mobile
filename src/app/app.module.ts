@@ -101,6 +101,10 @@ import { SettingsChannelsModule } from '../pages/settings-channels/settings-chan
 import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module';
 import { SettingsTutorialModule } from '../pages/settings-tutorial/settings-tutorial.module';
 
+import { AlertFeedModule } from '../pages/alert-feed/alert-feed.module';
+import { AlertFeedEditModule } from '../pages/alert-feed-edit/alert-feed-edit.module';
+import { AlertFeedSourceEditModule } from '../pages/alert-feed-source-edit/alert-feed-source-edit.module';
+
 import { UnsubscribePageModule } from '../pages/unsubscribe/unsubscribe.module';
 
 import { BulkAddToGroupModule } from '../pages/bulk-addtogroup/bulk-addtogroup.module';
@@ -231,6 +235,9 @@ import { SentryErrorHandler } from '../providers/sentry/sentry';
     SettingsSizesModule,
     SettingsRegionsModule,
     SettingsTutorialModule,
+    AlertFeedModule,
+    AlertFeedEditModule,
+    AlertFeedSourceEditModule,
     UnsubscribePageModule,
     BulkAddToGroupModule,
     BulkChangeRoleModule,
