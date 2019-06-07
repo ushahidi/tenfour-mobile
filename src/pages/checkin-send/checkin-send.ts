@@ -335,10 +335,10 @@ export class CheckinSendPage extends BasePrivatePage {
       this.showToast("Please specify 'Until' for when the scheduled Check-In should end", 4000);
     }
     else if (this.checkin.schedule.hasStartsAt() && this.checkin.schedule.isStartsAtInFuture() == false) {
-      this.showToast("Please specify 'When' to be a date in the future", 4000);
+      this.showToast("Please specify 'When' to be a time in the future", 4000);
     }
     else if (this.checkin.schedule.hasExpiresAt() && this.checkin.schedule.isExpiresAtInFuture() == false) {
-      this.showToast("Please specify 'Until' to be a date in the future", 4000);
+      this.showToast("Please specify 'Until' to be a time in the future", 4000);
     }
     else if (this.checkin.creditsRequired() > this.organization.credits) {
       this.showBillingAlert();
