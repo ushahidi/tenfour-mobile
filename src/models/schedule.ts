@@ -54,11 +54,31 @@ export class Schedule extends Model {
     return null;
   }
 
+  public isStartsAtInFuture():Boolean {
+    if (this.starts_at) {
+      let now = new Date();
+      let starts = new Date(this.starts_at);
+      let starts_utc = new Date(starts.getTime() + starts.getTimezoneOffset() * 60000);
+      return starts_utc > now;
+    }
+    return false;
+  }
+
   public expiresAt():Date {
     if (this.expires_at) {
       return new Date(this.expires_at);
     }
     return null;
+  }
+
+  public isExpiresAtInFuture():Boolean {
+    if (this.expires_at) {
+      let now = new Date();
+      let expires = new Date(this.expires_at);
+      let expires_utc = new Date(expires.getTime() + expires.getTimezoneOffset() * 60000);
+      return expires_utc > now;
+    }
+    return false;
   }
 
 }

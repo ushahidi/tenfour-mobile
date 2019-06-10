@@ -45,7 +45,7 @@ export class CheckinListPage extends BasePrivatePage {
   checkins:Checkin[] = [];
   selected:Checkin = null;
   loading:boolean = false;
-  limit:number = 5;
+  limit:number = 10;
   offset:number = 0;
   badgeNumber:number = 0;
 
@@ -68,7 +68,6 @@ export class CheckinListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.limit = this.tablet || this.website ? 10 : 5;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
