@@ -3,11 +3,15 @@ name: Test Checklist
 about: A series of tests for ensure things are functioning properly.
 
 ---
+### Target Platform
+- [ ] Web
+- [ ] iOS
+- [ ] Android
 
 ### App Install
 - [ ] Can install Android App
 - [ ] Can open Android App on device
-- [ ] Can install iOS App 
+- [ ] Can install iOS App
 - [ ] Can open iOS App on device
 
 ### App Launch
