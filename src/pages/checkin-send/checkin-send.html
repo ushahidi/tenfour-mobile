@@ -82,7 +82,7 @@
                  [(ngModel)]="checkin.schedule.remaining_count" (ngModelChange)="countsChanged($event)"></ion-input>
     </ion-item>
   </ion-list>
-  <ion-list *ngIf="organization && checkin">
+  <ion-list *ngIf="checkin">
     <ion-item>
       <ion-label>Save this check-in to re-use later</ion-label>
       <ion-checkbox checked="false" item-end [(ngModel)]="checkin.template"></ion-checkbox>
