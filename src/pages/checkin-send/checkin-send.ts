@@ -261,6 +261,7 @@ export class CheckinSendPage extends BasePrivatePage {
          this.checkin.everyone = true;
        }
        this.countRecipients();
+       this.resizeContent();
      });
   }
 
