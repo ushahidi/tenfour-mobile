@@ -261,7 +261,7 @@ export class Checkin extends Model {
       return false;
     }
     if (person.id == this.user_id || person.isOwnerOrAdmin()) {
-      return this.sent !== true && this.send_at !== null;
+      return this.sent == null || this.sent == false;
     }
     return false;
   }
