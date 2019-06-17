@@ -1,11 +1,21 @@
-page-alert-feed {
-  .details {
-    h1 {
-      padding-top: 10px;
-      padding-bottom: 5px;
-    }
-    p {
-      color: color($colors, text);
+page-alert-feed-edit {
+  .person-avatar {
+    margin-bottom: 0 !important;
+  }
+  ion-badge {
+    min-width: 18px;
+    min-height: 18px;
+    border-radius: 2px !important;
+  }
+  ion-textarea {
+    font-size: 1.4em;
+  }
+  ion-list {
+    margin-bottom: 0;
+  }
+  ion-item {
+    .input-cover {
+      margin-left: 50px;
     }
   }
 }

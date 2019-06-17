@@ -14,7 +14,7 @@ import { AlertFeed } from '../../models/alertFeed';
 @Component({
   selector: 'page-alert-feed',
   templateUrl: 'alert-feed.html',
-  providers: [ ApiProvider, StorageProvider ]
+  providers: [ ApiProvider, StorageProvider ]   
 })
 export class AlertFeedPage extends BasePrivatePage {
 

@@ -98,4 +98,11 @@ export class AlertFeedEditPage extends BasePrivatePage {
       });
     });
   }
+
+  private cancelEdit(event:any) {
+    this.logger.info(this, "cancelEdit");
+    this.hideModal({
+      canceled: true
+    });
+  }
 }
