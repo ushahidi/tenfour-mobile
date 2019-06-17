@@ -56,7 +56,11 @@ export class CheckinAnswersPage extends BasePrivatePage {
       "#5BAA61", "#E7C24D", "#BA6A6B", "#2875B1",
       "#DE7E2D", "#B63DC1", "#52BFCD", "#0F7E70",
       "#A28AD9", "#19AEE9", "#0273A3", "#304170",
-      "#99238C", "#C7470D", "#793EE8", "#1E9545"];
+      "#99238C", "#C7470D", "#793EE8", "#1E9545",
+      "#454D66", "#248EA9", "#AC8DAF", "#89A3B2",
+      "#009975", "#5BD1D7", "#FAB95B", "#4592AF",
+      "#AEE7E8", "#7FA99B", "#F38181", "#D9D872",
+      "#F1D4D4", "#AEE7E8", "#F6EF98", "#89A3B2"];
     let color = colors[this.checkin.answers.length];
     this.checkin.answers.push(new Answer({
       icon: "",

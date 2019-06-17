@@ -67,11 +67,18 @@ export class CheckinBadgesComponent {
       for (let badge of defaults) {
         badge.width = `${width}px`;
       }
+      let cardWidth = document.querySelectorAll(".card")[0].clientWidth;
       let divisor = percentages.reduce((total, badge) => total + badge.number, 0);
       for (let badge of percentages) {
         let percentage = (badge.number / divisor * 100);
         let pixels = defaults.length > 0 ? defaults.length*(width/percentages.length) : defaults.length*width;
-        badge.width = `calc(${percentage}% - ${pixels}px)`;
+        badge.minWidth = `${width}px`;
+        if (cardWidth < pixels) {
+          badge.width = (badge.number / total * 100) + "%";
+        }
+        else {
+          badge.width = `calc(${percentage}% - ${pixels}px)`;
+        }
       }
     }
     return badges;

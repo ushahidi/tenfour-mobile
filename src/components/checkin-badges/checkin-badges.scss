@@ -2,11 +2,12 @@ checkin-badges {
   .badges {
     padding-top: 10px;
     .badge {
+      margin-bottom: 8px;
       display: inline-block;
       ion-badge {
         width: calc(100% - 10px);
         font-size: 16px;
-        margin-right: 5px;
+        margin-bottom: 0;
         border-radius: 2px !important;
       }
     }
