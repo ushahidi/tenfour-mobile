@@ -1,5 +1,5 @@
 <div class="badges" *ngIf="checkin">
-  <div class="badge text-truncate" style="min-width:50px;max-width:100%" [style.width]="badge.width" *ngFor="let badge of getBadges()">
+  <div class="badge text-truncate" [style.width]="badge.width" *ngFor="let badge of getBadges()">
     <ion-badge [style.background]="badge.color" [style.color]="white" [title]="badge.text">
       <strong>{{badge.number}}</strong>
     </ion-badge>
