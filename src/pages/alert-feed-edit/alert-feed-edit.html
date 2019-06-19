@@ -11,43 +11,27 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="alert">
+  <ion-list *ngIf="sources">
     <ion-item color="white">
       <ion-label floating>What Country?</ion-label>
-      <ion-input type="text" autocorrect="off" autocapitalize="words" autocomplete="off" [(ngModel)]="alert.country"></ion-input>
+      <ion-select [(ngModel)]="alert.country">
+        <ion-option value="{{location}}" *ngFor="let location of objectKeys(locations)">{{location}}</ion-option>
+      </ion-select>
     </ion-item>
     <ion-item color="white">
-      <ion-label floating>What City</ion-label>
-      <ion-input type="text" autocorrect="off" autocapitalize="sentences" autocomplete="off" [(ngModel)]="alert.city"></ion-input>
+      <ion-label floating>What State?</ion-label>
+      <ion-select [(ngModel)]="alert.state">
+        <ion-option value="{{state}}" *ngFor="let state of locations[alert.country]">{{state}}</ion-option>
+      </ion-select>
     </ion-item>
     <ion-list text-wrap no-margin radio-group [(ngModel)]="alert.sourceType">
       <ion-list-header>
         <h2>How is the alert received?</h2>
       </ion-list-header>
-      <ion-item color="white">
+      <ion-item color="white" *ngFor="let source of sources">
         <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-        <ion-label>SMS</ion-label>
+        <ion-label>{{source.name}}</ion-label>
         <ion-radio item-right></ion-radio>
-      </ion-item>
-      <ion-item color="white">
-        <ion-icon ios="ios-mail" md="md-mail" item-left></ion-icon>
-        <ion-label>Email</ion-label>
-        <ion-radio item-right [disabled]="!email_enabled"></ion-radio>
-      </ion-item>
-      <ion-item color="white">
-        <ion-icon ios="ios-text" md="md-text" item-left></ion-icon>
-        <ion-label>SMS</ion-label>
-        <ion-radio item-right [disabled]="!sms_enabled"></ion-radio>
-      </ion-item>
-      <ion-item color="white">
-        <ion-icon ios="ios-chatboxes" md="md-chatboxes" item-left></ion-icon>
-        <ion-label>Slack</ion-label>
-        <ion-radio item-right [disabled]="!slack_enabled"></ion-radio>
-      </ion-item>
-      <ion-item color="white">
-        <ion-icon ios="ios-call" md="md-call" item-left></ion-icon>
-        <ion-label>Voice Call</ion-label>
-        <ion-radio item-right [disabled]="!voice_enabled"></ion-radio>
       </ion-item>
     </ion-list>
   </ion-list>

@@ -6,6 +6,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertFeedSourceEditPage } from '../../pages/alert-feed-source-edit/alert-feed-source-edit';
+import { AlertSource } from 'models/alertSource';
 
 @IonicPage({
   name: 'AlertFeedEditPage',
@@ -17,9 +18,11 @@ import { AlertFeedSourceEditPage } from '../../pages/alert-feed-source-edit/aler
   providers: [ ApiProvider, StorageProvider ],
 })
 export class AlertFeedEditPage extends BasePrivatePage {
-
+  objectKeys = Object.keys;
   logo:string = "assets/images/logo-dots.png";
   alert:AlertFeed; 
+  sources:AlertSource[];
+  locations:{};
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -62,6 +65,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadAlertSources(); })
       .then(() => { return this.loadAlertFeed(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -78,6 +82,30 @@ export class AlertFeedEditPage extends BasePrivatePage {
       });
   }
 
+  protected loadAlertSources():Promise<AlertSource[]> {
+    return new Promise((resolve, reject) => {
+      this.api.getAlertSources(this.organization).then((sources:AlertSource[]) => {
+        this.logger.info(this, "loadAlertSource", alert);
+        this.zone.run(() => {
+          this.sources = sources;
+          this.locations = {};
+          sources.forEach(source => {
+            if (!this.locations[source.country]) {
+              this.locations[source.country] = [];
+            }
+            if (source.state) {
+              this.locations[source.country].push(source.state);
+            }
+          });
+        });
+        resolve(sources);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadAlertSource", error);
+        resolve([]);
+      });
+    });
+  }
   protected loadAlertFeed():Promise<AlertFeed> {
     return new Promise((resolve, reject) => {
       if (!this.alert) {

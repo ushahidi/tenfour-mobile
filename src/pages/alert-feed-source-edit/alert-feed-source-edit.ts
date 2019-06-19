@@ -76,7 +76,7 @@ export class AlertFeedSourceEditPage extends BasePrivatePage {
 
   protected loadAlertFeed():Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
-      this.api.getAlertSources().then((sources:AlertSource[]) => {
+      this.api.getAlertSources(this.organization).then((sources:AlertSource[]) => {
         this.logger.info(this, "loadAlertFeed", alert);
         this.zone.run(() => {
           this.sources = sources;

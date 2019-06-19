@@ -28,6 +28,17 @@ export class AlertSource extends Model {
   @Column("enabled", BOOLEAN)
   public enabled:boolean = null;
 
+
+  @Column("country", TEXT)
+  public country:string = null;
+
+
+  @Column("state", TEXT)
+  public state:string = null;
+
+  @Column("type", TEXT)
+  public type:string = null;
+
   @Column("name", TEXT)
   public name:string = null;
 
