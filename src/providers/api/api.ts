@@ -27,6 +27,7 @@ import { LoggerProvider } from '../../providers/logger/logger';
 import { StorageProvider } from '../../providers/storage/storage';
 import { EnvironmentProvider } from '../../providers/environment/environment';
 import { AlertFeed } from '../../models/alertFeed';
+import { AlertSource } from '../../models/alertSource';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -234,6 +235,24 @@ export class ApiProvider extends HttpProvider {
       },
       (error:any) => {
         reject(`There was a problem verifying email ${email}.`);
+      });
+    });
+  }
+
+  public getAlertSources():Promise<AlertSource[]> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/api/v1/alerts/sources`;
+      this.httpGet(url).then((data:any) => {
+        if (data) {
+          const sources = data.map(source => new AlertSource(data));
+          resolve(sources);
+        }
+        else {
+          resolve(null);
+        }
+      },
+      (error:any) => {
+        reject(error);
       });
     });
   }

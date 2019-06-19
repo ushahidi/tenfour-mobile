@@ -5,6 +5,7 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeed } from '../../models/alertFeed';
+import { AlertSource } from '../../models/alertSource';
 
 @IonicPage({
   name: 'AlertFeedSourceEditPage',
@@ -18,7 +19,7 @@ import { AlertFeed } from '../../models/alertFeed';
 export class AlertFeedSourceEditPage extends BasePrivatePage {
 
   logo:string = "assets/images/logo-dots.png";
-  alert:AlertFeed; 
+  sources:AlertSource[]; 
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -73,23 +74,18 @@ export class AlertFeedSourceEditPage extends BasePrivatePage {
       });
   }
 
-  protected loadAlertFeed():Promise<AlertFeed> {
+  protected loadAlertFeed():Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
-      if (!this.alert) {
-        this.alert = new AlertFeed();
-        resolve(this.alert);
-      }
-      this.api.getAlertFeed(this.alert.id).then((alert:AlertFeed) => {
+      this.api.getAlertSources().then((sources:AlertSource[]) => {
         this.logger.info(this, "loadAlertFeed", alert);
         this.zone.run(() => {
-          this.alert = alert;
+          this.sources = sources;
         });
-        resolve(alert);
+        resolve(sources);
       },
       (error:any) => {
         this.logger.error(this, "loadAlertFeed", error);
-        this.alert = new AlertFeed();
-        resolve(this.alert);
+        resolve([]);
       });
     });
   }
