@@ -59,19 +59,29 @@ export class CheckinBadgesComponent {
           number: this.checkin.waiting_count || 0
         });
       }
-      let width = 50;
-      let mininum = 10;
-      let total = badges.reduce((total, badge) => total + badge.number, 0);
-      let defaults = badges.filter((badge) => (badge.number / total * 100) < mininum);
-      let percentages = badges.filter((badge) => (badge.number / total * 100) >= mininum);
-      for (let badge of defaults) {
-        badge.width = `${width}px`;
+      let minWidth = 50;
+      let cardWidth = document.querySelectorAll(".card")[0].clientWidth;
+      let minPercentage = cardWidth / minWidth;
+      let totalNumber = badges.reduce((total, badge) => total + badge.number, 0);
+      let fixedBadges = badges.filter((badge) => (badge.number / totalNumber * 100) < minPercentage);
+      let dynamicBadges = badges.filter((badge) => (badge.number / totalNumber * 100) >= minPercentage);
+      for (let badge of fixedBadges) {
+        badge.width = `${minWidth}px`;
       }
-      let divisor = percentages.reduce((total, badge) => total + badge.number, 0);
-      for (let badge of percentages) {
-        let percentage = (badge.number / divisor * 100);
-        let pixels = defaults.length > 0 ? defaults.length*(width/percentages.length) : defaults.length*width;
-        badge.width = `calc(${percentage}% - ${pixels}px)`;
+      for (let badge of dynamicBadges) {
+        let percentage = (badge.number / totalNumber * 100);
+        if (fixedBadges.length > 0) {
+          let pixels = fixedBadges.length*(minWidth/dynamicBadges.length);
+          if (pixels < cardWidth) {
+            badge.width = `calc(${percentage}% - ${pixels}px)`;
+          }
+          else {
+            badge.width = `${percentage}%`;
+          }
+        }
+        else {
+          badge.width = `${percentage}%`;
+        }
       }
     }
     return badges;

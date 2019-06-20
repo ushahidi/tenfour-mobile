@@ -21,6 +21,9 @@ export class CheckinCardComponent implements OnInit {
   @Input()
   selected:boolean = false;
 
+  @Input()
+  canDelete:boolean = false;
+
   @Output()
   cardSelected = new EventEmitter();
 

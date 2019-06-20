@@ -24,7 +24,10 @@ page-checkin-send {
       }
     }
   }
-  .answer .badge {
-    transform: scale(.5, .5);
+  .answer {
+    margin-right: 10px;
+    .badge {
+      transform: scale(.7, .7);
+    }
   }
 }
