@@ -5,8 +5,8 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeed } from '../../models/alertFeed';
-import { AlertFeedSourceEditPage } from '../../pages/alert-feed-source-edit/alert-feed-source-edit';
-import { AlertSource } from 'models/alertSource';
+import { AlertSource } from '../../models/alertSource';
+import { AlertFeedPage } from '../../pages/alert-feed/alert-feed';
 
 @IonicPage({
   name: 'AlertFeedEditPage',
@@ -55,10 +55,28 @@ export class AlertFeedEditPage extends BasePrivatePage {
       });
     }
   }
-  protected showNext() {
-    let modal = this.showModal(AlertFeedSourceEditPage, {
-      alert: this.alert,
-    });
+  protected save() {
+    this.api.createFeedForSource(this.organization, this.alert).then(saved => {
+      this.hideModal({
+        organization: this.organization,
+        user: this.user
+      }).then((loaded:any) => {
+        this.logger.info(this, "showAlertFeed", "Loaded");
+      },
+      (error:any) => {
+        this.logger.error(this, "showAlertFeed", error);
+      });
+    }).catch(
+      error => { this.showToast("There was an error saving your request", 3000)}
+    );
+    this.logger.info(this, "showAlertFeed");
+    
+    // let modal = this.showModal(AlertFeedSourceEditPage, {
+    //   alert: this.alert,
+    // });
+    // this.alert.organization_id = this.organization.id;
+    // this.alert.owner_id = this.user.id;
+    
   }
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
@@ -109,10 +127,11 @@ export class AlertFeedEditPage extends BasePrivatePage {
   protected loadAlertFeed():Promise<AlertFeed> {
     return new Promise((resolve, reject) => {
       if (!this.alert) {
-        this.alert = new AlertFeed();
+        this.alert = new AlertFeed({organization: this.organization, user: this.user});
         resolve(this.alert);
+        return;
       }
-      this.api.getAlertFeed(this.alert.id).then((alert:AlertFeed) => {
+      this.api.getAlertFeed(this.alert.id, this.organization).then((alert:AlertFeed) => {
         this.logger.info(this, "loadAlertFeed", alert);
         this.zone.run(() => {
           this.alert = alert;
@@ -121,7 +140,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
       },
       (error:any) => {
         this.logger.error(this, "loadAlertFeed", error);
-        this.alert = new AlertFeed();
+        this.alert = new AlertFeed({organization: this.organization, user: this.user});
         resolve(this.alert);
       });
     });

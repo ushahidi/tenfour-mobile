@@ -13,6 +13,9 @@ export class AlertFeed extends Model {
     if (data && data.organization) {
       this.organization_id = data.organization.id;
     }
+    if (data && data.user) {
+      this.owner_id = data.user.id;
+    }
   }
 
   public newInstance<M extends AlertFeed>(data:any=null):any {
@@ -25,17 +28,23 @@ export class AlertFeed extends Model {
   @Column("country", TEXT)
   public country:string = null;
 
-  @Column("city", TEXT)
-  public city:string = null;
+  @Column("state", TEXT)
+  public state:string = null;
 
-  @Column("sourceType", TEXT)
-  public sourceType:string = null;
-
-  @Column("sourceConfig", TEXT)
-  public sourceConfig:string = null;
+  @Column("source_id", TEXT)
+  public source_id:string = null;
 
   @Column("organization_id", INTEGER)
   public organization_id:number = null;
+
+  @Column("owner_id", INTEGER)
+  public owner_id:number = null;
+
+  @Column("automatic", BOOLEAN)
+  public automatic:boolean = false;
+
+  @Column("enabled", BOOLEAN)
+  public enabled:boolean = false;
 
   public organization:Organization[] = [];
 

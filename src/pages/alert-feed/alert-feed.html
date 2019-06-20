@@ -13,10 +13,10 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <div class="zero-state" *ngIf="organization && alerts.length === 0">
+  <div class="zero-state" *ngIf="organization && feeds.length === 0">
     <!-- zero state help logo/icon-->
   </div>
-  <div *ngIf="organization && alerts.length === 0">
+  <div *ngIf="organization && feeds.length === 0">
     <h1>Adding Alerts</h1>
     <p>You can add in alerts from third parties by using apis, RSS or email alerts.</p>
     <ion-buttons>
@@ -24,13 +24,13 @@
     </ion-buttons>
   </div>
   <ion-list>
-    <ion-card margin-top margin-bottom color="card" *ngFor="let alert of alerts">
+    <ion-card margin-top margin-bottom color="card" *ngFor="let feed of feeds">
       <ion-card-content text-center tappable (click)="createCheckin($event)">
         <!-- <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar> -->
-        <h1>{{alert.title}}</h1>
-        <p>{{alert.message}}</p>
-        <p><strong>Time sent: </strong> {{ alert.sent_at | dateTime}} </p>
-        <p><strong>Via {{alert.sourceType}}: </strong> {{ alert.sourceName }} </p>
+        <h1>{{feed.title}}</h1>
+        <p>{{feed.message}}</p>
+        <p><strong>Time sent: </strong> {{ feed.sent_at | dateTime}} </p>
+        <p><strong>Via {{feed.type}}: </strong> {{ feed.sourceName }} </p>
       </ion-card-content>
       <ion-row no-padding no-margin>
         <ion-col col-6 text-left no-padding no-margin>

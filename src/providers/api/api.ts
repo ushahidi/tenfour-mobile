@@ -239,6 +239,25 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public createFeedForSource(organization:Organization, feed:AlertFeed) {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/feed`;
+        this.httpPost(url, feed.getValues(), token.access_token).then((data:any) => {
+          if (data) {
+            const feed = new AlertFeed(data.feed);
+            resolve(data.alert);
+          }
+          else {
+            resolve(null);
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      });
+    });
+  }
   public getAlertSources(organization:Organization):Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
@@ -259,20 +278,39 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getAlertFeed(id:number):Promise<AlertFeed> {
+  public getAlertFeed(id:number,organization:Organization):Promise<AlertFeed> {
     return new Promise((resolve, reject) => {
-      let url = `${this.api}/api/v1/alertFeed/${id}`;
-      this.httpGet(url).then((data:any) => {
-        if (data) {
-          const feed = new AlertFeed(data);
-          resolve(feed);
-        }
-        else {
-          resolve(null);
-        }
-      },
-      (error:any) => {
-        reject(error);
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/feed/${id}`;
+        this.httpGet(url, {}, token.access_token).then((data:any) => {
+          if (data) {
+            const feed = new AlertFeed(data.feed);
+            resolve(feed);
+          }
+          else {
+            resolve(null);
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      });
+    });
+  }
+
+  public getAlertFeeds(organization:Organization):Promise<AlertFeed[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/feed/`;
+        this.httpGet(url, {}, token.access_token).then((data:any) => {
+          const feeds = data.feeds.map(feed => {
+            return new AlertFeed(feed);
+          })
+          resolve(feeds);
+        },
+        (error:any) => {
+          reject(error);
+        });
       });
     });
   }

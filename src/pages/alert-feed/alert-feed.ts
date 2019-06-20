@@ -19,8 +19,8 @@ import { AlertFeed } from '../../models/alertFeed';
 export class AlertFeedPage extends BasePrivatePage {
 
   logo:string = "assets/images/logo-dots.png";
-  alerts:AlertFeed[] = [];
-
+  feeds:AlertFeed[] = [];
+  
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -59,6 +59,7 @@ export class AlertFeedPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadAlertFeeds(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -72,6 +73,25 @@ export class AlertFeedPage extends BasePrivatePage {
         }
         this.showToast(error);
       });
+  }
+  
+
+  protected loadAlertFeeds():Promise<AlertFeed[]> {
+    return new Promise((resolve, reject) => {
+      this.api.getAlertFeeds(this.organization).then((feeds:AlertFeed[]) => {
+        this.logger.info(this, "loadFeeds", feeds);
+        // this.zone.run(() => {
+        //   this.fe = organization;
+        // });
+        this.feeds = feeds;
+        resolve(feeds);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadFeeds", error);
+        this.feeds = [];
+        resolve([]);
+      });
+    });
   }
 
   private addAlertFeed(event:any = null) {
