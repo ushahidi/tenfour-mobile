@@ -1,4 +1,4 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, NgZone, Input } from '@angular/core';
 import { IonicPage, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController } from 'ionic-angular';
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
@@ -6,21 +6,21 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeedEditPage } from '../../pages/alert-feed-edit/alert-feed-edit';
 import { AlertFeed } from '../../models/alertFeed';
-import { AlertFeedEntriesPage } from '../../pages/alert-feed-entries/alert-feed-entries';
+import { AlertCheckinEditPage } from '../../pages/alert-checkin-edit/alert-checkin-edit';
 
 @IonicPage({
-  name: 'AlertFeedPage',
-  segment: 'alert-feed'
+  name: 'AlertFeedEntriesPage',
+  segment: 'alert-feed-entries'
 })
 @Component({
-  selector: 'page-alert-feed',
-  templateUrl: 'alert-feed.html',
+  selector: 'page-alert-feed-entries',
+  templateUrl: 'alert-feed-entries.html',
   providers: [ ApiProvider, StorageProvider ]   
 })
-export class AlertFeedPage extends BasePrivatePage {
+export class AlertFeedEntriesPage extends BasePrivatePage {
 
   logo:string = "assets/images/logo-dots.png";
-  feeds:AlertFeed[] = [];
+  feed:AlertFeed = null;
   
   constructor(
       protected zone:NgZone,
@@ -54,19 +54,13 @@ export class AlertFeedPage extends BasePrivatePage {
       });
     }
   }
-  protected seeFeedEntries(feed) {
-    this.showPage(AlertFeedEntriesPage, {
-      feed: feed,
-      organization: this.organization,
-      user: this.user
-    });
-  }
+
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadAlertFeeds(); })
+      .then(() => { return this.loadFeed(true); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -80,25 +74,6 @@ export class AlertFeedPage extends BasePrivatePage {
         }
         this.showToast(error);
       });
-  }
-  
-
-  protected loadAlertFeeds():Promise<AlertFeed[]> {
-    return new Promise((resolve, reject) => {
-      this.api.getAlertFeeds(this.organization).then((feeds:AlertFeed[]) => {
-        this.logger.info(this, "loadFeeds", feeds);
-        // this.zone.run(() => {
-        //   this.fe = organization;
-        // });
-        this.feeds = feeds;
-        resolve(feeds);
-      },
-      (error:any) => {
-        this.logger.error(this, "loadFeeds", error);
-        this.feeds = [];
-        resolve([]);
-      });
-    });
   }
 
   private addAlertFeed(event:any = null) {
@@ -122,6 +97,21 @@ export class AlertFeedPage extends BasePrivatePage {
     //     });
     //   }
     // });
+  }
+
+  protected loadFeed(cache:boolean=true):Promise<AlertFeed> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.feed) {
+        resolve(this.feed);
+      }
+      else if (cache && this.hasParameter("feed")){
+        this.feed = this.getParameter<AlertFeed>("feed");
+        resolve(this.feed);
+      }
+      else {
+        reject("Feed Not Provided");
+      }
+    });
   }
 
 }

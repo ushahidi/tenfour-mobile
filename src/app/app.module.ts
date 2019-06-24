@@ -102,6 +102,8 @@ import { SettingsLDAPModule } from '../pages/settings-ldap/settings-ldap.module'
 import { SettingsTutorialModule } from '../pages/settings-tutorial/settings-tutorial.module';
 
 import { AlertFeedModule } from '../pages/alert-feed/alert-feed.module';
+import { AlertFeedEntriesModule } from '../pages/alert-feed-entries/alert-feed-entries.module';
+import { AlertCheckinEditModule } from '../pages/alert-checkin-edit/alert-checkin-edit.module';
 import { AlertFeedEditModule } from '../pages/alert-feed-edit/alert-feed-edit.module';
 import { AlertFeedSourceEditModule } from '../pages/alert-feed-source-edit/alert-feed-source-edit.module';
 
@@ -236,6 +238,8 @@ import { SentryErrorHandler } from '../providers/sentry/sentry';
     SettingsRegionsModule,
     SettingsTutorialModule,
     AlertFeedModule,
+    AlertFeedEntriesModule,
+    AlertCheckinEditModule,
     AlertFeedEditModule,
     AlertFeedSourceEditModule,
     UnsubscribePageModule,

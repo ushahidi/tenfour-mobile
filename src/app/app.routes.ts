@@ -60,7 +60,9 @@ import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
 
 import { AlertFeedPage } from '../pages/alert-feed/alert-feed';
 import { AlertFeedEditPage } from '../pages/alert-feed-edit/alert-feed-edit';
+import { AlertFeedEntriesPage } from '../pages/alert-feed-entries/alert-feed-entries';
 import { AlertFeedSourceEditPage } from '../pages/alert-feed-source-edit/alert-feed-source-edit';
+import { AlertCheckinEditPage } from '../pages/alert-checkin-edit/alert-checkin-edit';
 
 export class TenFourRoutes {
 
@@ -125,8 +127,10 @@ export class TenFourRoutes {
     
     { component: AlertFeedPage, name: 'AlertFeedPage', segment: 'alert-feed' },
     { component: AlertFeedEditPage, name: 'AlertFeedEditPage', segment: 'alert-feed-edit', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertFeedEntriesPage, name: 'AlertFeedEntriesPage', segment: 'alert-feed-entries', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertCheckinEditPage, name: 'AlertCheckinEditPage', segment: 'alert-feed/checkins/edit', defaultHistory: ['AlertFeedPage'] },
     { component: AlertFeedSourceEditPage, name: 'AlertFeedSourceEditPage', segment: 'alert-feed-source-edit', defaultHistory: ['AlertFeedEditPage'] },
-    
+
     { component: UnsubscribePage, name: 'UnsubscribePage', segment: 'unsubscribe/:org_name/:email/:token' }
   ];
 }

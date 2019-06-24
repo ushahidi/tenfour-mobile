@@ -1,0 +1,31 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Create Check-In</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="checkin">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="checkin">
+    <ion-list-header>
+      <h2>Create check-in question from alert</h2>
+    </ion-list-header>
+    <ion-item text-wrap no-lines color="white" class="textarea">
+      <ion-textarea #message type="text" autocorrect="off" autocapitalize="true" placeholder="Ask a new question..."
+        (keypress)="onKeyPress($event)" [(ngModel)]="checkin.message"></ion-textarea>
+    </ion-item>
+  </ion-list>
+
+  <ion-list *ngIf="checkin">
+    <ion-list-header>
+      <h2>You can edit this question</h2>
+    </ion-list-header>
+    <ion-item>
+      You can edit this question created from the alert message
+    </ion-item>
+  </ion-list>
+</ion-content>
