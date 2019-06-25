@@ -3,7 +3,7 @@ import { TruncatePipe } from './truncate';
 
 @NgModule({
   declarations: [
-    TruncatePipe,
+    TruncatePipe
   ],
   imports: [ ],
   exports: [

@@ -50,7 +50,7 @@ export class UnsubscribePage extends BasePublicPage {
     this.analytics.trackPage(this);
   }
 
-  private confirm(event:any) {
+  protected confirm(event:any) {
     this.logger.info(this, "confirm");
 
     if (this.email && this.token) {
@@ -66,7 +66,7 @@ export class UnsubscribePage extends BasePublicPage {
     }
   }
 
-  private done(event:any) {
+  protected done(event:any) {
     this.showPage(SigninUrlPage, {});
   }
 

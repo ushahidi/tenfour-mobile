@@ -4,7 +4,6 @@ import { IonicPage, Events, Platform, NavParams, NavController, ViewController, 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { SigninUrlPage } from '../../pages/signin-url/signin-url';
 
-
 import { Organization } from '../../models/organization';
 import { User } from '../../models/user';
 import { Location } from '../../models/location';
@@ -15,8 +14,6 @@ import { CameraProvider } from '../../providers/camera/camera';
 import { StorageProvider } from '../../providers/storage/storage';
 import { LocationProvider } from '../../providers/location/location';
 import { ThumbnailProvider } from '../../providers/thumbnail/thumbnail';
-
-import { LocationSuggestComponent } from '../../components/location-suggest/location-suggest';
 
 import { EVENT_ACCOUNT_DELETED } from '../../constants/events';
 
@@ -199,7 +196,7 @@ export class SettingsEditPage extends BasePrivatePage {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         let img = document.createElement("img");
-        img.src = reader.result;
+        img.src = reader.result as string;
         img.onload = function () {
           let imageData = this.thumbnail.toThumbnailDataURL(img);
 

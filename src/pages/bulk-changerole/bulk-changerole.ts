@@ -11,7 +11,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 @IonicPage({
-  name: 'BulkChangeRolePage',
+  name: 'BulkChangeRolePage'
 })
 @Component({
   selector: 'bulk-changerole',
@@ -40,25 +40,18 @@ export class BulkChangeRolePage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
-
       this.people = this.navParams.get('people');
-
       if (this.people.length == 1) {
         this.role = this.people[0].role;
       }
   }
 
-  ionViewDidEnter() {
-    super.ionViewDidEnter();
-  }
-
-  private save() {
+  save() {
     this.logger.info(this, "save");
-
     this.checkChangeOwnerRole();
   }
 
-  private checkChangeOwnerRole() {
+  checkChangeOwnerRole() {
       if (this.people.find(person => {
         return person.role === 'owner';
       })) {
@@ -81,7 +74,7 @@ export class BulkChangeRolePage extends BasePrivatePage {
       }
   }
 
-  private checkSelfChangeRole() {
+  checkSelfChangeRole() {
     if (this.people.find(person => {
       return person.id === this.user.id && person.role !== 'owner';
     })) {
@@ -104,23 +97,18 @@ export class BulkChangeRolePage extends BasePrivatePage {
     }
   }
 
-  private changeRole() {
+  changeRole() {
     this.logger.info(this, "changeRole");
-
     let loading = this.showLoading("Saving...", true);
     let promises = [];
-
     this.people.forEach(person => {
         if (this.role === 'multiple') {
           return;
         }
-
         if (person.role === 'owner') {
           return;
         }
-
         person.role = this.role;
-
         promises.push(new Promise((resolve, reject) => {
           this.api.updatePerson(this.organization, person).then((person:Person) => {
             return this.storage.savePerson(this.organization, person).then((saved:any) => {
@@ -129,9 +117,7 @@ export class BulkChangeRolePage extends BasePrivatePage {
           }, reject);
         }));
     });
-
     let updateCount = promises.length;
-
     Promise.all(promises).then(() => {
         loading.dismiss();
         this.hideModal();

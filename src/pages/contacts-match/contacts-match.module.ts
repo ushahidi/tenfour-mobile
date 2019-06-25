@@ -4,10 +4,10 @@ import { ContactsMatchPage } from './contacts-match';
 
 @NgModule({
   declarations: [
-    ContactsMatchPage,
+    ContactsMatchPage
   ],
   imports: [
-    IonicPageModule.forChild(ContactsMatchPage),
-  ],
+    IonicPageModule.forChild(ContactsMatchPage)
+  ]
 })
 export class ContactsMatchModule {}

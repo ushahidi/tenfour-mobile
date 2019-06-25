@@ -5,10 +5,10 @@ import { GroupRowComponent } from './group-row';
 
 @NgModule({
   declarations: [
-    GroupRowComponent,
+    GroupRowComponent
   ],
   imports: [
-    IonicPageModule.forChild(GroupRowComponent),
+    IonicPageModule.forChild(GroupRowComponent)
   ],
   exports: [
     GroupRowComponent

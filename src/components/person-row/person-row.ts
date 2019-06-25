@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { Person } from '../../models/person';
 
@@ -6,7 +6,7 @@ import { Person } from '../../models/person';
   selector: 'person-row',
   templateUrl: 'person-row.html'
 })
-export class PersonRowComponent {
+export class PersonRowComponent implements OnInit {
 
   @Input()
   person:Person;
@@ -29,7 +29,7 @@ export class PersonRowComponent {
   hasRowSelected:boolean = false;
   hasRemoveSelected:boolean = false;
 
-  dots:string =  "assets/images/logo-dots.png";
+  dots:string = "assets/images/logo-dots.png";
 
   constructor() {
   }

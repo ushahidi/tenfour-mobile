@@ -22,6 +22,12 @@ import {
   EVENT_CHECKIN_UPDATED,
   EVENT_CHECKINS_WAITING_CHANGED } from '../../constants/events';
 
+export enum Filter {
+  sent = "sent",
+  inbox = "inbox",
+  scheduled = "scheduled"
+}
+
 @IonicPage({
   name: 'CheckinListPage',
   segment: 'checkins'
@@ -34,11 +40,12 @@ import {
 })
 export class CheckinListPage extends BasePrivatePage {
 
-  filter:string = "all";
+  Filter:any = Filter;
+  filter:Filter = Filter.sent;
   checkins:Checkin[] = [];
   selected:Checkin = null;
   loading:boolean = false;
-  limit:number = 5;
+  limit:number = 10;
   offset:number = 0;
   badgeNumber:number = 0;
 
@@ -61,34 +68,66 @@ export class CheckinListPage extends BasePrivatePage {
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
-    this.limit = this.tablet || this.website ? 10 : 5;
     let loading = this.showLoading("Loading...");
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
-      this.loadWaitingResponse(true, this.mobile).then((waiting:Checkin[]) => {
-        this.logger.info(this, "ionViewDidLoad", "loadWaitingResponse", "Loaded");
+      this.loadInboxCheckins(true, this.mobile).then((waiting:Checkin[]) => {
+        this.logger.info(this, "ionViewDidLoad", "loadInboxCheckins", "Loaded");
       },
       (error:any) => {
-        this.logger.error(this, "ionViewDidLoad", "loadWaitingResponse", error);
+        this.logger.error(this, "ionViewDidLoad", "loadInboxCheckins", error);
       });
+    },
+    (error:any) => {
+      this.logger.error(this, "ionViewDidLoad", "loadUpdates", error);
     });
   }
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
     this.selected = null;
-    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number) => {
-      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId);
-      let alert = this.showAlert("Check-In Received", "You have received a new Check-In.");
-      alert.onDidDismiss(data => {
-        let loading = this.showLoading("Loading...");
-        this.loadCheckins(false).then((checkins:Checkin[]) => {
-          loading.dismiss();
+    this.events.subscribe(EVENT_CHECKIN_CREATED, (checkinId:number, data:any) => {
+      this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, data);
+      let message = ["You received a new Check-In"];
+      if (data && data['sender_name']) {
+        message.push(` from ${data['sender_name']}`)
+      }
+      if (data && data['msg']) {
+        message.push(`, ${data['msg']}`);
+      }
+      this.showConfirm("Check-In Received", message.join(""), [
+        {
+          text: 'View',
+          handler: () => {
+            let loading = this.showLoading("Loading...", true);
+            this.loadInboxCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+              let checkin = checkins.find(checkin => checkin.id == checkinId);
+              this.logger.info(this, EVENT_CHECKIN_CREATED, checkinId, "showCheckinDetails", checkin);
+              this.showCheckinDetails(checkin);
+            },
+            (error:any) => {
+              loading.dismiss();
+            });
+          }
         },
-        (error:any) => {
-          loading.dismiss();
-        });
-      });
+        {
+          text: 'Ignore',
+          role: 'cancel',
+          handler: () => {
+            this.loading = true;
+            let loading = this.showLoading("Loading...");
+            this.loadCheckins(false).then((checkins:Checkin[]) => {
+              loading.dismiss();
+              this.loading = false;
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.loading = false;
+            })
+          }
+        }
+      ]);
     });
     this.events.subscribe(EVENT_CHECKIN_UPDATED, (checkinId:number) => {
       this.logger.info(this, EVENT_CHECKIN_UPDATED, checkinId);
@@ -138,17 +177,78 @@ export class CheckinListPage extends BasePrivatePage {
           event.complete();
         }
         this.loading = false;
-        this.showToast(error);
+        if (error === "Unable to authenticate with invalid API key and token.") {
+          this.showAlert("Problem Logging In", error);
+        }
+        else {
+          this.showToast(error);
+        }
       });
   }
 
   private loadCheckins(cache:boolean=true):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
+      this.checkins = [];
+      let loadCheckins:Promise<Checkin[]> = null;
+      if (this.filter === Filter.sent) {
+        loadCheckins = this.loadSentCheckins(cache);
+      }
+      else if (this.filter === Filter.inbox) {
+        loadCheckins = this.loadInboxCheckins(cache);
+      }
+      else if (this.filter === Filter.scheduled) {
+        loadCheckins = this.loadScheduledCheckins(cache);
+      }
+      loadCheckins.then((checkins:Checkin[]) => {
+        this.organization.checkins = checkins;
+        this.checkins = checkins;
+        resolve(this.checkins);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadCheckins", error);
+        reject(error);
+      });
+    });
+  }
+
+  private loadMoreCheckins(event:any) {
+    return new Promise((resolve, reject) => {
+      this.offset = this.offset + this.limit;
+      let loadMoreCheckins:Promise<Checkin[]> = null;
+      if (this.filter === Filter.sent) {
+        loadMoreCheckins = this.loadSentCheckins(true);
+      }
+      else if (this.filter === Filter.inbox) {
+        loadMoreCheckins = this.loadInboxCheckins(true);
+      }
+      else if (this.filter === Filter.scheduled) {
+        loadMoreCheckins = this.loadScheduledCheckins(true);
+      }
+      loadMoreCheckins.then((checkins:Checkin[]) => {
+        this.organization.checkins = [...this.organization.checkins, ...checkins];
+        this.checkins = [...this.checkins, ...checkins];
+        if (event) {
+          event.complete();
+        }
+        resolve(this.checkins);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadMoreCheckins", error);
+        if (event) {
+          event.complete();
+        }
+        reject(error);
+      });
+    });
+  }
+
+  private loadSentCheckins(cache:boolean=true):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
       this.promiseFallback(cache,
         this.storage.getCheckins(this.organization, this.limit, this.offset),
         this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
-          this.logger.info(this, "loadCheckins", checkins.length);
+          this.logger.info(this, "loadSentCheckins", checkins.length);
           for (let checkin of checkins) {
             for (let reply of checkin.replies) {
               if (this.user && this.user.id == reply.user_id) {
@@ -157,17 +257,61 @@ export class CheckinListPage extends BasePrivatePage {
             }
           }
           this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.organization.checkins = checkins;
-            this.checkins = this.filterCheckins(checkins);
-            resolve(this.checkins);
+            resolve(checkins);
+          },
+          (error:any) => {
+            this.logger.error(this, "loadSentCheckins", error);
+            reject(error);
           });
         },
         (error:any) => {
-          this.logger.error(this, "loadCheckins", error);
-          this.organization.checkins = [];
-          this.checkins = [];
+          this.logger.error(this, "loadSentCheckins", error);
           reject(error);
         });
+    });
+  }
+
+  private loadInboxCheckins(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.logger.info(this, "loadInboxCheckins");
+      this.promiseFallback(cache,
+        this.storage.getCheckinsWaiting(this.organization, this.user, 25, this.offset),
+        this.api.getCheckinsWaiting(this.organization, this.user, 25, this.offset), 1).then((checkins:Checkin[]) => {
+          if (checkins && checkins.length > 0) {
+            this.logger.info(this, "loadInboxCheckins", checkins.length);
+            this.events.publish(EVENT_CHECKINS_WAITING_CHANGED, checkins);
+            this.badgeNumber = checkins.length;
+            this.badge.setBadgeNumber(this.badgeNumber);
+            if (showPopup == true) {
+              let checkin = checkins[0];
+              this.showCheckinRespond(checkin, checkins);
+            }
+            resolve(checkins);
+          }
+          else {
+            this.logger.info(this, "loadInboxCheckins", 0);
+            this.badgeNumber = 0;
+            this.badge.clearBadgeNumber();
+            resolve([]);
+          }
+        },
+        (error:any) => {
+          this.logger.info(this, "loadInboxCheckins", error);
+          resolve([]);
+        });
+    });
+  }
+
+  private loadScheduledCheckins(cache:boolean=true):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.api.getCheckinsScheduled(this.organization, this.limit, this.offset).then((checkins:Checkin[]) => {
+        this.logger.info(this, "loadScheduledCheckins", checkins.length);
+        resolve(checkins);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadScheduledCheckins", error);
+        reject(error);
+      });
     });
   }
 
@@ -192,69 +336,16 @@ export class CheckinListPage extends BasePrivatePage {
     });
   }
 
-  private loadMore(event:any) {
-    return new Promise((resolve, reject) => {
-      this.offset = this.offset + this.limit;
-      this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset);
-      this.promiseFallback(true,
-        this.storage.getCheckins(this.organization, this.limit, this.offset),
-        this.api.getCheckins(this.organization, this.limit, this.offset), 1).then((checkins:Checkin[]) => {
-          this.storage.saveCheckins(this.organization, checkins).then((saved:boolean) => {
-            this.organization.checkins = [...this.organization.checkins, ...checkins];
-            this.checkins = [...this.checkins, ...this.filterCheckins(checkins)];
-            if (event) {
-              event.complete();
-            }
-            this.logger.info(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Loaded", this.organization.checkins.length);
-            resolve(this.checkins);
-          });
-        },
-        (error:any) => {
-          this.logger.error(this, "loadMore", "Limit", this.limit, "Offset", this.offset, "Failed", error);
-          reject(error);
-        });
-    });
-  }
-
-  private loadWaitingResponse(cache:boolean=true, showPopup:boolean=false):Promise<Checkin[]> {
-    return new Promise((resolve, reject) => {
-      this.logger.info(this, "loadWaitingResponse");
-      this.promiseFallback(cache,
-        this.storage.getCheckinsWaiting(this.organization, this.user, 25),
-        this.api.getCheckinsWaiting(this.organization, this.user, 25), 1).then((checkins:Checkin[]) => {
-          if (checkins && checkins.length > 0) {
-            this.logger.info(this, "loadWaitingResponse", checkins.length);
-            this.events.publish(EVENT_CHECKINS_WAITING_CHANGED, checkins);
-            this.badgeNumber = checkins.length;
-            this.badge.setBadgeNumber(this.badgeNumber);
-            if (showPopup == true) {
-              let checkin = checkins[0];
-              this.showCheckinRespond(checkin, checkins);
-            }
-            resolve(checkins);
-          }
-          else {
-            this.logger.info(this, "loadWaitingResponse", 0);
-            this.badgeNumber = 0;
-            this.badge.clearBadgeNumber();
-            resolve([]);
-          }
-        },
-        (error:any) => {
-          this.logger.info(error, "loadWaitingResponse", error);
-          resolve([]);
-        });
-    });
-  }
-
   private showCheckinDetails(checkin:Checkin) {
-    this.showModalOrPage(CheckinDetailsPage, {
-      organization: this.organization,
-      user: this.user,
-      person: this.user,
-      checkin: checkin,
-      checkin_id: checkin.id
-    });
+    if (checkin) {
+      this.showModalOrPage(CheckinDetailsPage, {
+        organization: this.organization,
+        user: this.user,
+        person: this.user,
+        checkin: checkin,
+        checkin_id: checkin.id
+      });
+    }
   }
 
   private showCheckinRespond(checkin:Checkin, checkins:Checkin[]=null) {
@@ -274,7 +365,7 @@ export class CheckinListPage extends BasePrivatePage {
         else {
           this.loadCheckins(false).then((loaded:any) => {
             this.logger.info(this, "showCheckinRespond", "loadCheckins", "Loaded");
-            this.loadWaitingResponse(true, false);
+            this.loadInboxCheckins(true, false);
           },
           (error:any) => {
             this.logger.info(this, "showCheckinRespond", "loadCheckins", error);
@@ -296,6 +387,42 @@ export class CheckinListPage extends BasePrivatePage {
     });
   }
 
+  private deleteCheckin(checkin:Checkin) {
+    this.logger.info(this, "deleteCheckin", checkin);
+    let buttons = [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.logger.info(this, "save", "Cancelled");
+        }
+      },
+      {
+        text: 'Delete',
+        handler: () => {
+          let loading = this.showLoading("Deleting...", true);
+          this.api.deleteCheckinScheduled(this.organization, checkin).then((deleted:any) => {
+            this.loadScheduledCheckins(true).then((checkins:Checkin[]) => {
+              this.organization.checkins = checkins;
+              this.checkins = checkins;
+              loading.dismiss();
+              this.showToast(`Check-In ${checkin.message} deleted`);
+            },
+            (error:any) => {
+              loading.dismiss();
+              this.showAlert("Problem Loading Scheduled Check-ins", error);
+            });
+          },
+          (error:any) => {
+            loading.dismiss();
+            this.showAlert("Problem Deleting Scheduled Check-Ins", error);
+          });
+        }
+      }
+    ];
+    this.showConfirm("Are you sure?", "Deleting all scheduled check-ins in this set can't be undone.", buttons);
+  }
+
   private createCheckin(event:any) {
     let modal = this.showModal(CheckinEditPage, {
       organization: this.organization,
@@ -310,7 +437,12 @@ export class CheckinListPage extends BasePrivatePage {
         else {
           this.loadCheckins(false).then((loaded:any) => {
             this.logger.info(this, "createCheckin", "loadCheckins", "Loaded");
-            this.loadWaitingResponse(true, false);
+            this.loadInboxCheckins(true, false).then((checkins:Checkin[]) =>{
+              this.logger.info(this, "createCheckin", "loadCheckins", "loadInboxCheckins", "Loaded");
+            },
+            (error:any) => {
+              this.logger.error(this, "createCheckin", "loadCheckins", "loadInboxCheckins", error);
+            });
           },
           (error:any) => {
             this.logger.error(this, "createCheckin", "loadCheckins", error);
@@ -340,53 +472,16 @@ export class CheckinListPage extends BasePrivatePage {
 
   private filterChanged(event:any) {
     this.logger.info(this, "filterChanged", this.filter);
-    let loading = this.showLoading("Filtering...");
+    let loading = this.showLoading("Loading...");
     this.loading = true;
-    this.offset = 0;
-    this.checkins = [];
-    if (this.filter === "all") {
-      this.loadCheckins(true).then((filtered:any) => {
-        this.loading = false;
-        loading.dismiss();
-      });
-    }
-    else if (this.filter === "waiting") {
-      this.loadWaitingResponse(true, false).then((checkins:Checkin[]) => {
-        this.checkins = this.filterCheckins(checkins);
-        this.loading = false;
-        loading.dismiss();
-      });
-    }
-  }
-
-  private filterCheckins(checkins:Checkin[]) {
-    let filtered = [];
-    for (let checkin of checkins) {
-      if (checkin.template && !checkin.recipients.length) {
-        continue;
-      }
-      if (this.filter === "all") {
-        filtered.push(checkin);
-      }
-      else if (this.filter === "waiting") {
-        if (checkin.canRespond(this.user)) {
-          filtered.push(checkin);
-        }
-      }
-    }
-    this.logger.info(this, "filterCheckins", this.filter, "Checkins", checkins.length, "Filtered", filtered.length);
-    return filtered;
-  }
-
-  private swipeEvent(event:any) {
-    if(event.direction == '2'){
-      this.logger.info(this, "swipeEvent", event, "Left");
-      this.filter = "all";
-    }
-    else if(event.direction == '4'){
-      this.logger.info(this, "swipeEvent", event, "Right");
-      this.filter = "waiting";
-    }
+    this.loadCheckins(true).then((checkins:Checkin[]) => {
+      this.loading = false;
+      loading.dismiss();
+    },
+    (error:any) => {
+      this.loading = false;
+      loading.dismiss();
+    });
   }
 
 }

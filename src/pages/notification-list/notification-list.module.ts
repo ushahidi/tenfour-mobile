@@ -8,13 +8,13 @@ import { OrganizationLogoModule } from '../../components/organization-logo/organ
 
 @NgModule({
   declarations: [
-    NotificationListPage,
+    NotificationListPage
   ],
   imports: [
     DateTimeModule,
     PersonAvatarModule,
     OrganizationLogoModule,
-    IonicPageModule.forChild(NotificationListPage),
+    IonicPageModule.forChild(NotificationListPage)
   ],
   exports: [
     NotificationListPage

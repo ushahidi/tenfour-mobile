@@ -12,7 +12,7 @@ import { DayOfMonthModule } from '../../pipes/day-of-month/day-of-month.module';
 
 @NgModule({
   declarations: [
-    SettingsPaymentsPage,
+    SettingsPaymentsPage
   ],
   imports: [
     DayOfMonthModule,
@@ -20,7 +20,7 @@ import { DayOfMonthModule } from '../../pipes/day-of-month/day-of-month.module';
     SettingsPlanProPageModule,
     SettingsPlanProWelcomePageModule,
     SettingsCreditsPageModule,
-    IonicPageModule.forChild(SettingsPaymentsPage),
+    IonicPageModule.forChild(SettingsPaymentsPage)
   ],
   exports: [
     SettingsPaymentsPage

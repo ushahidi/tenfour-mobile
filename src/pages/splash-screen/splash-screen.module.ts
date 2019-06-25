@@ -5,10 +5,10 @@ import { SplashScreenPage } from './splash-screen';
 
 @NgModule({
   declarations: [
-    SplashScreenPage,
+    SplashScreenPage
   ],
   imports: [
-    IonicPageModule.forChild(SplashScreenPage),
-  ],
+    IonicPageModule.forChild(SplashScreenPage)
+  ]
 })
 export class SplashScreenModule {}

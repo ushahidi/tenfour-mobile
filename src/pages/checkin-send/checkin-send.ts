@@ -1,6 +1,8 @@
 import { Component, ViewChild, NgZone } from '@angular/core';
 import { IonicPage, Select, Platform, NavParams, NavController, ViewController, ModalController, ToastController, AlertController, LoadingController, ActionSheetController, PopoverController } from 'ionic-angular';
 
+import * as moment from 'moment';
+
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
@@ -15,11 +17,13 @@ import { Checkin } from '../../models/checkin';
 import { Recipient } from '../../models/recipient';
 import { Group } from '../../models/group';
 import { Person } from '../../models/person';
+import { Schedule } from '../../models/schedule';
 
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 import { EVENT_CREDITS_CHANGED } from '../../constants/events';
+import { TIME_HOURS, TIME_DAYS, TIME_WEEKS, TIME_MONTHS, TIME_YEARS } from '../../constants/times';
 
 @IonicPage({
   name: 'CheckinSendPage',
@@ -38,6 +42,17 @@ export class CheckinSendPage extends BasePrivatePage {
 
   @ViewChild('select')
   select:Select;
+
+  today:string = null;
+  future:string = null;
+  frequencies:any = {
+    'once': null,
+    'hourly': TIME_HOURS,
+    'daily': TIME_DAYS,
+    'weekly': TIME_WEEKS,
+    'monthly': TIME_MONTHS,
+    'yearly': TIME_YEARS
+  }
 
   constructor(
       protected zone:NgZone,
@@ -62,6 +77,8 @@ export class CheckinSendPage extends BasePrivatePage {
     this.loadUpdates(false).then((loaded:any) => {
       loading.dismiss();
     });
+    this.today = moment().local().format('YYYY-MM-DD');
+    this.future = moment().add(2, 'years').format('YYYY-MM-DD');
   }
 
   ionViewDidEnter() {
@@ -107,6 +124,11 @@ export class CheckinSendPage extends BasePrivatePage {
       if (this.organization && this.organization.hasFreePlan()) {
         this.checkin.send_via = "app";
       }
+      if (this.checkin.schedule == null) {
+        this.checkin.schedule = new Schedule({
+          frequency: "once"
+        });
+      }
       resolve(this.checkin);
     });
   }
@@ -132,13 +154,11 @@ export class CheckinSendPage extends BasePrivatePage {
   private loadContactsForCheckin(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       let promises = [];
-
       this.checkin.users.forEach((person:Person) => {
         if (!person.contacts || !person.contacts.length) {
           promises.push(this.loadContactsForPerson(cache, person));
         }
       });
-
       this.checkin.groups.forEach((group:Group) => {
         group.members.forEach((person:Person) => {
           if (!person.contacts || !person.contacts.length) {
@@ -167,7 +187,6 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
-
     if (this.checkin.template) {
         let buttons = [
           {
@@ -190,7 +209,7 @@ export class CheckinSendPage extends BasePrivatePage {
             handler: () => {
               this.createCheckin(event);
             }
-          },
+          }
         ];
         this.showConfirm("Do you want to save this check-in?",
           "You can save this check-in to re-use later.", buttons);
@@ -203,15 +222,14 @@ export class CheckinSendPage extends BasePrivatePage {
 
   private editAnswers() {
     this.logger.info(this, "editAnswers");
-    let modal = this.showModal(CheckinAnswersPage, {
+    this.showModal(CheckinAnswersPage, {
       checkin: this.checkin
     });
   }
 
   private editChannels() {
     this.logger.info(this, "editChannels");
-
-    let modal = this.showModal(CheckinChannelsPage, {
+    this.showModal(CheckinChannelsPage, {
       checkin: this.checkin,
       organization: this.organization,
       user: this.user
@@ -227,7 +245,7 @@ export class CheckinSendPage extends BasePrivatePage {
       people: this.checkin.users,
       show_groups: true,
       show_people: true,
-      show_everyone: true,
+      show_everyone: true
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "addPerson", data);
@@ -243,6 +261,7 @@ export class CheckinSendPage extends BasePrivatePage {
          this.checkin.everyone = true;
        }
        this.countRecipients();
+       this.resizeContent();
      });
   }
 
@@ -313,6 +332,15 @@ export class CheckinSendPage extends BasePrivatePage {
     else if (this.checkin.recipientIds().length == 0) {
       this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
     }
+    else if (this.checkin.schedule.frequency !== 'once' && this.checkin.schedule.hasExpiresAt() == false) {
+      this.showToast("Please specify 'Until' for when the scheduled Check-In should end", 4000);
+    }
+    else if (this.checkin.schedule.hasStartsAt() && this.checkin.schedule.isStartsAtInFuture() == false) {
+      this.showToast("Please specify 'When' to be a time in the future", 4000);
+    }
+    else if (this.checkin.schedule.hasExpiresAt() && this.checkin.schedule.isExpiresAtInFuture() == false) {
+      this.showToast("Please specify 'Until' to be a time in the future", 4000);
+    }
     else if (this.checkin.creditsRequired() > this.organization.credits) {
       this.showBillingAlert();
     }
@@ -372,6 +400,43 @@ export class CheckinSendPage extends BasePrivatePage {
     }, (error) => {
       this.showToast(error);
     });
+  }
+
+  private datesChanged(event:any) {
+    this.logger.info(this, "datesChanged", event);
+    if (this.checkin.schedule.hasStartsAt() && this.checkin.schedule.hasExpiresAt()) {
+      let milliseconds = this.frequencies[this.checkin.schedule.frequency];
+      if (milliseconds) {
+        let starts_at = this.checkin.schedule.startsAt().valueOf();
+        let expires_at = this.checkin.schedule.expiresAt().valueOf();
+        let duration = Math.abs((expires_at - starts_at));
+        this.checkin.schedule.remaining_count = Math.round(duration / milliseconds);
+      }
+      else {
+        this.checkin.schedule.remaining_count = null;
+      }
+    }
+    else {
+      this.checkin.schedule.remaining_count = null;
+    }
+  }
+
+  private countsChanged(event:any) {
+    this.logger.info(this, "countsChanged", event);
+    if (this.checkin.schedule.hasStartsAt() == false) {
+      let now = new Date();
+      let local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      this.checkin.schedule.starts_at = new Date(local).toISOString();
+    }
+    let milliseconds = this.frequencies[this.checkin.schedule.frequency];
+    if (milliseconds) {
+      let starts_at = this.checkin.schedule.startsAt();
+      let expires_at = starts_at.getTime() + (this.checkin.schedule.remaining_count * milliseconds);
+      this.checkin.schedule.expires_at = new Date(expires_at).toISOString();
+    }
+    else {
+      this.checkin.schedule.expires_at = null;
+    }
   }
 
 }

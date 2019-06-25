@@ -12,7 +12,7 @@ import { GroupByModule } from '../../pipes/group-by/group-by.module';
 
 @NgModule({
   declarations: [
-    PersonListPage,
+    PersonListPage
   ],
   imports: [
     PersonAvatarModule,
@@ -21,7 +21,7 @@ import { GroupByModule } from '../../pipes/group-by/group-by.module';
     PersonDetailsModule,
     GroupByModule,
     BulkActionsModule,
-    IonicPageModule.forChild(PersonListPage),
+    IonicPageModule.forChild(PersonListPage)
   ],
   exports: [
     PersonListPage

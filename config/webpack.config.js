@@ -27,6 +27,9 @@ function getSourcePath(env) {
   else if (env == 'test' || env == 'testing') {
     return './src/environments/environment.testing.ts';
   }
+  else if (env == 'test' || env == 'preview') {
+    return './src/environments/environment.preview.ts';
+  }
   else if (env == 'prod' || env == 'production') {
     return './src/environments/environment.production.ts';
   }

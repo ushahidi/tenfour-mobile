@@ -5,10 +5,10 @@ import { CheckinBadgesComponent } from './checkin-badges';
 
 @NgModule({
   declarations: [
-    CheckinBadgesComponent,
+    CheckinBadgesComponent
   ],
   imports: [
-    IonicPageModule.forChild(CheckinBadgesComponent),
+    IonicPageModule.forChild(CheckinBadgesComponent)
   ],
   exports: [
     CheckinBadgesComponent

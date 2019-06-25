@@ -141,7 +141,6 @@ import { CountriesProvider } from '../providers/countries/countries';
 import { StorageProvider } from '../providers/storage/storage';
 import { LocationProvider } from '../providers/location/location';
 import { CameraProvider } from '../providers/camera/camera';
-import { FileTransferProvider } from '../providers/filetransfer/filetransfer';
 import { BadgeProvider } from '../providers/badge/badge';
 import { AnalyticsProvider } from '../providers/analytics/analytics';
 import { BrowserProvider } from '../providers/browser/browser';
@@ -158,8 +157,7 @@ import { MailerProvider } from '../providers/mailer/mailer';
 import { EnvironmentProvider } from '../providers/environment/environment';
 import { IntercomProvider } from '../providers/intercom/intercom';
 import { ThumbnailProvider } from '../providers/thumbnail/thumbnail';
-
-import { SentryErrorHandler } from '../services/sentry-errorhandler';
+import { SentryErrorHandler } from '../providers/sentry/sentry';
 
 @NgModule({
   declarations: [
@@ -316,7 +314,7 @@ import { SentryErrorHandler } from '../services/sentry-errorhandler';
     { provide: EnvironmentProvider, useClass: EnvironmentProvider },
     { provide: IntercomProvider, useClass: IntercomProvider },
     { provide: ErrorHandler, useClass: SentryErrorHandler },
-    { provide: ThumbnailProvider, useClass: ThumbnailProvider },
+    { provide: ThumbnailProvider, useClass: ThumbnailProvider }
   ]
 })
 export class AppModule {}

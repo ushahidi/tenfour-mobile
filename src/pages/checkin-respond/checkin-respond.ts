@@ -23,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-checkin-respond',
   templateUrl: 'checkin-respond.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class CheckinRespondPage extends BasePrivatePage {
 

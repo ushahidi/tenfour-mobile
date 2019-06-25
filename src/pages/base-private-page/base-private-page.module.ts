@@ -5,10 +5,10 @@ import { BasePrivatePage } from './base-private-page';
 
 @NgModule({
   declarations: [
-    BasePrivatePage,
+    BasePrivatePage
   ],
   imports: [
-    IonicPageModule.forChild(BasePrivatePage),
+    IonicPageModule.forChild(BasePrivatePage)
   ],
   exports: [
     BasePrivatePage

@@ -9,12 +9,12 @@ import { CheckinCardModule } from '../../components/checkin-card/checkin-card.mo
 
 @NgModule({
   declarations: [
-    SignupPage,
+    SignupPage
   ],
   imports: [
     SignupEmailModule,
     CheckinCardModule,
-    IonicPageModule.forChild(SignupPage),
+    IonicPageModule.forChild(SignupPage)
   ],
   exports: [
     SignupPage

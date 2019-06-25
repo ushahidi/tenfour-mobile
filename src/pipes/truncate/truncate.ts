@@ -1,10 +1,11 @@
-import { Injectable, Pipe } from '@angular/core';
+import { Injectable, Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
   name: 'truncate'
 })
 @Injectable()
-export class TruncatePipe {
+export class TruncatePipe implements PipeTransform {
+
   transform(value:string, args:number=20) {
     let text = "" + value;
     let limit = args ? args : 10;
@@ -14,4 +15,5 @@ export class TruncatePipe {
     }
     return words.slice(0, limit).join(" ");
   }
+
 }

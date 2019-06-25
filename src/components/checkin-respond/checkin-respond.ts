@@ -1,4 +1,4 @@
-import { Component, NgZone, Input, Output, EventEmitter } from '@angular/core';
+import { Component, NgZone, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { Organization } from '../../models/organization';
 import { Checkin } from '../../models/checkin';
@@ -16,7 +16,7 @@ import { LocationProvider } from '../../providers/location/location';
   templateUrl: 'checkin-respond.html',
   providers: [ LoggerProvider, LocationProvider, KeyboardProvider ]
 })
-export class CheckinRespondComponent {
+export class CheckinRespondComponent implements OnInit {
 
   @Input()
   organization:Organization;

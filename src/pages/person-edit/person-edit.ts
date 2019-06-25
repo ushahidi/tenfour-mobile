@@ -5,7 +5,6 @@ import { BasePrivatePage } from '../../pages/base-private-page/base-private-page
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 
 import { Organization } from '../../models/organization';
-import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Contact } from '../../models/contact';
 import { Country } from '../../models/country';
@@ -95,7 +94,7 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null) {
+  protected loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return new Promise((resolve, reject) => {
@@ -124,7 +123,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private loadRegions(cache:boolean=true):Promise<boolean> {
+  protected loadRegions(cache:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
       if (cache) {
         this.storage.getCountries(this.organization).then((countries:Country[]) => {
@@ -200,7 +199,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private loadCamera():Promise<boolean> {
+  protected loadCamera():Promise<boolean> {
     return new Promise((resolve, reject) => {
       Promise.all([
         this.camera.cameraPresent(),
@@ -219,7 +218,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private cancelEdit(event:any) {
+  protected cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     if (this.editing && this.mobile) {
       let loading = this.showLoading("Canceling...", true);
@@ -248,7 +247,7 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private savePersonAndContacts(activity:string, event:any) {
+  protected savePersonAndContacts(activity:string, event:any) {
     let loading = this.showLoading(`${activity}...`, true);
     this.savePerson(this.organization, this.person).then((person:Person) => {
       let promises = [];
@@ -299,7 +298,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private savePerson(organization:Organization, person:Person):Promise<Person> {
+  protected savePerson(organization:Organization, person:Person):Promise<Person> {
     return new Promise((resolve, reject) => {
       if (person.id) {
         this.logger.info(this, "savePerson", "Update", person);
@@ -334,7 +333,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private saveContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
+  protected saveContact(organization:Organization, person:Person, contact:Contact):Promise<Contact> {
     return new Promise((resolve, reject) => {
       if (contact.id) {
         this.logger.info(this, "saveContact", "Update", contact);
@@ -378,7 +377,7 @@ export class PersonEditPage extends BasePrivatePage {
     });
   }
 
-  private addPhone(event:any=null) {
+  protected addPhone(event:any=null) {
     let countryCodes = this.organization.countryCodes();
     let countryCode = countryCodes && countryCodes.length > 0 ? countryCodes[0] : 1;
     let contact = new Contact({
@@ -388,17 +387,17 @@ export class PersonEditPage extends BasePrivatePage {
     this.person.contacts.push(contact)
   }
 
-  private addEmail(event:any=null) {
+  protected addEmail(event:any=null) {
     let contact = new Contact({type: 'email'});
     this.person.contacts.push(contact);
   }
 
-  private addAddress(event:any=null) {
+  protected addAddress(event:any=null) {
     let contact = new Contact({type: 'address'});
     this.person.contacts.push(contact);
   }
 
-  private showCameraOptions(event:any) {
+  protected showCameraOptions(event:any) {
     if (this.mobile) {
       let buttons = [];
       if (this.cameraPresent) {
@@ -443,7 +442,7 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private onFileChanged(event:any) {
+  protected onFileChanged(event:any) {
     this.logger.info(this, "onFileChanged", event.target);
     if (event.target.files && event.target.files.length > 0) {
       let reader = new FileReader();
@@ -451,7 +450,7 @@ export class PersonEditPage extends BasePrivatePage {
       reader.readAsDataURL(file);
       reader.onload = (e) => {
         let img = document.createElement("img");
-        img.src = reader.result;
+        img.src = reader.result as string;
         img.onload = function () {
           let imageData = this.thumbnail.toThumbnailDataURL(img);
 
@@ -466,11 +465,11 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private addRole(event:any) {
+  protected addRole(event:any) {
     this.logger.info(this, "addRole");
   }
 
-  private removePerson(event:any) {
+  protected removePerson(event:any) {
     let buttons = [
       {
         text: 'Remove',
@@ -516,7 +515,7 @@ export class PersonEditPage extends BasePrivatePage {
     this.showConfirm("Remove Person", "Are you sure you want to remove this person?", buttons);
   }
 
-  private deleteAccount(event:any) {
+  protected deleteAccount(event:any) {
     let buttons = [
       {
         text: 'Delete',
@@ -546,7 +545,7 @@ export class PersonEditPage extends BasePrivatePage {
     this.showConfirm("Delete Account", "Are you sure you want to delete your account?", buttons);
   }
 
-  private onKeyPress(event:any) {
+  protected onKeyPress(event:any) {
     if (this.isKeyReturn(event)) {
       this.logger.info(this, "onKeyPress", "Enter");
       this.hideKeyboard();
@@ -557,14 +556,14 @@ export class PersonEditPage extends BasePrivatePage {
     }
   }
 
-  private showPeopleSelect(event:any=null) {
+  protected showPeopleSelect(event:any=null) {
     let modal = this.showModal(PersonSelectPage, {
       organization: this.organization,
       user: this.user,
       groups: this.person.groups,
       show_groups: true,
       show_people: false,
-      show_everyone: false,
+      show_everyone: false
     });
     modal.onDidDismiss(data => {
       this.logger.info(this, "showPeopleSelect", data);
@@ -574,12 +573,12 @@ export class PersonEditPage extends BasePrivatePage {
      });
   }
 
-  private onContactChanged(contact:any) {
+  protected onContactChanged(contact:any) {
     this.logger.info(this, "onContactChanged", contact);
     contact.blocked = false;
   }
 
-  private showTransferOwnerWarning() {
+  protected showTransferOwnerWarning() {
     this.logger.info(this, "showTransferOwnerWarning");
     if (this.person.role === 'owner') {
       this.showAlert('Warning', 'If you transfer ownership to this person, you may lose your privileges.');

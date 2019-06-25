@@ -5,10 +5,10 @@ import { SettingsRolesPage } from './settings-roles';
 
 @NgModule({
   declarations: [
-    SettingsRolesPage,
+    SettingsRolesPage
   ],
   imports: [
-    IonicPageModule.forChild(SettingsRolesPage),
+    IonicPageModule.forChild(SettingsRolesPage)
   ],
   exports: [
     SettingsRolesPage

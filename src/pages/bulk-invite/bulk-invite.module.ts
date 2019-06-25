@@ -8,12 +8,12 @@ import { MultiAvatarModule } from '../../components/multi-avatar/multi-avatar.mo
 
 @NgModule({
   declarations: [
-    BulkInvitePage,
+    BulkInvitePage
   ],
   imports: [
     MultiAvatarModule,
     PersonAvatarModule,
-    IonicPageModule.forChild(BulkInvitePage),
+    IonicPageModule.forChild(BulkInvitePage)
   ],
   exports: [
     BulkInvitePage

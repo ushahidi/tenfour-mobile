@@ -1,5 +1,5 @@
-<ion-list>
-  <button ion-item *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="shareCheckin()">Share</button>
-  <button ion-item *ngIf="!checkin.template && (user.isOwner() || user.isAdmin() || user.id == checkin.user_id)" (click)="saveAsTemplate()">Save check-in to re-use later</button>
-  <button ion-item *ngIf="checkin.template && (user.isOwner() || user.isAdmin() || user.id == checkin.user_id)" (click)="removeAsTemplate()">Remove from saved check-ins</button>
+<ion-list text-wrap no-margin>
+  <button ion-item *ngIf="user.isOwner() || user.isAdmin() || user.isAuthor() || user.isViewer()" (click)="shareCheckin()">Share Check-In</button>
+  <button ion-item *ngIf="!checkin.template && (user.isOwner() || user.isAdmin() || user.id == checkin.user_id)" (click)="saveAsTemplate()">Save Template</button>
+  <button ion-item *ngIf="checkin.template && (user.isOwner() || user.isAdmin() || user.id == checkin.user_id)" (click)="removeAsTemplate()">Remove Template</button>
 </ion-list>

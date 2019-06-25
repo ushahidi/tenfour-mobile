@@ -18,7 +18,6 @@ import { Template } from '../../models/template';
 import { Reply } from '../../models/reply';
 import { Answer } from '../../models/answer';
 import { Group } from '../../models/group';
-import { Settings } from '../../models/settings';
 import { Region } from '../../models/region';
 import { Subscription } from '../../models/subscription';
 import { Notification } from '../../models/notification';
@@ -101,12 +100,17 @@ export class ApiProvider extends HttpProvider {
 
   public removeToken(organization:Organization):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.storage.remove(organization.subdomain).then((removed:any) => {
-        resolve(true);
-      },
-      (error:any) => {
+      if (organization) {
+        this.storage.remove(organization.subdomain).then((removed:any) => {
+          resolve(true);
+        },
+        (error:any) => {
+          resolve(false);
+        });
+      }
+      else {
         resolve(false);
-      });
+      }
     });
   }
 
@@ -293,7 +297,7 @@ export class ApiProvider extends HttpProvider {
         password: password,
         subdomain: organization.subdomain,
         terms_of_service: true,
-        verification_code: verificationCode,
+        verification_code: verificationCode
       };
       this.clientLogin(organization).then((token:Token) => {
         this.httpPost(url, params, token.access_token).then((data:any) => {
@@ -698,11 +702,10 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-
-  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10):Promise<Checkin[]> {
+  public getCheckinsWaiting(organization:Organization, user:User, limit:number=10, offset:number=0):Promise<Checkin[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}`;
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/?limit=${limit}&offset=${offset}`;
         let params = { };
         this.httpGet(url, params, token.access_token).then((data:any) => {
           let checkins = [];
@@ -715,6 +718,49 @@ export class ApiProvider extends HttpProvider {
             }
           }
           resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getCheckinsScheduled(organization:Organization, limit:number=10, offset:number=0):Promise<Checkin[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/scheduled/?limit=${limit}&offset=${offset}`;
+        let params = { };
+        this.httpGet(url, params, token.access_token).then((data:any) => {
+          let checkins = [];
+          if (data && data.scheduled_checkins) {
+            for (let _checkin of data.scheduled_checkins) {
+              let checkin = new Checkin(_checkin);
+              checkins.push(checkin);
+            }
+          }
+          resolve(checkins);
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public deleteCheckinScheduled(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/scheduled/${checkin.schedule.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
         },
         (error:any) => {
           reject(error);
@@ -817,12 +863,29 @@ export class ApiProvider extends HttpProvider {
       group_ids: checkin.groups.map((group) => { return group.id; }),
       user_ids: checkin.users.map((user) => { return user.id; })
     };
+    if (checkin.schedule && !this.checkinShouldSendNow(checkin)) {
+      params['schedule'] = checkin.schedule;
+      if (checkin.schedule.starts_at && checkin.schedule.starts_at.length > 0) {
+        let local = new Date(checkin.schedule.starts_at);
+        let utc = new Date(local.getTime() + local.getTimezoneOffset() * 60000);
+        params['schedule']['starts_at'] = utc.toISOString();
+      } else {
+        params['schedule']['starts_at'] = new Date().toISOString();
+      }
+      if (checkin.schedule.expires_at && checkin.schedule.expires_at.length > 0) {
+        let local = new Date(checkin.schedule.expires_at);
+        let utc = new Date(local.getTime() + local.getTimezoneOffset() * 60000);
+        params['schedule']['expires_at'] = utc.toISOString();
+      }
+    }
     if (checkin.self_test_check_in) {
       params['self_test_check_in'] = 1;
     }
     return params;
   }
-
+  private checkinShouldSendNow(checkin:Checkin) {
+    return checkin.schedule.frequency === 'once' && !checkin.schedule.startsAt() && !checkin.schedule.expiresAt();
+  }
   // create a check-in without sending
   public createCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
     return new Promise((resolve, reject) => {
@@ -911,6 +974,24 @@ export class ApiProvider extends HttpProvider {
           else {
             reject("Checkin Not Resent");
           }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public deleteCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/checkins/${checkin.id}`;
+        let params = { };
+        this.httpDelete(url, params, token.access_token).then((data:any) => {
+          resolve(data);
         },
         (error:any) => {
           reject(error);
@@ -1115,7 +1196,7 @@ export class ApiProvider extends HttpProvider {
         let url = `${this.api}/api/v1/organizations/${organization.id}/people/${user.id}/notifications`;
         let params = {
           id: user.id,
-          name: user.name,
+          name: user.name
         };
         this.httpPut(url, params, token.access_token).then((data:any) => {
           if (data && data.notifications) {
@@ -1608,7 +1689,6 @@ export class ApiProvider extends HttpProvider {
   public matchCSVContacts(organization:Organization, map:any, data:any):Promise<any> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
-
         // Initialize a new array of the length of the csv column with nulls
         let maps_to = [];
         let columns = data.file.columns;
@@ -1616,10 +1696,8 @@ export class ApiProvider extends HttpProvider {
         for (let i = 0; i < Object.keys(columns).length; i++) {
           maps_to.push(null);
         }
-
-        //iterate through the map Object, check if value is null and replace any null with value
-        //insert this into the maps_to array in the correct positions
-
+        // iterate through the map Object, check if value is null and replace any null with value
+        // insert this into the maps_to array in the correct positions
         for (let i=0; i<columns.length; i++) {
           for (let mapKey of Object.keys(map)) {
             if (map[mapKey] === columns[i]) {
@@ -1627,13 +1705,11 @@ export class ApiProvider extends HttpProvider {
             }
           }
         }
-
         let params = {
           fileId: data.file.id,
           orgId: organization.id,
           maps_to: maps_to
         };
-
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}`;
         this.httpPut(url, params, token.access_token).then((data:any) => {
           resolve(data);
@@ -1655,7 +1731,6 @@ export class ApiProvider extends HttpProvider {
           fileId: data.file.id,
           orgId: organization.id
         };
-
         let url = `${this.api}/api/v1/organizations/${organization.id}/files/${data.file.id}/contacts`;
         this.httpPost(url, params, token.access_token).then((data:any) => {
           resolve(true);
@@ -1713,7 +1788,7 @@ export class ApiProvider extends HttpProvider {
     return new Promise((resolve, reject) => {
       let url = `${this.api}/organization/lookup`;
       let params = {
-        email: email,
+        email: email
       };
       this.httpPost(url, params).then((data:any) => {
         resolve(true);

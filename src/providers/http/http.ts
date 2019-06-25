@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Platform } from 'ionic-angular';
 import { Http, Headers, URLSearchParams, RequestOptions, Response } from '@angular/http';
+
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/retry';
@@ -19,8 +20,8 @@ import { LoggerProvider } from '../logger/logger';
 @Injectable()
 export class HttpProvider {
 
-  timeout:number        = 1 * 60 * 1000;
-  timeout_upload:number = 5 * 60 * 1000;
+  readonly TIMEOUT:number = 1 * 60 * 1000;
+  readonly TIMEOUT_UPLOAD:number = 5 * 60 * 1000;
 
   constructor(
     protected platform:Platform,
@@ -107,7 +108,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "GET", url, params);
         this.http.get(url, options)
-          .timeout(this.timeout)
+          .timeout(this.TIMEOUT)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -161,7 +162,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(this.timeout)
+          .timeout(this.TIMEOUT)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -215,7 +216,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PUT", url, params);
         this.http.put(url, params, options)
-          .timeout(this.timeout)
+          .timeout(this.TIMEOUT)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -269,7 +270,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "PATCH", url, params);
         this.http.patch(url, params, options)
-          .timeout(this.timeout)
+          .timeout(this.TIMEOUT)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -323,7 +324,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "DELETE", url);
         this.http.delete(url, options)
-          .timeout(this.timeout)
+          .timeout(this.TIMEOUT)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');
@@ -340,7 +341,7 @@ export class HttpProvider {
     });
   }
 
-  protected fileUpload(url:string, token:string, file:any, httpMethod:string="POST", mimeType:string='application/binary', acceptType:string="application/json", contentType:string=undefined, contentLength:number=null):Promise<any> {
+  protected fileUpload(url:string, token:string, file:any, httpMethod:string="POST", mimeType:string='application/binary', acceptType:string="application/json", contentType:string=null, contentLength:number=null):Promise<any> {
     return new Promise((resolve, reject) => {
       if (this.platform.is("cordova")) {
         let headers = {};
@@ -356,8 +357,8 @@ export class HttpProvider {
         if (token) {
           headers['Authorization'] = `Bearer ${token}`;
         }
-        var params = {};
-        var options:FileUploadOptions = {
+        let params = {};
+        let options:FileUploadOptions = {
           httpMethod: httpMethod,
           mimeType: mimeType,
           fileName: file.name,
@@ -390,7 +391,7 @@ export class HttpProvider {
         });
         this.logger.info(this, "POST", url, params);
         this.http.post(url, params, options)
-          .timeout(this.timeout_upload)
+          .timeout(this.TIMEOUT_UPLOAD)
           .map((res:any) => this.httpResponse(res))
           .catch((error:any) => {
             return Observable.throw(error || 'Request Error');

@@ -54,7 +54,7 @@
   steps:
   - name: "Build PWA client (preview)"
     service: builder
-    command: ENV=dev npm run ionic:build --debug
+    command: ENV=preview npm run ionic:build --debug
   - name: "Deploy PWA client (preview)"
     service: ansible
     command: >

@@ -1,7 +1,8 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 
 import { User } from '../../models/user';
 import { Checkin } from '../../models/checkin';
+import { Schedule } from '../../models/schedule';
 
 import { LoggerProvider } from '../../providers/logger/logger';
 
@@ -9,7 +10,7 @@ import { LoggerProvider } from '../../providers/logger/logger';
   selector: 'checkin-card',
   templateUrl: 'checkin-card.html'
 })
-export class CheckinCardComponent {
+export class CheckinCardComponent implements OnInit {
 
   @Input()
   checkin:Checkin = null;
@@ -29,18 +30,22 @@ export class CheckinCardComponent {
   @Output()
   resendSelected = new EventEmitter();
 
+  @Output()
+  deleteSelected = new EventEmitter();
+
   hasCardSelected:boolean = false;
   hasSendSelected:boolean = false;
   hasResendSelected:boolean = false;
+  hasDeleteSelected:boolean = false;
 
   constructor(private logger:LoggerProvider) {
-
   }
 
   ngOnInit() {
     this.hasCardSelected = this.cardSelected && this.cardSelected.observers.length > 0;
     this.hasSendSelected = this.sendSelected && this.sendSelected.observers.length > 0;
     this.hasResendSelected = this.resendSelected && this.resendSelected.observers.length > 0;
+    this.hasDeleteSelected = this.deleteSelected && this.deleteSelected.observers.length > 0;
   }
 
   onCardSelected(event:any) {
@@ -56,6 +61,11 @@ export class CheckinCardComponent {
   onResendSelected(event:any) {
     this.logger.info(this, "onResendSelected");
     this.resendSelected.emit();
+  }
+
+  onDeleteSelected(event:any) {
+    this.logger.info(this, "onDeleteSelected");
+    this.deleteSelected.emit();
   }
 
 }

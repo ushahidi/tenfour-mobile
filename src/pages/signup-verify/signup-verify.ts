@@ -23,7 +23,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   providers: [ ApiProvider, StorageProvider, MailerProvider ],
   entryComponents:[ SignupDetailsPage ]
 })
-export class SignupVerifyPage extends BasePublicPage  {
+export class SignupVerifyPage extends BasePublicPage {
 
   email:string = null;
   code:string = null;
@@ -50,7 +50,6 @@ export class SignupVerifyPage extends BasePublicPage  {
 
   ionViewWillEnter() {
     super.ionViewWillEnter();
-
     if (!this.modal) {
       this.loading=true;
       this.verifyModal = this.showModal(SignupVerifyPage, {
@@ -58,7 +57,6 @@ export class SignupVerifyPage extends BasePublicPage  {
         code: this.getParameter('code')
       }, {enableBackdropDismiss: false});
     }
-
     let loading = this.showLoading("Loading...");
     this.loadUpdates(true).then((loaded:any) => {
       loading.dismiss();
@@ -171,7 +169,8 @@ export class SignupVerifyPage extends BasePublicPage  {
   private dismissVerifyModal() {
     if (this.verifyModal) {
       this.verifyModal.dismiss();
-    } else {
+    }
+    else {
       this.hideModal();
     }
   }

@@ -12,20 +12,21 @@
     </ion-buttons>
   </ion-navbar>
 </ion-header>
-<ion-content padding (swipe)="swipeEvent($event)">
+<ion-content padding>
   <ion-refresher (ionRefresh)="loadUpdates(false, $event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
-  <div padding-left padding-right *ngIf="(filter == 'all' && checkins.length > 0) || filter == 'waiting'">
+  <div padding-left padding-right>
     <ion-segment #segment color="primary" [(ngModel)]="filter" (ionChange)="filterChanged($event)">
-      <ion-segment-button value="all">All Check-Ins</ion-segment-button>
-      <ion-segment-button value="waiting">Awaiting Response <ion-badge *ngIf="website == true && badgeNumber > 0">{{badgeNumber}}</ion-badge></ion-segment-button>
+      <ion-segment-button [value]="Filter.sent">Sent</ion-segment-button>
+      <ion-segment-button [value]="Filter.inbox">Inbox</ion-segment-button>
+      <ion-segment-button [value]="Filter.scheduled">Scheduled</ion-segment-button>
     </ion-segment>
   </div>
   <div text-center class="spinner" *ngIf="loading == true && (checkins == null || checkins.length == 0)">
     <ion-spinner name="ios"></ion-spinner>
   </div>
-  <div class="zero-state" *ngIf="loading == false && filter == 'all' && checkins.length == 0">
+  <div class="zero-state" *ngIf="loading == false && filter == 'sent' && checkins.length == 0">
     <img src="assets/images/zero-check-in.png"/>
     <h2>What is a Check-In?</h2>
     <h6>'Check-In' is what we call our messages in TenFour.</h6>
@@ -37,13 +38,14 @@
   </div>
   <ion-list *ngIf="checkins">
     <ion-item class="empty" no-lines text-wrap margin-top *ngIf="loading == false && checkins.length == 0">
-      <h2 text-center padding-top margin-top *ngIf="filter == 'waiting'">There currently are no Check-Ins awaiting response...</h2>
+      <h2 text-center padding-top margin-top *ngIf="filter == 'inbox'">There currently are no Check-Ins awaiting response...</h2>
     </ion-item>
     <checkin-card [checkin]="checkin" [user]="user" [selected]="selected == checkin"
-                  (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)" (resendSelected)="resendCheckin(checkin)"
+                  (cardSelected)="showCheckinDetails(checkin)" (sendSelected)="showCheckinRespond(checkin)"
+                  (resendSelected)="resendCheckin(checkin)" (deleteSelected)="deleteCheckin(checkin)"
                   *ngFor="let checkin of checkins"></checkin-card>
   </ion-list>
-  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+  <ion-infinite-scroll (ionInfinite)="loadMoreCheckins($event)">
     <ion-infinite-scroll-content></ion-infinite-scroll-content>
   </ion-infinite-scroll>
 </ion-content>

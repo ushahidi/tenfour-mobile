@@ -74,7 +74,7 @@ export class NotificationListPage extends BasePrivatePage {
     this.viewNotifications();
   }
 
-  private loadUpdates(cache:boolean=true, event:any=null) {
+  loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     this.loading = true;
     return Promise.resolve()
@@ -98,7 +98,7 @@ export class NotificationListPage extends BasePrivatePage {
       });
   }
 
-  private loadNotifications(cache:boolean=true):Promise<any> {
+  loadNotifications(cache:boolean=true):Promise<any> {
     return new Promise((resolve, reject) => {
       this.offset = 0;
       this.promiseFallback(cache,
@@ -120,7 +120,7 @@ export class NotificationListPage extends BasePrivatePage {
     });
   }
 
-  private loadMore(event:any):Promise<Notification[]> {
+  loadMore(event:any):Promise<Notification[]> {
     this.logger.info(this, "loadMore");
     return new Promise((resolve, reject) => {
       this.offset = this.offset + this.limit;
@@ -152,7 +152,7 @@ export class NotificationListPage extends BasePrivatePage {
     });
   }
 
-  private viewNotifications() {
+  viewNotifications() {
     this.logger.info(this, "viewNotifications");
     let promises = [];
     for (let notification of this.notifications) {
@@ -173,7 +173,7 @@ export class NotificationListPage extends BasePrivatePage {
     });
   }
 
-  private close(event:any) {
+  close(event:any) {
     this.hideModal();
   }
 

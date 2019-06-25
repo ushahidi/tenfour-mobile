@@ -19,7 +19,7 @@ import { StorageProvider } from '../../providers/storage/storage';
   selector: 'page-settings-types',
   templateUrl: 'settings-types.html',
   providers: [ ApiProvider, StorageProvider ],
-  entryComponents:[  ]
+  entryComponents:[ ]
 })
 export class SettingsTypesPage extends BasePrivatePage {
 

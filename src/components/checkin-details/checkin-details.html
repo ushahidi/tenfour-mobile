@@ -3,7 +3,7 @@
     <p class="saved" *ngIf="checkin.template">Saved</p>
     <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar>
     <h1>{{checkin.message}}</h1>
-    <p>{{checkin.created_at | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
+    <p>{{(checkin.send_at || checkin.created_at) | dateTime}}, <strong>{{checkin.user_name}}</strong></p>
     <checkin-badges [checkin]="checkin" *ngIf="checkin"></checkin-badges>
   </ion-item>
   <ion-item text-wrap color="white" *ngIf="canRespond || canResend">
@@ -11,11 +11,7 @@
     <button ion-button text-only item-right clear color="primary" tappable *ngIf="canResend" (click)="onResendClicked($event)">Resend</button>
   </ion-item>
 </ion-list>
-<ion-list *ngIf="checkin.recipients.length > ENABLE_FILTER_AFTER_RECIPIENT_COUNT">
-  <ion-list-header>
-    <ion-searchbar start placeholder="Search..." [debounce]="250" [(ngModel)]="filter"></ion-searchbar>
-  </ion-list-header>
-</ion-list>
+<ion-searchbar start placeholder="Search responses..." [debounce]="250" [(ngModel)]="filter" *ngIf="checkin.recipients.length > ENABLE_FILTER_AFTER_RECIPIENT_COUNT"></ion-searchbar>
 <ion-list *ngFor="let answer of checkin.answers">
   <ion-list-header *ngIf="answer.replies > 0">
     <h2>{{answer.answer}}</h2>

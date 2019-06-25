@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { NavParams, ViewController } from 'ionic-angular';
 
 import { Person } from '../../models/person';
@@ -7,7 +7,7 @@ import { Person } from '../../models/person';
   selector: 'checkin-popover',
   templateUrl: 'checkin-popover.html'
 })
-export class CheckinPopoverComponent {
+export class CheckinPopoverComponent implements OnInit {
 
   @Input()
   title:string = null;

@@ -38,6 +38,7 @@ export class FirebaseProvider {
     return new Promise((resolve, reject) => {
       this.platform.ready().then(() => {
         if (this.platform.is("cordova")) {
+          this.logger.info(this, "initialize", "cordova");
           this.getToken().then((token:string) => {
             resolve(token != null);
           },
@@ -46,24 +47,31 @@ export class FirebaseProvider {
           });
         }
         else if ('serviceWorker' in navigator) {
-          firebase.initializeApp({
-            projectId: ENVIRONMENT.firebaseAppId,
-            apiKey: ENVIRONMENT.firebaseApiKey,
-            messagingSenderId: ENVIRONMENT.firebaseSenderId
-          });
-          this.firebaseWeb = firebase.messaging();
-          navigator.serviceWorker.register('/service-worker.js').then((registration) => {
-            this.logger.info(this, "getToken", "serviceWorker", registration);
-            this.firebaseWeb.useServiceWorker(registration);
-            this.getToken().then((token:string) => {
-              resolve(token != null);
-            },
-            (error:any) => {
-              resolve(false);
+          try {
+            firebase.initializeApp({
+              appId: ENVIRONMENT.firebaseAppId,
+              projectId: ENVIRONMENT.firebaseProjectId,
+              apiKey: ENVIRONMENT.firebaseApiKey,
+              messagingSenderId: ENVIRONMENT.firebaseSenderId
             });
-          });
+            this.firebaseWeb = firebase.messaging();
+            navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+              this.logger.info(this, "initialize", "serviceWorker", registration);
+              this.firebaseWeb.useServiceWorker(registration);
+              this.getToken().then((token:string) => {
+                resolve(token != null);
+              },
+              (error:any) => {
+                resolve(false);
+              });
+            });
+          }
+          catch (error) {
+            this.logger.warn(this, "initialize", "Firebase not supported in your browser");
+          }
         }
         else {
+          this.logger.warn(this, "initialize", "Not Loaded");
           resolve(false);
         }
       });
@@ -94,6 +102,7 @@ export class FirebaseProvider {
           });
       }
       else if ('serviceWorker' in navigator) {
+        this.logger.info(this, "getToken", "serviceWorker");
         this.firebaseWeb.requestPermission()
           .then((permission:any) => {
             this.logger.info(this, "getToken", "permission", permission);
@@ -121,12 +130,49 @@ export class FirebaseProvider {
     });
   }
 
+  public removeToken():Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      this.storage.getFirebase().then((token:string) => {
+        if (token && token.length > 0) {
+          if (this.platform.is("cordova")) {
+            // TODO remove firebase token via native plugin
+            resolve(false);
+          }
+          else if (this.firebaseWeb != null) {
+            this.promiseTimeout(this.firebaseWeb.deleteToken(token), 3000).then((deleted:any) => {
+              this.logger.info(this, "removeToken", "Removed");
+              resolve(true);
+            },
+            (error:any) => {
+              this.logger.error(this, "removeToken", "deleteToken", error);
+              resolve(false);
+            });
+          }
+          else {
+            resolve(false);
+          }
+        }
+        else {
+          this.logger.warn(this, "removeToken", "No Token");
+          resolve(false);
+        }
+      },
+      (error:any) => {
+        this.logger.error(this, "removeToken", error);
+        resolve(false);
+      });
+    });
+  }
+
   public subscribeNotifications() {
     if (this.platform.is("cordova")) {
       this.logger.info(this, "subscribeNotifications", "cordova");
       this.firebaseNative.onNotificationOpen().subscribe((data:any) => {
         this.logger.info(this, "subscribeNotifications", data);
-        if (data && data.notification) {
+        if (data && data.data) {
+          this.publishEvent(data.data);
+        }
+        else if (data && data.notification) {
           this.publishEvent(data.notification);
         }
       });
@@ -147,12 +193,19 @@ export class FirebaseProvider {
           });
       });
     }
-    else if ('serviceWorker' in navigator) {
+    else if (this.firebaseWeb != null) {
       this.logger.info(this, "subscribeNotifications", "serviceWorker");
+      navigator.serviceWorker.addEventListener('message', (data:any) => {
+        this.logger.info(this, "subscribeNotifications", "message", data);
+        if (data && data.data) {
+          this.logger.info(this, "subscribeNotifications", "message data", data.data);
+          this.publishEvent(data.data);
+        }
+      });
       this.firebaseWeb.onMessage((data:any) => {
         this.logger.info(this, "subscribeNotifications", "onMessage", data);
-        if (data && data.notification) {
-          this.publishEvent(data.notification);
+        if (data && data.data) {
+          this.publishEvent(data.data);
         }
       },
       (error:any) => {
@@ -186,15 +239,15 @@ export class FirebaseProvider {
   public publishEvent(notification:any) {
     if (notification && notification['type'] == EVENT_CHECKIN_CREATED) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_CREATED, notification);
-      this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_CREATED, notification['checkin_id'], notification);
     }
     else if (notification && notification['type'] == EVENT_CHECKIN_UPDATED) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_UPDATED, notification);
-      this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_UPDATED, notification['checkin_id'], notification);
     }
     else if (notification && notification['type'] == EVENT_CHECKIN_DETAILS) {
       this.logger.info(this, "publishEvent", EVENT_CHECKIN_DETAILS, notification);
-      this.events.publish(EVENT_CHECKIN_DETAILS, notification['checkin_id']);
+      this.events.publish(EVENT_CHECKIN_DETAILS, notification['checkin_id'], notification);
     }
     else {
       this.logger.warn(this, "publishEvent", "Notification", notification);
@@ -295,7 +348,7 @@ export class FirebaseProvider {
 
   private promiseTimeout(promise:Promise<any>, milliseconds:number=1000) {
     return new Promise((resolve, reject) => {
-      var timer = setTimeout(() => {
+      let timer = setTimeout(() => {
         reject("Promise Timeout");
       }, milliseconds);
       promise.then((result:any) => {

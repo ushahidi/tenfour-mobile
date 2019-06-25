@@ -4,10 +4,10 @@ import { PersonImportPage } from './person-import';
 
 @NgModule({
   declarations: [
-    PersonImportPage,
+    PersonImportPage
   ],
   imports: [
-    IonicPageModule.forChild(PersonImportPage),
+    IonicPageModule.forChild(PersonImportPage)
   ],
   exports: [
     PersonImportPage

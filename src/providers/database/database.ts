@@ -398,23 +398,23 @@ export class DatabaseProvider {
         }
         else if (parameter && parameter.toString().indexOf(">") != -1){
           let components = parameter.split(">");
-          let number = Number(components[1].trim());
-          parameters.push(number);
+          let value = Number(components[1].trim());
+          parameters.push(value);
         }
         else if (parameter && parameter.toString().indexOf(">=") != -1){
           let components = parameter.split(">=");
-          let number = Number(components[1].trim());
-          parameters.push(number);
+          let value = Number(components[1].trim());
+          parameters.push(value);
         }
         else if (parameter && parameter.toString().indexOf("<") != -1){
           let components = parameter.split("<");
-          let number = Number(components[1].trim());
-          parameters.push(number);
+          let value = Number(components[1].trim());
+          parameters.push(value);
         }
         else if (parameter && parameter.toString().indexOf("<=") != -1){
           let components = parameter.split("<=");
-          let number = Number(components[1].trim());
-          parameters.push(number);
+          let value = Number(components[1].trim());
+          parameters.push(value);
         }
         else {
           parameters.push(parameter);

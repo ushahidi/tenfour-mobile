@@ -7,11 +7,11 @@ import { SignupPasswordModule } from '../../pages/signup-password/signup-passwor
 
 @NgModule({
   declarations: [
-    SignupPaymentPage,
+    SignupPaymentPage
   ],
   imports: [
     SignupPasswordModule,
-    IonicPageModule.forChild(SignupPaymentPage),
+    IonicPageModule.forChild(SignupPaymentPage)
   ],
   exports: [
     SignupPaymentPage
