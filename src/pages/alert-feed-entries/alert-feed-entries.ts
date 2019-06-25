@@ -7,6 +7,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeedEditPage } from '../../pages/alert-feed-edit/alert-feed-edit';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertCheckinEditPage } from '../../pages/alert-checkin-edit/alert-checkin-edit';
+import { AlertFeedEntry } from '../../models/alertFeedEntry';
 
 @IonicPage({
   name: 'AlertFeedEntriesPage',
@@ -114,4 +115,16 @@ export class AlertFeedEntriesPage extends BasePrivatePage {
     });
   }
 
+  private createCheckin(feedEntry:AlertFeedEntry) {
+    const _feedEntry = new AlertFeedEntry().copyInto(feedEntry);
+    let modal = this.showModal(AlertCheckinEditPage, {
+      organization: this.organization,
+      user: this.user,
+      feedEntry: _feedEntry
+    });
+    
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "createCheckin", "Modal", data);
+    });
+  }
 }

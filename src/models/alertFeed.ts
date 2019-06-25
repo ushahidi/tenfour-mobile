@@ -47,5 +47,4 @@ export class AlertFeed extends Model {
   public enabled:boolean = false;
 
   public organization:Organization[] = [];
-
 }

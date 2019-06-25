@@ -16,6 +16,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 
 import { ColorPickerComponent } from '../../components/color-picker/color-picker';
+import { AlertFeedEntry } from '../../models/alertFeedEntry';
 
 @IonicPage({
   name: 'AlertCheckinEditPage',
@@ -34,7 +35,7 @@ export class AlertCheckinEditPage extends BasePrivatePage {
   message:TextInput;
 
   checkin:Checkin = null;
-
+  feedEntry:AlertFeedEntry = null;
   constructor(
       protected appController:App,
       protected zone:NgZone,
@@ -76,6 +77,7 @@ export class AlertCheckinEditPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
+      .then(() => { return this.loadFeedEntry(true); })
       .then(() => { return this.loadCheckin(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -91,10 +93,42 @@ export class AlertCheckinEditPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
+  private getCheckinMessage() {
+    if (this.feedEntry.body.length < 150) {
+      return this.feedEntry.body.length;
+    }
+    return this.feedEntry.body.slice(0, 150);
+  }
+
+  protected loadFeedEntry(cache:boolean=true):Promise<AlertFeedEntry> {
+    return new Promise((resolve, reject) => {
+      if (cache && this.feedEntry) {
+        resolve(this.feedEntry);
+      }
+      else if (cache && this.hasParameter("feedEntry")){
+        this.feedEntry = this.getParameter<AlertFeedEntry>("feedEntry");
+        resolve(this.feedEntry);
+      }
+      else {
+        reject("Feed Not Provided");
+      }
+    });
+  }
 
   private loadCheckin(cache:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.checkin == null) {
+      if (this.feedEntry &&  this.user) {
+        this.checkin = new Checkin({
+          organization_id: this.organization.id,
+          user_id: this.user.id,
+          user_initials: this.user.initials,
+          user_picture: this.user.profile_picture,
+          //in the backend, checkin handler can do its thing and generate the bit.ly
+          // for long messages
+          message: this.getCheckinMessage()
+        });
+        this.initCheckin();
+      } else if (this.checkin == null) {
         if (this.user) {
           this.initCheckin();
         }
@@ -110,12 +144,14 @@ export class AlertCheckinEditPage extends BasePrivatePage {
   }
 
   private initCheckin() {
-    this.checkin = new Checkin({
-      organization_id: this.organization.id,
-      user_id: this.user.id,
-      user_initials: this.user.initials,
-      user_picture: this.user.profile_picture
-    });
+    if (!this.checkin) {
+      this.checkin = new Checkin({
+        organization_id: this.organization.id,
+        user_id: this.user.id,
+        user_initials: this.user.initials,
+        user_picture: this.user.profile_picture
+      });
+    }
     this.checkin.schedule = new Schedule({
       frequency: "once"
     });
@@ -176,13 +212,6 @@ export class AlertCheckinEditPage extends BasePrivatePage {
       color: "#5BAA61",
       answer: "Yes"
     }));
-  }
-
-  private showTemplates(event:any) {
-    this.logger.info(this, "showTemplates");
-    this.showModal(CheckinTemplatesPage, {
-      organization: this.organization
-    });
   }
 
   private onKeyPress(event:any) {
