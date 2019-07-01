@@ -21,7 +21,7 @@
   </div>
   <ion-list *ngIf="feed">
     <ion-card margin-top margin-bottom color="card" *ngFor="let feedEntry of feed.feed">
-      <ion-card-content text-center tappable (click)="createCheckin(feedEntry)">
+      <ion-card-content text-center tappable (click)="next(feedEntry)">
         <!-- <person-avatar [initials]="checkin.user_initials" [image]="checkin.user_picture" [large]="true"></person-avatar> -->
         <h1>{{feedEntry.title}}</h1>
         <p>{{feedEntry.body}}</p>

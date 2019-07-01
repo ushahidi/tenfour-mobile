@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-navbar color="navbar">
+    <ion-buttons left>
+      <button ion-button color="cancel" (click)="cancelEdit($event)">Cancel</button>
+    </ion-buttons>
+    <ion-title>Automatic Alert</ion-title>
+    <ion-buttons right>
+      <button ion-button color="primary" [solid]="website == true ? 'true' : null" (click)="showNext($event)" *ngIf="checkin">Next</button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+<ion-content>
+  <ion-list *ngIf="organization && checkin">
+    
+    <ion-item text-wrap>
+      <ion-label>lorem ipsum text for automatic alerts.</ion-label>
+    </ion-item>
+    
+    <button ion-item text-wrap (click)="editAnswers()">
+      <ion-label stacked>Answers</ion-label>
+      <ion-label *ngIf="checkin.answers.length">
+        <span class="answer" *ngFor="let answer of checkin.answers">
+          <ion-badge [style.background]="answer.color">&nbsp;</ion-badge>
+          {{answer.answer}}
+        </span>
+      </ion-label>
+      <ion-label *ngIf="!checkin.answers.length">
+        Don't ask for a response.
+      </ion-label>
+    </button>
+    <button ion-item text-wrap (click)="editChannels()">
+      <ion-label stacked>Send via</ion-label>
+      <ion-label *ngIf="checkin.send_via.length">{{checkin.send_via | humanize}}</ion-label>
+      <ion-label *ngIf="!checkin.send_via.length">Don't send the check-in</ion-label>
+    </button>
+    <button class="recipients-item" ion-item text-wrap (click)="addPerson()">
+      <ion-label stacked>Send to...</ion-label>
+      <ion-label *ngIf="!checkin.users.length && !checkin.groups.length">Add people or groups</ion-label>
+      <ion-label class="recipients-list" *ngIf="checkin.users.length || checkin.groups.length">
+        <span *ngFor="let group of checkin.groups">
+          <ion-icon item-left class="group-icon" ios="ios-people" md="md-people"></ion-icon>
+          {{group.name}}
+        </span>
+        <span *ngFor="let user of checkin.users">
+          <ion-icon item-left class="recipient-icon" ios="ios-person" md="md-person"></ion-icon>
+          {{user.name}}
+        </span>
+      </ion-label>
+    </button>
+    <button ion-item text-wrap (click)="editChannels()">
+      <ion-label stacked>Send via</ion-label>
+      <ion-label *ngIf="checkin.send_via.length">{{checkin.send_via | humanize}}</ion-label>
+      <ion-label *ngIf="!checkin.send_via.length">Don't send the check-in</ion-label>
+    </button>
+  </ion-list>
+</ion-content>

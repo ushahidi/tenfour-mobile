@@ -8,6 +8,7 @@ import { AlertFeedEditPage } from '../../pages/alert-feed-edit/alert-feed-edit';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertCheckinEditPage } from '../../pages/alert-checkin-edit/alert-checkin-edit';
 import { AlertFeedEntry } from '../../models/alertFeedEntry';
+import { AlertFeedAutomaticPage } from '../../pages/alert-feed-automatic/alert-feed-automatic';
 
 @IonicPage({
   name: 'AlertFeedEntriesPage',
@@ -115,6 +116,18 @@ export class AlertFeedEntriesPage extends BasePrivatePage {
     });
   }
 
+  private next(feedEntry:AlertFeedEntry) {
+    const _feedEntry = new AlertFeedEntry().copyInto(feedEntry);
+    let modal = this.showModal(AlertFeedAutomaticPage, {
+      organization: this.organization,
+      user: this.user,
+      feedEntry: _feedEntry
+    });
+    
+    modal.onDidDismiss(data => {
+      this.logger.info(this, "createCheckin", "Modal", data);
+    });
+  }
   private createCheckin(feedEntry:AlertFeedEntry) {
     const _feedEntry = new AlertFeedEntry().copyInto(feedEntry);
     let modal = this.showModal(AlertCheckinEditPage, {

@@ -61,8 +61,10 @@ import { UnsubscribePage } from '../pages/unsubscribe/unsubscribe';
 import { AlertFeedPage } from '../pages/alert-feed/alert-feed';
 import { AlertFeedEditPage } from '../pages/alert-feed-edit/alert-feed-edit';
 import { AlertFeedEntriesPage } from '../pages/alert-feed-entries/alert-feed-entries';
+import { AlertFeedAutomaticPage } from '../pages/alert-feed-automatic/alert-feed-automatic';
 import { AlertFeedSourceEditPage } from '../pages/alert-feed-source-edit/alert-feed-source-edit';
 import { AlertCheckinEditPage } from '../pages/alert-checkin-edit/alert-checkin-edit';
+import { AlertAutomaticSetupPage } from '../pages/alert-automatic-setup/alert-automatic-setup';
 
 export class TenFourRoutes {
 
@@ -126,8 +128,10 @@ export class TenFourRoutes {
     { component: SettingsTutorialPage, name: 'SettingsTutorialPage', segment: 'settings/tutorial', defaultHistory: ['SettingsListPage'] },
     
     { component: AlertFeedPage, name: 'AlertFeedPage', segment: 'alert-feed' },
-    { component: AlertFeedEditPage, name: 'AlertFeedEditPage', segment: 'alert-feed-edit', defaultHistory: ['AlertFeedPage'] },
-    { component: AlertFeedEntriesPage, name: 'AlertFeedEntriesPage', segment: 'alert-feed-entries', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertFeedEditPage, name: 'AlertFeedEditPage', segment: 'alert-feed', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertFeedEntriesPage, name: 'AlertFeedEntriesPage', segment: 'alert-feed', defaultHistory: ['AlertFeedPage'] },
+    { component: AlertAutomaticSetupPage, name: 'AlertAutomaticSetupPage', segment: 'alert-feed', defaultHistory: ['AlertFeedAutomaticPage'] },
+    { component: AlertFeedAutomaticPage, name: 'AlertFeedAutomaticPage', segment: 'alert-feed', defaultHistory: ['AlertFeedEntriesPage'] },
     { component: AlertCheckinEditPage, name: 'AlertCheckinEditPage', segment: 'alert-feed/checkins/edit', defaultHistory: ['AlertFeedPage'] },
     { component: AlertFeedSourceEditPage, name: 'AlertFeedSourceEditPage', segment: 'alert-feed-source-edit', defaultHistory: ['AlertFeedEditPage'] },
 

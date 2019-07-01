@@ -28,6 +28,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 import { EnvironmentProvider } from '../../providers/environment/environment';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertSource } from '../../models/alertSource';
+import { AlertSubscription } from '../../models/alertSubscription';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -333,6 +334,47 @@ export class ApiProvider extends HttpProvider {
       },
       (error:any) => {
         reject(error);
+      });
+    });
+  }
+  /**
+   * Receives an array of subscription objects
+   * [{group_id: number|null, user_id: number|null, feed_id: number<required>}]
+   * Returns an array of the created AlertSubscriptions
+   */
+  public saveAlertSubscriptions(subscriptions:any[], organization:Organization, alertFeed:AlertFeed):Promise<AlertSubscription[]> {
+    return new Promise((resolve, reject) => {
+      let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/feed/subscriptions`;
+      this.httpPost(url, subscriptions).then((data:any) => {
+        if (data) {
+          const subscriptions = data.subscriptions.map(feed => {
+            return new AlertSubscription(feed);
+          })
+          resolve(subscriptions);
+        }
+        else {
+          resolve(null);
+        }
+      },
+      (error:any) => {
+        reject(error);
+      });
+    });
+  }
+
+  public getAlertSubscriptions(organization:Organization, alertFeed:AlertFeed):Promise<AlertSubscription[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/feed/${alertFeed.id}/subscriptions`;
+        this.httpGet(url, {}, token.access_token).then((data:any) => {
+          const subscriptions = data.subscriptions.map(feed => {
+            return new AlertSubscription(feed);
+          })
+          resolve(subscriptions);
+        },
+        (error:any) => {
+          reject(error);
+        });
       });
     });
   }

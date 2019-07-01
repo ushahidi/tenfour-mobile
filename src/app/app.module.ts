@@ -103,6 +103,9 @@ import { SettingsTutorialModule } from '../pages/settings-tutorial/settings-tuto
 
 import { AlertFeedModule } from '../pages/alert-feed/alert-feed.module';
 import { AlertFeedEntriesModule } from '../pages/alert-feed-entries/alert-feed-entries.module';
+import { AlertFeedAutomaticModule } from '../pages/alert-feed-automatic/alert-feed-automatic.module';
+import { AlertAutomaticSetupModule } from '../pages/alert-automatic-setup/alert-automatic-setup.module';
+
 import { AlertCheckinEditModule } from '../pages/alert-checkin-edit/alert-checkin-edit.module';
 import { AlertFeedEditModule } from '../pages/alert-feed-edit/alert-feed-edit.module';
 import { AlertFeedSourceEditModule } from '../pages/alert-feed-source-edit/alert-feed-source-edit.module';
@@ -239,6 +242,8 @@ import { SentryErrorHandler } from '../providers/sentry/sentry';
     SettingsTutorialModule,
     AlertFeedModule,
     AlertFeedEntriesModule,
+    AlertFeedAutomaticModule,
+    AlertAutomaticSetupModule,
     AlertCheckinEditModule,
     AlertFeedEditModule,
     AlertFeedSourceEditModule,

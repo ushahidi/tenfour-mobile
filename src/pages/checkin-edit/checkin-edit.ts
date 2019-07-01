@@ -51,7 +51,7 @@ export class CheckinEditPage extends BasePrivatePage {
       protected api:ApiProvider,
       protected storage:StorageProvider) {
       super(zone, platform, navParams, navController, viewController, modalController, toastController, alertController, loadingController, actionController, storage);
-  }
+  } 
 
   ionViewDidLoad() {
     super.ionViewDidLoad();
