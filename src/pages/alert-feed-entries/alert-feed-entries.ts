@@ -118,7 +118,7 @@ export class AlertFeedEntriesPage extends BasePrivatePage {
 
   private next(feedEntry:AlertFeedEntry) {
     const _feedEntry = new AlertFeedEntry().copyInto(feedEntry);
-    let modal = this.showModal(AlertFeedAutomaticPage, {
+    let modal = this.showModal(AlertCheckinEditPage, {
       organization: this.organization,
       user: this.user,
       feedEntry: _feedEntry

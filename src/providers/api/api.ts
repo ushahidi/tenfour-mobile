@@ -247,7 +247,7 @@ export class ApiProvider extends HttpProvider {
         this.httpPost(url, feed.getValues(), token.access_token).then((data:any) => {
           if (data) {
             const feed = new AlertFeed(data.feed);
-            resolve(data.alert);
+            resolve(feed);
           }
           else {
             resolve(null);

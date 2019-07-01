@@ -28,11 +28,6 @@
         Don't ask for a response.
       </ion-label>
     </button>
-    <button ion-item text-wrap (click)="editChannels()">
-      <ion-label stacked>Send via</ion-label>
-      <ion-label *ngIf="checkin.send_via.length">{{checkin.send_via | humanize}}</ion-label>
-      <ion-label *ngIf="!checkin.send_via.length">Don't send the check-in</ion-label>
-    </button>
     <button class="recipients-item" ion-item text-wrap (click)="addPerson()">
       <ion-label stacked>Send to...</ion-label>
       <ion-label *ngIf="!checkin.users.length && !checkin.groups.length">Add people or groups</ion-label>

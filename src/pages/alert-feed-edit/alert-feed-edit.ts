@@ -6,7 +6,7 @@ import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertSource } from '../../models/alertSource';
-import { AlertFeedPage } from '../../pages/alert-feed/alert-feed';
+import { AlertFeedAutomaticPage } from '../../pages/alert-feed-automatic/alert-feed-automatic';
 
 @IonicPage({
   name: 'AlertFeedEditPage',
@@ -56,11 +56,14 @@ export class AlertFeedEditPage extends BasePrivatePage {
     }
   }
   protected save() {
-    this.api.createFeedForSource(this.organization, this.alert).then(saved => {
+    this.api.createFeedForSource(this.organization, this.alert).then((saved:AlertFeed) => {
       this.hideModal({
         organization: this.organization,
         user: this.user
       }).then((loaded:any) => {
+        this.showModal(AlertFeedAutomaticPage, {
+          alertFeed: saved
+        })
         this.logger.info(this, "showAlertFeed", "Loaded");
       },
       (error:any) => {
@@ -69,6 +72,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
     }).catch(
       error => { this.showToast("There was an error saving your request", 3000)}
     );
+    
     this.logger.info(this, "showAlertFeed");
     
     // let modal = this.showModal(AlertFeedSourceEditPage, {

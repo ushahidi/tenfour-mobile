@@ -3,25 +3,20 @@ import { App, IonicPage, Platform, TextInput, NavParams, NavController, ViewCont
 
 import { BasePrivatePage } from '../../pages/base-private-page/base-private-page';
 import { CheckinSendPage } from '../../pages/checkin-send/checkin-send';
-import { CheckinTemplatesPage } from '../../pages/checkin-templates/checkin-templates';
-import { AlertFeedPage } from '../../pages/alert-feed/alert-feed';
-import { Organization } from '../../models/organization';
-import { User } from '../../models/user';
 import { Person } from '../../models/person';
 import { Checkin } from '../../models/checkin';
 import { Answer } from '../../models/answer';
 import { Schedule } from '../../models/schedule';
-
 import { ApiProvider } from '../../providers/api/api';
 import { StorageProvider } from '../../providers/storage/storage';
-
-import { ColorPickerComponent } from '../../components/color-picker/color-picker';
 import { AlertFeedEntry } from '../../models/alertFeedEntry';
 import { Recipient } from '../../models/recipient';
 import { PersonSelectPage } from '../../pages/person-select/person-select';
 import { CheckinChannelsPage } from '../../pages/checkin-channels/checkin-channels';
 import { CheckinAnswersPage } from '../../pages/checkin-answers/checkin-answers';
 import { Group } from '../../models/group';
+import { SettingsPaymentsPage } from '../../pages/settings-payments/settings-payments';
+import { AlertFeed } from '../../models/alertFeed';
 
 @IonicPage({
   name: 'AlertAutomaticSetupPage',
@@ -40,7 +35,7 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
   message:TextInput;
 
   checkin:Checkin = null;
-  feedEntry:AlertFeedEntry = null;
+  alertFeed:AlertFeed = null;
   constructor(
       protected appController:App,
       protected zone:NgZone,
@@ -82,7 +77,7 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadFeedEntry(true); })
+      .then(() => { return this.loadAlertFeed(true); })
       .then(() => { return this.loadCheckin(cache); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -98,31 +93,25 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
-  private getCheckinMessage() {
-    if (this.feedEntry.body.length < 150) {
-      return this.feedEntry.body.length;
-    }
-    return this.feedEntry.body.slice(0, 150);
-  }
 
-  protected loadFeedEntry(cache:boolean=true):Promise<AlertFeedEntry> {
+  protected loadAlertFeed(cache:boolean=true):Promise<AlertFeed> {
     return new Promise((resolve, reject) => {
-      if (cache && this.feedEntry) {
-        resolve(this.feedEntry);
+      if (cache && this.alertFeed) {
+        resolve(this.alertFeed);
       }
-      else if (cache && this.hasParameter("feedEntry")){
-        this.feedEntry = this.getParameter<AlertFeedEntry>("feedEntry");
-        resolve(this.feedEntry);
+      else if (cache && this.hasParameter("alertFeed")){
+        this.alertFeed = this.getParameter<AlertFeed>("alertFeed");
+        resolve(this.alertFeed);
       }
       else {
-        reject("Feed Not Provided");
+        reject("AlertFeed Not Provided");
       }
     });
   }
 
   private loadCheckin(cache:boolean=true):Promise<boolean> {
     return new Promise((resolve, reject) => {
-      if (this.feedEntry &&  this.user) {
+      if (this.alertFeed &&  this.user) {
         this.checkin = new Checkin({
           organization_id: this.organization.id,
           user_id: this.user.id,
@@ -130,7 +119,7 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
           user_picture: this.user.profile_picture,
           //in the backend, checkin handler can do its thing and generate the bit.ly
           // for long messages
-          message: this.getCheckinMessage()
+          message: `[template] A message will be created for the feed ${this.alertFeed.id} when an alert comes in to the system.`
         });
         this.initCheckin();
       } else if (this.checkin == null) {
@@ -154,7 +143,8 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
         organization_id: this.organization.id,
         user_id: this.user.id,
         user_initials: this.user.initials,
-        user_picture: this.user.profile_picture
+        user_picture: this.user.profile_picture,
+        message: `[template] A message will be created for the feed ${this.alertFeed.id} when an alert comes in to the system.`
       });
     }
     this.checkin.template = true;
@@ -189,9 +179,71 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
       canceled: true
     });
   }
+
+  private upgradeToPro(event:any) {
+    this.logger.info(this, "upgradeToPro");
+    if (this.ios) {
+      let alert = this.showAlert("Visit Website", "Please login to the website to upgrade to TenFour Pro.");
+      alert.onDidDismiss(data => {
+        this.showUrl("https://app.tenfour.org", "_blank");
+      });
+    }
+    else {
+      this.showModalOrPage(SettingsPaymentsPage, {
+        organization: this.organization,
+        user: this.user
+      });
+    }
+  }
+  private showBillingAlert() {
+    if (this.user.isOwner()) {
+      this.showAlert("Not enough credits",
+        "Purchase more credits in billing in order to send your message",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Billing', handler: () => { this.upgradeToPro(null); } }
+        ]
+      );
+    } else {
+      this.showAlert("Not enough credits",
+        "Your organization owner will need to buy more before you can send via SMS",
+        [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Notify Owner', handler: () => { this.notifyOwner(); } }
+        ]
+      );
+    }
+  }
+
+  private notifyOwner() {
+    this.logger.info(this, "notifyOwner");
+    this.api.notifyPerson(this.organization, 'owner', "The organization has insufficient credits to send a Check-In").then(() => {
+      this.showToast("The organization owner has been notified")
+    }, (error) => {
+      this.showToast(error);
+    });
+  }
+
   // same as createCheckin in checkin-send.ts
   private showNext(event:any) {
+    if (this.checkin.send_via == null || this.checkin.send_via.length == 0) {
+      this.showToast("Please specify 'Send Via' on how to send the Check-In", 4000);
+      return;
+    }
+    else if (this.checkin.recipientIds().length == 0) {
+      this.showToast("Please specify 'Send To' for who should receive the Check-In", 4000);
+      return;
+    }
+    else if (this.checkin.schedule.frequency !== 'once' && this.checkin.schedule.hasExpiresAt() == false) {
+      this.showToast("Please specify 'Until' for when the scheduled Check-In should end", 4000);
+      return;
+    }
+    else if (this.checkin.creditsRequired() > this.organization.credits) {
+      this.showBillingAlert();
+      return;
+    }
     let loading = this.showLoading("Saving...", true);
+
     this.api.createCheckin(this.organization, this.checkin)
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then(() => {
