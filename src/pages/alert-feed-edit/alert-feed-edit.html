@@ -29,9 +29,9 @@
         <h2>Select a source</h2>
       </ion-list-header>
       <ion-item color="white" *ngFor="let source of sources">
-        <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
-        <ion-label>{{source.name}}</ion-label>
-        <ion-radio value="{{source.source_id}}" item-right></ion-radio>
+          <ion-icon ios="ios-phone-portrait" md="md-phone-portrait" item-left></ion-icon>
+          <ion-label>Source: {{source.name}}</ion-label>
+          <ion-radio value="{{source.source_id}}" item-right></ion-radio>
       </ion-item>
     </ion-list>
   </ion-list>

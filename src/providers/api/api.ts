@@ -995,6 +995,7 @@ export class ApiProvider extends HttpProvider {
 
   private getCheckInParams(organization:Organization, checkin:Checkin) {
     let params = {
+      alert_feed: false, 
       organization_id: organization.id,
       message: checkin.message,
       answers: checkin.answers,
@@ -1029,11 +1030,14 @@ export class ApiProvider extends HttpProvider {
     return checkin.schedule.frequency === 'once' && !checkin.schedule.startsAt() && !checkin.schedule.expiresAt();
   }
   // create a check-in without sending
-  public createCheckin(organization:Organization, checkin:Checkin):Promise<Checkin> {
+  public createCheckin(organization:Organization, checkin:Checkin, alert_feed:any = null):Promise<Checkin> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/checkins`;
         let params = this.getCheckInParams(organization, checkin);
+        if (alert_feed) {
+          params.alert_feed = alert_feed;
+        }
         params.recipients = [];
         this.httpPost(url, params, token.access_token).then((data:any) => {
           if (data && data.checkin) {

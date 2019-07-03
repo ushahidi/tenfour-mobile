@@ -55,6 +55,9 @@ export class AlertFeedEditPage extends BasePrivatePage {
       });
     }
   }
+  openSourceUrl(url) {
+    window.open(url, '_blank');
+  }
   protected save() {
     this.api.createFeedForSource(this.organization, this.alert).then((saved:AlertFeed) => {
       this.hideModal({

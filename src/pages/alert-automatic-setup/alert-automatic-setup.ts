@@ -244,7 +244,7 @@ export class AlertAutomaticSetupPage extends BasePrivatePage {
     }
     let loading = this.showLoading("Saving...", true);
 
-    this.api.createCheckin(this.organization, this.checkin)
+    this.api.createCheckin(this.organization, this.checkin, { feed_id: this.alertFeed.id })
       .then((checkin:Checkin) => { return this.storage.saveCheckin(this.organization, checkin); })
       .then(() => {
         loading.dismiss();
