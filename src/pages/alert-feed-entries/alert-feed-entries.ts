@@ -8,7 +8,6 @@ import { AlertFeedEditPage } from '../../pages/alert-feed-edit/alert-feed-edit';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertCheckinEditPage } from '../../pages/alert-checkin-edit/alert-checkin-edit';
 import { AlertFeedEntry } from '../../models/alertFeedEntry';
-import { AlertFeedAutomaticPage } from '../../pages/alert-feed-automatic/alert-feed-automatic';
 
 @IonicPage({
   name: 'AlertFeedEntriesPage',
@@ -84,21 +83,6 @@ export class AlertFeedEntriesPage extends BasePrivatePage {
       organization: this.organization,
       user: this.user
     });
-    // modal.onDidDismiss(data => {
-    //   this.logger.info(this, "addAlertFeed", "Modal", data);
-    //   if (data) {
-    //     let loading = this.showLoading("Loading...");
-    //     this.loadAlertFeed(false).then((finished:any) => {
-    //       loading.dismiss();
-    //       if (data.alertFeed && data.alertFeed.id) {
-    //         this.showToast(`Added ${data.person.name}`);
-    //       }
-    //     },
-    //     (error:any) => {
-    //       loading.dismiss();
-    //     });
-    //   }
-    // });
   }
 
   protected loadFeed(cache:boolean=true):Promise<AlertFeed> {
@@ -128,6 +112,7 @@ export class AlertFeedEntriesPage extends BasePrivatePage {
       this.logger.info(this, "createCheckin", "Modal", data);
     });
   }
+
   private createCheckin(feedEntry:AlertFeedEntry) {
     const _feedEntry = new AlertFeedEntry().copyInto(feedEntry);
     let modal = this.showModal(AlertCheckinEditPage, {

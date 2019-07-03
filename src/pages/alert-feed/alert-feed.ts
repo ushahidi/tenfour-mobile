@@ -87,9 +87,6 @@ export class AlertFeedPage extends BasePrivatePage {
     return new Promise((resolve, reject) => {
       this.api.getAlertFeeds(this.organization).then((feeds:AlertFeed[]) => {
         this.logger.info(this, "loadFeeds", feeds);
-        // this.zone.run(() => {
-        //   this.fe = organization;
-        // });
         this.feeds = feeds;
         resolve(feeds);
       },
@@ -107,21 +104,6 @@ export class AlertFeedPage extends BasePrivatePage {
       organization: this.organization,
       user: this.user
     });
-    // modal.onDidDismiss(data => {
-    //   this.logger.info(this, "addAlertFeed", "Modal", data);
-    //   if (data) {
-    //     let loading = this.showLoading("Loading...");
-    //     this.loadAlertFeed(false).then((finished:any) => {
-    //       loading.dismiss();
-    //       if (data.alertFeed && data.alertFeed.id) {
-    //         this.showToast(`Added ${data.person.name}`);
-    //       }
-    //     },
-    //     (error:any) => {
-    //       loading.dismiss();
-    //     });
-    //   }
-    // });
   }
 
 }
