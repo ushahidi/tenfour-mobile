@@ -259,10 +259,16 @@ export class ApiProvider extends HttpProvider {
       });
     });
   }
-  public getAlertSources(organization:Organization):Promise<AlertSource[]> {
+  public getAlertSources(organization:Organization, country:string, state:string):Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/sources`;
+        let params = {
+          country: country,
+        };
+        if (state) {
+          params['state'] = state;
+        }
         this.httpGet(url, {}, token.access_token).then((data:any) => {
           if (data) {
             const sources = data.alerts.map(source => new AlertSource(source));

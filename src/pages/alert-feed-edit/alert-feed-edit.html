@@ -11,20 +11,20 @@
 </ion-header>
 
 <ion-content>
-  <ion-list *ngIf="sources">
+  <ion-list *ngIf="alert && locations">
     <ion-item color="white">
       <ion-label floating>What Country?</ion-label>
-      <ion-select [(ngModel)]="alert.country">
+      <ion-select (ngModel)="onChangeLocation()" [(ngModel)]="alert.country">
         <ion-option value="{{location}}" *ngFor="let location of objectKeys(locations)">{{location}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item color="white">
-      <ion-label floati ng>What State?</ion-label>
-      <ion-select [(ngModel)]="alert.state">
+      <ion-label floating>What State?</ion-label>
+      <ion-select (ngModel)="onChangeLocation()" [(ngModel)]="alert.state">
         <ion-option value="{{state}}" *ngFor="let state of locations[alert.country]">{{state}}</ion-option>
       </ion-select>
     </ion-item>
-    <ion-list text-wrap no-margin radio-group [(ngModel)]="alert.source_id">
+    <ion-list *ngIf="alert.country" text-wrap no-margin radio-group [(ngModel)]="alert.source_id">
       <ion-list-header>
         <h2>Select a source</h2>
       </ion-list-header>

@@ -75,23 +75,15 @@ export class AlertFeedEditPage extends BasePrivatePage {
     }).catch(
       error => { this.showToast("There was an error saving your request", 3000)}
     );
-    
     this.logger.info(this, "showAlertFeed");
-    
-    // let modal = this.showModal(AlertFeedSourceEditPage, {
-    //   alert: this.alert,
-    // });
-    // this.alert.organization_id = this.organization.id;
-    // this.alert.owner_id = this.user.id;
-    
   }
   private loadUpdates(cache:boolean=true, event:any=null) {
     this.logger.info(this, "loadUpdates");
     return Promise.resolve()
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
-      .then(() => { return this.loadAlertSources(); })
       .then(() => { return this.loadAlertFeed(); })
+      .then(() => { return this.loadAlertSources(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
         if (event) {
@@ -109,7 +101,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
 
   protected loadAlertSources():Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
-      this.api.getAlertSources(this.organization).then((sources:AlertSource[]) => {
+      this.api.getAlertSources(this.organization, this.alert.country, this.alert.state).then((sources:AlertSource[]) => {
         this.logger.info(this, "loadAlertSource", alert);
         this.zone.run(() => {
           this.sources = sources;
@@ -153,6 +145,10 @@ export class AlertFeedEditPage extends BasePrivatePage {
     });
   }
 
+  private onChangeLocation(event:any) {
+    this.logger.info(this, "onChangeLocation");
+    this.loadAlertSources();
+  }
   private cancelEdit(event:any) {
     this.logger.info(this, "cancelEdit");
     this.hideModal({
