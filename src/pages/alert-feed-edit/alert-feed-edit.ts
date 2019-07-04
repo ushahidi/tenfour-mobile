@@ -7,6 +7,7 @@ import { StorageProvider } from '../../providers/storage/storage';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertSource } from '../../models/alertSource';
 import { AlertFeedAutomaticPage } from '../../pages/alert-feed-automatic/alert-feed-automatic';
+import { AlertSourceLocation } from '../../models/AlertSourceLocation';
 
 @IonicPage({
   name: 'AlertFeedEditPage',
@@ -83,6 +84,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
       .then(() => { return this.loadOrganization(cache); })
       .then(() => { return this.loadUser(cache); })
       .then(() => { return this.loadAlertFeed(); })
+      .then(() => { return this.loadAlertSourceLocations(); })
       .then(() => { return this.loadAlertSources(); })
       .then(() => {
         this.logger.info(this, "loadUpdates", "Loaded");
@@ -98,22 +100,27 @@ export class AlertFeedEditPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
-
+  protected loadAlertSourceLocations():Promise<AlertSourceLocation[]> {
+    return new Promise((resolve, reject) => {
+      this.api.getAlertSourceLocations(this.organization).then((locations:[]) => {
+        this.logger.info(this, "loadAlertSourceLocation", this.locations);
+        this.zone.run(() => {
+          this.locations = locations;
+        });
+        resolve(locations);
+      },
+      (error:any) => {
+        this.logger.error(this, "loadAlertSourceLocation", error);
+        resolve([]);
+      });
+    });
+  }
   protected loadAlertSources():Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
       this.api.getAlertSources(this.organization, this.alert.country, this.alert.state).then((sources:AlertSource[]) => {
         this.logger.info(this, "loadAlertSource", alert);
         this.zone.run(() => {
           this.sources = sources;
-          this.locations = {};
-          sources.forEach(source => {
-            if (!this.locations[source.country]) {
-              this.locations[source.country] = [];
-            }
-            if (source.state) {
-              this.locations[source.country].push(source.state);
-            }
-          });
         });
         resolve(sources);
       },
@@ -147,6 +154,7 @@ export class AlertFeedEditPage extends BasePrivatePage {
 
   private onChangeLocation(event:any) {
     this.logger.info(this, "onChangeLocation");
+    this.sources = [];
     this.loadAlertSources();
   }
   private cancelEdit(event:any) {

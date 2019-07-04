@@ -14,13 +14,13 @@
   <ion-list *ngIf="alert && locations">
     <ion-item color="white">
       <ion-label floating>What Country?</ion-label>
-      <ion-select (ngModel)="onChangeLocation()" [(ngModel)]="alert.country">
+      <ion-select (ionChange)="onChangeLocation()" [(ngModel)]="alert.country">
         <ion-option value="{{location}}" *ngFor="let location of objectKeys(locations)">{{location}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item color="white">
       <ion-label floating>What State?</ion-label>
-      <ion-select (ngModel)="onChangeLocation()" [(ngModel)]="alert.state">
+      <ion-select (ionChange)="onChangeLocation()" [(ngModel)]="alert.state">
         <ion-option value="{{state}}" *ngFor="let state of locations[alert.country]">{{state}}</ion-option>
       </ion-select>
     </ion-item>

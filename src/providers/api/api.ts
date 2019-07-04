@@ -29,6 +29,7 @@ import { EnvironmentProvider } from '../../providers/environment/environment';
 import { AlertFeed } from '../../models/alertFeed';
 import { AlertSource } from '../../models/alertSource';
 import { AlertSubscription } from '../../models/alertSubscription';
+import { AlertSourceLocation } from '../../models/AlertSourceLocation';
 
 @Injectable()
 export class ApiProvider extends HttpProvider {
@@ -264,12 +265,14 @@ export class ApiProvider extends HttpProvider {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/sources`;
         let params = {
-          country: country,
         };
+        if (country) {
+          params['country'] = country;
+        }
         if (state) {
           params['state'] = state;
         }
-        this.httpGet(url, {}, token.access_token).then((data:any) => {
+        this.httpGet(url, params, token.access_token).then((data:any) => {
           if (data) {
             const sources = data.alerts.map(source => new AlertSource(source));
             resolve(sources);
@@ -285,6 +288,33 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
+  public getAlertSourceLocations(organization:Organization):Promise<[]> {
+    return new Promise((resolve, reject) => {
+      this.getToken(organization).then((token:Token) => {
+        let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/locations`;
+        this.httpGet(url, {}, token.access_token).then((data:any) => {
+          if (data) {
+            const locations = {};
+            data.locations.forEach(location => {
+              if (!locations[location.country]) {
+                locations[location.country] = [];
+              }
+              if (location.state) {
+                locations[location.country].push(location.state);
+              }
+            });
+            resolve(locations);
+          }
+          else {
+            resolve(null);
+          }
+        },
+        (error:any) => {
+          reject(error);
+        });
+      });
+    });
+  }
   public getAlertFeed(id:number,organization:Organization):Promise<AlertFeed> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {

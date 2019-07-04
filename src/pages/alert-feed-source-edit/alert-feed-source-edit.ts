@@ -20,6 +20,7 @@ export class AlertFeedSourceEditPage extends BasePrivatePage {
 
   logo:string = "assets/images/logo-dots.png";
   sources:AlertSource[]; 
+  alert:AlertFeed;
   constructor(
       protected zone:NgZone,
       protected platform:Platform,
@@ -76,7 +77,7 @@ export class AlertFeedSourceEditPage extends BasePrivatePage {
 
   protected loadAlertFeed():Promise<AlertSource[]> {
     return new Promise((resolve, reject) => {
-      this.api.getAlertSources(this.organization).then((sources:AlertSource[]) => {
+      this.api.getAlertSources(this.organization, this.alert.country, this.alert.state).then((sources:AlertSource[]) => {
         this.logger.info(this, "loadAlertFeed", alert);
         this.zone.run(() => {
           this.sources = sources;
