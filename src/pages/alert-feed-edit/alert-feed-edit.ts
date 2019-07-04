@@ -100,9 +100,9 @@ export class AlertFeedEditPage extends BasePrivatePage {
         this.showToast(error);
       });
   }
-  protected loadAlertSourceLocations():Promise<AlertSourceLocation[]> {
+  protected loadAlertSourceLocations():Promise<any> {
     return new Promise((resolve, reject) => {
-      this.api.getAlertSourceLocations(this.organization).then((locations:[]) => {
+      this.api.getAlertSourceLocations(this.organization).then((locations:{}) => {
         this.logger.info(this, "loadAlertSourceLocation", this.locations);
         this.zone.run(() => {
           this.locations = locations;

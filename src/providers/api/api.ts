@@ -288,7 +288,7 @@ export class ApiProvider extends HttpProvider {
     });
   }
 
-  public getAlertSourceLocations(organization:Organization):Promise<[]> {
+  public getAlertSourceLocations(organization:Organization):Promise<any> {
     return new Promise((resolve, reject) => {
       this.getToken(organization).then((token:Token) => {
         let url = `${this.api}/api/v1/organizations/${organization.id}/alerts/locations`;
