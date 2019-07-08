@@ -95,7 +95,7 @@ export class AlertCheckinEditPage extends BasePrivatePage {
   }
   private getCheckinMessage() {
     if (this.feedEntry.body.length < 150) {
-      return this.feedEntry.body.length;
+      return this.feedEntry.body;
     }
     return this.feedEntry.body.slice(0, 150);
   }
