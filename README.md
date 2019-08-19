@@ -90,9 +90,7 @@ ionic cordova platform rm browser
 #### Add Platforms
 ```
 ionic cordova platform add ios@4.5.5 --buildConfig=build.json
-ionic cordova platform add android@6.4.0 --buildConfig=build.json
 ionic cordova platform add android@7.1.4 --buildConfig=build.json
-ionic cordova platform add android@8.0.0 --buildConfig=build.json
 ionic cordova platform add browser
 ```
 #### Add Plugins
