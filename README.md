@@ -3,6 +3,11 @@
 
 ---
 
+#### Build Guide
+Visit [BUILD.md](/BUILD.md) to create a release build.
+
+---
+
 #### Style Guide
 Visit [STYLE.md](/STYLE.md) to see the development style guide.
 
@@ -32,32 +37,48 @@ Visit [THEME.md](/docs/THEME.md) for information on changing colors and styling.
 * [Ionic Community Forum](https://forum.ionicframework.com/)
 
 ---
-#### Setup Environment
+#### Setup Permissions
 ```
-sudo npm install -g cordova@7.1.0
-sudo npm install -g ionic@latest
-npm install -g xcode@latest
+sudo chown -R $(whoami) ~/.npm
+sudo chown -R $(whoami) /usr/local/lib
+sudo chown -R $(whoami) /usr/local/bin
+```
+#### Setup Environments
+```
+nvm install 9
+npm install -g cordova@8.1.2
+npm install -g ionic@3.20.1
+```
+```
+npm install -g cordova-res@latest
 npm install -g cordova-common@latest
 npm install -g cordova-ios@latest
 npm install -g cordova-android@latest
 npm install -g cordova-browser@latest
-sudo npm install -g ios-sim@latest
+npm install -g xcode@latest
+npm install -g ios-sim@latest
 npm install -g ios-deploy@latest
 npm install -g android-simulator@latest
+```
+#### Upgrade Gradle
+```
+brew upgrade gradle
+```
+#### Setup CocoaPods
+```
+gem update --system
+gem cleanup --system
+gem install cocoapods -n /usr/local/bin
+pod setup
 ```
 #### Clean Modules
 ```
 rm -r www
 rm -r node_modules
 rm -f package-lock.json
-npm install
-```
-#### CocoaPods
-```
-gem update --system
-gem cleanup --system
-gem install cocoapods -n /usr/local/bin
-pod setup
+npm cache clean --force
+npm cache clear --force
+npm install --force
 ```
 #### Remove Platforms
 ```
@@ -70,6 +91,8 @@ ionic cordova platform rm browser
 ```
 ionic cordova platform add ios@4.5.5 --buildConfig=build.json
 ionic cordova platform add android@6.4.0 --buildConfig=build.json
+ionic cordova platform add android@7.1.4 --buildConfig=build.json
+ionic cordova platform add android@8.0.0 --buildConfig=build.json
 ionic cordova platform add browser
 ```
 #### Add Plugins

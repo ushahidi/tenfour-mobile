@@ -22,5 +22,6 @@
       "path": "/maps.googleapis.com",
       "proxyUrl": "https://maps.googleapis.com"
     }
-  ]
+  ],
+  "app_id": ""
 }
