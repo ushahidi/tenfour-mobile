@@ -15,6 +15,7 @@ node_modules
 *.DS_Store
 
 # ANDROID
+rollcall.keystore
 *.apk
 *.ap_
 *.dex
