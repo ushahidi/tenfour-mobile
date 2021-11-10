@@ -1,9 +1,0 @@
-[{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "com.ushahidi.tenfour",
-    "sha256_cert_fingerprints":
-    ["47:73:F2:5D:46:D4:86:78:05:70:93:DD:A8:6F:E2:00:18:FF:F6:AB:C8:50:8F:A3:D1:CD:25:40:29:13:AD:F3"]
-  }
-}]
