@@ -1,1 +1,0 @@
-export let version:string = '2.12.0';
